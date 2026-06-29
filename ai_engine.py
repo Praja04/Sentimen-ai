@@ -4,6 +4,7 @@ import time
 import schedule
 import math
 import yfinance as yf
+from bs4 import BeautifulSoup
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -95,7 +96,7 @@ def fetch_live_prices_mt5():
 # ==========================================
 # 2. GEMINI ENGINE & SCRAPER (1-Minute Updates)
 # ==========================================
-def run_gemini_update():
+def run_live_price_update():
     """Updates Live Prices, News, and Sentiment."""
     print(f"[{datetime.now()}] Running 1-Minute Live Update...")
     
@@ -133,110 +134,6 @@ def run_gemini_update():
             p, c, col = format_price("WTI OIL", prices["WTI OIL"])
             db['assets'][2]['price'], db['assets'][2]['change'], db['assets'][2]['cColor'] = p, c, col
             db['liquidity_zones']['WTI OIL'] = prices["WTI OIL"].get("poc_price", 0)
-
-    # --- SCRAPE CNBC & BLOOMBERG NEWS ---
-    try:
-        import urllib.request
-        import xml.etree.ElementTree as ET
-        import urllib.parse
-        print("Scraping CNBC US and Bloomberg News...")
-        
-        titles = []
-        
-        # 1. CNBC US
-        try:
-            req = urllib.request.Request('https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664', headers={'User-Agent': 'Mozilla/5.0'})
-            xml_data = urllib.request.urlopen(req, timeout=10).read()
-            root = ET.fromstring(xml_data)
-            for item in root.findall('.//item')[:2]:
-                title = item.find('title')
-                if title is not None and title.text: titles.append(("CNBC", title.text.strip()))
-        except Exception as e:
-            print("CNBC fail:", e)
-            
-        # 2. Bloomberg
-        try:
-            req = urllib.request.Request('https://feeds.bloomberg.com/markets/news.rss', headers={'User-Agent': 'Mozilla/5.0'})
-            xml_data = urllib.request.urlopen(req, timeout=10).read()
-            root = ET.fromstring(xml_data)
-            for item in root.findall('.//item')[:2]:
-                title = item.find('title')
-                if title is not None and title.text: titles.append(("BLOOMBERG", title.text.strip()))
-        except Exception as e:
-            print("Bloomberg fail:", e)
-            
-        # 3. ForexLive
-        try:
-            req = urllib.request.Request('https://www.forexlive.com/feed', headers={'User-Agent': 'Mozilla/5.0'})
-            xml_data = urllib.request.urlopen(req, timeout=10).read()
-            root = ET.fromstring(xml_data)
-            for item in root.findall('.//item')[:2]:
-                title = item.find('title')
-                if title is not None and title.text: titles.append(("FOREXLIVE", title.text.strip()))
-        except Exception as e:
-            print("ForexLive fail:", e)
-            
-        # 4. Investing.com
-        try:
-            req = urllib.request.Request('https://www.investing.com/rss/news_285.rss', headers={'User-Agent': 'Mozilla/5.0'})
-            xml_data = urllib.request.urlopen(req, timeout=10).read()
-            root = ET.fromstring(xml_data)
-            for item in root.findall('.//item')[:2]:
-                title = item.find('title')
-                if title is not None and title.text: titles.append(("INVESTING", title.text.strip()))
-        except Exception as e:
-            print("Investing.com fail:", e)
-            
-        # 5. WSJ Markets
-        try:
-            req = urllib.request.Request('https://feeds.a.dj.com/rss/RSSMarketsMain.xml', headers={'User-Agent': 'Mozilla/5.0'})
-            xml_data = urllib.request.urlopen(req, timeout=10).read()
-            root = ET.fromstring(xml_data)
-            for item in root.findall('.//item')[:2]:
-                title = item.find('title')
-                if title is not None and title.text: titles.append(("WSJ", title.text.strip()))
-        except Exception as e:
-            print("WSJ fail:", e)
-            
-        if titles:
-            news_list = []
-            for source, eng_title in titles:
-                # Translate via Google Translate Free API
-                try:
-                    url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=' + urllib.parse.quote(eng_title)
-                    res_req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-                    res_data = urllib.request.urlopen(res_req, timeout=5).read().decode('utf-8')
-                    res_json = json.loads(res_data)
-                    t_title = res_json[0][0][0]
-                except Exception as ex:
-                    print("Translation error:", ex)
-                    t_title = eng_title 
-                
-                # Determine impact using NLP if available, else fallback
-                impact = 'text-yellow'
-                if has_gemini:
-                    try:
-                        model = genai.GenerativeModel('gemini-1.5-flash')
-                        prompt = f"Analyze this financial news: '{eng_title}'. Is the impact BULLISH or BEARISH for safe-haven Gold (XAUUSD)? Reply EXACTLY one word: BULLISH, BEARISH, or NEUTRAL."
-                        ans = model.generate_content(prompt).text.strip().upper()
-                        if "BULLISH" in ans: impact = 'text-green'
-                        elif "BEARISH" in ans: impact = 'text-red'
-                    except Exception as e:
-                        print("Gemini NLP fail:", e)
-                        t_lower = t_title.lower()
-                        if any(k in t_lower for k in ['naik', 'menguat', 'laba', 'positif', 'lonjakan', 'tinggi', 'rekor', 'untung', 'surplus', 'cuan', 'up', 'high', 'gain']): impact = 'text-green'
-                        elif any(k in t_lower for k in ['turun', 'melemah', 'rugi', 'negatif', 'jatuh', 'anjlok', 'krisis', 'bengkak', 'defisit', 'tekanan', 'phk', 'down', 'low', 'loss', 'drop']): impact = 'text-red'
-                else:
-                    t_lower = t_title.lower()
-                    if any(k in t_lower for k in ['naik', 'menguat', 'laba', 'positif', 'lonjakan', 'tinggi', 'rekor', 'untung', 'surplus', 'cuan', 'up', 'high', 'gain']): impact = 'text-green'
-                    elif any(k in t_lower for k in ['turun', 'melemah', 'rugi', 'negatif', 'jatuh', 'anjlok', 'krisis', 'bengkak', 'defisit', 'tekanan', 'phk', 'down', 'low', 'loss', 'drop']): impact = 'text-red'
-                
-                news_list.append({'time': source, 'title': t_title, 'impact': impact})
-                
-            if news_list:
-                db['news_feed'] = news_list
-    except Exception as e:
-        print(f"Failed to scrape news: {e}")
 
     # --- SENTIMENT ALGORITHM (Enhanced Multi-Asset) ---
     try:
@@ -531,6 +428,209 @@ def generate_forecast(symbol, timeframe, macro_s, sent_s, flow_s, regime_s, tech
         "_best_pillar": best_pillar
     }
 
+
+def run_news_update():
+    print(f"[{datetime.now()}] Running 15-Minute News & AI Sentiment Update...")
+    try:
+        with open(JSON_PATH, 'r', encoding='utf-8') as f:
+            db = json.load(f)
+    except Exception as e:
+        print("Failed to read JSON:", e)
+        return
+
+    # --- SCRAPE NEWS ---
+    try:
+        import urllib.request
+        import xml.etree.ElementTree as ET
+        import urllib.parse
+        from bs4 import BeautifulSoup
+        
+        titles = []
+        
+        # 1. CNBC US
+        try:
+            req = urllib.request.Request('https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("CNBC", title.text.strip()))
+        except Exception as e: pass
+            
+        # 2. Bloomberg
+        try:
+            req = urllib.request.Request('https://feeds.bloomberg.com/markets/news.rss', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("BLOOMBERG", title.text.strip()))
+        except Exception as e: pass
+            
+        # 3. ForexLive
+        try:
+            req = urllib.request.Request('https://www.forexlive.com/feed', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("FOREXLIVE", title.text.strip()))
+        except Exception as e: pass
+            
+        # 4. Investing.com
+        try:
+            req = urllib.request.Request('https://www.investing.com/rss/news_285.rss', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("INVESTING", title.text.strip()))
+        except Exception as e: pass
+            
+        # 5. WSJ Markets
+        try:
+            req = urllib.request.Request('https://feeds.a.dj.com/rss/RSSMarketsMain.xml', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("WSJ", title.text.strip()))
+        except Exception as e: pass
+            
+        # 6. Kitco News
+        try:
+            req = urllib.request.Request("https://www.kitco.com/news/", headers={'User-Agent': 'Mozilla/5.0'})
+            html = urllib.request.urlopen(req, timeout=10).read()
+            soup = BeautifulSoup(html, 'html.parser')
+            k_count = 0
+            for a in soup.find_all('a', href=True):
+                if '/news/article/' in a['href'] or '/news/202' in a['href']:
+                    text = a.get_text(strip=True)
+                    if len(text) > 20:
+                        titles.append(("KITCO", text))
+                        k_count += 1
+                        if k_count >= 2: break
+        except Exception as e: pass
+            
+        # 7. OilPrice.com
+        try:
+            req = urllib.request.Request('https://oilprice.com/rss/main', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("OILPRICE", title.text.strip()))
+        except Exception as e: pass
+            
+        # 8. Yahoo Finance
+        try:
+            req = urllib.request.Request('https://finance.yahoo.com/news/rssindex', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("YAHOO", title.text.strip()))
+        except Exception as e: pass
+            
+        # 9. FXStreet
+        try:
+            req = urllib.request.Request("https://www.fxstreet.com/news", headers={'User-Agent': 'Mozilla/5.0'})
+            html = urllib.request.urlopen(req, timeout=10).read()
+            soup = BeautifulSoup(html, 'html.parser')
+            k_count = 0
+            for a in soup.find_all('a', href=True):
+                if '/news/' in a['href'] and len(a.get_text(strip=True)) > 20:
+                    titles.append(("FXSTREET", a.get_text(strip=True)))
+                    k_count += 1
+                    if k_count >= 2: break
+        except Exception as e: pass
+            
+        # 10. Reuters
+        try:
+            req = urllib.request.Request("https://www.reuters.com/markets/commodities/", headers={'User-Agent': 'Mozilla/5.0'})
+            html = urllib.request.urlopen(req, timeout=10).read()
+            soup = BeautifulSoup(html, 'html.parser')
+            k_count = 0
+            for a in soup.find_all('a', href=True):
+                text = a.get_text(strip=True)
+                if '/markets/commodities/' in a['href'] and len(text) > 30:
+                    titles.append(("REUTERS", text))
+                    k_count += 1
+                    if k_count >= 2: break
+        except Exception as e: pass
+            
+        # 11. Financial Times
+        try:
+            req = urllib.request.Request("https://www.ft.com/", headers={'User-Agent': 'Mozilla/5.0'})
+            html = urllib.request.urlopen(req, timeout=10).read()
+            soup = BeautifulSoup(html, 'html.parser')
+            k_count = 0
+            for a in soup.find_all('a', href=True):
+                text = a.get_text(strip=True)
+                if '/content/' in a['href'] and len(text) > 20:
+                    titles.append(("FT", text))
+                    k_count += 1
+                    if k_count >= 2: break
+        except Exception as e: pass
+
+        if titles:
+            existing_news = db.get('news_feed', [])
+            existing_titles = {n['title'].lower() for n in existing_news}
+            
+            news_to_process = []
+            for source, eng_title in titles:
+                if eng_title.lower() not in existing_titles:
+                    news_to_process.append((source, eng_title))
+
+            if not news_to_process:
+                print("No new news to process.")
+                return
+
+            # Batch translation and NLP
+            batch_titles = [t[1] for t in news_to_process]
+            batch_results = {}
+            
+            if has_gemini:
+                try:
+                    import json
+                    model = genai.GenerativeModel('gemini-3.5-flash', system_instruction="You are a Quant Macro AI. Reply strictly in JSON mapping title string to one word: BULLISH, BEARISH, or NEUTRAL.")
+                    prompt = f"Analyze the global market impact (Risk-On/Growth vs Risk-Off/Fear) of each headline. Return valid JSON dictionary format only: {json.dumps(batch_titles)}"
+                    ans = model.generate_content(prompt).text.strip()
+                    import re
+                    ans = re.sub(r'```json\n?|```', '', ans).strip()
+                    batch_results = json.loads(ans)
+                except Exception as e:
+                    print("Batch Gemini NLP fail:", e)
+            
+            new_news_list = []
+            for source, eng_title in news_to_process:
+                t_title = eng_title
+                try:
+                    url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=' + urllib.parse.quote(eng_title)
+                    res_req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    res_data = urllib.request.urlopen(res_req, timeout=5).read().decode('utf-8')
+                    res_json = json.loads(res_data)
+                    t_title = res_json[0][0][0]
+                except Exception: pass
+                
+                impact = 'text-yellow'
+                ai_decision = batch_results.get(eng_title, "NEUTRAL").upper()
+                if "BULLISH" in ai_decision: impact = 'text-green'
+                elif "BEARISH" in ai_decision: impact = 'text-red'
+                else:
+                    t_lower = t_title.lower()
+                    if any(k in t_lower for k in ['naik', 'menguat', 'laba', 'positif', 'lonjakan', 'tinggi', 'rekor', 'untung', 'surplus', 'cuan', 'up', 'high', 'gain']): impact = 'text-green'
+                    elif any(k in t_lower for k in ['turun', 'melemah', 'rugi', 'negatif', 'jatuh', 'anjlok', 'krisis', 'bengkak', 'defisit', 'tekanan', 'phk', 'down', 'low', 'loss', 'drop']): impact = 'text-red'
+                
+                new_news_list.append({'time': source, 'title': t_title, 'impact': impact})
+                
+            db['news_feed'] = (new_news_list + existing_news)[:20]
+            with open(JSON_PATH, 'w', encoding='utf-8') as f:
+                json.dump(db, f, indent=2, ensure_ascii=False)
+                
+    except Exception as e:
+        print(f"Failed to scrape news: {e}")
+
 def run_claude_4h_forecast():
     """Updates 4H and 1D Forecasts dynamically via MT5 Algorithms."""
     print(f"[{datetime.now()}] Running Algorithmic Forecast Update (Trifecta Fundamental + Tech)...")
@@ -597,17 +697,17 @@ def run_claude_4h_forecast():
                 f4 = generate_forecast(mt5_sym, '1D', macro_score, sentiment_score, flow_score, regime_score, tech_s, cal_score, ml_weights)
                 f1 = generate_forecast(mt5_sym, '1W', macro_score, sentiment_score, flow_score, regime_score, tech_s, cal_score, ml_weights)
                 
-                # RAG INJECTION FOR XAUUSD 4H FORECAST
-                if has_gemini and ui_sym == "XAUUSD" and f4:
+                # RAG INJECTION FOR 4H FORECAST
+                if has_gemini and f4:
                     try:
                         news_ctx = " | ".join([n['title'] for n in db.get('news_feed', [])[:5]])
                         rag_prompt = (
-                            f"You are a quant Hedge Fund AI. Market Data: XAUUSD Price={prices['XAUUSD']['price']}, "
+                            f"Market Data: {ui_sym} Price={prices[ui_sym]['price']}, "
                             f"Macro Score={macro_score}/100, Regime Risk={regime_score}/100, Flow={flow_score}/100. "
-                            f"Recent News: {news_ctx}. Based on this exact data matrix, predict XAUUSD next 4H direction. "
+                            f"Recent News: {news_ctx}. Based on this exact data matrix, predict {ui_sym} next 4H direction. "
                             f"Reply ONLY in valid JSON format: {{\"dir\": \"BULLISH\" or \"BEARISH\", \"bp\": \"85%\", \"action\": \"BUY DIP\" or \"SELL RALLY\"}}"
                         )
-                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        model = genai.GenerativeModel('gemini-1.5-pro', system_instruction="You are a quant Hedge Fund AI. Reply strictly in JSON.")
                         ans = model.generate_content(rag_prompt).text
                         
                         import re
@@ -624,6 +724,9 @@ def run_claude_4h_forecast():
                             f4['action'] = ai_res['action']
                             f4['btn'] = "btn-green" if "BUY" in ai_res['action'] else "btn-red"
                         f4['conf'] = "99%" # AI RAG Override Signature
+                        
+                        import time
+                        time.sleep(35) # BYPASS 1.5 PRO LIMIT (2 RPM)
                     except Exception as e:
                         print("Gemini RAG Forecast Error:", e)
                         
@@ -688,13 +791,31 @@ def run_claude_daily_macro():
     """Updates Macro Dashboard algorithmically using Yahoo Finance Proxies."""
     print(f"[{datetime.now()}] Running Daily Macro Update (Algorithmic)...")
     try:
-        # Fetch DXY, TNX, VIX, and DJI
-        tickers = "DX-Y.NYB ^TNX ^VIX ^DJI"
+        tickers = "DX-Y.NYB ^TNX ^VIX ^DJI ^IRX TIP BTC-USD DBC ^RUT ^DJT HYG IEF GLD ^SKEW USO"
         data = yf.Tickers(tickers)
-        dxy = data.tickers["DX-Y.NYB"].history(period="1mo")['Close'].tolist()
-        tnx = data.tickers["^TNX"].history(period="1mo")['Close'].tolist()
-        vix = data.tickers["^VIX"].history(period="1mo")['Close'].tolist()
-        dji = data.tickers["^DJI"].history(period="1mo")['Close'].tolist()
+        
+        def get_hist(sym):
+            try:
+                hist = data.tickers[sym].history(period="1mo")['Close'].tolist()
+                return hist if len(hist) > 0 else [0, 0]
+            except:
+                return [0, 0]
+                
+        dxy = get_hist("DX-Y.NYB")
+        tnx = get_hist("^TNX")
+        vix = get_hist("^VIX")
+        dji = get_hist("^DJI")
+        irx = get_hist("^IRX")
+        tip = get_hist("TIP")
+        bil = get_hist("BTC-USD")
+        dbc = get_hist("DBC")
+        adp = get_hist("^RUT")
+        djt = get_hist("^DJT")
+        hyg = get_hist("HYG")
+        ief = get_hist("IEF")
+        gld = get_hist("GLD")
+        skew = get_hist("^SKEW")
+        uso = get_hist("USO")
         
         def get_status(arr, bull_word, bear_word):
             if len(arr) < 2: return bear_word, 50, "down"
@@ -702,10 +823,45 @@ def run_claude_daily_macro():
             curr = arr[-1]
             score = min(99, int(50 + (abs(curr - sma) / sma) * 1000))
             if curr > sma: return bull_word, score, "up"
-            return bear_word, score, "down"
+            return bear_word, max(1, 100 - score), "down"
 
         dxy_val, dxy_score, dxy_dir = get_status(dxy, "BULLISH", "BEARISH")
         tnx_val, tnx_score, tnx_dir = get_status(tnx, "RISING", "FALLING")
+        irx_val, irx_score, irx_dir = get_status(irx, "HAWKISH", "DOVISH")
+        # Real Yield is inverse to TIP bond price
+        tip_val, tip_score, tip_dir = get_status(tip, "FALLING", "RISING") 
+        if tip_dir == "up": tip_dir = "down" # TIP price up = Yield down
+        else: tip_dir = "up"
+        
+        bil_val, bil_score, bil_dir = get_status(bil, "EXPANDING", "CONTRACTING")
+        dbc_val, dbc_score, dbc_dir = get_status(dbc, "RISING", "EASING")
+        adp_val, adp_score, adp_dir = get_status(adp, "STRONG", "WEAK")
+        djt_val, djt_score, djt_dir = get_status(djt, "GROWING", "SLOWING")
+        
+        # Capital Flow: HYG / IEF
+        cap_flow = [h/i if i != 0 else 0 for h, i in zip(hyg, ief)]
+        cap_val, cap_score, cap_dir = get_status(cap_flow, "RISK-ON", "RISK-OFF")
+        
+        # Central Bank: GLD / DXY proxy
+        cb_flow = [g/d if d != 0 else 0 for g, d in zip(gld, dxy)]
+        cb_val, cb_score, cb_dir = get_status(cb_flow, "ACCUMULATING", "EASING")
+        
+        gld_val, gld_score, gld_dir = get_status(gld, "BULLISH", "BEARISH")
+        uso_val, uso_score, uso_dir = get_status(uso, "TIGHT SUPPLY", "SURPLUS")
+        
+        # Correlation GLD vs DXY
+        corr_val, corr_score, corr_dir = "POSITIVE", 50, "up"
+        if len(gld) > 2 and len(dxy) > 2:
+            try:
+                import numpy as np
+                mlen = min(len(gld), len(dxy))
+                c = np.corrcoef(gld[-mlen:], dxy[-mlen:])[0, 1]
+                if c < -0.3: corr_val, corr_score, corr_dir = "STRONG NEG", int(abs(c)*100), "down"
+                else: corr_val, corr_score, corr_dir = "POSITIVE", int((c+1)*50), "up"
+            except:
+                pass
+                
+        skew_val, skew_score, skew_dir = get_status(skew, "HEDGING RISK", "CALM")
         
         # Calculate NATIVE Market Regime Score (Risk On/Off)
         regime_score = 50
@@ -719,18 +875,28 @@ def run_claude_daily_macro():
         with open(JSON_PATH, 'r', encoding='utf-8') as f:
             db = json.load(f)
             
+        mapping = {
+            'DXY INDEX': (dxy_val, dxy_score, dxy_dir),
+            'TREASURY YIELD': (tnx_val, tnx_score, tnx_dir),
+            'FED POLICY': (irx_val, irx_score, irx_dir),
+            'REAL YIELD': (tip_val, tip_score, tip_dir),
+            'LIQUIDITY (RRP)': (bil_val, bil_score, bil_dir),
+            'INFLATION (PCE)': (dbc_val, dbc_score, dbc_dir),
+            'EMPLOYMENT': (adp_val, adp_score, adp_dir),
+            'GDP GROWTH': (djt_val, djt_score, djt_dir),
+            'CAPITAL FLOW': (cap_val, cap_score, cap_dir),
+            'CENTRAL BANK': (cb_val, cb_score, cb_dir),
+            'PHYSICAL GOLD': (gld_val, gld_score, gld_dir),
+            'OIL MARKET': (uso_val, uso_score, uso_dir),
+            'CORRELATION': (corr_val, corr_score, corr_dir),
+            'OPTIONS SKEW': (skew_val, skew_score, skew_dir)
+        }
+            
         for row in db['macro_dashboard']:
-            if row['name'] == 'DXY INDEX':
-                row['value'] = dxy_val
-                row['score'] = dxy_score
-                row['dir'] = dxy_dir
-            elif row['name'] == 'TREASURY YIELD':
-                row['value'] = tnx_val
-                row['score'] = tnx_score
-                row['dir'] = tnx_dir
-            else:
-                if len(dji) >= 2:
-                    row['score'] = min(99, max(10, row['score'] + (1 if tnx_dir == "up" else -1)))
+            if row['name'] in mapping:
+                row['value'] = mapping[row['name']][0]
+                row['score'] = mapping[row['name']][1]
+                row['dir'] = mapping[row['name']][2]
         
         # Update Gauges dynamically based on calculated macro scores
         avg_score = sum([m['score'] for m in db['macro_dashboard']]) // len(db['macro_dashboard'])
@@ -774,12 +940,13 @@ def run_claude_weekly_flow():
             with open(JSON_PATH, 'r', encoding='utf-8') as f:
                 db = json.load(f)
                 
-            import random
-            cot_vol = random.uniform(10.0, 30.0)
-            spec_vol = random.uniform(5.0, 15.0)
-            etf_vol = random.uniform(1.5, 5.0)
-            opt_vol = random.randint(55, 75)
-            ret_vol = random.randint(65, 85)
+            # Make deterministic based on price action instead of random
+            week_range = abs(rates[-1]['high'] - rates[-1]['low'])
+            cot_vol = min(50.0, week_range * 0.5)
+            spec_vol = cot_vol * 0.6
+            etf_vol = min(10.0, week_range * 0.1)
+            opt_vol = min(90, 50 + int(week_range * 0.5))
+            ret_vol = min(95, 60 + int(week_range * 0.3))
                 
             db['institutional_flow'][0]['val'] = f"ADDING LONGS (+{cot_vol:.1f}K)" if trend_up else f"ADDING SHORTS (-{cot_vol:.1f}K)"
             db['institutional_flow'][0]['color'] = "text-green" if trend_up else "text-red"
@@ -884,15 +1051,18 @@ if __name__ == "__main__":
     print("XEDY V30 Dynamic AI Engine Started!")
     
     # Run immediate initial updates
-    run_gemini_update()
+    run_live_price_update()
+    run_news_update()
     run_claude_4h_forecast()
     run_claude_daily_macro()
     run_claude_weekly_flow()
     run_technical_and_calendar()
     
     # Schedulers
-    schedule.every(1).minutes.do(run_gemini_update)
-    schedule.every(15).minutes.do(run_claude_4h_forecast) # Run more often for dynamic look
+    schedule.every(1).minutes.do(run_live_price_update)
+    schedule.every(15).minutes.do(run_news_update)
+
+    schedule.every(2).hours.do(run_claude_4h_forecast) # Run more often for dynamic look
     schedule.every(1).hours.do(run_claude_daily_macro)    # Hourly for dynamic look
     schedule.every(4).hours.do(run_claude_weekly_flow)
     schedule.every(1).minutes.do(run_technical_and_calendar)
