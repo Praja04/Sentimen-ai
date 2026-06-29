@@ -2,8 +2,8 @@ import os
 import json
 import time
 import schedule
-import time
 import math
+import yfinance as yf
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -348,8 +348,12 @@ def generate_forecast(symbol, timeframe, macro_s, sent_s, flow_s, regime_s, tech
     err_tech = 0
     err_cal = 0
     
+    # Real accuracy tracking: count days where actual High/Low fell within ATR projection
+    atr_hit_count = 0
+    dir_hit_count = 0  # direction accuracy
+    
     # Adaptive Volatility Multiplier
-    vol_multiplier = 2.0
+    vol_multiplier = 1.0
     
     for i in range(19, 29):
         hist_closes = closes[i-19:i+1] # 20 candles up to i
@@ -379,6 +383,11 @@ def generate_forecast(symbol, timeframe, macro_s, sent_s, flow_s, regime_s, tech
         actual_went_up = closes[i+1] > hist_current_price
         ideal_bp = 100 if actual_went_up else 0
         
+        # Direction accuracy
+        predicted_bullish = hist_final_bp > 50
+        if predicted_bullish == actual_went_up:
+            dir_hit_count += 1
+        
         # Positive error = Too Bullish. Negative error = Too Bearish.
         error = hist_final_bp - ideal_bp
         error_sum += error
@@ -391,29 +400,45 @@ def generate_forecast(symbol, timeframe, macro_s, sent_s, flow_s, regime_s, tech
         err_tech += abs(bp_t_test - ideal_bp)
         err_cal += abs(bp_c_test - ideal_bp)
         
-        # Adaptive Volatility Learning
+        # Adaptive Volatility Learning (ATR Self-Supervised)
         actual_high = rates[i+1]['high']
         actual_low = rates[i+1]['low']
-        hist_upper = hist_sma20 + (vol_multiplier * hist_std_dev)
-        hist_lower = hist_sma20 - (vol_multiplier * hist_std_dev)
         
-        # Widen if breached, shrink if too loose
+        hist_rates = rates[max(0, i-14):i+1] 
+        hist_ranges = [(r['high'] - r['low']) for r in hist_rates]
+        hist_base_atr = sum(hist_ranges) / len(hist_ranges) if len(hist_ranges) > 0 else 100
+        
+        hist_upper = hist_current_price + (hist_base_atr * vol_multiplier)
+        hist_lower = hist_current_price - (hist_base_atr * vol_multiplier)
+        
+        # Real ATR hit tracking: did actual High/Low stay within projected band?
+        high_within_band = actual_high <= hist_upper
+        low_within_band = actual_low >= hist_lower
+        if high_within_band and low_within_band:
+            atr_hit_count += 1
+        
+        # Widen if breached (Safety Bias), Shrink if too loose (Anti-Hunting)
         if actual_high > hist_upper:
-            vol_multiplier += 0.1
-        elif actual_high < (hist_sma20 + (1.5 * hist_std_dev)):
-            vol_multiplier -= 0.05
+            vol_multiplier += 0.05
+        elif actual_high < (hist_current_price + (hist_base_atr * (vol_multiplier - 0.5))):
+            vol_multiplier -= 0.02
             
         if actual_low < hist_lower:
-            vol_multiplier += 0.1
-        elif actual_low > (hist_sma20 - (1.5 * hist_std_dev)):
-            vol_multiplier -= 0.05
+            vol_multiplier += 0.05
+        elif actual_low > (hist_current_price - (hist_base_atr * (vol_multiplier - 0.5))):
+            vol_multiplier -= 0.02
             
-        # Anti-Hunting Clamp
-        vol_multiplier = max(1.5, min(3.0, vol_multiplier))
+        # Anti-Hunting Clamp (Bounded Volatility Multiplier)
+        vol_multiplier = max(0.8, min(3.5, vol_multiplier))
         
     mean_error = error_sum / test_count
     # Apply 20% of the mean error as a dampening correction offset
     correction_offset = int(mean_error * 0.2) 
+    
+    # Real Accuracy = weighted combo: 60% ATR band hit rate + 40% direction hit rate
+    atr_accuracy = (atr_hit_count / test_count) * 100
+    dir_accuracy = (dir_hit_count / test_count) * 100
+    real_accuracy = round((atr_accuracy * 0.6) + (dir_accuracy * 0.4), 1)
     
     # Determine the most accurate pillar
     errors_dict = {'macro': err_macro, 'sentiment': err_sent, 'flow': err_flow, 'regime': err_regime, 'tech': err_tech, 'cal': err_cal}
@@ -430,8 +455,39 @@ def generate_forecast(symbol, timeframe, macro_s, sent_s, flow_s, regime_s, tech
     std_dev = variance ** 0.5
     if std_dev == 0: std_dev = 0.001
     
-    upper_band = sma20 + (vol_multiplier * std_dev)
-    lower_band = sma20 - (vol_multiplier * std_dev)
+    # --- TAHAP 5: ATR-Based Target Generation ---
+    try:
+        w_rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_W1, 0, 14)
+        m_rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_MN1, 0, 14)
+        
+        def calc_atr(rate_list):
+            if rate_list is None or len(rate_list) == 0: return 0
+            return sum([(r['high'] - r['low']) for r in rate_list]) / len(rate_list)
+            
+        current_atr = calc_atr(rates[-14:])
+        weekly_atr = calc_atr(w_rates)
+        monthly_atr = calc_atr(m_rates)
+        
+        # Scale weekly and monthly down to timeframe equivalent
+        if timeframe == '1D':
+            base_atr = max(current_atr, weekly_atr / 5, monthly_atr / 20)
+        elif timeframe == '1W':
+            base_atr = max(current_atr, weekly_atr, monthly_atr / 4)
+        else:
+            base_atr = max(current_atr, weekly_atr / 30)
+            
+        # Fundamental Multiplier combined with ML Validated Multiplier
+        if cal_s >= 65: fun_multiplier = 2.5
+        elif cal_s >= 55: fun_multiplier = 1.5
+        else: fun_multiplier = 1.0
+            
+        upper_band = current_price + (base_atr * fun_multiplier * vol_multiplier)
+        lower_band = current_price - (base_atr * fun_multiplier * vol_multiplier)
+    except Exception as e:
+        print("ATR Calc Error:", e)
+        # Fallback
+        upper_band = sma20 + (vol_multiplier * std_dev)
+        lower_band = sma20 - (vol_multiplier * std_dev)
     
     if current_price > sma20:
         tech_bp = min(95, int(50 + ((current_price - sma20)/std_dev)*20))
@@ -456,8 +512,8 @@ def generate_forecast(symbol, timeframe, macro_s, sent_s, flow_s, regime_s, tech
         action = "SELL RALLY"
         btn = "btn-red"
         
-    # Accuracy reflects the magnitude of the backtest error
-    accuracy = min(99.5, max(50.0, 100 - (abs(mean_error)/2)))
+    # Real accuracy: % of backtest days where actual H/L stayed within ATR band + direction was correct
+    accuracy = real_accuracy
     conf = min(99, final_bp if final_bp > bearp else bearp)
     
     return {
