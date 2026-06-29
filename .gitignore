@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment Variables (CRITICAL: Do not push API Keys!)
+.env
+
+# Database and Logs
+*.db
+*.log
+*.sqlite3
+xedy_v30_data.json
+
+# OS generated files
+.DS_Store
+Thumbs.db

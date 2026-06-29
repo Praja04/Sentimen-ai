@@ -1,0 +1,8 @@
+Flask==3.0.3
+MetaTrader5
+flask-cors==4.0.0
+yfinance
+google-generativeai
+anthropic
+python-dotenv
+schedule

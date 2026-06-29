@@ -1,0 +1,48 @@
+{
+  "lastUpdate": "28 Juni 2026 12:00 UTC",
+  "summary": "Kondisi ekonomi makro global saat ini didominasi oleh pergeseran sikap Federal Reserve di bawah kepemimpinan baru Chair Kevin Warsh. Transisi menuju kebijakan yang lebih ketat (Hawkish) memicu lonjakan pada US Real Yield dan mendorong penguatan DXY. Emas mendapat perlawanan dari imbal hasil tinggi, sementara Minyak dalam tekanan perlambatan permintaan global.",
+  "marketPhase": {
+    "topDriver": "Federal Reserve Pivot (Hawkish Surprise)",
+    "dominantRegime": "Yield Driven / Fed Driven",
+    "macroBias": "Kuatnya arus modal ke USD (Risk-Off pada komoditas tertentu)"
+  },
+  "alignment": {
+    "score": 85,
+    "status": "STRONG",
+    "description": "Semua mesin ekonomi mayor bergerak searah menunjukkan supremasi USD."
+  },
+  "dashboard": [
+    {"name": "FED", "score": 85, "status": "Hawkish", "reason": "FOMC menahan suku bunga. Dot plot mengindikasikan potensi kenaikan."},
+    {"name": "REAL YIELD", "score": 80, "status": "Bullish USD", "reason": "Inflasi tertahan, nominal yield naik, Real Yield atraktif."},
+    {"name": "DXY", "score": 78, "status": "Strong", "reason": "Bullish trend struktural, momentum kuat didorong The Fed."},
+    {"name": "TREASURY", "score": 75, "status": "Bear Flattener", "reason": "US2Y naik, US10Y stabil. Ekspektasi higher-for-longer."},
+    {"name": "LIQUIDITY", "score": 40, "status": "Contracting", "reason": "RRP menyusut, SOMA turun, kondisi finansial mengetat."},
+    {"name": "INFLATION", "score": 70, "status": "Sticky", "reason": "CPI & Core PCE tertahan di sektor perumahan & jasa."},
+    {"name": "EMPLOYMENT", "score": 65, "status": "Solid", "reason": "NFP moderat, pengangguran 3.9%, pertumbuhan upah persisten."},
+    {"name": "GDP", "score": 68, "status": "Expanding", "reason": "Ekonomi AS solid (~2.2%), belum ada sinyal resesi."},
+    {"name": "CAPITAL FLOW", "score": 82, "status": "Inflow USD", "reason": "Arus kas beralih ke obligasi AS untuk yield tinggi."},
+    {"name": "CENTRAL BANK", "score": 60, "status": "Accumulation", "reason": "Pembelian fisik Emas berlanjut untuk diversifikasi."},
+    {"name": "PHYS. GOLD", "score": 65, "status": "High Premium", "reason": "Premium Shanghai kuat, menopang harga dasar emas."},
+    {"name": "OIL MARKET", "score": 45, "status": "Weak Demand", "reason": "OPEC membatasi kuota namun permintaan Tiongkok lesu."},
+    {"name": "CORRELATION", "score": 80, "status": "Synchronized", "reason": "US Real Yield menekan aset tanpa imbal hasil."}
+  ],
+  "topDrivers": [
+    "Federal Reserve Pivot (Hawkish Surprise)",
+    "US Real Yield Breakout",
+    "Sticky Inflation Data",
+    "Weak Global Manufacturing Demand",
+    "Central Bank Gold Floor"
+  ],
+  "impactMatrix": [
+    {"instrument": "XAUUSD", "status": "Bearish", "reason": "Tersedak oleh naiknya US Real Yield dan DXY kuat."},
+    {"instrument": "USDJPY", "status": "Bullish", "reason": "Yield Differential melebar akibat ancaman Fed hike."},
+    {"instrument": "WTI OIL", "status": "Bearish", "reason": "Dolar kuat dan permintaan makro lesu."},
+    {"instrument": "EURUSD", "status": "Bearish", "reason": "Arus kas masuk ke AS, ECB lebih dovish."},
+    {"instrument": "GBPUSD", "status": "Bearish", "reason": "Likuiditas lari ke aset berbasis USD."}
+  ],
+  "conclusion": {
+    "usd": "Bullish",
+    "gold": "Bearish",
+    "oil": "Bearish"
+  }
+}

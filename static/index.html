@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XEDY V30 INSTITUTIONAL FORECAST DASHBOARD</title>
+    <!-- Sci-Fi Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Roboto+Mono:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=30">
+    <!-- Chart.js for Gauges and Line Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="cyber-container">
+        <!-- HEADER -->
+        <header class="cyber-header">
+            <div class="header-left panel-border">
+                <table class="header-table">
+                    <tr><td>DATE</td><td id="sys-date" class="text-white">Loading...</td></tr>
+                    <tr><td>TIME</td><td id="sys-time" class="text-white">Loading...</td></tr>
+                    <tr><td>LAST UPDATE</td><td id="sys-update" class="text-white">Loading...</td></tr>
+                </table>
+            </div>
+            <div class="header-center">
+                <img src="globe.png" alt="Globe" class="logo-globe">
+                <div class="title-container">
+                    <h1>XEDY V30</h1>
+                    <h2>INSTITUTIONAL FORECAST DASHBOARD</h2>
+                </div>
+            </div>
+            <div class="header-right panel-border">
+                <div class="market-phase-box">
+                    <span class="label">MARKET PHASE</span>
+                    <span class="phase-value text-green" id="market-phase-val">RISK ON</span>
+                    <div style="font-size:0.6rem; color:var(--text-muted); margin-top:4px;">TOP DRIVER</div>
+                    <div class="text-white" id="top-driver-val" style="font-size:0.7rem; text-align:center;">LOADING...</div>
+                </div>
+                <table class="header-table" style="margin-left: 1rem;" id="global-time-table">
+                    <tr><th colspan="3" style="text-align:center; padding-bottom:4px; font-weight:600; color:#fff;">GLOBAL TIME</th></tr>
+                    <tr><td>NEW YORK</td><td id="ny-status">...</td><td id="ny-time">...</td></tr>
+                    <tr><td>LONDON</td><td id="lon-status">...</td><td id="lon-time">...</td></tr>
+                    <tr><td>TOKYO</td><td id="tok-status">...</td><td id="tok-time">...</td></tr>
+                    <tr><td>SYDNEY</td><td id="syd-status">...</td><td id="syd-time">...</td></tr>
+                </table>
+            </div>
+        </header>
+
+        <!-- MAIN GRID -->
+        <main class="cyber-grid">
+            <div class="world-map-bg"></div>
+            
+            <!-- LEFT COLUMN -->
+            <div class="grid-left">
+                <div class="panel panel-border" style="flex: 1.6;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">MACRO DASHBOARD 
+                        <div class="tooltip-container" style="margin-left: 8px;">
+                            <span class="info-icon">ⓘ</span>
+                            <div class="tooltip-text" style="bottom: auto; top: 150%; width: 280px; z-index: 1000;">
+                                <strong style="color:var(--text-yellow);">Cara Membaca Macro Dashboard</strong><br><br>
+                                Tabel ini merangkum skor 8 indikator fundamental ekonomi utama.<br><br>
+                                <span class="text-green">■ Skor > 55 (Hijau):</span> Kondisi ini mendukung kenaikan harga emas.<br>
+                                <span class="text-red">■ Skor < 45 (Merah):</span> Kondisi ini menekan harga emas turun.<br>
+                                <span class="text-yellow">■ Skor 45-55 (Kuning):</span> Berpengaruh netral/sideway.
+                            </div>
+                        </div>
+                    </h3>
+                    <div class="macro-list" id="macro-dashboard-list"></div>
+                </div>
+                <div class="panel panel-border" style="flex: 0.7; position: relative;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">MACRO ALIGNMENT SCORE 
+                        <div class="tooltip-container" style="margin-left: 8px;">
+                            <span class="info-icon">ⓘ</span>
+                            <div class="tooltip-text" style="bottom: auto; top: 150%; width: 270px; z-index: 1000;">
+                                <strong style="color:var(--text-yellow);">Macro Alignment Score</strong><br><br>
+                                Merupakan nilai akumulasi keseluruhan dari kondisi ekonomi global. Menunjukkan seberapa kuat kekuatan fundamental mendukung arah emas saat ini.<br><br>
+                                <span class="text-green">> 55 (STRONG):</span> Sangat selaras untuk dorongan naik (Buy).<br>
+                                <span class="text-red">< 45 (WEAK):</span> Sangat selaras untuk dorongan turun (Sell).
+                            </div>
+                        </div>
+                    </h3>
+                    <div class="gauge-container">
+                        <canvas id="macroGauge"></canvas>
+                        <div class="gauge-value">
+                            <span class="num">72</span>
+                            <span class="desc text-green">STRONG</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-border" style="flex: 0.7;">
+                    <h3 class="panel-title">TOP 5 MACRO DRIVERS</h3>
+                    <div class="drivers-list" id="drivers-list">
+                        <!-- Injected by script.js -->
+                    </div>
+                </div>
+                <div class="panel panel-border" style="flex: 0.8;">
+                    <h3 class="panel-title">ECONOMIC CALENDAR</h3>
+                    <div class="eco-cal-list" id="eco-calendar-list">
+                        <!-- Injected by script.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER COLUMN -->
+            <div class="grid-center">
+                <div class="tv-news-container">
+                    <div class="tv-box panel-border">
+                        <iframe src="https://www.cnbcindonesia.com/embed/tv?ref=transmedia&smartautoplay=true" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                    <div class="news-box panel-border">
+                        <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
+                            LIVE MACRO NEWS
+                            <button id="btn-read-news" style="background:transparent; border:1px solid var(--border-glow); color:var(--text-yellow); cursor:pointer; font-size:0.6rem; padding:2px 5px; border-radius:3px;">🔊 BACA</button>
+                        </h3>
+                        <div class="news-list" id="news-list">
+                            <div style="padding: 10px; color: var(--text-muted); text-align: center;">Loading AI News Feed...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="assets-container" id="assets-container"></div>
+                <div class="panel panel-border sentiment-panel">
+                    <h3 class="panel-title text-center" style="border-left:none; border-bottom:1px solid var(--border-accent);">MARKET SENTIMENT INDEX</h3>
+                    <div class="sentiment-chart-wrapper">
+                        <canvas id="sentimentChart"></canvas>
+                        <div class="sentiment-score">
+                            <span class="text-green num">65</span>
+                            <span class="text-green desc">RISK ON</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:center; align-items:center; gap:15px; font-size:0.65rem; margin-top:8px; margin-bottom:5px; font-family:'Roboto Mono', monospace; color:var(--text-muted); position:relative;">
+                        <span><span class="text-red" style="font-weight:bold;">▬</span> 0-45 FEAR</span>
+                        <span><span class="text-yellow" style="font-weight:bold;">▬</span> 46-55 SIDEWAY</span>
+                        <span><span class="text-green" style="font-weight:bold;">▬</span> 56-100 GREED</span>
+                        <div class="tooltip-container">
+                            <span class="info-icon">ⓘ</span>
+                            <div class="tooltip-text">
+                                <strong style="color:var(--text-yellow);">Indeks Sentimen AI (0-100)</strong><br><br>
+                                <span class="text-red">0-45 (FEAR):</span> Dominasi berita/data negatif. Pasar pesimis, penghindaran risiko, aset <i>safe-haven</i> diburu.<br><br>
+                                <span class="text-yellow">46-55 (SIDEWAY):</span> Berita netral/berimbang. Pasar menunggu konfirmasi tren arah harga.<br><br>
+                                <span class="text-green">56-100 (GREED):</span> Dominasi berita/data positif. Pasar optimis, aksi beli agresif.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="grid-right">
+                <div class="panel panel-border" style="flex: 1;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">INSTITUTIONAL FLOW 
+                        <div class="tooltip-container" style="margin-left: 8px;">
+                            <span class="info-icon">ⓘ</span>
+                            <div class="tooltip-text" style="bottom: auto; top: 150%; width: 280px; left: auto; right: -50px; transform: none; z-index: 1000;">
+                                <strong style="color:var(--text-yellow);">Institutional Flow</strong><br><br>
+                                Melacak kemana perginya "Uang Besar" (Smart Money).<br><br>
+                                <strong>COT / Speculators:</strong> Posisi agregat pemain institusi di pasar berjangka.<br>
+                                <strong>ETF Holdings:</strong> Aliran dana fisik masuk/keluar ke aset ETF Emas.<br>
+                                <strong>Options Skew:</strong> Minat perlindungan harga; Put dominan (turun) vs Call dominan (naik).
+                            </div>
+                        </div>
+                    </h3>
+                    <div class="flow-list" id="flow-list"></div>
+                </div>
+                <div class="panel panel-border" style="flex: 0.7; position: relative;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">MARKET REGIME GAUGE 
+                        <div class="tooltip-container" style="margin-left: 8px;">
+                            <span class="info-icon">ⓘ</span>
+                            <div class="tooltip-text" style="bottom: auto; top: 150%; width: 260px; left: auto; right: -50px; transform: none; z-index: 1000;">
+                                <strong style="color:var(--text-yellow);">Market Regime</strong><br><br>
+                                Mendeteksi fase psikologi risiko dunia.<br><br>
+                                <span class="text-green">RISK OFF:</span> Dunia sedang panik. Uang lari mencari aman ke Emas (Bullish bagi Emas).<br><br>
+                                <span class="text-red">RISK ON:</span> Dunia sedang berani spekulasi. Uang masuk Saham/Kripto, Emas ditinggalkan (Bearish bagi Emas).
+                            </div>
+                        </div>
+                    </h3>
+                    <div class="gauge-container small-gauge">
+                        <canvas id="regimeGauge"></canvas>
+                        <div class="gauge-value regime">
+                            <span class="desc text-green">RISK ON</span>
+                            <span class="num">70%</span>
+                        </div>
+                    </div>
+                    <div class="regime-labels"><span>RISK OFF</span><span>RISK ON</span></div>
+                </div>
+                <div class="panel panel-border" style="flex: 1.2;">
+                    <h3 class="panel-title">CORRELATION MATRIX</h3>
+                    <div style="flex: 1; min-height: 0; overflow: auto;">
+                        <table class="correlation-table">
+                            <thead>
+                                <tr><th></th><th>XAUUSD</th><th>USDJPY</th><th>WTI<br>OIL</th><th>DXY</th><th>US10Y</th><th>DJI</th><th>VIX</th></tr>
+                            </thead>
+                        <tbody id="correlation-table-body">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                <div class="panel panel-border" style="flex: 0.6;">
+                    <h3 class="panel-title">TECHNICAL SIGNALS (H4)</h3>
+                    <table class="tech-table">
+                        <thead>
+                            <tr><th>ASSET</th><th>RSI(14)</th><th>MA(50)</th><th>TREND</th></tr>
+                        </thead>
+                        <tbody id="tech-table-body">
+                            <!-- Rows will be injected here by script.js -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel panel-border" style="flex: 0.5;">
+                    <h3 class="panel-title" style="border-left:none; border-bottom:1px solid var(--border-accent);">LIQUIDITY ZONES</h3>
+                    <div style="display:flex; flex-direction:column; justify-content:space-evenly; align-items:center; height:100%; text-align:center; padding-top: 2px;">
+                        
+                        <div>
+                            <span style="font-size: 0.55rem; color:var(--text-yellow);">XAUUSD</span>
+                            <div class="glitch" style="font-size: 1.1rem; font-weight: bold; color: #fff;" id="liquidity-poc-xau">...</div>
+                        </div>
+
+                        <div>
+                            <span style="font-size: 0.55rem; color:var(--text-yellow);">USDJPY</span>
+                            <div class="glitch" style="font-size: 1.1rem; font-weight: bold; color: #fff;" id="liquidity-poc-jpy">...</div>
+                        </div>
+
+                        <div>
+                            <span style="font-size: 0.55rem; color:var(--text-yellow);">WTI OIL</span>
+                            <div class="glitch" style="font-size: 1.1rem; font-weight: bold; color: #fff;" id="liquidity-poc-oil">...</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="panel panel-border conclusion-panel" style="flex: 0.6;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">FINAL MACRO CONCLUSION 
+                        <div class="tooltip-container" style="margin-left: 8px;">
+                            <span class="info-icon">ⓘ</span>
+                            <div class="tooltip-text" style="bottom: 150%; top: auto; width: 280px; left: auto; right: -100px; transform: none; z-index: 1000;">
+                                <strong style="color:var(--text-yellow);">Final Conclusion</strong><br><br>
+                                Ini adalah kesimpulan absolut dari AI (Otak Utama).<br><br>
+                                Algoritma menggabungkan 6 Pilar Utama (Macro, Sentiment, Flow, Regime, Technical, dan Calendar) dengan sistem <i>Gradient Shift</i> (Bobot Dinamis) untuk menghasilkan prediksi arah emas yang paling tajam dan terkalibrasi secara otonom.
+                            </div>
+                        </div>
+                    </h3>
+                    <div class="conclusion-content">
+
+                        <div class="overall-badge">
+                            <span class="title">OVERALL<br>MACRO BIAS</span>
+                            <span class="result text-green" id="bias-result">LOADING...</span>
+                            <span class="sub text-red" id="bias-sub"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="cyber-footer">
+            <span>DATA SOURCES: FEDERAL RESERVE | FRED | BLS | CME | REUTERS | BLOOMBERG | CFTC | WGC | EIA | IEA | OPEC | LBMA | TRADING ECONOMICS</span>
+            <span class="text-blue">XEDY V30 INSTITUTIONAL AI ENGINE</span>
+        </footer>
+    </div>
+    
+    <script src="script.js?v=30"></script>
+</body>
+</html>
