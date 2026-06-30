@@ -1,6 +1,7 @@
 let backtestResultsPerTF = null;
 let backtestPayloadInfo = null;
 let backtestAbortController = null;
+let currentDemoState = null;
 const elements = {
     symbol: document.getElementById("symbol"),
     initialCapital: document.getElementById("initialCapital"),
@@ -367,6 +368,7 @@ async function fetchLiveTicks() {
             }
         }
         if(!data.error && data.demo) {
+            currentDemoState = data.demo;
             renderLiveDemo(data.demo);
         }
     } catch (e) {
