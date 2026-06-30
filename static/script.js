@@ -86,6 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchXedyData, 60000); // Heavy 60s dashboard refresh
     setInterval(fetchLiveTicks, 1000); // Lightweight 1s tick updates
 
+    // Auto-reload at 3 AM to flush browser memory/garbage collection
+    function checkDailyReload() {
+        const now = new Date();
+        if (now.getHours() === 3 && now.getMinutes() === 0) {
+            console.log("Memory flush reload...");
+            window.location.reload();
+        }
+    }
+    setInterval(checkDailyReload, 60000); // Check once per minute
+
     function renderDashboard(data) {
         // Render Macro Dashboard
         const macroListEl = document.getElementById('macro-dashboard-list');

@@ -2,6 +2,12 @@ from flask import Flask, jsonify, send_from_directory
 import MetaTrader5 as mt5
 from flask_cors import CORS
 import os
+import json
+from collections import defaultdict
+from datetime import datetime, timedelta
+from itertools import product
+from pathlib import Path
+from flask import request
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
@@ -143,6 +149,897 @@ def get_news_calendar():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# --- BACKTEST CORE LOGIC ---
+
+def ensure_mt5():
+    if mt5 is None:
+        raise RuntimeError("MetaTrader5 Python package is not available.")
+    if not mt5.initialize():
+        raise RuntimeError(f"MetaTrader5 initialize failed: {mt5.last_error()}")
+
+def load_dashboard_data():
+    with open('xedy_v30_data.json', 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def parse_month_range(start_month=None, end_month=None, days=30):
+    if start_month and end_month:
+        start_date = datetime.strptime(f"{start_month}-01", "%Y-%m-%d")
+        end_anchor = datetime.strptime(f"{end_month}-01", "%Y-%m-%d")
+        next_month = (end_anchor.replace(day=28) + timedelta(days=4)).replace(day=1)
+        end_date = next_month - timedelta(minutes=1)
+        if end_date <= start_date:
+            raise RuntimeError("End month must be after or equal to start month.")
+        return start_date, end_date
+
+    end_date = datetime.utcnow()
+    start_date = end_date - timedelta(days=max(1, int(days)))
+    return start_date, end_date
+
+
+def fetch_mt5_rates(symbol="XAUUSD", days=30, start_month=None, end_month=None):
+    ensure_mt5()
+    if not mt5.symbol_select(symbol, True):
+        raise RuntimeError(f"Unable to select symbol {symbol}.")
+
+    start_date, end_date = parse_month_range(start_month=start_month, end_month=end_month, days=days)
+    rates = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_M1, start_date, end_date)
+    if rates is None or len(rates) == 0:
+        raise RuntimeError(f"No MT5 data returned for {symbol} M1.")
+
+    return [
+        {
+            "time": int(row["time"]),
+            "open": float(row["open"]),
+            "high": float(row["high"]),
+            "low": float(row["low"]),
+            "close": float(row["close"]),
+        }
+        for row in rates
+    ]
+
+
+def get_symbol_risk_context(symbol="XAUUSD"):
+    ensure_mt5()
+    info = mt5.symbol_info(symbol)
+    if info is None:
+        return {"symbol": symbol, "tick_size": None, "tick_value": None, "volume_step": 0.01}
+    tick_size = float(getattr(info, "trade_tick_size", 0.0) or 0.0)
+    tick_value = float(getattr(info, "trade_tick_value", 0.0) or 0.0)
+    volume_step = float(getattr(info, "volume_step", 0.01) or 0.01)
+    volume_min = float(getattr(info, "volume_min", volume_step) or volume_step)
+    volume_max = float(getattr(info, "volume_max", 100.0) or 100.0)
+    return {
+        "symbol": symbol,
+        "tick_size": tick_size if tick_size > 0 else None,
+        "tick_value": tick_value if tick_value > 0 else None,
+        "volume_step": volume_step,
+        "volume_min": volume_min,
+        "volume_max": volume_max,
+    }
+
+
+def ema(values, period):
+    result = [None] * len(values)
+    if period <= 0 or len(values) < period:
+        return result
+
+    multiplier = 2 / (period + 1)
+    seed = sum(values[:period]) / period
+    result[period - 1] = seed
+    prev = seed
+    for index in range(period, len(values)):
+        prev = ((values[index] - prev) * multiplier) + prev
+        result[index] = prev
+    return result
+
+
+def rsi(values, period):
+    result = [None] * len(values)
+    if period <= 0 or len(values) <= period:
+        return result
+
+    gains = 0.0
+    losses = 0.0
+    for index in range(1, period + 1):
+        delta = values[index] - values[index - 1]
+        gains += max(delta, 0.0)
+        losses += max(-delta, 0.0)
+
+    avg_gain = gains / period
+    avg_loss = losses / period
+    rs = avg_gain / avg_loss if avg_loss else 0.0
+    result[period] = 100 - (100 / (1 + rs)) if avg_loss else 100.0
+
+    for index in range(period + 1, len(values)):
+        delta = values[index] - values[index - 1]
+        gain = max(delta, 0.0)
+        loss = max(-delta, 0.0)
+        avg_gain = ((avg_gain * (period - 1)) + gain) / period
+        avg_loss = ((avg_loss * (period - 1)) + loss) / period
+        rs = avg_gain / avg_loss if avg_loss else 0.0
+        result[index] = 100 - (100 / (1 + rs)) if avg_loss else 100.0
+
+    return result
+
+
+def atr(rates, period):
+    result = [None] * len(rates)
+    if period <= 0 or len(rates) <= period:
+        return result
+
+    true_ranges = [0.0]
+    for index in range(1, len(rates)):
+        high = rates[index]["high"]
+        low = rates[index]["low"]
+        prev_close = rates[index - 1]["close"]
+        true_ranges.append(max(high - low, abs(high - prev_close), abs(low - prev_close)))
+
+    seed = sum(true_ranges[1 : period + 1]) / period
+    result[period] = seed
+    prev = seed
+    for index in range(period + 1, len(rates)):
+        prev = ((prev * (period - 1)) + true_ranges[index]) / period
+        result[index] = prev
+    return result
+
+
+def rolling_extreme(values, lookback, mode):
+    result = [None] * len(values)
+    for index in range(lookback, len(values)):
+        window = values[index - lookback : index]
+        result[index] = max(window) if mode == "high" else min(window)
+    return result
+
+
+def dedupe_rr_values(values):
+    return sorted({round(max(0.6, min(4.0, value)), 2) for value in values})
+
+
+def make_strategy_library(rr_values=None):
+    rr_values = dedupe_rr_values(rr_values or [1.0, 1.4, 1.8, 2.2, 2.6])
+    library = []
+
+    for threshold, confirmation, stop_atr, max_hold_bars, rr in product(
+        [0.15, 0.22, 0.3],
+        [0.05, 0.12],
+        [1.0, 1.4, 1.8],
+        [20, 60, 120],
+        rr_values,
+    ):
+        library.append(
+            {
+                "name": f"AI XEDY_V30 Core T{threshold:.2f} C{confirmation:.2f}",
+                "type": "xedy_v30_ai",
+                "params": {
+                    "threshold": threshold,
+                    "confirmation": confirmation,
+                    "stop_atr": stop_atr,
+                    "rr": rr,
+                    "max_hold_bars": max_hold_bars,
+                },
+            }
+        )
+
+    for pullback_limit, confirmation, stop_atr, max_hold_bars, rr in product(
+        [0.05, 0.12],
+        [0.05, 0.1],
+        [1.0, 1.6],
+        [20, 60],
+        rr_values,
+    ):
+        library.append(
+            {
+                "name": f"AI XEDY_V30 Trend Pullback P{pullback_limit:.2f}",
+                "type": "xedy_trend_pullback",
+                "params": {
+                    "pullback_limit": pullback_limit,
+                    "confirmation": confirmation,
+                    "stop_atr": stop_atr,
+                    "rr": rr,
+                    "max_hold_bars": max_hold_bars,
+                },
+            }
+        )
+
+    for extreme_rsi, threshold, stop_atr, max_hold_bars, rr in product(
+        [28, 34],
+        [0.12, 0.22],
+        [1.0, 1.5],
+        [20, 60],
+        rr_values,
+    ):
+        library.append(
+            {
+                "name": f"AI XEDY_V30 Mean Revert RSI{extreme_rsi}",
+                "type": "xedy_mean_revert",
+                "params": {
+                    "extreme_rsi": extreme_rsi,
+                    "threshold": threshold,
+                    "stop_atr": stop_atr,
+                    "rr": rr,
+                    "max_hold_bars": max_hold_bars,
+                },
+            }
+        )
+
+    for breakout_buffer, threshold, stop_atr, max_hold_bars, rr in product(
+        [0.1, 0.18],
+        [0.12, 0.22],
+        [1.0, 1.6],
+        [20, 60],
+        rr_values,
+    ):
+        library.append(
+            {
+                "name": f"AI XEDY_V30 Breakout B{breakout_buffer:.2f}",
+                "type": "xedy_breakout_confirm",
+                "params": {
+                    "breakout_buffer": breakout_buffer,
+                    "threshold": threshold,
+                    "stop_atr": stop_atr,
+                    "rr": rr,
+                    "max_hold_bars": max_hold_bars,
+                },
+            }
+        )
+
+    return library
+
+
+def score_direction_text(value):
+    text = str(value or "").upper()
+    positive_tokens = ["BULLISH", "BUY", "RISK OFF", "SAFE HAVEN", "HEAVY BUYING", "SUPPLY DEFICIT", "NEGATIVE"]
+    negative_tokens = ["BEARISH", "SELL", "RISK ON", "SURPLUS", "OUTFLOWS", "ADDING SHORTS", "STRONG"]
+    for token in positive_tokens:
+        if token in text:
+            return 1.0
+    for token in negative_tokens:
+        if token in text:
+            return -1.0
+    return 0.0
+
+
+def compute_xedy_fundamental_bias():
+    data = load_dashboard_data()
+    gauges = data.get("gauges", {})
+    macro_items = data.get("macro_dashboard", [])
+    flow_items = data.get("institutional_flow", [])
+    drivers = data.get("top_drivers", [])
+    tech_signal = data.get("technical_signals", {}).get("XAUUSD", {})
+
+    macro_bias = 0.0
+    for item in macro_items:
+        score = float(item.get("score", 50))
+        magnitude = abs(score - 50.0) / 50.0
+        direction = score_direction_text(item.get("val")) or score_direction_text(item.get("value"))
+        macro_bias += direction * magnitude
+    macro_bias = macro_bias / len(macro_items) if macro_items else 0.0
+
+    flow_bias = 0.0
+    for item in flow_items:
+        flow_bias += score_direction_text(item.get("val")) or score_direction_text(item.get("color"))
+    flow_bias = flow_bias / len(flow_items) if flow_items else 0.0
+
+    driver_bias = 0.0
+    for driver in drivers:
+        driver_bias += score_direction_text(driver)
+    driver_bias = driver_bias / len(drivers) if drivers else 0.0
+
+    gauge_bias = (
+        ((float(gauges.get("macro_alignment_score", 50)) - 50.0) / 50.0) * 0.45
+        + ((float(gauges.get("institutional_flow_score", 50)) - 50.0) / 50.0) * 0.35
+        + ((float(gauges.get("market_sentiment_score", 50)) - 50.0) / 50.0) * 0.2
+    )
+
+    technical_dashboard_bias = score_direction_text(tech_signal.get("trend"))
+    technical_dashboard_bias += -0.5 if str(tech_signal.get("ma50", "")).upper() == "DOWN" else 0.5
+    rsi_value = float(tech_signal.get("rsi", 50))
+    technical_dashboard_bias += ((rsi_value - 50.0) / 50.0) * 0.5
+    technical_dashboard_bias /= 2.0
+
+    raw_bias = (macro_bias * 0.35) + (flow_bias * 0.2) + (driver_bias * 0.1) + (gauge_bias * 0.2) + (technical_dashboard_bias * 0.15)
+    return max(-1.0, min(1.0, raw_bias))
+
+
+def clamp(value, low, high):
+    return max(low, min(high, value))
+
+
+def compute_technical_score(cache, index):
+    ema_fast = cache["ema_9"][index]
+    ema_mid = cache["ema_21"][index]
+    ema_slow = cache["ema_50"][index]
+    rsi_value = cache["rsi_14"][index]
+    current_close = cache["close"][index]
+    if None in (ema_fast, ema_mid, ema_slow, rsi_value):
+        return None
+
+    trend_score = 0.0
+    if ema_fast > ema_mid > ema_slow:
+        trend_score += 1.0
+    elif ema_fast < ema_mid < ema_slow:
+        trend_score -= 1.0
+
+    price_vs_mid = (current_close - ema_mid) / ema_mid if ema_mid else 0.0
+    trend_score += clamp(price_vs_mid * 200, -1.0, 1.0)
+    trend_score += clamp((rsi_value - 50.0) / 20.0, -1.0, 1.0)
+    return trend_score / 3.0
+
+
+def compute_combined_score(cache, index):
+    technical_score = compute_technical_score(cache, index)
+    if technical_score is None:
+        return None, None
+    combined_score = (cache["xedy_fundamental_bias"] * 0.8) + (technical_score * 0.2)
+    return combined_score, technical_score
+
+
+def build_indicator_cache(rates, strategies):
+    closes = [row["close"] for row in rates]
+    highs = [row["high"] for row in rates]
+    lows = [row["low"] for row in rates]
+    cache = {
+        "close": closes,
+        "high": highs,
+        "low": lows,
+        "atr_14": atr(rates, 14),
+        "xedy_fundamental_bias": compute_xedy_fundamental_bias(),
+    }
+
+    for period in {9, 21, 50}:
+        cache[f"ema_{period}"] = ema(closes, period)
+    cache["rsi_14"] = rsi(closes, 14)
+    cache["rolling_high_20"] = rolling_extreme(highs, 20, "high")
+    cache["rolling_low_20"] = rolling_extreme(lows, 20, "low")
+
+    return cache
+
+
+def estimate_lot_size(stop_distance, equity, risk_pct, risk_context):
+    if stop_distance <= 0:
+        return 0.0
+    risk_amount = equity * (risk_pct / 100.0)
+    tick_size = risk_context.get("tick_size")
+    tick_value = risk_context.get("tick_value")
+    if not tick_size or not tick_value:
+        return 0.0
+    money_per_lot = (stop_distance / tick_size) * tick_value
+    if money_per_lot <= 0:
+        return 0.0
+    raw_lot = risk_amount / money_per_lot
+    step = risk_context.get("volume_step", 0.01) or 0.01
+    volume_min = risk_context.get("volume_min", step) or step
+    volume_max = risk_context.get("volume_max", 100.0) or 100.0
+    rounded = round(raw_lot / step) * step
+    return round(clamp(rounded, volume_min, volume_max), 2)
+
+
+def entry_signal(strategy, cache, index):
+    params = strategy["params"]
+    current_close = cache["close"][index]
+    atr_value = cache["atr_14"][index]
+    if atr_value is None or atr_value <= 0:
+        return None
+
+    if strategy["type"] == "xedy_v30_ai":
+        combined_score, trend_score = compute_combined_score(cache, index)
+        if combined_score is None:
+            return None
+        stop_distance = atr_value * params["stop_atr"]
+        if combined_score >= params["threshold"] and trend_score >= params["confirmation"]:
+            return {
+                "side": 1,
+                "stop_distance": stop_distance,
+                "take_distance": stop_distance * params["rr"],
+                "signal_strength": combined_score,
+            }
+        if combined_score <= -params["threshold"] and trend_score <= -params["confirmation"]:
+            return {
+                "side": -1,
+                "stop_distance": stop_distance,
+                "take_distance": stop_distance * params["rr"],
+                "signal_strength": combined_score,
+            }
+        return None
+
+    if strategy["type"] == "xedy_trend_pullback":
+        combined_score, trend_score = compute_combined_score(cache, index)
+        ema_mid = cache["ema_21"][index]
+        ema_fast = cache["ema_9"][index]
+        if None in (combined_score, trend_score, ema_mid, ema_fast):
+            return None
+        pullback = abs((current_close - ema_mid) / ema_mid) if ema_mid else 0.0
+        stop_distance = atr_value * params["stop_atr"]
+        if combined_score > 0 and trend_score > params["confirmation"] and current_close <= ema_fast and pullback <= params["pullback_limit"]:
+            return {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+        if combined_score < 0 and trend_score < -params["confirmation"] and current_close >= ema_fast and pullback <= params["pullback_limit"]:
+            return {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+        return None
+
+    if strategy["type"] == "xedy_mean_revert":
+        combined_score, trend_score = compute_combined_score(cache, index)
+        rsi_value = cache["rsi_14"][index]
+        if None in (combined_score, trend_score, rsi_value):
+            return None
+        stop_distance = atr_value * params["stop_atr"]
+        if combined_score > params["threshold"] and rsi_value <= params["extreme_rsi"]:
+            return {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+        if combined_score < -params["threshold"] and rsi_value >= 100 - params["extreme_rsi"]:
+            return {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+        return None
+
+    if strategy["type"] == "xedy_breakout_confirm":
+        combined_score, trend_score = compute_combined_score(cache, index)
+        rolling_high = cache["rolling_high_20"][index]
+        rolling_low = cache["rolling_low_20"][index]
+        if None in (combined_score, trend_score, rolling_high, rolling_low):
+            return None
+        stop_distance = atr_value * params["stop_atr"]
+        breakout_unit = atr_value * params["breakout_buffer"]
+        if combined_score > params["threshold"] and current_close > rolling_high + breakout_unit:
+            return {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+        if combined_score < -params["threshold"] and current_close < rolling_low - breakout_unit:
+            return {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+        return None
+
+    return None
+
+
+def exit_signal(strategy, cache, index, position):
+    params = strategy["params"]
+    if strategy["type"] in {"xedy_v30_ai", "xedy_trend_pullback", "xedy_mean_revert", "xedy_breakout_confirm"}:
+        ema_mid = cache["ema_21"][index]
+        ema_slow = cache["ema_50"][index]
+        rsi_value = cache["rsi_14"][index]
+        if None in (ema_mid, ema_slow, rsi_value):
+            return False
+        elapsed_bars = index - position["entry_index"]
+        reversal = (position["side"] == 1 and ema_mid < ema_slow and rsi_value < 48) or (
+            position["side"] == -1 and ema_mid > ema_slow and rsi_value > 52
+        )
+        return reversal or elapsed_bars >= params["max_hold_bars"]
+
+    return False
+
+
+def close_position(position, exit_price, exit_time, reason, equity, risk_pct):
+    stop_distance = position["stop_distance"]
+    if stop_distance <= 0:
+        return None, equity
+
+    move = (exit_price - position["entry"]) * position["side"]
+    r_multiple = move / stop_distance
+    pnl_amount = equity * (risk_pct / 100.0) * r_multiple
+    new_equity = equity + pnl_amount
+
+    trade = {
+        "side": "LONG" if position["side"] == 1 else "SHORT",
+        "entry_time": position["entry_time"],
+        "exit_time": exit_time,
+        "entry": round(position["entry"], 5),
+        "exit": round(exit_price, 5),
+        "reason": reason,
+        "r_multiple": round(r_multiple, 3),
+        "profit_pct": round((pnl_amount / equity) * 100.0, 3) if equity else 0.0,
+        "profit_amount": round(pnl_amount, 2),
+        "lot": round(position.get("lot", 0.0), 2),
+        "mae_r": round(position.get("mae_r", 0.0), 3),
+        "mfe_r": round(position.get("mfe_r", 0.0), 3),
+    }
+    return trade, new_equity
+
+
+def update_position_excursions(position, bar):
+    stop_distance = position["stop_distance"]
+    if stop_distance <= 0:
+        return
+    if position["side"] == 1:
+        adverse_move = max(0.0, position["entry"] - bar["low"])
+        favorable_move = max(0.0, bar["high"] - position["entry"])
+    else:
+        adverse_move = max(0.0, bar["high"] - position["entry"])
+        favorable_move = max(0.0, position["entry"] - bar["low"])
+    position["mae_r"] = max(position.get("mae_r", 0.0), adverse_move / stop_distance)
+    position["mfe_r"] = max(position.get("mfe_r", 0.0), favorable_move / stop_distance)
+
+
+def build_monthly_report(trades, initial_capital):
+    monthly = {}
+    running_equity = float(initial_capital)
+    for trade in trades:
+        month_text = datetime.utcfromtimestamp(trade["exit_time"]).strftime("%Y-%m")
+        bucket = monthly.setdefault(
+            month_text,
+            {
+                "month": month_text,
+                "trades": 0,
+                "lot": 0.0,
+                "avg_lot": 0.0,
+                "profit_amount": 0.0,
+                "wins": 0,
+                "mae_r_total": 0.0,
+                "mfe_r_total": 0.0,
+                "start_equity": running_equity,
+                "peak_equity": running_equity,
+                "end_equity": running_equity,
+                "max_drawdown_pct": 0.0,
+            },
+        )
+        bucket["trades"] += 1
+        bucket["lot"] += float(trade.get("lot", 0.0))
+        bucket["profit_amount"] += float(trade.get("profit_amount", 0.0))
+        bucket["wins"] += 1 if trade["r_multiple"] > 0 else 0
+        bucket["mae_r_total"] += float(trade.get("mae_r", 0.0))
+        bucket["mfe_r_total"] += float(trade.get("mfe_r", 0.0))
+        running_equity += float(trade.get("profit_amount", 0.0))
+        bucket["end_equity"] = running_equity
+        bucket["peak_equity"] = max(bucket["peak_equity"], running_equity)
+        if bucket["peak_equity"] > 0:
+            bucket["max_drawdown_pct"] = max(
+                bucket["max_drawdown_pct"],
+                ((bucket["peak_equity"] - running_equity) / bucket["peak_equity"]) * 100.0,
+            )
+
+    report = []
+    for month_text in sorted(monthly):
+        bucket = monthly[month_text]
+        trades_count = bucket["trades"] or 1
+        start_equity = bucket["start_equity"] or 1.0
+        report.append(
+            {
+                "month": month_text,
+                "trades": bucket["trades"],
+                "lot": round(bucket["lot"], 2),
+                "avg_lot": round(bucket["lot"] / trades_count, 2),
+                "avg_mae_r": round(bucket["mae_r_total"] / trades_count, 3),
+                "avg_mfe_r": round(bucket["mfe_r_total"] / trades_count, 3),
+                "profit_amount": round(bucket["profit_amount"], 2),
+                "profit_pct": round((bucket["profit_amount"] / start_equity) * 100.0, 2),
+                "drawdown_pct": round(bucket["max_drawdown_pct"], 2),
+                "win_rate": round((bucket["wins"] / trades_count) * 100.0, 2),
+            }
+        )
+    return report
+
+
+def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, risk_context=None):
+    warmup = 60
+    equity = float(initial_capital)
+    peak_equity = equity
+    max_drawdown = 0.0
+    trades = []
+    position = None
+
+    for index in range(warmup, len(rates)):
+        bar = rates[index]
+
+        if position is not None:
+            update_position_excursions(position, bar)
+            exit_price = None
+            exit_reason = None
+
+            if position["side"] == 1:
+                if bar["low"] <= position["stop"]:
+                    exit_price = position["stop"]
+                    exit_reason = "stop"
+                elif bar["high"] >= position["take"]:
+                    exit_price = position["take"]
+                    exit_reason = "take"
+                elif exit_signal(strategy, cache, index, position):
+                    exit_price = bar["close"]
+                    exit_reason = "signal"
+            else:
+                if bar["high"] >= position["stop"]:
+                    exit_price = position["stop"]
+                    exit_reason = "stop"
+                elif bar["low"] <= position["take"]:
+                    exit_price = position["take"]
+                    exit_reason = "take"
+                elif exit_signal(strategy, cache, index, position):
+                    exit_price = bar["close"]
+                    exit_reason = "signal"
+
+            if exit_price is not None:
+                trade, equity = close_position(position, exit_price, bar["time"], exit_reason, equity, risk_pct)
+                if trade:
+                    trades.append(trade)
+                    peak_equity = max(peak_equity, equity)
+                    if peak_equity > 0:
+                        max_drawdown = max(max_drawdown, ((peak_equity - equity) / peak_equity) * 100.0)
+                position = None
+
+        if position is None:
+            signal = entry_signal(strategy, cache, index)
+            if signal:
+                entry = bar["close"]
+                stop_distance = signal["stop_distance"]
+                take_distance = signal["take_distance"]
+                side = signal["side"]
+                lot = estimate_lot_size(stop_distance, equity, risk_pct, risk_context or {})
+                position = {
+                    "side": side,
+                    "entry": entry,
+                    "stop_distance": stop_distance,
+                    "entry_time": bar["time"],
+                    "entry_index": index,
+                    "stop": entry - stop_distance if side == 1 else entry + stop_distance,
+                    "take": entry + take_distance if side == 1 else entry - take_distance,
+                    "lot": lot,
+                    "mae_r": 0.0,
+                    "mfe_r": 0.0,
+                }
+
+    if position is not None:
+        trade, equity = close_position(position, rates[-1]["close"], rates[-1]["time"], "end_of_test", equity, risk_pct)
+        if trade:
+            trades.append(trade)
+            peak_equity = max(peak_equity, equity)
+            if peak_equity > 0:
+                max_drawdown = max(max_drawdown, ((peak_equity - equity) / peak_equity) * 100.0)
+
+    if not trades:
+        return {
+            "strategy_name": strategy["name"],
+            "strategy_type": strategy["type"],
+            "parameters": strategy["params"],
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "max_drawdown_pct": 0.0,
+            "avg_monthly_profit_pct": 0.0,
+            "net_profit_pct": 0.0,
+            "score": 0.0,
+            "sample_trades": [],
+        }
+
+    wins = sum(1 for trade in trades if trade["r_multiple"] > 0)
+    monthly_profit = defaultdict(float)
+    monthly_start_equity = {}
+    running_equity = float(initial_capital)
+    for trade in trades:
+        month_text = datetime.utcfromtimestamp(trade["exit_time"]).strftime("%Y-%m")
+        if month_text not in monthly_start_equity:
+            monthly_start_equity[month_text] = running_equity
+        change = running_equity * (trade["profit_pct"] / 100.0)
+        monthly_profit[month_text] += change
+        running_equity += change
+
+    monthly_returns = []
+    for month_text, profit_amount in monthly_profit.items():
+        start_equity = monthly_start_equity[month_text]
+        monthly_returns.append((profit_amount / start_equity) * 100.0 if start_equity else 0.0)
+
+    avg_mae_r = sum(trade["mae_r"] for trade in trades) / len(trades)
+    avg_mfe_r = sum(trade["mfe_r"] for trade in trades) / len(trades)
+    monthly_report = build_monthly_report(trades, initial_capital)
+    net_profit_pct = ((equity - initial_capital) / initial_capital) * 100.0
+    avg_monthly_profit_pct = sum(monthly_returns) / len(monthly_returns) if monthly_returns else 0.0
+    win_rate = (wins / len(trades)) * 100.0
+    expectancy_score = avg_mfe_r - avg_mae_r
+    score = (avg_monthly_profit_pct * 1.2) + (win_rate * 0.35) - (max_drawdown * 0.5) + (len(trades) * 0.03) + (expectancy_score * 3)
+
+    return {
+        "strategy_name": strategy["name"],
+        "strategy_type": strategy["type"],
+        "parameters": strategy["params"],
+        "total_trades": len(trades),
+        "win_rate": round(win_rate, 2),
+        "max_drawdown_pct": round(max_drawdown, 2),
+        "avg_monthly_profit_pct": round(avg_monthly_profit_pct, 2),
+        "net_profit_pct": round(net_profit_pct, 2),
+        "ending_balance": round(equity, 2),
+        "initial_capital": round(initial_capital, 2),
+        "avg_mae_r": round(avg_mae_r, 3),
+        "avg_mfe_r": round(avg_mfe_r, 3),
+        "score": round(score, 2),
+        "sample_trades": trades[:5],
+        "monthly_report": monthly_report,
+    }
+
+
+def compare_metric(value, operator, threshold):
+    if operator == ">":
+        return value > threshold
+    if operator == ">=":
+        return value >= threshold
+    if operator == "<":
+        return value < threshold
+    if operator == "<=":
+        return value <= threshold
+    return False
+
+
+def evaluate_result_against_filters(result, filters):
+    return (
+        compare_metric(result["max_drawdown_pct"], filters["drawdown"]["operator"], filters["drawdown"]["value"])
+        and compare_metric(result["win_rate"], filters["win_rate"]["operator"], filters["win_rate"]["value"])
+        and compare_metric(result["avg_monthly_profit_pct"], filters["monthly_profit"]["operator"], filters["monthly_profit"]["value"])
+    )
+
+
+def generate_refined_rr_values(seed_results):
+    rr_values = []
+    for item in seed_results[:6]:
+        base_rr = float(item["parameters"].get("rr", 1.5))
+        rr_values.extend([base_rr - 0.2, base_rr - 0.05, base_rr, base_rr + 0.05, base_rr + 0.2])
+    rr_values.extend([1.0, 1.4, 1.8, 2.2, 2.6])
+    return dedupe_rr_values(rr_values)
+
+
+def build_self_learning_strategies(seed_results):
+    refined = []
+    for item in seed_results[:6]:
+        params = item["parameters"]
+        for delta_threshold in [-0.02, 0.0, 0.02]:
+            for delta_confirmation in [-0.02, 0.0, 0.02]:
+                tuned = dict(params)
+                if "threshold" in tuned:
+                    tuned["threshold"] = round(clamp(float(tuned["threshold"]) + delta_threshold, 0.08, 0.4), 2)
+                if "confirmation" in tuned:
+                    tuned["confirmation"] = round(clamp(float(tuned["confirmation"]) + delta_confirmation, 0.02, 0.25), 2)
+                tuned["rr"] = round(clamp(float(tuned.get("rr", 1.5)) + delta_threshold + delta_confirmation, 0.8, 3.5), 2)
+                tuned["stop_atr"] = round(clamp(float(tuned.get("stop_atr", 1.2)) + (delta_threshold * 2), 0.8, 2.5), 2)
+                refined.append(
+                    {
+                        "name": f"{item['strategy_name']} Self-Learning",
+                        "type": item["strategy_type"],
+                        "params": tuned,
+                    }
+                )
+    return refined
+
+
+def rank_results(results):
+    results.sort(
+        key=lambda item: (
+            item["passes_filters"],
+            item["net_profit_pct"],
+            item["avg_monthly_profit_pct"],
+            item["avg_mfe_r"] - item["avg_mae_r"],
+        ),
+        reverse=True,
+    )
+    return results
+
+
+def search_backtest_methods(
+    symbol="XAUUSD",
+    days=30,
+    risk_pct=1.0,
+    filters=None,
+    initial_capital=10000.0,
+    start_month=None,
+    end_month=None,
+):
+    rates = fetch_mt5_rates(symbol=symbol, days=days, start_month=start_month, end_month=end_month)
+    risk_context = get_symbol_risk_context(symbol)
+
+    filters = filters or {
+        "drawdown": {"operator": ">", "value": 5},
+        "win_rate": {"operator": "<", "value": 80},
+        "monthly_profit": {"operator": "<", "value": 40},
+    }
+
+    all_results = []
+    learning_iterations = []
+    rr_values = dedupe_rr_values([1.0, 1.4, 1.8, 2.2, 2.6])
+    iteration_sources = [("grid", make_strategy_library(rr_values))]
+
+    for iteration_index in range(2):
+        phase_name, strategies = iteration_sources[-1]
+        cache = build_indicator_cache(rates, strategies)
+        current_results = []
+        for strategy in strategies:
+            result = run_backtest(
+                rates,
+                strategy,
+                cache,
+                risk_pct=risk_pct,
+                initial_capital=initial_capital,
+                risk_context=risk_context,
+            )
+            if result["total_trades"] < 8:
+                continue
+            result["passes_filters"] = evaluate_result_against_filters(result, filters)
+            current_results.append(result)
+        rank_results(current_results)
+        all_results.extend(current_results)
+        passes = sum(1 for item in current_results if item["passes_filters"])
+        learning_iterations.append(
+            {
+                "phase": phase_name,
+                "tested": len(strategies),
+                "returned": len(current_results),
+                "passes": passes,
+            }
+        )
+        if passes > 0 and iteration_index >= 1:
+            break
+        seed_results = current_results[:6]
+        rr_values = generate_refined_rr_values(seed_results)
+        next_phase = "self_learning" if iteration_index == 0 else f"self_learning_{iteration_index}"
+        next_strategies = build_self_learning_strategies(seed_results) + make_strategy_library(rr_values)
+        iteration_sources.append((next_phase, next_strategies))
+
+    deduped = {}
+    for item in all_results:
+        dedupe_key = (
+            item["strategy_type"],
+            tuple(sorted((key, str(value)) for key, value in item["parameters"].items())),
+        )
+        previous = deduped.get(dedupe_key)
+        if previous is None or item["net_profit_pct"] > previous["net_profit_pct"]:
+            deduped[dedupe_key] = item
+
+    results = rank_results(list(deduped.values()))
+    top_results = results[:10]
+    passing_count = sum(1 for item in results if item["passes_filters"])
+
+    return {
+        "symbol": symbol,
+        "timeframe": "M1",
+        "bars": len(rates),
+        "days": days,
+        "range": {
+            "start_month": start_month,
+            "end_month": end_month,
+        },
+        "method": "AI XEDY_V30",
+        "weighting": {"fundamental": 80, "technical": 20},
+        "fundamental_bias": round(compute_xedy_fundamental_bias(), 3),
+        "initial_capital": round(float(initial_capital), 2),
+        "filters": filters,
+        "strategies_tested": sum(item["tested"] for item in learning_iterations),
+        "strategies_returned": len(top_results),
+        "passing_count": passing_count,
+        "target_reached": passing_count > 0,
+        "rrr_search": {
+            "mode": "adaptive_self_learning",
+            "iterations": learning_iterations,
+        },
+        "results": top_results,
+    }
+
+
+
+
+@app.route("/backtest")
+def serve_backtest():
+    return send_from_directory(app.static_folder, "backtest.html")
+
+@app.route("/api/backtest/search", methods=["POST"])
+def api_backtest_search():
+    payload = request.get_json(silent=True) or {}
+    filters = payload.get("filters") or {}
+
+    try:
+        result = search_backtest_methods(
+            symbol=payload.get("symbol", "XAUUSD"),
+            days=int(payload.get("days", 30)),
+            risk_pct=float(payload.get("risk_pct", 1.0)),
+            initial_capital=float(payload.get("initial_capital", 10000)),
+            start_month=payload.get("start_month"),
+            end_month=payload.get("end_month"),
+            filters={
+                "drawdown": {
+                    "operator": filters.get("drawdown", {}).get("operator", ">"),
+                    "value": float(filters.get("drawdown", {}).get("value", 5)),
+                },
+                "win_rate": {
+                    "operator": filters.get("win_rate", {}).get("operator", "<"),
+                    "value": float(filters.get("win_rate", {}).get("value", 80)),
+                },
+                "monthly_profit": {
+                    "operator": filters.get("monthly_profit", {}).get("operator", "<"),
+                    "value": float(filters.get("monthly_profit", {}).get("value", 40)),
+                },
+            },
+        )
+        return jsonify({"success": True, "data": result})
+    except Exception as exc:
+        return jsonify({"success": False, "error": str(exc)}), 500
 
 if __name__ == '__main__':
     # Start the Flask app
