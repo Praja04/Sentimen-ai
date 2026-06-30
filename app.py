@@ -81,7 +81,7 @@ def get_live_ticks():
         try:
             import livetest_sim
             bias = compute_xedy_fundamental_bias()
-            demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"], bias)
+            demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"]["bid"], bias)
         except Exception as err:
             print("Error in livetest simulation tick update:", err)
             
@@ -579,16 +579,17 @@ def compute_combined_score(cache, index):
     return combined_score, technical_score
 
 
-def build_indicator_cache(rates, strategies):
+def build_indicator_cache(rates, strategies, fundamental_bias=None):
     closes = [row["close"] for row in rates]
     highs = [row["high"] for row in rates]
     lows = [row["low"] for row in rates]
+    bias_val = fundamental_bias if fundamental_bias is not None else compute_xedy_fundamental_bias()
     cache = {
         "close": closes,
         "high": highs,
         "low": lows,
         "atr_14": atr(rates, 14),
-        "xedy_fundamental_bias": compute_xedy_fundamental_bias(),
+        "xedy_fundamental_bias": bias_val,
     }
 
     for period in {9, 21, 50}:
@@ -1157,6 +1158,7 @@ def search_backtest_methods(
     end_month=None,
     sort_priority=None,
     timeframe="M1",
+    fundamental_bias=None,
 ):
     rates = fetch_mt5_rates(symbol=symbol, days=days, start_month=start_month, end_month=end_month, timeframe=timeframe)
     risk_context = get_symbol_risk_context(symbol)
@@ -1173,9 +1175,9 @@ def search_backtest_methods(
     iteration_sources = [("grid", make_strategy_library(rr_values))]
 
     global stop_backtest_requested
-    for iteration_index in range(5):
+    for iteration_index in range(3):
         phase_name, strategies = iteration_sources[-1]
-        cache = build_indicator_cache(rates, strategies)
+        cache = build_indicator_cache(rates, strategies, fundamental_bias=fundamental_bias)
         current_results = []
         for strategy in strategies:
             if stop_backtest_requested:
@@ -1270,6 +1272,7 @@ def api_backtest_search():
     results_per_tf = {}
 
     try:
+        bias_val = compute_xedy_fundamental_bias()
         for tf in tfs:
             if stop_backtest_requested:
                 break
@@ -1283,6 +1286,7 @@ def api_backtest_search():
                 end_month=payload.get("end_month"),
                 sort_priority=payload.get("sort_priority", ["net_profit", "win_rate", "drawdown"]),
                 timeframe=tf,
+                fundamental_bias=bias_val,
                 filters={
                     "drawdown": {
                         "operator": filters.get("drawdown", {}).get("operator", "<"),
