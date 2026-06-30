@@ -17,14 +17,14 @@
     {
       "name": "DXY INDEX",
       "val": "BULLISH",
-      "score": 58,
+      "score": 59,
       "dir": "up",
       "value": "BULLISH"
     },
     {
       "name": "TREASURY YIELD",
       "val": "FALLING",
-      "score": 35,
+      "score": 36,
       "dir": "down",
       "value": "FALLING"
     },
@@ -45,14 +45,14 @@
     {
       "name": "EMPLOYMENT",
       "val": "WEAKENING",
-      "score": 75,
+      "score": 76,
       "dir": "up",
       "value": "STRONG"
     },
     {
       "name": "GDP GROWTH",
       "val": "SLOWING",
-      "score": 39,
+      "score": 42,
       "dir": "down",
       "value": "SLOWING"
     },
@@ -73,7 +73,7 @@
     {
       "name": "PHYSICAL GOLD",
       "val": "SUPPLY DEFICIT",
-      "score": 1,
+      "score": 3,
       "dir": "down",
       "value": "BEARISH"
     },
@@ -87,7 +87,7 @@
     {
       "name": "CORRELATION",
       "val": "RISK OFF",
-      "score": 86,
+      "score": 87,
       "dir": "down",
       "value": "STRONG NEG"
     }
@@ -132,18 +132,23 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "S&P 500 Naik di Akhir Kuartal Terbaik Sejak 2020: Market Wrap",
+      "title": "Arabika Raih Keuntungan Terbesar Sejak 2022 seiring Meningkatnya Risiko Pasokan di Brasil",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Emas Naik Di Atas $4.000 seiring Para Pedagang Menatap Prospek Fed dan Pembicaraan Iran",
+      "title": "S&P 500 Naik di Akhir Kuartal Terbaik Sejak 2020: Market Wrap",
       "impact": "text-green"
     },
     {
       "time": "FOREXLIVE",
-      "title": "Bailey, BOE: Kita punya waktu untuk menilai berlalunya harga energi yang lebih tinggi",
+      "title": "Tekanan USDJPY yang lebih tinggi terus berlanjut.",
       "impact": "text-green"
+    },
+    {
+      "time": "FOREXLIVE",
+      "title": "Pembeli S&P membawa harga kembali ke atas MA 200 jam",
+      "impact": "text-yellow"
     },
     {
       "time": "INVESTING",
@@ -187,13 +192,13 @@
     },
     {
       "time": "YAHOO",
-      "title": "Kenaikan saham mengendalikan kuartal ini karena harga minyak mengalami penurunan terbesar dalam beberapa tahun; ",
-      "impact": "text-green"
+      "title": "Mahkamah Agung AS akan mendengarkan banding Apple atas penghinaan dalam gugatan Epic Games",
+      "impact": "text-yellow"
     },
     {
       "time": "YAHOO",
-      "title": "Ulasan Bilt Cards 2.0: Apakah lebih baik dari versi aslinya — dan apakah Anda masih bisa mendapatkan poin dari sewa?",
-      "impact": "text-yellow"
+      "title": "Beth Hammack dari Fed Cleveland memperingatkan AI memicu inflasi dan kemungkinan kenaikan suku bunga",
+      "impact": "text-green"
     },
     {
       "time": "CNBC",
@@ -207,17 +212,12 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Pendanaan RBI Membatasi Kesepakatan 'Body Blow' kepada Perusahaan Perdagangan Prop India",
-      "impact": "text-red"
+      "title": "S&P 500 Naik di Akhir Kuartal Terbaik Sejak 2020: Market Wrap",
+      "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Reli Pasar Keuangan Bulan Juni Menyelamatkan Kuartal dan Semester Pertama",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "FOREXLIVE",
-      "title": "Bailey, BOE: Kita punya waktu untuk menilai berlalunya harga energi yang lebih tinggi",
+      "title": "Emas Naik Di Atas $4.000 seiring Para Pedagang Menatap Prospek Fed dan Pembicaraan Iran",
       "impact": "text-green"
     }
   ],
@@ -225,8 +225,8 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,028.28",
-      "change": "+11.64 (+0.29%)",
+      "price": "4,030.34",
+      "change": "+13.70 (+0.34%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -256,8 +256,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.660",
-      "change": "+0.72 (+0.44%)",
+      "price": "162.634",
+      "change": "+0.69 (+0.43%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -287,8 +287,8 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "69.92",
-      "change": "-0.33 (-0.47%)",
+      "price": "69.86",
+      "change": "-0.39 (-0.56%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -317,9 +317,9 @@
     }
   ],
   "gauges": {
-    "macro_alignment_score": 36,
+    "macro_alignment_score": 37,
     "market_regime_score": 55,
-    "market_sentiment_score": 50,
+    "market_sentiment_score": 70,
     "institutional_flow_score": 20
   },
   "ml_memory": {
@@ -412,7 +412,7 @@
   },
   "economic_calendar": [
     {
-      "time": "00:17",
+      "time": "00:26",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "01:17",
+      "time": "01:26",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "03:17",
+      "time": "03:26",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "04:17",
+      "time": "04:26",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

@@ -13,33 +13,51 @@ def init_demo_file():
             "active_trades": [],
             "history": [
                 {
+                    "ticket": 2873426,
                     "open_time": "2026-06-29 10:15:30",
                     "close_time": "2026-06-29 14:22:45",
+                    "symbol": "XAUUSD",
                     "type": "SELL",
                     "lots": 0.52,
                     "entry": 2335.20,
                     "exit": 2328.10,
-                    "profit": 369.20,
+                    "commission": -1.50,
+                    "swap": 0.00,
+                    "gross_profit": 369.20,
+                    "net_profit": 367.70,
+                    "exit_reason": "TP HIT",
                     "result": "PROFIT"
                 },
                 {
+                    "ticket": 2873912,
                     "open_time": "2026-06-29 16:45:00",
                     "close_time": "2026-06-29 18:10:12",
+                    "symbol": "XAUUSD",
                     "type": "SELL",
                     "lots": 0.52,
                     "entry": 2330.50,
                     "exit": 2334.80,
-                    "profit": -223.60,
+                    "commission": -1.50,
+                    "swap": 0.00,
+                    "gross_profit": -223.60,
+                    "net_profit": -225.10,
+                    "exit_reason": "SL HIT",
                     "result": "LOSS"
                 },
                 {
+                    "ticket": 2874108,
                     "open_time": "2026-06-30 08:30:00",
                     "close_time": "2026-06-30 11:15:20",
+                    "symbol": "XAUUSD",
                     "type": "SELL",
                     "lots": 0.53,
                     "entry": 2328.90,
                     "exit": 2321.40,
-                    "profit": 397.50,
+                    "commission": -1.50,
+                    "swap": 0.00,
+                    "gross_profit": 397.50,
+                    "net_profit": 396.00,
+                    "exit_reason": "TP HIT",
                     "result": "PROFIT"
                 }
             ],
@@ -118,18 +136,28 @@ def update_livetest_sim(current_gold_price, bias):
                 final_profit = (exit_price - trade["entry_price"]) * trade["lots"] * 100.0
                 
             final_profit = round(final_profit, 2)
-            state["balance"] = round(state["balance"] + final_profit, 2)
+            commission = trade.get("commission", -1.50)
+            swap = trade.get("swap", 0.00)
+            net_profit = round(final_profit + commission + swap, 2)
+            
+            state["balance"] = round(state["balance"] + net_profit, 2)
             state["equity"] = state["balance"]
             
             # Move to history
             state["history"].insert(0, {
+                "ticket": trade["ticket"],
                 "open_time": trade["time"],
                 "close_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "symbol": trade["symbol"],
                 "type": trade["type"],
                 "lots": trade["lots"],
                 "entry": trade["entry_price"],
                 "exit": round(exit_price, 2),
-                "profit": final_profit,
+                "commission": commission,
+                "swap": swap,
+                "gross_profit": final_profit,
+                "net_profit": net_profit,
+                "exit_reason": "TP HIT" if result_text == "PROFIT" else "SL HIT",
                 "result": result_text
             })
             # Clear active trades
@@ -150,7 +178,7 @@ def update_livetest_sim(current_gold_price, bias):
         tp_price = entry_price - tp_dist if trade_type == "SELL" else entry_price + tp_dist
         
         new_trade = {
-            "ticket": int(time.time() * 100) % 10000000,
+            "ticket": 20000000 + (int(time.time() * 100) % 10000000),
             "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "symbol": "XAUUSD",
             "type": trade_type,
@@ -159,6 +187,9 @@ def update_livetest_sim(current_gold_price, bias):
             "current_price": round(entry_price, 2),
             "sl": round(sl_price, 2),
             "tp": round(tp_price, 2),
+            "commission": -1.50,
+            "swap": 0.00,
+            "status": "RUNNING",
             "profit": 0.0
         }
         state["active_trades"].append(new_trade)

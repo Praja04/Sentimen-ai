@@ -6,7 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function updateTime() {
         const now = new Date();
-        sysDate.innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        sysDate.innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' 
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
         sysTime.innerText = now.toLocaleTimeString('en-GB', { hour12: false }) + ' WIB';
         sysUpdate.innerText = sysTime.innerText;
         
@@ -46,7 +61,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache'
                 }
-            });
+            
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
             const data = await res.json();
             if(!data.error) {
                 renderDashboard(data);
@@ -62,7 +92,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/api/live_ticks?t=${new Date().getTime()}`, {
                 cache: 'no-store',
                 headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-            });
+            
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
             const data = await res.json();
             if(!data.error && data.ticks) {
                 for (const [symbol, price] of Object.entries(data.ticks)) {
@@ -72,7 +117,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         el.innerText = price.toLocaleString('en-US', {
                             minimumFractionDigits: decimals,
                             maximumFractionDigits: decimals
-                        });
+                        
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
                     }
                 }
                 
@@ -121,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeList.length > 0) {
             activeBody.innerHTML = activeList.map(t => `
                 <tr>
+                    <td>#${t.ticket}</td>
                     <td>${t.time.split(' ')[1]}</td>
                     <td>${t.symbol}</td>
                     <td class="${t.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${t.type}</td>
@@ -129,13 +190,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${t.current_price.toFixed(2)}</td>
                     <td>${t.sl.toFixed(2)}</td>
                     <td>${t.tp.toFixed(2)}</td>
+                    <td>$${t.swap.toFixed(2)}</td>
+                    <td>$${t.commission.toFixed(2)}</td>
+                    <td style="color:var(--text-blue); font-weight:bold;">${t.status || 'RUNNING'}</td>
                     <td class="${t.profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold;">
                         ${t.profit >= 0 ? '+' : ''}$${t.profit.toFixed(2)}
                     </td>
                 </tr>
             `).join("");
         } else {
-            activeBody.innerHTML = `<tr><td colspan="9" class="empty-state">Tidak ada transaksi aktif saat ini.</td></tr>`;
+            activeBody.innerHTML = `<tr><td colspan="13" class="empty-state">Tidak ada transaksi aktif saat ini.</td></tr>`;
         }
         
         // 4. Closed History Table
@@ -144,22 +208,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (historyList.length > 0) {
             historyBody.innerHTML = historyList.map(h => `
                 <tr>
+                    <td>#${h.ticket}</td>
                     <td>${h.open_time.split(' ')[1]}</td>
                     <td>${h.close_time.split(' ')[1]}</td>
+                    <td>${h.symbol || 'XAUUSD'}</td>
                     <td class="${h.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${h.type}</td>
                     <td>${h.lots.toFixed(2)}</td>
                     <td>${h.entry.toFixed(2)}</td>
                     <td>${h.exit.toFixed(2)}</td>
-                    <td class="${h.profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold;">
-                        ${h.profit >= 0 ? '+' : ''}$${h.profit.toFixed(2)}
+                    <td>$${(h.commission || 0).toFixed(2)}</td>
+                    <td>$${(h.swap || 0).toFixed(2)}</td>
+                    <td class="${(h.gross_profit || 0) >= 0 ? 'text-green' : 'text-red'}">$${(h.gross_profit || 0).toFixed(2)}</td>
+                    <td class="${h.net_profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold;">
+                        ${h.net_profit >= 0 ? '+' : ''}$${h.net_profit.toFixed(2)}
                     </td>
+                    <td style="font-weight:bold; font-size:0.55rem; color:var(--text-muted);">${h.exit_reason || 'TP HIT'}</td>
                     <td class="${h.result === 'PROFIT' ? 'text-green' : 'text-red'}" style="font-weight:bold; font-size:0.55rem; letter-spacing:0.5px;">
                         ${h.result}
                     </td>
                 </tr>
             `).join("");
         } else {
-            historyBody.innerHTML = `<tr><td colspan="8" class="empty-state">Belum ada riwayat transaksi.</td></tr>`;
+            historyBody.innerHTML = `<tr><td colspan="14" class="empty-state">Belum ada riwayat transaksi.</td></tr>`;
         }
     }
 
@@ -198,7 +268,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             `;
+        
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
+    }
+});
         macroListEl.innerHTML = mHtml;
 
         // Render Top 5 Macro Drivers dynamically
@@ -207,7 +292,22 @@ document.addEventListener('DOMContentLoaded', () => {
             let drHtml = '';
             data.top_drivers.forEach((dr, idx) => {
                 drHtml += `<div class="driver-item"><span class="idx">${idx + 1}</span> ${dr}</div>`;
-            });
+            
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
             driversListEl.innerHTML = drHtml;
         }
 
@@ -225,7 +325,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             `;
+        
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
+    }
+});
         flowListEl.innerHTML = fHtml;
 
         // Render Assets
@@ -267,7 +382,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             `;
+        
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
+    }
+});
         assetsContainer.innerHTML = aHtml;
 
         // Render Correlation Matrix dynamically
@@ -286,9 +416,39 @@ document.addEventListener('DOMContentLoaded', () => {
                         else if (val <= -0.20) colorClass = 'text-red';
                         else colorClass = 'text-muted'; // Neutral correlation
                         cHtml += `<td class="${colorClass}">${valStr}</td>`;
-                    });
+                    
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
                     cHtml += `</tr>`;
-                });
+                
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
                 tableBody.innerHTML = cHtml;
             }
         }
@@ -320,7 +480,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="news-title ${n.impact}">${n.title}</div>
                 </div>
                 `;
-            });
+            
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
             // Pure CSS Marquee Approach (Bulletproof)
             // Duplicate the news list so it seamlessly loops via CSS transform
             const infiniteHtml = newsHtml + newsHtml;
@@ -357,7 +532,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Sometimes voices load asynchronously
                         speechSynthesis.addEventListener('voiceschanged', function() {
                             voices = window.speechSynthesis.getVoices();
-                        });
+                        
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
                     }
                     
                     // Look for Indonesian female voice
@@ -368,7 +558,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     utterance.onend = () => { btnReadNews.innerText = '🔊 BACA'; };
                     window.speechSynthesis.speak(utterance);
                     btnReadNews.innerText = '⏸ STOP';
-                });
+                
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
             }
         }
 
@@ -436,7 +641,22 @@ document.addEventListener('DOMContentLoaded', () => {
             sData.push(sentScore);
             sData.shift();
             
-            let nowTime = new Date().toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            let nowTime = new Date().toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' 
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
             sLabels.push(nowTime);
             sLabels.shift();
             
@@ -463,7 +683,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="event">${e.event}</span>
                         <span class="impact ${e.impact}">${e.impact}</span>
                     </div>`;
-                });
+                
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
                 if (ecoListEl.innerHTML !== ecHtml) ecoListEl.innerHTML = ecHtml;
             }
         }
@@ -487,7 +722,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td class="${trClass}" style="font-weight:bold;">${t.trend}</td>
                         </tr>`;
                     }
-                });
+                
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
                 if (techBodyEl.innerHTML !== tHtml) techBodyEl.innerHTML = tHtml;
             }
         }
@@ -513,7 +763,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     plugins: { tooltip: { enabled: false } },
                     animation: { duration: 2000, easing: 'easeOutQuart' }
                 }
-            });
+            
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
         }
 
         // Macro Alignment Gauge
@@ -572,7 +837,22 @@ document.addEventListener('DOMContentLoaded', () => {
             sData[1439 - i] = cur;
             
             let d = new Date(now.getTime() - i * 60000);
-            sLabels[1439 - i] = d.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            sLabels[1439 - i] = d.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' 
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
             
             // Random walk backwards with mean reversion to 50
             let drift = (Math.random() - 0.5) * 4;
@@ -615,6 +895,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 layout: { padding: { right: 70, left: 0, top: 10, bottom: 0 } }
             }
+        
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
+    }
+
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        // Load saved state
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        
+        // Save state on change
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
     }
 });

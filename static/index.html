@@ -259,6 +259,55 @@
                 LIVETEST REAL-TIME DEMO (Rekomendasi: TF M15 / Risk 1.0%)
                 <span class="badge-live" id="live-demo-badge">LIVE SIMULATION RUNNING</span>
             </h3>
+            
+            <!-- Recommendations & Checklist Row -->
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; margin-bottom: 20px; margin-top: 10px;">
+                <!-- Best Metrics Card -->
+                <div class="panel-border" style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 4px; border: 1px solid var(--border-accent);">
+                    <h4 style="margin-top: 0; color: var(--text-yellow); font-size: 0.8rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; font-family: 'Rajdhani', sans-serif;">🏆 REKOMENDASI TERBAIK HASIL BACKTEST</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                        <div style="background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 4px; text-align: center; border: 1px solid rgba(0, 255, 65, 0.2);">
+                            <div style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">PROFIT TERBESAR</div>
+                            <strong style="font-size: 1.1rem; color: var(--text-green); font-family: 'Roboto Mono', monospace;">+40.68%</strong>
+                            <div style="font-size: 0.55rem; color: #fff; margin-top: 2px;">TF M15 / Risk 1.0%</div>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 4px; text-align: center; border: 1px solid rgba(59, 130, 246, 0.2);">
+                            <div style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">WINRATE TERBESAR</div>
+                            <strong style="font-size: 1.1rem; color: var(--text-blue); font-family: 'Roboto Mono', monospace;">70.0%</strong>
+                            <div style="font-size: 0.55rem; color: #fff; margin-top: 2px;">TF H4 / Risk 1.0%</div>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 4px; text-align: center; border: 1px solid rgba(255, 215, 0, 0.2);">
+                            <div style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">DRAWDOWN TERENDAH</div>
+                            <strong style="font-size: 1.1rem; color: var(--text-yellow); font-family: 'Roboto Mono', monospace;">2.98%</strong>
+                            <div style="font-size: 0.55rem; color: #fff; margin-top: 2px;">TF H4 / Risk 1.0%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Checklist Card -->
+                <div class="panel-border" style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 4px; border: 1px solid var(--border-accent);">
+                    <h4 style="margin-top: 0; color: var(--text-yellow); font-size: 0.8rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; font-family: 'Rajdhani', sans-serif;">✅ CEKLIST KESIAPAN LIVE TEST</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; font-size: 0.65rem; color: var(--text-muted); font-family: 'Rajdhani', sans-serif; font-weight: 600;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" checked disabled />
+                            <span style="color: #fff;">Backtest Validasi Terpenuhi (Profit &gt; 0, DD &lt; 10%, WR &gt; 50%)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" checked disabled />
+                            <span style="color: #fff;">Terminal MetaTrader 5 (MT5) Terhubung</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" checked disabled />
+                            <span style="color: #fff;">Kalibrasi AI Fundamental Bias Terkoneksi</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" id="chk-live-ready" style="accent-color: var(--text-yellow);" />
+                            <strong style="color: var(--text-yellow);">SIAP DI-LIVE TEST (Aktifkan Eksekusi Akun Demo/Real)</strong>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <div class="livetest-grid">
                 <div class="livetest-card">
                     <span class="label">Total Balance</span>
@@ -282,17 +331,21 @@
                 <div class="livetest-frame active-trades">
                     <h4>Bingkai Transaksi Terjadi (Active Trades)</h4>
                     <div class="table-scroll">
-                        <table class="livetest-table">
+                        <table class="livetest-table" style="min-width: 800px;">
                             <thead>
                                 <tr>
+                                    <th>Ticket</th>
                                     <th>Time</th>
                                     <th>Symbol</th>
                                     <th>Type</th>
                                     <th>Lots</th>
                                     <th>Entry Price</th>
                                     <th>Current Price</th>
-                                    <th>Stop Loss</th>
-                                    <th>Take Profit</th>
+                                    <th>SL</th>
+                                    <th>TP</th>
+                                    <th>Swap</th>
+                                    <th>Commission</th>
+                                    <th>Status</th>
                                     <th>Profit ($)</th>
                                 </tr>
                             </thead>
@@ -306,16 +359,22 @@
                 <div class="livetest-frame history-trades">
                     <h4>Histori Transaksi (Closed Trades)</h4>
                     <div class="table-scroll">
-                        <table class="livetest-table">
+                        <table class="livetest-table" style="min-width: 800px;">
                             <thead>
                                 <tr>
+                                    <th>Ticket</th>
                                     <th>Open Time</th>
                                     <th>Close Time</th>
+                                    <th>Symbol</th>
                                     <th>Type</th>
                                     <th>Lots</th>
                                     <th>Entry</th>
                                     <th>Exit</th>
-                                    <th>Profit ($)</th>
+                                    <th>Commission</th>
+                                    <th>Swap</th>
+                                    <th>Gross Profit</th>
+                                    <th>Net Profit</th>
+                                    <th>Reason</th>
                                     <th>Result</th>
                                 </tr>
                             </thead>
