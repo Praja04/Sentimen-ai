@@ -1,24 +1,40 @@
 {
-    "balance": 10543.1,
-    "equity": 11115.6,
+    "balance": 11641.6,
+    "equity": 11641.6,
     "active_trades": [
         {
-            "ticket": 23684077,
-            "time": "2026-06-30 23:27:20",
+            "ticket": 26380049,
+            "time": "2026-07-01 06:56:40",
             "symbol": "XAUUSD",
             "type": "SELL",
-            "lots": 0.5,
-            "entry_price": 4028.71,
-            "current_price": 4017.26,
-            "sl": 4043.71,
-            "tp": 4006.71,
+            "lots": 0.08,
+            "entry_price": 4005.91,
+            "current_price": 4005.91,
+            "sl": 4020.91,
+            "tp": 3983.91,
             "commission": -1.5,
             "swap": 0.0,
             "status": "RUNNING",
-            "profit": 572.5
+            "profit": 0.0
         }
     ],
     "history": [
+        {
+            "ticket": 23684077,
+            "open_time": "2026-06-30 23:27:20",
+            "close_time": "2026-07-01 06:56:34",
+            "symbol": "XAUUSD",
+            "type": "SELL",
+            "lots": 0.5,
+            "entry": 4028.71,
+            "exit": 4006.71,
+            "commission": -1.5,
+            "swap": 0.0,
+            "gross_profit": 1100.0,
+            "net_profit": 1098.5,
+            "exit_reason": "TP HIT",
+            "result": "PROFIT"
+        },
         {
             "ticket": 2873426,
             "open_time": "2026-06-29 10:15:30",
@@ -68,5 +84,5 @@
             "result": "PROFIT"
         }
     ],
-    "last_update": 1782860967.9674313
+    "last_update": 1782863800.4927998
 }

@@ -381,6 +381,14 @@ function renderLiveDemo(demo) {
     document.getElementById("live-balance").innerText = `$${demo.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     document.getElementById("live-equity").innerText = `$${demo.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     
+    // Update active strategy label
+    const stratLabel = document.getElementById("active-strat-label");
+    if (stratLabel && demo.active_config) {
+        stratLabel.innerText = `Active: ${demo.active_config.strategy_name} (${demo.active_config.timeframe} / Risk ${demo.active_config.risk_percent}%)`;
+    } else if (stratLabel) {
+        stratLabel.innerText = "Active: Default M15 (Risk 1.0%)";
+    }
+    
     const totalProfit = demo.equity - 10000.0;
     const totalProfitPct = (totalProfit / 10000.0) * 100.0;
     const profitEl = document.getElementById("live-profit");
@@ -522,3 +530,90 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// Handle single checklist strategy selection across all timeframes with confirmation
+async function handleStrategySelect(checkbox) {
+    const isChecked = checkbox.checked;
+    
+    const tf = checkbox.getAttribute('data-tf');
+    const risk = checkbox.getAttribute('data-risk');
+    const type = checkbox.getAttribute('data-type');
+    const name = checkbox.getAttribute('data-name');
+    const win = checkbox.getAttribute('data-win');
+    const dd = checkbox.getAttribute('data-dd');
+    const profit = checkbox.getAttribute('data-profit');
+
+    if (isChecked) {
+        // Show confirmation prompt BEFORE applying
+        if (confirm(`Apakah Anda yakin ingin memilih strategi ini untuk LIVE TEST?\n\n- Nama: ${name}\n- Timeframe: ${tf}\n- Risk: ${risk}%`)) {
+            // Uncheck all other checkboxes instantly
+            const allCheckboxes = document.querySelectorAll('.strategy-selector-chk');
+            allCheckboxes.forEach(chk => {
+                if (chk !== checkbox) chk.checked = false;
+            });
+            
+            await deployToLiveTest(tf, risk, type, name, win, dd, profit);
+        } else {
+            checkbox.checked = false; // Revert checkbox if canceled
+        }
+    } else {
+        // Show confirmation prompt BEFORE disabling
+        if (confirm("Apakah Anda yakin ingin menonaktifkan strategi ini dari Live Test?")) {
+            await clearActiveLiveTestStrategy();
+        } else {
+            checkbox.checked = true; // Revert checkbox if canceled
+        }
+    }
+}
+
+// Deploy strategy config parameters to the backend active configuration
+async function deployToLiveTest(timeframe, riskPercent, strategyType, strategyName, winRate, maxDrawdown, netProfit) {
+    try {
+        const payload = {
+            timeframe,
+            risk_percent: parseFloat(riskPercent),
+            strategy_type: strategyType,
+            strategy_name: strategyName,
+            win_rate: parseFloat(winRate),
+            max_drawdown: parseFloat(maxDrawdown),
+            net_profit: parseFloat(netProfit)
+        };
+        
+        const res = await fetch('/api/livetest/apply_parameters', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await res.json();
+        if (data.status === "success") {
+            alert(`🚀 SUKSES!\n\nParameter Strategi "${strategyName}" (${timeframe}) berhasil diterapkan ke Live Test.`);
+            location.reload(); // Reload to refresh layouts and configurations
+        } else {
+            alert(`❌ Gagal menerapkan parameter: ${data.message}`);
+        }
+    } catch (e) {
+        console.error("Deploy parameters failed:", e);
+        alert(`❌ Error: ${e.message}`);
+    }
+}
+
+// Clear active strategy parameters from the live test
+async function clearActiveLiveTestStrategy() {
+    try {
+        const res = await fetch('/api/livetest/clear_parameters', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+            alert("✅ Reset Sukses! Live Test kini berjalan dengan parameter bawaan.");
+            location.reload();
+        } else {
+            alert(`❌ Gagal reset: ${data.message}`);
+        }
+    } catch (e) {
+        console.error("Reset active strategy failed:", e);
+        alert(`❌ Error: ${e.message}`);
+    }
+}

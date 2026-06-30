@@ -165,14 +165,22 @@ def update_livetest_sim(current_gold_price, bias):
             
     # 2. If no active trade, open a new one
     else:
+        # Load active config from state if present
+        config = state.get("active_config", {})
+        risk_percent = config.get("risk_percent", 1.0)
+        sl_dist = config.get("sl_dist", 15.0)
+        tp_dist = config.get("tp_dist", 22.0)
+        
         # Open Sell since fundamental bias is Bearish, Buy if Bullish
         trade_type = "SELL" if bias < 0 else "BUY"
-        lots = 0.50 # Balanced M15 size for 1.0% risk
         
-        # SL and TP targets
-        sl_dist = 15.0 # ATR average for Gold
-        tp_dist = 22.0 # 1.5x Reward-to-Risk ratio
-        
+        # Calculate dynamic lot size based on risk and balance: Lot Size = (Balance * Risk%) / (SL * 100)
+        balance = state.get("balance", 10000.0)
+        risk_amount = balance * (risk_percent / 100.0)
+        lots = round(risk_amount / (sl_dist * 100.0), 2)
+        if lots < 0.01:
+            lots = 0.01
+            
         entry_price = current_gold_price
         sl_price = entry_price + sl_dist if trade_type == "SELL" else entry_price - sl_dist
         tp_price = entry_price - tp_dist if trade_type == "SELL" else entry_price + tp_dist

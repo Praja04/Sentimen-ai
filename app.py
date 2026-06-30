@@ -1324,6 +1324,87 @@ def api_backtest_stop():
     stop_backtest_requested = True
     return jsonify({"success": True, "message": "Stop requested."})
 
+
+
+@app.route('/api/livetest/apply_parameters', methods=['POST'])
+def apply_livetest_parameters():
+    try:
+        req = request.get_json()
+        if not req:
+            return jsonify({"status": "error", "message": "Empty payload"}), 400
+            
+        tf = req.get("timeframe", "M15")
+        risk = float(req.get("risk_percent", 1.0))
+        strat_type = req.get("strategy_type", "xedy_v30_ai")
+        strat_name = req.get("strategy_name", "AI XEDY_V30 Core")
+        win_rate = req.get("win_rate", 68)
+        max_dd = req.get("max_drawdown", 7.2)
+        net_profit = req.get("net_profit", 68.0)
+        
+        # Calculate SL & TP distances based on strategy type
+        sl_dist = 15.0
+        tp_dist = 22.0
+        if strat_type == "xedy_trend_pullback":
+            sl_dist = 12.0
+            tp_dist = 18.0
+        elif strat_type == "xedy_mean_revert":
+            sl_dist = 25.0
+            tp_dist = 25.0
+        elif strat_type == "xedy_breakout_confirm":
+            sl_dist = 18.0
+            tp_dist = 30.0
+            
+        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        state = {}
+        if os.path.exists(demo_file):
+            with open(demo_file, 'r', encoding='utf-8') as f_demo:
+                state = json.load(f_demo)
+                
+        state["active_config"] = {
+            "timeframe": tf,
+            "risk_percent": risk,
+            "strategy_type": strat_type,
+            "strategy_name": strat_name,
+            "sl_dist": sl_dist,
+            "tp_dist": tp_dist,
+            "win_rate": win_rate,
+            "max_drawdown": max_dd,
+            "net_profit": net_profit
+        }
+        
+        # Force close any existing trade to open a new one with new config
+        state["active_trades"] = []
+        
+        with open(demo_file, 'w', encoding='utf-8') as f_demo:
+            json.dump(state, f_demo, indent=4)
+            
+        return jsonify({"status": "success", "message": "Parameters successfully applied to Live Test"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route('/api/livetest/clear_parameters', methods=['POST'])
+def clear_livetest_parameters():
+    try:
+        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        state = {}
+        if os.path.exists(demo_file):
+            with open(demo_file, 'r', encoding='utf-8') as f_demo:
+                state = json.load(f_demo)
+                
+        if "active_config" in state:
+            del state["active_config"]
+            
+        # Force close any existing trade
+        state["active_trades"] = []
+            
+        with open(demo_file, 'w', encoding='utf-8') as f_demo:
+            json.dump(state, f_demo, indent=4)
+            
+        return jsonify({"status": "success", "message": "Live test reset to default"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 if __name__ == '__main__':
     # Start the Flask app
     app.run(debug=True, host='0.0.0.0', port=5000)

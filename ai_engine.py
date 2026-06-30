@@ -593,7 +593,7 @@ def run_news_update():
             if has_gemini:
                 try:
                     # using global json import
-                    model = genai.GenerativeModel('gemini-1.5-flash', system_instruction="You are a Quant Macro AI. Reply strictly in JSON mapping title string to one word: BULLISH, BEARISH, or NEUTRAL.")
+                    model = genai.GenerativeModel('gemini-2.5-flash', system_instruction="You are a Quant Macro AI. Reply strictly in JSON mapping title string to one word: BULLISH, BEARISH, or NEUTRAL.")
                     prompt = f"Analyze the global market impact (Risk-On/Growth vs Risk-Off/Fear) of each headline. Return valid JSON dictionary format only: {json.dumps(batch_titles)}"
                     ans = model.generate_content(prompt).text.strip()
                     import re
@@ -707,7 +707,7 @@ def run_claude_4h_forecast():
                             f"Recent News: {news_ctx}. Based on this exact data matrix, predict {ui_sym} next 4H direction. "
                             f"Reply ONLY in valid JSON format: {{\"dir\": \"BULLISH\" or \"BEARISH\", \"bp\": \"85%\", \"action\": \"BUY DIP\" or \"SELL RALLY\"}}"
                         )
-                        model = genai.GenerativeModel('gemini-1.5-flash', system_instruction="You are a quant Hedge Fund AI. Reply strictly in JSON.")
+                        model = genai.GenerativeModel('gemini-2.5-flash', system_instruction="You are a quant Hedge Fund AI. Reply strictly in JSON.")
                         ans = model.generate_content(rag_prompt).text
                         
                         import re
