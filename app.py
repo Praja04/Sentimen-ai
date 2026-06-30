@@ -1104,32 +1104,51 @@ def api_backtest_search():
     payload = request.get_json(silent=True) or {}
     filters = payload.get("filters") or {}
 
+    tfs = ["M1", "M5", "M15", "M30", "H1", "H4", "D1"]
+    results_per_tf = {}
+
     try:
-        result = search_backtest_methods(
-            symbol=payload.get("symbol", "XAUUSD"),
-            days=int(payload.get("days", 30)),
-            risk_pct=float(payload.get("risk_pct", 1.0)),
-            initial_capital=float(payload.get("initial_capital", 10000)),
-            start_month=payload.get("start_month"),
-            end_month=payload.get("end_month"),
-            sort_priority=payload.get("sort_priority", ["net_profit", "win_rate", "drawdown"]),
-            timeframe=payload.get("timeframe", "M1"),
-            filters={
-                "drawdown": {
-                    "operator": filters.get("drawdown", {}).get("operator", ">"),
-                    "value": float(filters.get("drawdown", {}).get("value", 5)),
+        for tf in tfs:
+            if stop_backtest_requested:
+                break
+                
+            tf_result = search_backtest_methods(
+                symbol=payload.get("symbol", "XAUUSD"),
+                days=int(payload.get("days", 30)),
+                risk_pct=float(payload.get("risk_pct", 1.0)),
+                initial_capital=float(payload.get("initial_capital", 10000)),
+                start_month=payload.get("start_month"),
+                end_month=payload.get("end_month"),
+                sort_priority=payload.get("sort_priority", ["net_profit", "win_rate", "drawdown"]),
+                timeframe=tf,
+                filters={
+                    "drawdown": {
+                        "operator": filters.get("drawdown", {}).get("operator", ">"),
+                        "value": float(filters.get("drawdown", {}).get("value", 5)),
+                    },
+                    "win_rate": {
+                        "operator": filters.get("win_rate", {}).get("operator", "<"),
+                        "value": float(filters.get("win_rate", {}).get("value", 80)),
+                    },
+                    "monthly_profit": {
+                        "operator": filters.get("monthly_profit", {}).get("operator", "<"),
+                        "value": float(filters.get("monthly_profit", {}).get("value", 40)),
+                    },
                 },
-                "win_rate": {
-                    "operator": filters.get("win_rate", {}).get("operator", "<"),
-                    "value": float(filters.get("win_rate", {}).get("value", 80)),
-                },
-                "monthly_profit": {
-                    "operator": filters.get("monthly_profit", {}).get("operator", "<"),
-                    "value": float(filters.get("monthly_profit", {}).get("value", 40)),
-                },
-            },
-        )
-        return jsonify({"success": True, "data": result})
+            )
+            results_per_tf[tf] = tf_result
+
+        if stop_backtest_requested:
+            stop_backtest_requested = False
+            return jsonify({"success": False, "error": "Backtest dihentikan oleh user."}), 400
+
+        return jsonify({
+            "success": True, 
+            "data": {
+                "symbol": payload.get("symbol", "XAUUSD"),
+                "results_per_tf": results_per_tf
+            }
+        })
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500
 

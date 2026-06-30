@@ -324,3 +324,33 @@ button {
         grid-template-columns: 1fr;
     }
 }
+
+.tf-tabs {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 12px;
+}
+
+.tf-tab {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.tf-tab:hover {
+    color: var(--text);
+    border-color: var(--accent);
+}
+
+.tf-tab.active {
+    background: linear-gradient(135deg, var(--accent-strong), #0e7cf6);
+    color: #04121f;
+    border-color: var(--accent-strong);
+}

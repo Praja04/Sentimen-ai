@@ -1,3 +1,5 @@
+let backtestResultsPerTF = null;
+let backtestPayloadInfo = null;
 let backtestAbortController = null;
 const elements = {
     symbol: document.getElementById("symbol"),
@@ -155,7 +157,7 @@ function renderResults(payload) {
 async function runBacktestSearch() {
     elements.runBacktest.disabled = true;
     elements.stopBacktest.style.display = "inline-block";
-    elements.statusText.textContent = `Menjalankan AI XEDY_V30 (${elements.timeframe.value}) dengan bobot fundamental 80% dan teknikal 20%...`;
+    elements.statusText.textContent = 'Menjalankan AI XEDY_V30 (M1 s/d D1) dengan bobot fundamental 80% dan teknikal 20%...';
     
     backtestAbortController = new AbortController();
 
@@ -241,3 +243,29 @@ async function stopBacktestExecution() {
 }
 
 elements.stopBacktest.addEventListener("click", stopBacktestExecution);
+
+function switchTF(tf) {
+    if (!backtestResultsPerTF || !backtestResultsPerTF[tf]) return;
+    
+    // Update active tab styling
+    document.querySelectorAll(".tf-tab").forEach(tab => {
+        if (tab.getAttribute("data-tf") === tf) {
+            tab.classList.add("active");
+        } else {
+            tab.classList.remove("active");
+        }
+    });
+    
+    const tfData = backtestResultsPerTF[tf];
+    renderResults(tfData);
+}
+
+// Add event listener to tabs
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".tf-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+            const tf = tab.getAttribute("data-tf");
+            switchTF(tf);
+        });
+    });
+});
