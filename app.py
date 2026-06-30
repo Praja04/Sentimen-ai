@@ -233,6 +233,34 @@ def get_symbol_risk_context(symbol="XAUUSD"):
     }
 
 
+def macd(values):
+    ema12 = ema(values, 12)
+    ema26 = ema(values, 26)
+    macd_line = []
+    for e12, e26 in zip(ema12, ema26):
+        if e12 is None or e26 is None:
+            macd_line.append(None)
+        else:
+            macd_line.append(e12 - e26)
+            
+    first_valid = next((i for i, x in enumerate(macd_line) if x is not None), len(macd_line))
+    signal_line = [None] * len(macd_line)
+    if first_valid < len(macd_line):
+        valid_part = macd_line[first_valid:]
+        valid_sig = ema(valid_part, 9)
+        for i, val in enumerate(valid_sig):
+            signal_line[first_valid + i] = val
+            
+    hist = []
+    for ml, sl in zip(macd_line, signal_line):
+        if ml is None or sl is None:
+            hist.append(None)
+        else:
+            hist.append(ml - sl)
+            
+    return macd_line, signal_line, hist
+
+
 def ema(values, period):
     result = [None] * len(values)
     if period <= 0 or len(values) < period:
@@ -402,6 +430,26 @@ def make_strategy_library(rr_values=None):
             }
         )
 
+    # AI XEDY_V30 MACD Momentum
+    for threshold, stop_atr, max_hold_bars, rr in product(
+        [0.05, 0.15],
+        [1.2],
+        [45],
+        rr_values,
+    ):
+        library.append(
+            {
+                "name": f"AI XEDY_V30 MACD Momentum T{threshold:.2f}",
+                "type": "xedy_macd_momentum",
+                "params": {
+                    "threshold": threshold,
+                    "stop_atr": stop_atr,
+                    "rr": rr,
+                    "max_hold_bars": max_hold_bars,
+                },
+            }
+        )
+
     return library
 
 
@@ -511,6 +559,11 @@ def build_indicator_cache(rates, strategies):
     cache["rolling_high_20"] = rolling_extreme(highs, 20, "high")
     cache["rolling_low_20"] = rolling_extreme(lows, 20, "low")
 
+    macd_line, signal_line, hist = macd(closes)
+    cache["macd_line"] = macd_line
+    cache["macd_signal"] = signal_line
+    cache["macd_hist"] = hist
+
     return cache
 
 
@@ -598,6 +651,18 @@ def entry_signal(strategy, cache, index):
             elif combined_score < -params["threshold"] and current_close < rolling_low - breakout_unit:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
+    elif strategy["type"] == "xedy_macd_momentum":
+        combined_score, trend_score = compute_combined_score(cache, index)
+        macd_line = cache["macd_line"][index]
+        macd_sig = cache["macd_signal"][index]
+        macd_hist = cache["macd_hist"][index]
+        if not (None in (combined_score, trend_score, macd_line, macd_sig, macd_hist)):
+            stop_distance = atr_value * params["stop_atr"]
+            if combined_score > 0 and macd_hist > params["threshold"]:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            elif combined_score < 0 and macd_hist < -params["threshold"]:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+
     if signal:
         # Arah market strictly mengikuti Trend Fundamental
         if signal["side"] == 1 and bias < 0.0:
@@ -619,6 +684,16 @@ def exit_signal(strategy, cache, index, position):
         elapsed_bars = index - position["entry_index"]
         reversal = (position["side"] == 1 and ema_mid < ema_slow and rsi_value < 48) or (
             position["side"] == -1 and ema_mid > ema_slow and rsi_value > 52
+        )
+        return reversal or elapsed_bars >= params["max_hold_bars"]
+
+    elif strategy["type"] == "xedy_macd_momentum":
+        macd_hist = cache["macd_hist"][index]
+        elapsed_bars = index - position["entry_index"]
+        if macd_hist is None:
+            return False
+        reversal = (position["side"] == 1 and macd_hist < 0.0) or (
+            position["side"] == -1 and macd_hist > 0.0
         )
         return reversal or elapsed_bars >= params["max_hold_bars"]
 
@@ -884,11 +959,16 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
     expectancy_score = avg_mfe_r - avg_mae_r
     score = (avg_monthly_profit_pct * 1.2) + (win_rate * 0.35) - (max_drawdown * 0.5) + (len(trades) * 0.03) + (expectancy_score * 3)
 
+    total_buy = sum(1 for t in trades if t["side"] == "LONG")
+    total_sell = sum(1 for t in trades if t["side"] == "SHORT")
+
     return {
         "strategy_name": strategy["name"],
         "strategy_type": strategy["type"],
         "parameters": strategy["params"],
         "total_trades": len(trades),
+        "total_buy": total_buy,
+        "total_sell": total_sell,
         "win_rate": round(win_rate, 2),
         "max_drawdown_pct": round(max_drawdown, 2),
         "avg_monthly_profit_pct": round(avg_monthly_profit_pct, 2),
@@ -920,6 +1000,10 @@ def evaluate_result_against_filters(result, filters):
     if result.get("max_drawdown_pct", 100.0) >= 10.0:
         return False
         
+    # Enforce net profit is positive
+    if result.get("net_profit_pct", 0.0) <= 0.0:
+        return False
+
     # Enforce no negative months
     monthly_report = result.get("monthly_report", [])
     if monthly_report:
@@ -1016,7 +1100,7 @@ def search_backtest_methods(
     iteration_sources = [("grid", make_strategy_library(rr_values))]
 
     global stop_backtest_requested
-    for iteration_index in range(2):
+    for iteration_index in range(5):
         phase_name, strategies = iteration_sources[-1]
         cache = build_indicator_cache(rates, strategies)
         current_results = []
@@ -1039,6 +1123,7 @@ def search_backtest_methods(
         rank_results(current_results, sort_priority=sort_priority)
         all_results.extend(current_results)
         passes = sum(1 for item in current_results if item["passes_filters"])
+        positive_passing = sum(1 for item in current_results if item["passes_filters"] and item["net_profit_pct"] > 0.0)
         learning_iterations.append(
             {
                 "phase": phase_name,
@@ -1047,7 +1132,7 @@ def search_backtest_methods(
                 "passes": passes,
             }
         )
-        if passes > 0 and iteration_index >= 1:
+        if positive_passing > 0 and iteration_index >= 1:
             break
         seed_results = current_results[:6]
         rr_values = generate_refined_rr_values(seed_results)

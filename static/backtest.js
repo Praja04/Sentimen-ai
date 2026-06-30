@@ -115,7 +115,7 @@ function renderResults(payload) {
                 <div class="result-head">
                     <div>
                         <div class="label">#${index + 1} | ${payload.method} | ${item.strategy_type}</div>
-                        <h3>${item.strategy_name}</h3>
+                        <h3>${item.strategy_name} <span class="badge tf-badge">${payload.timeframe}</span></h3>
                     </div>
                     <div class="badge ${item.passes_filters ? "pass" : "fail"}">
                         ${item.passes_filters ? "LOLOS FILTER" : "TIDAK LOLOS"}
@@ -143,6 +143,23 @@ function renderResults(payload) {
                     ${metricCard("RRR", item.parameters.rr)}
                     ${metricCard("Validasi filter", item.passes_filters ? "Lolos" : "Tidak")}
                 </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric full-width" style="grid-column: span 4; border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px;">
+                        <div class="label" style="text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 4px;">Detail Logika Perdagangan (Rules)</div>
+                        <div style="font-size: 12px; line-height: 1.5; color: var(--text);">
+                            <strong>Trigger Isyarat:</strong> ${
+                                item.strategy_type === 'xedy_v30_ai' ? 'Dynamic combined score + trend filter' :
+                                item.strategy_type === 'xedy_trend_pullback' ? 'Trend alignment + EMA 21 pullback filter' :
+                                item.strategy_type === 'xedy_mean_revert' ? 'Mean Reversion RSI Extreme boundary' :
+                                item.strategy_type === 'xedy_breakout_confirm' ? 'Support/Resistance channel breakout' :
+                                'MACD Momentum Crossover confirmation'
+                            }<br>
+                            <strong>Aturan Grid Averaging:</strong> Multi-Level Entry (maks. 3 tingkat, step 1.5 * ATR), Arah order wajib searah dengan Trend Fundamental (Strictly ${payload.fundamental_bias > 0 ? 'LONG Only' : 'SHORT Only'}).
+                        </div>
+                    </div>
+                </div>
+
                 <div class="param-row">${params}</div>
                 <div class="sample-trades">
                     <div class="label">Sample trades</div>

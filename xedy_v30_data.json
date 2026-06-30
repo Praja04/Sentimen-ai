@@ -205,8 +205,8 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,031.35",
-      "change": "+14.71 (+0.37%)",
+      "price": "4,028.73",
+      "change": "+12.09 (+0.30%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -236,8 +236,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.388",
-      "change": "+0.44 (+0.27%)",
+      "price": "162.398",
+      "change": "+0.45 (+0.28%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -267,8 +267,8 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "70.44",
-      "change": "+0.19 (+0.27%)",
+      "price": "70.62",
+      "change": "+0.37 (+0.53%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -299,7 +299,7 @@
   "gauges": {
     "macro_alignment_score": 34,
     "market_regime_score": 55,
-    "market_sentiment_score": 86,
+    "market_sentiment_score": 95,
     "institutional_flow_score": 20
   },
   "ml_memory": {
@@ -392,7 +392,7 @@
   },
   "economic_calendar": [
     {
-      "time": "19:26",
+      "time": "19:36",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -401,7 +401,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "20:26",
+      "time": "20:36",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -410,7 +410,7 @@
       "prev": "215K"
     },
     {
-      "time": "22:26",
+      "time": "22:36",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -419,7 +419,7 @@
       "prev": "49.1"
     },
     {
-      "time": "23:26",
+      "time": "23:36",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
@@ -436,7 +436,7 @@
     "GLOBAL LIQUIDITY SHIFT"
   ],
   "liquidity_zones": {
-    "XAUUSD": 4032.0,
+    "XAUUSD": 4062.0,
     "USDJPY": 162.0,
     "WTI OIL": 70.0
   }
