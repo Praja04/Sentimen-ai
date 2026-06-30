@@ -6,22 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function updateTime() {
         const now = new Date();
-        sysDate.innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' 
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+        sysDate.innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
         sysTime.innerText = now.toLocaleTimeString('en-GB', { hour12: false }) + ' WIB';
         sysUpdate.innerText = sysTime.innerText;
         
@@ -61,22 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache'
                 }
-            
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+            });
             const data = await res.json();
             if(!data.error) {
                 renderDashboard(data);
@@ -92,188 +62,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/api/live_ticks?t=${new Date().getTime()}`, {
                 cache: 'no-store',
                 headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-            
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+            });
             const data = await res.json();
             if(!data.error && data.ticks) {
-                for (const [symbol, price] of Object.entries(data.ticks)) {
+                for (const [symbol, tickInfo] of Object.entries(data.ticks)) {
                     const el = document.getElementById(`live-price-${symbol.replace(/\s+/g, '-')}`);
                     if (el) {
                         const decimals = symbol.includes('JPY') ? 3 : 2;
-                        el.innerText = price.toLocaleString('en-US', {
+                        el.innerText = tickInfo.bid.toLocaleString('en-US', {
                             minimumFractionDigits: decimals,
                             maximumFractionDigits: decimals
-                        
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+                        });
                     }
-                }
-                
-                // Render Livetest Demo State
-                if (data.demo) {
-                    renderLiveDemo(data.demo);
+                    
+                    // Update detailed stats inside asset cards on homepage
+                    const bidEl = document.getElementById(`live-bid-${symbol.replace(/\s+/g, '-')}`);
+                    const askEl = document.getElementById(`live-ask-${symbol.replace(/\s+/g, '-')}`);
+                    const chgEl = document.getElementById(`live-chg-${symbol.replace(/\s+/g, '-')}`);
+                    const volEl = document.getElementById(`live-vol-${symbol.replace(/\s+/g, '-')}`);
+                    
+                    const decimals = symbol.includes('JPY') ? 3 : 2;
+                    if (bidEl) bidEl.innerText = tickInfo.bid.toFixed(decimals);
+                    if (askEl) askEl.innerText = tickInfo.ask.toFixed(decimals);
+                    if (chgEl) {
+                        const formattedChg = tickInfo.change >= 0 ? `+${tickInfo.change.toFixed(3)}%` : `${tickInfo.change.toFixed(3)}%`;
+                        chgEl.innerText = formattedChg;
+                        chgEl.className = tickInfo.change >= 0 ? 'text-green' : 'text-red';
+                    }
+                    if (volEl) volEl.innerText = tickInfo.volume.toLocaleString('en-US');
                 }
             }
         } catch (e) {
             console.error("Fast tick fetch failed:", e);
         }
-    }
-
-    // RENDER LIVETEST DEMO PANEL
-    function renderLiveDemo(demo) {
-        // 1. Account Cards
-        document.getElementById("live-balance").innerText = `$${demo.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        document.getElementById("live-equity").innerText = `$${demo.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        
-        const totalProfit = demo.equity - 10000.0;
-        const totalProfitPct = (totalProfit / 10000.0) * 100.0;
-        const profitEl = document.getElementById("live-profit");
-        
-        if (totalProfit >= 0) {
-            profitEl.innerText = `+$${totalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (+${totalProfitPct.toFixed(2)}%)`;
-            profitEl.className = "text-green";
-        } else {
-            profitEl.innerText = `-$${Math.abs(totalProfit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${totalProfitPct.toFixed(2)}%)`;
-            profitEl.className = "text-red";
-        }
-        
-        // 2. Current Status
-        const statusEl = document.getElementById("live-status");
-        const activeList = demo.active_trades || [];
-        if (activeList.length > 0) {
-            const t = activeList[0];
-            statusEl.innerText = `TRADING ${t.type} / ENTRY: ${t.entry_price}`;
-            statusEl.className = t.type === "BUY" ? "text-green" : "text-red";
-        } else {
-            statusEl.innerText = "SCANNING FOR SIGNALS...";
-            statusEl.className = "text-yellow";
-        }
-        
-        // 3. Active Trades Table (MT5 layout)
-        const activeBody = document.getElementById("live-active-trades-body");
-        let activeHtml = "";
-        let runningProfitTotal = 0;
-        
-        if (activeList.length > 0) {
-            activeHtml = activeList.map(t => {
-                runningProfitTotal += t.profit;
-                const formattedProfit = t.profit >= 0 ? `+${t.profit.toFixed(2)}` : t.profit.toFixed(2);
-                return `
-                    <tr>
-                        <td>${t.symbol}</td>
-                        <td>${t.ticket}</td>
-                        <td>${t.time}</td>
-                        <td class="${t.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${t.type.toLowerCase()}</td>
-                        <td>${t.lots.toFixed(2)}</td>
-                        <td>${t.entry_price.toFixed(2)}</td>
-                        <td>${t.sl.toFixed(2)}</td>
-                        <td>${t.tp.toFixed(2)}</td>
-                        <td>${t.current_price.toFixed(2)}</td>
-                        <td class="${t.profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
-                            ${formattedProfit}
-                        </td>
-                    </tr>
-                `;
-            }).join("");
-        } else {
-            activeHtml = `<tr><td colspan="10" class="empty-state">Tidak ada transaksi aktif saat ini.</td></tr>`;
-        }
-        
-        // Insert MT5 summary row for Trade tab
-        const formattedTotalProfit = runningProfitTotal >= 0 ? `+${runningProfitTotal.toFixed(2)}` : runningProfitTotal.toFixed(2);
-        activeHtml += `
-            <tr class="mt5-summary-row">
-                <td colspan="9">
-                    <b>• Balance: ${demo.balance.toFixed(2)} USD Equity: ${demo.equity.toFixed(2)} Free Margin: ${demo.equity.toFixed(2)}</b>
-                </td>
-                <td class="${runningProfitTotal >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
-                    ${runningProfitTotal !== 0 ? formattedTotalProfit : '0.00'}
-                </td>
-            </tr>
-        `;
-        activeBody.innerHTML = activeHtml;
-        
-        // 4. Closed History Table (MT5 layout)
-        const historyBody = document.getElementById("live-history-trades-body");
-        const historyList = demo.history || [];
-        let historyHtml = "";
-        let totalClosedProfit = 0;
-        
-        if (historyList.length > 0) {
-            historyHtml = historyList.map(h => {
-                totalClosedProfit += h.net_profit;
-                const formattedProfit = h.net_profit >= 0 ? `+${h.net_profit.toFixed(2)}` : h.net_profit.toFixed(2);
-                
-                // Calculate percentage change return
-                const initialCap = 10000.0;
-                const pctChange = (h.net_profit / initialCap) * 100.0;
-                const formattedChange = pctChange >= 0 ? `+${pctChange.toFixed(3)}%` : `${pctChange.toFixed(3)}%`;
-                
-                return `
-                    <tr>
-                        <td>${h.open_time}</td>
-                        <td>${h.symbol || 'XAUUSD'}</td>
-                        <td>${h.ticket}</td>
-                        <td class="${h.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${h.type.toLowerCase()}</td>
-                        <td>${h.lots.toFixed(2)}</td>
-                        <td>${h.entry.toFixed(2)}</td>
-                        <td>${h.sl.toFixed(2)}</td>
-                        <td>${h.tp.toFixed(2)}</td>
-                        <td>${h.close_time}</td>
-                        <td>${h.exit.toFixed(2)}</td>
-                        <td class="${h.net_profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold;">
-                            ${formattedProfit}
-                        </td>
-                        <td class="${h.net_profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
-                            ${formattedChange}
-                        </td>
-                    </tr>
-                `;
-            }).join("");
-        } else {
-            historyHtml = `<tr><td colspan="12" class="empty-state">Belum ada riwayat transaksi.</td></tr>`;
-        }
-        
-        // Insert MT5 summary row for History tab
-        const formattedTotalClosed = totalClosedProfit >= 0 ? `+${totalClosedProfit.toFixed(2)}` : totalClosedProfit.toFixed(2);
-        historyHtml += `
-            <tr class="mt5-summary-row">
-                <td colspan="10">
-                    <b>• Profit: ${totalClosedProfit.toFixed(2)} Credit: 0.00 Deposit: 10000.00 Withdrawal: 0.00 Balance: ${demo.balance.toFixed(2)}</b>
-                </td>
-                <td class="${totalClosedProfit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;" colspan="2">
-                    ${formattedTotalClosed}
-                </td>
-            </tr>
-        `;
-        historyBody.innerHTML = historyHtml;
     }
 
     // INITIALIZATION
@@ -311,22 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             `;
-        
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
-    }
-});
         macroListEl.innerHTML = mHtml;
 
         // Render Top 5 Macro Drivers dynamically
@@ -335,22 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let drHtml = '';
             data.top_drivers.forEach((dr, idx) => {
                 drHtml += `<div class="driver-item"><span class="idx">${idx + 1}</span> ${dr}</div>`;
-            
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+            });
             driversListEl.innerHTML = drHtml;
         }
 
@@ -368,22 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             `;
-        
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
-    }
-});
         flowListEl.innerHTML = fHtml;
 
         // Render Assets
@@ -433,22 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             `;
-        
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
-    }
-});
         assetsContainer.innerHTML = aHtml;
 
         // Render Correlation Matrix dynamically
@@ -467,39 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         else if (val <= -0.20) colorClass = 'text-red';
                         else colorClass = 'text-muted'; // Neutral correlation
                         cHtml += `<td class="${colorClass}">${valStr}</td>`;
-                    
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+                    });
                     cHtml += `</tr>`;
-                
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+                });
                 tableBody.innerHTML = cHtml;
             }
         }
@@ -531,22 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="news-title ${n.impact}">${n.title}</div>
                 </div>
                 `;
-            
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+            });
             // Pure CSS Marquee Approach (Bulletproof)
             // Duplicate the news list so it seamlessly loops via CSS transform
             const infiniteHtml = newsHtml + newsHtml;
@@ -583,22 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Sometimes voices load asynchronously
                         speechSynthesis.addEventListener('voiceschanged', function() {
                             voices = window.speechSynthesis.getVoices();
-                        
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+                        });
                     }
                     
                     // Look for Indonesian female voice
@@ -609,22 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     utterance.onend = () => { btnReadNews.innerText = '🔊 BACA'; };
                     window.speechSynthesis.speak(utterance);
                     btnReadNews.innerText = '⏸ STOP';
-                
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+                });
             }
         }
 
@@ -692,22 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sData.push(sentScore);
             sData.shift();
             
-            let nowTime = new Date().toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' 
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+            let nowTime = new Date().toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' });
             sLabels.push(nowTime);
             sLabels.shift();
             
@@ -734,22 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="event">${e.event}</span>
                         <span class="impact ${e.impact}">${e.impact}</span>
                     </div>`;
-                
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+                });
                 if (ecoListEl.innerHTML !== ecHtml) ecoListEl.innerHTML = ecHtml;
             }
         }
@@ -773,22 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td class="${trClass}" style="font-weight:bold;">${t.trend}</td>
                         </tr>`;
                     }
-                
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+                });
                 if (techBodyEl.innerHTML !== tHtml) techBodyEl.innerHTML = tHtml;
             }
         }
@@ -814,22 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     plugins: { tooltip: { enabled: false } },
                     animation: { duration: 2000, easing: 'easeOutQuart' }
                 }
-            
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+            });
         }
 
         // Macro Alignment Gauge
@@ -888,22 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sData[1439 - i] = cur;
             
             let d = new Date(now.getTime() - i * 60000);
-            sLabels[1439 - i] = d.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' 
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
+            sLabels[1439 - i] = d.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' });
             
             // Random walk backwards with mean reversion to 50
             let drift = (Math.random() - 0.5) * 4;
@@ -946,36 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 layout: { padding: { right: 70, left: 0, top: 10, bottom: 0 } }
             }
-        
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
-        });
-    }
-});
-    }
-
-    // checklist state persistence
-    const chkLiveReady = document.getElementById("chk-live-ready");
-    if (chkLiveReady) {
-        // Load saved state
-        const savedState = localStorage.getItem("chk-live-ready-state");
-        if (savedState === "true") {
-            chkLiveReady.checked = true;
-        }
-        
-        // Save state on change
-        chkLiveReady.addEventListener("change", (e) => {
-            localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
     }
 });
