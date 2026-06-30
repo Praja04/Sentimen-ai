@@ -405,12 +405,20 @@ document.addEventListener('DOMContentLoaded', () => {
             let chgColor = a.cColor || 'text-green';
             aHtml += `
             <div class="asset-card">
-                <div class="asset-header">
-                    <div class="asset-icon">${a.icon}</div>
-                    <div class="asset-info">
-                        <span class="asset-name">${a.symbol}</span>
-                        <span class="asset-price ${chgColor}" id="live-price-${a.symbol.replace(/\s+/g, '-')}">${a.price}</span>
-                        <span class="asset-change ${chgColor}">${a.change}</span>
+                <div class="asset-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                        <div class="asset-icon">${a.icon}</div>
+                        <div class="asset-info">
+                            <span class="asset-name">${a.symbol}</span>
+                            <span class="asset-price ${chgColor}" id="live-price-${a.symbol.replace(/\s+/g, '-')}">${a.price}</span>
+                        </div>
+                    </div>
+                    <!-- Detailed Tick Metrics -->
+                    <div class="tick-details" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 0.55rem; width: 100%; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px; font-family: var(--font-mono);">
+                        <div><span style="color:var(--text-muted);">BID:</span> <strong id="live-bid-${a.symbol.replace(/\s+/g, '-')}" style="color:#fff;">...</strong></div>
+                        <div><span style="color:var(--text-muted);">ASK:</span> <strong id="live-ask-${a.symbol.replace(/\s+/g, '-')}" style="color:#fff;">...</strong></div>
+                        <div><span style="color:var(--text-muted);">CHG:</span> <strong id="live-chg-${a.symbol.replace(/\s+/g, '-')}" class="${chgColor}">${a.change}</strong></div>
+                        <div><span style="color:var(--text-muted);">VOL:</span> <strong id="live-vol-${a.symbol.replace(/\s+/g, '-')}" style="color:#fff;">...</strong></div>
                     </div>
                 </div>
                 <div class="forecast-split">

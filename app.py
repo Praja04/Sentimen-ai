@@ -42,12 +42,31 @@ def get_live_ticks():
     ticks = {}
     for symbol in ["XAUUSD", "USDJPY"]:
         t = mt5.symbol_info_tick(symbol)
-        if t: ticks[symbol] = t.bid
+        if t:
+            rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_D1, 0, 1)
+            daily_open = rates[0]['open'] if (rates is not None and len(rates) > 0) else t.bid
+            daily_vol = rates[0]['tick_volume'] if (rates is not None and len(rates) > 0) else 0
+            daily_change = ((t.bid - daily_open) / daily_open) * 100.0 if daily_open > 0 else 0.0
+            ticks[symbol] = {
+                "bid": t.bid,
+                "ask": t.ask,
+                "change": round(daily_change, 3),
+                "volume": int(daily_vol)
+            }
         
     for symbol in ["WTI", "XTIUSD", "USOIL"]:
         t = mt5.symbol_info_tick(symbol)
         if t:
-            ticks["WTI OIL"] = t.bid
+            rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_D1, 0, 1)
+            daily_open = rates[0]['open'] if (rates is not None and len(rates) > 0) else t.bid
+            daily_vol = rates[0]['tick_volume'] if (rates is not None and len(rates) > 0) else 0
+            daily_change = ((t.bid - daily_open) / daily_open) * 100.0 if daily_open > 0 else 0.0
+            ticks["WTI OIL"] = {
+                "bid": t.bid,
+                "ask": t.ask,
+                "change": round(daily_change, 3),
+                "volume": int(daily_vol)
+            }
             break
             
     # Livetest Real-time Demo Simulation update

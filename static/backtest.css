@@ -532,3 +532,8 @@ button {
     font-size: 1.25rem;
     font-family: 'Roboto Mono', monospace;
 }
+
+/* Fix checkbox width layout conflict */
+input[type="checkbox"] {
+    width: auto !important;
+}

@@ -314,6 +314,24 @@ async function fetchLiveTicks() {
             headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
         });
         const data = await res.json();
+        if(!data.error && data.ticks) {
+            // Update XAUUSD live pricing card inside hero-card
+            const goldTick = data.ticks["XAUUSD"];
+            if (goldTick) {
+                const bidEl = document.getElementById("live-bid-XAUUSD");
+                const askEl = document.getElementById("live-ask-XAUUSD");
+                const chgEl = document.getElementById("live-chg-XAUUSD");
+                const volEl = document.getElementById("live-vol-XAUUSD");
+                
+                if (bidEl) bidEl.innerText = goldTick.bid.toFixed(2);
+                if (askEl) askEl.innerText = goldTick.ask.toFixed(2);
+                if (chgEl) {
+                    chgEl.innerText = (goldTick.change >= 0 ? "+" : "") + goldTick.change.toFixed(3) + "%";
+                    chgEl.className = goldTick.change >= 0 ? "text-green" : "text-red";
+                }
+                if (volEl) volEl.innerText = goldTick.volume.toLocaleString('en-US');
+            }
+        }
         if(!data.error && data.demo) {
             renderLiveDemo(data.demo);
         }

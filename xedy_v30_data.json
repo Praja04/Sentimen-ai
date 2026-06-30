@@ -132,23 +132,23 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Arabika Raih Keuntungan Terbesar Sejak 2022 seiring Meningkatnya Risiko Pasokan di Brasil",
+      "title": "Saham AS Naik seiring Indeks berada di Jalur untuk Kuartal Terbaik Sejak 2020",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "S&P 500 Naik di Akhir Kuartal Terbaik Sejak 2020: Market Wrap",
+      "title": "Arabika Raih Keuntungan Terbesar Sejak 2022 seiring Meningkatnya Risiko Pasokan di Brasil",
       "impact": "text-green"
+    },
+    {
+      "time": "FOREXLIVE",
+      "title": "Bitcoin sedang menguji titik terendah pada tahun 2026 dan level terendah sejak September 2024",
+      "impact": "text-yellow"
     },
     {
       "time": "FOREXLIVE",
       "title": "Tekanan USDJPY yang lebih tinggi terus berlanjut.",
       "impact": "text-green"
-    },
-    {
-      "time": "FOREXLIVE",
-      "title": "Pembeli S&P membawa harga kembali ke atas MA 200 jam",
-      "impact": "text-yellow"
     },
     {
       "time": "INVESTING",
@@ -182,23 +182,23 @@
     },
     {
       "time": "OILPRICE",
-      "title": "Pasar Minyak Bersiap Menghadapi Volatilitas Hormuz di Musim Panas",
+      "title": "Pulau Berang-berang Menjadi Tempat Uji Coba Energi Gelombang Air Tawar",
       "impact": "text-yellow"
     },
     {
       "time": "OILPRICE",
-      "title": "Platform ESG Inggris Disiapkan untuk Dijual karena Belanja Keberlanjutan Melambat",
+      "title": "Pasar Minyak Bersiap Menghadapi Volatilitas Hormuz di Musim Panas",
       "impact": "text-yellow"
     },
     {
       "time": "YAHOO",
-      "title": "Lupakan SanDisk: Titan Semikonduktor Pegas Melingkar Ini Siap Mengungguli",
-      "impact": "text-green"
+      "title": "Mungkinkah ETF Dividen Ini Menjadi Tiket Anda menuju Penghasilan Pasif $500 per Bulan?",
+      "impact": "text-yellow"
     },
     {
       "time": "YAHOO",
-      "title": "Saham Riset Lam, Rekan Chip Gear Mencapai Rekor Tertinggi",
-      "impact": "text-green"
+      "title": "Ekonomi masa perang: Maersk mencabut panduan setahun penuh karena permintaan yang kuat",
+      "impact": "text-yellow"
     },
     {
       "time": "CNBC",
@@ -225,8 +225,8 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,030.89",
-      "change": "+14.25 (+0.35%)",
+      "price": "4,021.48",
+      "change": "+4.84 (+0.12%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -256,8 +256,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.609",
-      "change": "+0.67 (+0.41%)",
+      "price": "162.626",
+      "change": "+0.68 (+0.42%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -287,8 +287,8 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "69.80",
-      "change": "-0.45 (-0.64%)",
+      "price": "69.74",
+      "change": "-0.51 (-0.73%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -319,7 +319,7 @@
   "gauges": {
     "macro_alignment_score": 37,
     "market_regime_score": 55,
-    "market_sentiment_score": 80,
+    "market_sentiment_score": 40,
     "institutional_flow_score": 20
   },
   "ml_memory": {
@@ -401,18 +401,18 @@
   "technical_signals": {
     "XAUUSD": {
       "trend": "BEARISH",
-      "rsi": 49,
+      "rsi": 39,
       "ma50": "DOWN"
     },
     "USDJPY": {
       "trend": "BULLISH",
-      "rsi": 98,
+      "rsi": 96,
       "ma50": "UP"
     }
   },
   "economic_calendar": [
     {
-      "time": "00:52",
+      "time": "01:11",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "01:52",
+      "time": "02:11",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "03:52",
+      "time": "04:11",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "04:52",
+      "time": "05:11",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
