@@ -314,11 +314,12 @@ def make_strategy_library(rr_values=None):
     rr_values = dedupe_rr_values(rr_values or [1.0, 1.4, 1.8, 2.2, 2.6])
     library = []
 
+    # AI XEDY_V30 Core
     for threshold, confirmation, stop_atr, max_hold_bars, rr in product(
-        [0.15, 0.22, 0.3],
-        [0.05, 0.12],
-        [1.0, 1.4, 1.8],
-        [20, 60, 120],
+        [0.18, 0.28],
+        [0.08],
+        [1.2, 1.8],
+        [30, 90],
         rr_values,
     ):
         library.append(
@@ -335,11 +336,12 @@ def make_strategy_library(rr_values=None):
             }
         )
 
+    # AI XEDY_V30 Pullback
     for pullback_limit, confirmation, stop_atr, max_hold_bars, rr in product(
-        [0.05, 0.12],
-        [0.05, 0.1],
-        [1.0, 1.6],
-        [20, 60],
+        [0.08],
+        [0.08],
+        [1.2],
+        [45],
         rr_values,
     ):
         library.append(
@@ -356,11 +358,12 @@ def make_strategy_library(rr_values=None):
             }
         )
 
+    # AI XEDY_V30 Mean Revert
     for extreme_rsi, threshold, stop_atr, max_hold_bars, rr in product(
-        [28, 34],
-        [0.12, 0.22],
-        [1.0, 1.5],
-        [20, 60],
+        [30],
+        [0.18],
+        [1.2],
+        [45],
         rr_values,
     ):
         library.append(
@@ -377,11 +380,12 @@ def make_strategy_library(rr_values=None):
             }
         )
 
+    # AI XEDY_V30 Breakout
     for breakout_buffer, threshold, stop_atr, max_hold_bars, rr in product(
-        [0.1, 0.18],
-        [0.12, 0.22],
-        [1.0, 1.6],
-        [20, 60],
+        [0.15],
+        [0.18],
+        [1.2],
+        [45],
         rr_values,
     ):
         library.append(
