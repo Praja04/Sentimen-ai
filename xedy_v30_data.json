@@ -1,0 +1,443 @@
+{
+  "macro_dashboard": [
+    {
+      "name": "FED POLICY",
+      "val": "VERY DOVISH",
+      "score": 60,
+      "dir": "up",
+      "value": "HAWKISH"
+    },
+    {
+      "name": "REAL YIELD",
+      "val": "NEGATIVE",
+      "score": 53,
+      "dir": "down",
+      "value": "FALLING"
+    },
+    {
+      "name": "DXY INDEX",
+      "val": "BULLISH",
+      "score": 61,
+      "dir": "up",
+      "value": "BULLISH"
+    },
+    {
+      "name": "TREASURY YIELD",
+      "val": "FALLING",
+      "score": 30,
+      "dir": "down",
+      "value": "FALLING"
+    },
+    {
+      "name": "LIQUIDITY (RRP)",
+      "val": "EXPANDING",
+      "score": 1,
+      "dir": "down",
+      "value": "CONTRACTING"
+    },
+    {
+      "name": "INFLATION (PCE)",
+      "val": "STICKY",
+      "score": 1,
+      "dir": "down",
+      "value": "EASING"
+    },
+    {
+      "name": "EMPLOYMENT",
+      "val": "WEAKENING",
+      "score": 75,
+      "dir": "up",
+      "value": "STRONG"
+    },
+    {
+      "name": "GDP GROWTH",
+      "val": "SLOWING",
+      "score": 50,
+      "dir": "up",
+      "value": "GROWING"
+    },
+    {
+      "name": "CAPITAL FLOW",
+      "val": "SAFE HAVEN",
+      "score": 44,
+      "dir": "down",
+      "value": "RISK-OFF"
+    },
+    {
+      "name": "CENTRAL BANK",
+      "val": "HEAVY BUYING",
+      "score": 1,
+      "dir": "down",
+      "value": "EASING"
+    },
+    {
+      "name": "PHYSICAL GOLD",
+      "val": "SUPPLY DEFICIT",
+      "score": 1,
+      "dir": "down",
+      "value": "BEARISH"
+    },
+    {
+      "name": "OIL MARKET",
+      "val": "BEARISH",
+      "score": 1,
+      "dir": "down",
+      "value": "SURPLUS"
+    },
+    {
+      "name": "CORRELATION",
+      "val": "RISK OFF",
+      "score": 86,
+      "dir": "down",
+      "value": "STRONG NEG"
+    }
+  ],
+  "institutional_flow": [
+    {
+      "name": "COMMERCIALS (COT)",
+      "val": "ADDING SHORTS (-50.0K)",
+      "color": "text-red"
+    },
+    {
+      "name": "LARGE SPECULATORS",
+      "val": "SELLING RALLY (-30.0K)",
+      "color": "text-red"
+    },
+    {
+      "name": "ETF HOLDINGS",
+      "val": "OUTFLOWS (-$10.0B)",
+      "color": "text-red"
+    },
+    {
+      "name": "OPTIONS SKEW",
+      "val": "PUT PREMIUM (90%)",
+      "color": "text-red"
+    },
+    {
+      "name": "RETAIL SENTIMENT",
+      "val": "HEAVILY LONG (95%)",
+      "color": "text-green"
+    }
+  ],
+  "news_feed": [
+    {
+      "time": "CNBC",
+      "title": "Sepuluh saham Tiongkok ini mendukung pusat data AS",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "CNBC",
+      "title": "Mengapa investor mungkin ingin memprioritaskan pasar obligasi di luar AS",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Perdagangan Minyak Mendekati Level Terendahnya dalam Empat Bulan karena AS dan Iran Menghentikan Serangan Baru",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Saham Naik karena Pembeli Menawar; ",
+      "impact": "text-green"
+    },
+    {
+      "time": "FOREXLIVE",
+      "title": "Kekhawatiran intervensi membatasi kenaikan USD/JPY karena para pedagang menunggu data penting AS",
+      "impact": "text-green"
+    },
+    {
+      "time": "FOREXLIVE",
+      "title": "Persetujuan hipotek Inggris menurun, pertumbuhan kredit konsumen bertahan di bulan Mei",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "INVESTING",
+      "title": "Deutsche Bank memperkirakan S&P 500 akan mencapai level 7000 pada akhir tahun 2025",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "INVESTING",
+      "title": "Tarif Trump, risalah rapat The Fed, pembelian Bitcoin oleh Rumble - hal-hal yang menggerakkan pasar",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "WSJ",
+      "title": "Saham-Saham Tenggelam Akibat Kehancuran AI yang Dipicu oleh DeepSeek Tiongkok",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "WSJ",
+      "title": "Emas Comex, Perak Berakhir Lebih Rendah",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "KITCO",
+      "title": "Penurunan berlimpah di Wall Street dan Main Street karena pasar mencerna bias hawkish Fed dengan data gaji bulan Juni sudah siap",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "KITCO",
+      "title": "Emas terlihat rusak, tapi satu-satunya yang berubah adalah harganya",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "OILPRICE",
+      "title": "Produksi Minyak Timur Tengah Melonjak ke 15 Juta Bph",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "OILPRICE",
+      "title": "Pembelian LNG Tiongkok Kembali Meningkat seiring Meningkatnya Permintaan Listrik di Musim Panas",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "YAHOO",
+      "title": "IRMAA mencapai pensiunan dua tahun setelah penjualan properti",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "YAHOO",
+      "title": "Sakelar ELD Wajib Progresif? ",
+      "impact": "text-yellow"
+    }
+  ],
+  "assets": [
+    {
+      "symbol": "XAUUSD",
+      "icon": "🪙",
+      "price": "3,995.09",
+      "change": "-21.55 (-0.54%)",
+      "cColor": "text-red",
+      "f4": {
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "3734.39",
+        "high": "4194.61",
+        "bp": "34%",
+        "bearp": "66%",
+        "conf": "66%",
+        "accuracy": "82.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
+      },
+      "f1": {
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "3471.69",
+        "high": "4457.31",
+        "bp": "31%",
+        "bearp": "69%",
+        "conf": "69%",
+        "accuracy": "86.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
+      }
+    },
+    {
+      "symbol": "USDJPY",
+      "icon": "🇺🇸",
+      "price": "162.166",
+      "change": "+0.22 (+0.14%)",
+      "cColor": "text-green",
+      "f4": {
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "160.898",
+        "high": "163.400",
+        "bp": "63%",
+        "bearp": "37%",
+        "conf": "63%",
+        "accuracy": "72.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
+      },
+      "f1": {
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "158.513",
+        "high": "165.785",
+        "bp": "66%",
+        "bearp": "34%",
+        "conf": "66%",
+        "accuracy": "82.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
+      }
+    },
+    {
+      "symbol": "WTI OIL",
+      "icon": "🛢️",
+      "price": "70.11",
+      "change": "-0.14 (-0.20%)",
+      "cColor": "text-red",
+      "f4": {
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "63.45",
+        "high": "77.17",
+        "bp": "39%",
+        "bearp": "61%",
+        "conf": "61%",
+        "accuracy": "80.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
+      },
+      "f1": {
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "46.54",
+        "high": "94.08",
+        "bp": "35%",
+        "bearp": "65%",
+        "conf": "65%",
+        "accuracy": "78.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
+      }
+    }
+  ],
+  "gauges": {
+    "macro_alignment_score": 35,
+    "market_regime_score": 55,
+    "market_sentiment_score": 51,
+    "institutional_flow_score": 20
+  },
+  "ml_memory": {
+    "sentiment_penalty": -1
+  },
+  "ml_weights": {
+    "macro": 0.09802448895620754,
+    "sentiment": 0.09802448895620754,
+    "flow": 0.5098775552189624,
+    "regime": 0.09802448895620754,
+    "tech": 0.09802448895620754,
+    "cal": 0.09802448895620754
+  },
+  "correlation_matrix": {
+    "XAUUSD": {
+      "XAUUSD": 1.0,
+      "USDJPY": -0.87,
+      "WTI OIL": 0.79,
+      "DXY": -0.92,
+      "US10Y": -0.08,
+      "DJI": -0.72,
+      "VIX": -0.41
+    },
+    "USDJPY": {
+      "XAUUSD": -0.87,
+      "USDJPY": 1.0,
+      "WTI OIL": -0.74,
+      "DXY": 0.88,
+      "US10Y": 0.1,
+      "DJI": 0.74,
+      "VIX": 0.21
+    },
+    "WTI OIL": {
+      "XAUUSD": 0.79,
+      "USDJPY": -0.74,
+      "WTI OIL": 1.0,
+      "DXY": -0.81,
+      "US10Y": 0.23,
+      "DJI": -0.9,
+      "VIX": -0.08
+    },
+    "DXY": {
+      "XAUUSD": -0.92,
+      "USDJPY": 0.88,
+      "WTI OIL": -0.81,
+      "DXY": 1.0,
+      "US10Y": 0.16,
+      "DJI": 0.77,
+      "VIX": 0.32
+    },
+    "US10Y": {
+      "XAUUSD": -0.08,
+      "USDJPY": 0.1,
+      "WTI OIL": 0.23,
+      "DXY": 0.16,
+      "US10Y": 1.0,
+      "DJI": 0.03,
+      "VIX": 0.16
+    },
+    "DJI": {
+      "XAUUSD": -0.72,
+      "USDJPY": 0.74,
+      "WTI OIL": -0.9,
+      "DXY": 0.77,
+      "US10Y": 0.03,
+      "DJI": 1.0,
+      "VIX": -0.13
+    },
+    "VIX": {
+      "XAUUSD": -0.41,
+      "USDJPY": 0.21,
+      "WTI OIL": -0.08,
+      "DXY": 0.32,
+      "US10Y": 0.16,
+      "DJI": -0.13,
+      "VIX": 1.0
+    }
+  },
+  "technical_signals": {
+    "XAUUSD": {
+      "trend": "BEARISH",
+      "rsi": 42,
+      "ma50": "DOWN"
+    },
+    "USDJPY": {
+      "trend": "BULLISH",
+      "rsi": 70,
+      "ma50": "UP"
+    }
+  },
+  "economic_calendar": [
+    {
+      "time": "12:35",
+      "cur": "USD",
+      "event": "Core PCE Price Index m/m",
+      "impact": "HIGH",
+      "actual": "",
+      "forecast": "0.2%",
+      "prev": "0.2%"
+    },
+    {
+      "time": "13:35",
+      "cur": "USD",
+      "event": "Unemployment Claims",
+      "impact": "HIGH",
+      "actual": "",
+      "forecast": "212K",
+      "prev": "215K"
+    },
+    {
+      "time": "15:35",
+      "cur": "USD",
+      "event": "ISM Manufacturing PMI",
+      "impact": "HIGH",
+      "actual": "",
+      "forecast": "49.5",
+      "prev": "49.1"
+    },
+    {
+      "time": "16:35",
+      "cur": "EUR",
+      "event": "ECB President Lagarde Speaks",
+      "impact": "MED",
+      "actual": "",
+      "forecast": "",
+      "prev": ""
+    }
+  ],
+  "top_drivers": [
+    "DXY SURGE: BULLISH",
+    "FALLING YIELDS: FALLING",
+    "MARKET INDECISION",
+    "LOW VOLATILITY REGIME",
+    "GLOBAL LIQUIDITY SHIFT"
+  ],
+  "liquidity_zones": {
+    "XAUUSD": 4032.0,
+    "USDJPY": 162.0,
+    "WTI OIL": 70.0
+  }
+}
