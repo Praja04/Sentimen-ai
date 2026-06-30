@@ -251,7 +251,8 @@ async function runBacktestSearch() {
         }
     } catch (error) {
         elements.resultsContainer.innerHTML = `<div class="empty-state">${error.message}</div>`;
-        elements.statusText.textContent = "Backtest gagal dijalankan.";
+        elements.statusText.textContent = `Backtest gagal dijalankan: ${error.message}`;
+        console.error("Backtest Error:", error);
     } finally {
         elements.runBacktest.disabled = false;
         elements.stopBacktest.style.display = "none";
