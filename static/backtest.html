@@ -88,6 +88,40 @@
                 </div>
                 <p class="hint">Metode tetap AI XEDY_V30. Filter ini dipakai sebagai penanda validasi, tetapi ranking utama sekarang berdasarkan 10 profit terbesar.</p>
             </div>
+
+            <div class="panel">
+                <h2>Prioritas Ranking</h2>
+                <div class="form-grid">
+                    <label>
+                        <span>Prioritas 1 (Utama)</span>
+                        <select id="priority1">
+                            <option value="net_profit">Net Profit (%)</option>
+                            <option value="win_rate">Win Rate (%)</option>
+                            <option value="drawdown">Max Drawdown (%)</option>
+                            <option value="monthly_profit">Monthly Profit (%)</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Prioritas 2</span>
+                        <select id="priority2">
+                            <option value="win_rate">Win Rate (%)</option>
+                            <option value="net_profit">Net Profit (%)</option>
+                            <option value="drawdown">Max Drawdown (%)</option>
+                            <option value="monthly_profit">Monthly Profit (%)</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Prioritas 3</span>
+                        <select id="priority3">
+                            <option value="drawdown">Max Drawdown (%)</option>
+                            <option value="net_profit">Net Profit (%)</option>
+                            <option value="win_rate">Win Rate (%)</option>
+                            <option value="monthly_profit">Monthly Profit (%)</option>
+                        </select>
+                    </label>
+                </div>
+                <p class="hint">Mengatur bobot pengurutan hasil pencarian. Hasil akan diurutkan berdasarkan Prioritas 1 terlebih dahulu, lalu disusul Prioritas 2 dan 3.</p>
+            </div>
         </section>
 
         <section class="action-bar">

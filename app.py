@@ -950,16 +950,25 @@ def build_self_learning_strategies(seed_results):
     return refined
 
 
-def rank_results(results):
-    results.sort(
-        key=lambda item: (
-            item["passes_filters"],
-            item["net_profit_pct"],
-            item["avg_monthly_profit_pct"],
-            item["avg_mfe_r"] - item["avg_mae_r"],
-        ),
-        reverse=True,
-    )
+def rank_results(results, sort_priority=None):
+    sort_priority = sort_priority or ["net_profit", "win_rate", "drawdown"]
+    
+    def get_sort_key(item):
+        key_tuple = [item.get("passes_filters", False)]
+        for p in sort_priority:
+            if p == "net_profit":
+                key_tuple.append(float(item.get("net_profit_pct", 0.0)))
+            elif p == "win_rate":
+                key_tuple.append(float(item.get("win_rate", 0.0)))
+            elif p == "drawdown":
+                key_tuple.append(-float(item.get("max_drawdown_pct", 100.0)))
+            elif p == "monthly_profit":
+                key_tuple.append(float(item.get("avg_monthly_profit_pct", 0.0)))
+        # Tie-breaker
+        key_tuple.append(float(item.get("avg_mfe_r", 0.0) - item.get("avg_mae_r", 0.0)))
+        return tuple(key_tuple)
+
+    results.sort(key=get_sort_key, reverse=True)
     return results
 
 
@@ -971,6 +980,7 @@ def search_backtest_methods(
     initial_capital=10000.0,
     start_month=None,
     end_month=None,
+    sort_priority=None,
 ):
     rates = fetch_mt5_rates(symbol=symbol, days=days, start_month=start_month, end_month=end_month)
     risk_context = get_symbol_risk_context(symbol)
@@ -1003,7 +1013,7 @@ def search_backtest_methods(
                 continue
             result["passes_filters"] = evaluate_result_against_filters(result, filters)
             current_results.append(result)
-        rank_results(current_results)
+        rank_results(current_results, sort_priority=sort_priority)
         all_results.extend(current_results)
         passes = sum(1 for item in current_results if item["passes_filters"])
         learning_iterations.append(
@@ -1032,7 +1042,7 @@ def search_backtest_methods(
         if previous is None or item["net_profit_pct"] > previous["net_profit_pct"]:
             deduped[dedupe_key] = item
 
-    results = rank_results(list(deduped.values()))
+    results = rank_results(list(deduped.values()), sort_priority=sort_priority)
     top_results = results[:10]
     passing_count = sum(1 for item in results if item["passes_filters"])
 
@@ -1081,6 +1091,7 @@ def api_backtest_search():
             initial_capital=float(payload.get("initial_capital", 10000)),
             start_month=payload.get("start_month"),
             end_month=payload.get("end_month"),
+            sort_priority=payload.get("sort_priority", ["net_profit", "win_rate", "drawdown"]),
             filters={
                 "drawdown": {
                     "operator": filters.get("drawdown", {}).get("operator", ">"),

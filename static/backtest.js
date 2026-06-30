@@ -10,6 +10,12 @@ const elements = {
     wrValue: document.getElementById("wrValue"),
     mpOperator: document.getElementById("mpOperator"),
     mpValue: document.getElementById("mpValue"),
+    priority1: document.getElementById("priority1"),
+    priority2: document.getElementById("priority2"),
+    priority3: document.getElementById("priority3"),
+    priority1: document.getElementById("priority1"),
+    priority2: document.getElementById("priority2"),
+    priority3: document.getElementById("priority3"),
     runBacktest: document.getElementById("runBacktest"),
     statusText: document.getElementById("statusText"),
     resultsContainer: document.getElementById("resultsContainer"),
@@ -149,6 +155,11 @@ async function runBacktestSearch() {
 
     const payload = {
         symbol: elements.symbol.value.trim() || "XAUUSD",
+        sort_priority: [
+            elements.priority1.value,
+            elements.priority2.value,
+            elements.priority3.value
+        ],
         initial_capital: Number(elements.initialCapital.value || 10000),
         start_month: elements.startMonth.value || null,
         end_month: elements.endMonth.value || null,
