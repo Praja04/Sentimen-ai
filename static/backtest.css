@@ -149,6 +149,11 @@ button {
     font-size: 0.95rem;
 }
 
+input,
+select {
+    width: 100%;
+}
+
 .action-bar {
     display: flex;
     align-items: center;

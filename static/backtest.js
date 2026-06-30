@@ -130,7 +130,7 @@ function renderResults(payload) {
                     ${metricCard("Net profit", `${item.net_profit_pct}%`)}
                 </div>
                 <div class="metrics-grid">
-                    ${metricCard("Total trades", item.total_trades)}
+                    ${metricCard("Total trades", `${item.total_trades} (Buy: ${item.total_buy || 0}, Sell: ${item.total_sell || 0})`)}
                     ${metricCard("Ending balance", `$${item.ending_balance}`)}
                     ${metricCard("Avg MAE (R)", item.avg_mae_r)}
                     ${metricCard("Avg MFE (R)", item.avg_mfe_r)}
