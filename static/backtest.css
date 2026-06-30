@@ -354,3 +354,22 @@ button {
     color: #04121f;
     border-color: var(--accent-strong);
 }
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color 0.2s ease;
+}
+.checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--accent-strong);
+}
+.checkbox-label:hover {
+    color: var(--text);
+}

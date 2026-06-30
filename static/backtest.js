@@ -174,7 +174,14 @@ function renderResults(payload) {
 async function runBacktestSearch() {
     elements.runBacktest.disabled = true;
     elements.stopBacktest.style.display = "inline-block";
-    elements.statusText.textContent = 'Menjalankan AI XEDY_V30 (M5 s/d H4) dengan bobot fundamental 80% dan teknikal 20%...';
+    const selectedTFs = Array.from(document.querySelectorAll('input[name="tf_select"]:checked')).map(el => el.value);
+    if (!selectedTFs.length) {
+        elements.statusText.textContent = "Error: Harap pilih minimal satu Timeframe pengujian.";
+        elements.runBacktest.disabled = false;
+        elements.stopBacktest.style.display = "none";
+        return;
+    }
+    elements.statusText.textContent = `Menjalankan AI XEDY_V30 (${selectedTFs.join(", ")}) dengan bobot fundamental 80% dan teknikal 20%...`;
     
     backtestAbortController = new AbortController();
 
@@ -190,7 +197,7 @@ async function runBacktestSearch() {
         end_month: elements.endMonth.value || null,
         days: 30,
         risk_pct: Number(elements.riskPct.value || 1),
-        timeframe: elements.timeframe.value,
+        timeframes: Array.from(document.querySelectorAll('input[name="tf_select"]:checked')).map(el => el.value),
         filters: {
             drawdown: {
                 operator: elements.ddOperator.value,
@@ -223,7 +230,26 @@ async function runBacktestSearch() {
         elements.statusText.textContent = "Selesai! Backtest seluruh TF berhasil dijalankan.";
         backtestResultsPerTF = result.data.results_per_tf;
         backtestPayloadInfo = result.data;
-        switchTF("M5");
+        
+        // Dynamically build TF tabs based on keys returned
+        const activeTFs = Object.keys(backtestResultsPerTF);
+        const tfTabsContainer = document.getElementById("tfTabs");
+        tfTabsContainer.innerHTML = activeTFs.map((tf, index) => {
+            const activeClass = index === 0 ? "active" : "";
+            return `<button class="tf-tab ${activeClass}" data-tf="${tf}">${tf}</button>`;
+        }).join("");
+        
+        // Re-attach event listeners to new tabs
+        document.querySelectorAll(".tf-tab").forEach(tab => {
+            tab.addEventListener("click", () => {
+                const tf = tab.getAttribute("data-tf");
+                switchTF(tf);
+            });
+        });
+        
+        if (activeTFs.length > 0) {
+            switchTF(activeTFs[0]);
+        }
     } catch (error) {
         elements.resultsContainer.innerHTML = `<div class="empty-state">${error.message}</div>`;
         elements.statusText.textContent = "Backtest gagal dijalankan.";
@@ -276,12 +302,4 @@ function switchTF(tf) {
     renderResults(tfData);
 }
 
-// Add event listener to tabs
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".tf-tab").forEach(tab => {
-        tab.addEventListener("click", () => {
-            const tf = tab.getAttribute("data-tf");
-            switchTF(tf);
-        });
-    });
-});
+

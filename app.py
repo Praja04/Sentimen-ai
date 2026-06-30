@@ -1228,7 +1228,7 @@ def api_backtest_search():
     payload = request.get_json(silent=True) or {}
     filters = payload.get("filters") or {}
 
-    tfs = ["M5", "M15", "M30", "H1", "H4"]
+    tfs = payload.get("timeframes") or ["M5", "M15", "M30", "H1", "H4"]
     results_per_tf = {}
 
     try:
