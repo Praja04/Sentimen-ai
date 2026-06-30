@@ -592,7 +592,7 @@ def run_news_update():
             
             if has_gemini:
                 try:
-                    import json
+                    # using global json import
                     model = genai.GenerativeModel('gemini-3.5-flash', system_instruction="You are a Quant Macro AI. Reply strictly in JSON mapping title string to one word: BULLISH, BEARISH, or NEUTRAL.")
                     prompt = f"Analyze the global market impact (Risk-On/Growth vs Risk-Off/Fear) of each headline. Return valid JSON dictionary format only: {json.dumps(batch_titles)}"
                     ans = model.generate_content(prompt).text.strip()
