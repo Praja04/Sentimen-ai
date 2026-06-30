@@ -40,34 +40,34 @@ def get_live_ticks():
         return jsonify({"error": "Failed to connect to MT5"}), 500
     
     ticks = {}
-    for symbol in ["XAUUSD", "USDJPY"]:
-        t = mt5.symbol_info_tick(symbol)
+    symbols_to_fetch = {
+        "XAUUSD": ["XAUUSD", "GOLD"],
+        "USDJPY": ["USDJPY"],
+        "WTI OIL": ["WTI", "XTIUSD", "USOIL", "CL"],
+        "DJI": ["DJI", "US30", "YM", "DJIA"],
+        "EURUSD": ["EURUSD"],
+        "GBPUSD": ["GBPUSD"]
+    }
+    
+    for label, options in symbols_to_fetch.items():
+        t = None
+        matched_symbol = None
+        for opt in options:
+            t = mt5.symbol_info_tick(opt)
+            if t:
+                matched_symbol = opt
+                break
         if t:
-            rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_D1, 0, 1)
+            rates = mt5.copy_rates_from_pos(matched_symbol, mt5.TIMEFRAME_D1, 0, 1)
             daily_open = rates[0]['open'] if (rates is not None and len(rates) > 0) else t.bid
             daily_vol = rates[0]['tick_volume'] if (rates is not None and len(rates) > 0) else 0
             daily_change = ((t.bid - daily_open) / daily_open) * 100.0 if daily_open > 0 else 0.0
-            ticks[symbol] = {
+            ticks[label] = {
                 "bid": t.bid,
                 "ask": t.ask,
                 "change": round(daily_change, 3),
                 "volume": int(daily_vol)
             }
-        
-    for symbol in ["WTI", "XTIUSD", "USOIL"]:
-        t = mt5.symbol_info_tick(symbol)
-        if t:
-            rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_D1, 0, 1)
-            daily_open = rates[0]['open'] if (rates is not None and len(rates) > 0) else t.bid
-            daily_vol = rates[0]['tick_volume'] if (rates is not None and len(rates) > 0) else 0
-            daily_change = ((t.bid - daily_open) / daily_open) * 100.0 if daily_open > 0 else 0.0
-            ticks["WTI OIL"] = {
-                "bid": t.bid,
-                "ask": t.ask,
-                "change": round(daily_change, 3),
-                "volume": int(daily_vol)
-            }
-            break
             
     # Livetest Real-time Demo Simulation update
     demo_state = None

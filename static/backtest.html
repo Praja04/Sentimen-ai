@@ -17,17 +17,84 @@
                 <h1>AI XEDY_V30 Backtest</h1>
                 <p class="hero-copy">Metode yang dipakai sekarang tetap: <strong>Fundamental 80%</strong> dari dataset XEDY V30 dan <strong>Teknikal 20%</strong> dari data <strong>M1 XAUUSD</strong> langsung dari MetaTrader 5. Hasil ditampilkan sebagai <strong>10 profit terbesar</strong>.</p>
             </div>
-            <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 12px; padding: 10px 15px; display: flex; flex-direction: column; gap: 4px; font-size: 0.65rem; min-width: 250px; font-family: 'Roboto Mono', monospace;">
-                <span style="font-weight: bold; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 3px;">🏆 XAUUSD LIVE TICK INFO</span>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px;">
-                    <div><span style="color:var(--muted);">BID:</span> <strong id="live-bid-XAUUSD" style="color:#fff;">...</strong></div>
-                    <div><span style="color:var(--muted);">ASK:</span> <strong id="live-ask-XAUUSD" style="color:#fff;">...</strong></div>
-                    <div><span style="color:var(--muted);">DAILY:</span> <strong id="live-chg-XAUUSD" class="text-green">...</strong></div>
-                    <div><span style="color:var(--muted);">VOL:</span> <strong id="live-vol-XAUUSD" style="color:#fff;">...</strong></div>
-                </div>
-            </div>
             <a class="ghost-link" href="/">Kembali ke dashboard</a>
         </section>
+
+        <!-- Live Market Ticker Bar -->
+        <div class="market-ticker-bar">
+            <!-- XAUUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">XAUUSD</span>
+                    <span class="ticker-change" id="ticker-chg-XAUUSD">...</span>
+                </div>
+                <div class="ticker-body">
+                    <span>B: <strong id="ticker-bid-XAUUSD">...</strong></span>
+                    <span>A: <strong id="ticker-ask-XAUUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-XAUUSD">...</strong></span>
+                </div>
+            </div>
+            <!-- USDJPY -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">USDJPY</span>
+                    <span class="ticker-change" id="ticker-chg-USDJPY">...</span>
+                </div>
+                <div class="ticker-body">
+                    <span>B: <strong id="ticker-bid-USDJPY">...</strong></span>
+                    <span>A: <strong id="ticker-ask-USDJPY">...</strong></span>
+                    <span>V: <strong id="ticker-vol-USDJPY">...</strong></span>
+                </div>
+            </div>
+            <!-- WTI OIL -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">WTI OIL</span>
+                    <span class="ticker-change" id="ticker-chg-WTI-OIL">...</span>
+                </div>
+                <div class="ticker-body">
+                    <span>B: <strong id="ticker-bid-WTI-OIL">...</strong></span>
+                    <span>A: <strong id="ticker-ask-WTI-OIL">...</strong></span>
+                    <span>V: <strong id="ticker-vol-WTI-OIL">...</strong></span>
+                </div>
+            </div>
+            <!-- DJI -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">DJI</span>
+                    <span class="ticker-change" id="ticker-chg-DJI">...</span>
+                </div>
+                <div class="ticker-body">
+                    <span>B: <strong id="ticker-bid-DJI">...</strong></span>
+                    <span>A: <strong id="ticker-ask-DJI">...</strong></span>
+                    <span>V: <strong id="ticker-vol-DJI">...</strong></span>
+                </div>
+            </div>
+            <!-- EURUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">EURUSD</span>
+                    <span class="ticker-change" id="ticker-chg-EURUSD">...</span>
+                </div>
+                <div class="ticker-body">
+                    <span>B: <strong id="ticker-bid-EURUSD">...</strong></span>
+                    <span>A: <strong id="ticker-ask-EURUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-EURUSD">...</strong></span>
+                </div>
+            </div>
+            <!-- GBPUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">GBPUSD</span>
+                    <span class="ticker-change" id="ticker-chg-GBPUSD">...</span>
+                </div>
+                <div class="ticker-body">
+                    <span>B: <strong id="ticker-bid-GBPUSD">...</strong></span>
+                    <span>A: <strong id="ticker-ask-GBPUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-GBPUSD">...</strong></span>
+                </div>
+            </div>
+        </div>
 
         <section class="control-grid">
             <div class="panel">

@@ -315,21 +315,29 @@ async function fetchLiveTicks() {
         });
         const data = await res.json();
         if(!data.error && data.ticks) {
-            // Update XAUUSD live pricing card inside hero-card
-            const goldTick = data.ticks["XAUUSD"];
-            if (goldTick) {
-                const bidEl = document.getElementById("live-bid-XAUUSD");
-                const askEl = document.getElementById("live-ask-XAUUSD");
-                const chgEl = document.getElementById("live-chg-XAUUSD");
-                const volEl = document.getElementById("live-vol-XAUUSD");
+            for (const [symbol, tickInfo] of Object.entries(data.ticks)) {
+                // Handle naming conversion for HTML IDs
+                const key = symbol.replace(/\s+/g, '-');
+                const bidEl = document.getElementById(`ticker-bid-${key}`);
+                const askEl = document.getElementById(`ticker-ask-${key}`);
+                const chgEl = document.getElementById(`ticker-chg-${key}`);
+                const volEl = document.getElementById(`ticker-vol-${key}`);
                 
-                if (bidEl) bidEl.innerText = goldTick.bid.toFixed(2);
-                if (askEl) askEl.innerText = goldTick.ask.toFixed(2);
+                // Formats
+                const isJPY = symbol.includes('JPY');
+                const isDJI = symbol.includes('DJI');
+                let decimals = 2;
+                if (isJPY) decimals = 3;
+                else if (isDJI) decimals = 1;
+                else if (symbol.includes('EUR') || symbol.includes('GBP')) decimals = 5;
+                
+                if (bidEl) bidEl.innerText = tickInfo.bid.toFixed(decimals);
+                if (askEl) askEl.innerText = tickInfo.ask.toFixed(decimals);
                 if (chgEl) {
-                    chgEl.innerText = (goldTick.change >= 0 ? "+" : "") + goldTick.change.toFixed(3) + "%";
-                    chgEl.className = goldTick.change >= 0 ? "text-green" : "text-red";
+                    chgEl.innerText = (tickInfo.change >= 0 ? "+" : "") + tickInfo.change.toFixed(3) + "%";
+                    chgEl.className = tickInfo.change >= 0 ? "text-green" : "text-red";
                 }
-                if (volEl) volEl.innerText = goldTick.volume.toLocaleString('en-US');
+                if (volEl) volEl.innerText = tickInfo.volume.toLocaleString('en-US');
             }
         }
         if(!data.error && data.demo) {

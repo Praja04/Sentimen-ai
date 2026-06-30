@@ -537,3 +537,56 @@ button {
 input[type="checkbox"] {
     width: auto !important;
 }
+
+/* Market Ticker Bar Styling */
+.market-ticker-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(10, 24, 45, 0.5);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    gap: 12px;
+    overflow-x: auto;
+    width: 100%;
+}
+.ticker-item {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.ticker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 3px;
+}
+.ticker-symbol {
+    font-weight: bold;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-family: 'Rajdhani', sans-serif;
+}
+.ticker-change {
+    font-size: 0.65rem;
+}
+.ticker-body {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    color: var(--muted);
+}
+.ticker-body strong {
+    color: #fff;
+    font-family: 'Roboto Mono', monospace;
+}
