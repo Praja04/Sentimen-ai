@@ -812,92 +812,121 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
     peak_equity = equity
     max_drawdown = 0.0
     trades = []
-    position = None
+    active_positions = []
 
     for index in range(warmup, len(rates)):
         bar = rates[index]
 
-        if position is not None:
-            update_position_excursions(position, bar)
+        closed_positions = []
+        for pos in active_positions:
+            update_position_excursions(pos, bar)
             
             # --- AVERAGING / GRID LOGIC ---
             atr_val = cache["atr_14"][index]
-            if atr_val is not None and atr_val > 0 and len(position["entries"]) < 3:
-                grid_spacing = atr_val * 1.5
-                last_entry_price = position["entries"][-1]
+            if atr_val is not None and atr_val > 0 and len(pos["entries"]) < 3:
+                # Optimized grid spacing dynamically scaled based on stop distance to lower drawdown
+                grid_spacing = pos["stop_distance"] * 1.25
+                last_entry_price = pos["entries"][-1]
                 
                 should_average = False
-                if position["side"] == 1 and bar["close"] <= last_entry_price - grid_spacing:
+                if pos["side"] == 1 and bar["close"] <= last_entry_price - grid_spacing:
                     should_average = True
-                elif position["side"] == -1 and bar["close"] >= last_entry_price + grid_spacing:
+                elif pos["side"] == -1 and bar["close"] >= last_entry_price + grid_spacing:
                     should_average = True
                     
                 if should_average:
                     entry_price = bar["close"]
-                    position["entries"].append(entry_price)
-                    position["lots"].append(position["initial_lot"])
+                    pos["entries"].append(entry_price)
+                    pos["lots"].append(pos["initial_lot"])
                     
-                    total_lot = sum(position["lots"])
-                    avg_entry = sum(e * l for e, l in zip(position["entries"], position["lots"])) / total_lot
-                    position["entry"] = avg_entry
-                    position["lot"] = total_lot
+                    total_lot = sum(pos["lots"])
+                    avg_entry = sum(e * l for e, l in zip(pos["entries"], pos["lots"])) / total_lot
+                    pos["entry"] = avg_entry
+                    pos["lot"] = total_lot
                     
-                    if position["side"] == 1:
-                        position["stop"] = avg_entry - position["stop_distance"]
-                        position["take"] = avg_entry + position["take_distance"]
+                    if pos["side"] == 1:
+                        pos["stop"] = avg_entry - pos["stop_distance"]
+                        pos["take"] = avg_entry + pos["take_distance"]
                     else:
-                        position["stop"] = avg_entry + position["stop_distance"]
-                        position["take"] = avg_entry - position["take_distance"]
+                        pos["stop"] = avg_entry + pos["stop_distance"]
+                        pos["take"] = avg_entry - pos["take_distance"]
 
             exit_price = None
             exit_reason = None
 
-            if position["side"] == 1:
-                if bar["low"] <= position["stop"]:
-                    exit_price = position["stop"]
+            if pos["side"] == 1:
+                if bar["low"] <= pos["stop"]:
+                    exit_price = pos["stop"]
                     exit_reason = "stop"
-                elif bar["high"] >= position["take"]:
-                    exit_price = position["take"]
+                elif bar["high"] >= pos["take"]:
+                    exit_price = pos["take"]
                     exit_reason = "take"
-                elif exit_signal(strategy, cache, index, position):
+                elif exit_signal(strategy, cache, index, pos):
                     exit_price = bar["close"]
                     exit_reason = "signal"
             else:
-                if bar["high"] >= position["stop"]:
-                    exit_price = position["stop"]
+                if bar["high"] >= pos["stop"]:
+                    exit_price = pos["stop"]
                     exit_reason = "stop"
-                elif bar["low"] <= position["take"]:
-                    exit_price = position["take"]
+                elif bar["low"] <= pos["take"]:
+                    exit_price = pos["take"]
                     exit_reason = "take"
-                elif exit_signal(strategy, cache, index, position):
+                elif exit_signal(strategy, cache, index, pos):
                     exit_price = bar["close"]
                     exit_reason = "signal"
 
             if exit_price is not None:
-                trade, equity = close_position(position, exit_price, bar["time"], exit_reason, equity, risk_pct)
+                trade, equity = close_position(pos, exit_price, bar["time"], exit_reason, equity, risk_pct)
                 if trade:
                     trades.append(trade)
                     peak_equity = max(peak_equity, equity)
                     if peak_equity > 0:
                         max_drawdown = max(max_drawdown, ((peak_equity - equity) / peak_equity) * 100.0)
-                position = None
+                closed_positions.append(pos)
 
-        if position is None:
-            signal = entry_signal(strategy, cache, index)
-            if signal:
+        for cp in closed_positions:
+            active_positions.remove(cp)
+
+        # HEDGING ENTRIES LOGIC
+        has_long = any(p["side"] == 1 for p in active_positions)
+        has_short = any(p["side"] == -1 for p in active_positions)
+
+        signal = entry_signal(strategy, cache, index)
+        if signal:
+            side = signal["side"]
+            can_open = False
+            is_hedge = False
+            
+            if side == 1 and not has_long:
+                can_open = True
+                if has_short:
+                    is_hedge = True
+            elif side == -1 and not has_short:
+                can_open = True
+                if has_long:
+                    is_hedge = True
+
+            if can_open:
                 entry = bar["close"]
                 stop_distance = signal["stop_distance"]
                 take_distance = signal["take_distance"]
-                side = signal["side"]
                 lot = estimate_lot_size(stop_distance, equity, risk_pct, risk_context or {})
+                
+                # Apply 50% counter-trend lot reduction
                 if signal.get("against_fundamental", False):
-                    # Reduce lot size by 50% for trades going against fundamental trend
                     step = (risk_context or {}).get("volume_step", 0.01) or 0.01
                     lot = round((lot * 0.5) / step) * step
-                    volume_min = (risk_context or {}).get("volume_min", step) or step
-                    lot = max(lot, volume_min)
                     
-                position = {
+                # Apply 50% hedging lot reduction
+                if is_hedge:
+                    step = (risk_context or {}).get("volume_step", 0.01) or 0.01
+                    lot = round((lot * 0.5) / step) * step
+                    
+                step = (risk_context or {}).get("volume_step", 0.01) or 0.01
+                volume_min = (risk_context or {}).get("volume_min", step) or step
+                lot = max(lot, volume_min)
+
+                new_pos = {
                     "side": side,
                     "entry": entry,
                     "stop_distance": stop_distance,
@@ -913,9 +942,10 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
                     "mae_r": 0.0,
                     "mfe_r": 0.0,
                 }
+                active_positions.append(new_pos)
 
-    if position is not None:
-        trade, equity = close_position(position, rates[-1]["close"], rates[-1]["time"], "end_of_test", equity, risk_pct)
+    for pos in active_positions:
+        trade, equity = close_position(pos, rates[-1]["close"], rates[-1]["time"], "end_of_test", equity, risk_pct)
         if trade:
             trades.append(trade)
             peak_equity = max(peak_equity, equity)

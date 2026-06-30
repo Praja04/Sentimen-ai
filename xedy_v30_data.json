@@ -205,8 +205,8 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,046.03",
-      "change": "+29.39 (+0.73%)",
+      "price": "4,035.52",
+      "change": "+18.88 (+0.47%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -236,8 +236,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.432",
-      "change": "+0.49 (+0.30%)",
+      "price": "162.486",
+      "change": "+0.54 (+0.34%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -267,9 +267,9 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "70.38",
-      "change": "+0.13 (+0.19%)",
-      "cColor": "text-green",
+      "price": "70.16",
+      "change": "-0.09 (-0.13%)",
+      "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
@@ -299,7 +299,7 @@
   "gauges": {
     "macro_alignment_score": 36,
     "market_regime_score": 55,
-    "market_sentiment_score": 26,
+    "market_sentiment_score": 51,
     "institutional_flow_score": 21
   },
   "ml_memory": {
@@ -381,7 +381,7 @@
   "technical_signals": {
     "XAUUSD": {
       "trend": "BEARISH",
-      "rsi": 53,
+      "rsi": 50,
       "ma50": "DOWN"
     },
     "USDJPY": {
@@ -392,7 +392,7 @@
   },
   "economic_calendar": [
     {
-      "time": "22:47",
+      "time": "23:06",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -401,7 +401,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "23:47",
+      "time": "00:06",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -410,7 +410,7 @@
       "prev": "215K"
     },
     {
-      "time": "01:47",
+      "time": "02:06",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -419,7 +419,7 @@
       "prev": "49.1"
     },
     {
-      "time": "02:47",
+      "time": "03:06",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
