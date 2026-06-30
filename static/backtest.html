@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/backtest.css?v=1">
+    <link rel="stylesheet" href="/backtest.css?v=2">
 </head>
 <body>
     <main class="page-shell">
@@ -70,32 +70,32 @@
                     <div class="target-row">
                         <span>Drawdown (%)</span>
                         <select id="ddOperator">
+                            <option value="<" selected>&lt;</option>
+                            <option value="<=">&lt;=</option>
                             <option value=">">&gt;</option>
                             <option value=">=">&gt;=</option>
-                            <option value="<">&lt;</option>
-                            <option value="<=">&lt;=</option>
                         </select>
-                        <input id="ddValue" type="number" value="5" />
+                        <input id="ddValue" type="number" value="10" />
                     </div>
                     <div class="target-row">
                         <span>Win rate (%)</span>
                         <select id="wrOperator">
+                            <option value=">" selected>&gt;</option>
+                            <option value=">=">&gt;=</option>
                             <option value="<">&lt;</option>
                             <option value="<=">&lt;=</option>
-                            <option value=">">&gt;</option>
-                            <option value=">=">&gt;=</option>
                         </select>
-                        <input id="wrValue" type="number" value="80" />
+                        <input id="wrValue" type="number" value="50" />
                     </div>
                     <div class="target-row">
                         <span>Profit / bulan (%)</span>
                         <select id="mpOperator">
+                            <option value=">" selected>&gt;</option>
+                            <option value=">=">&gt;=</option>
                             <option value="<">&lt;</option>
                             <option value="<=">&lt;=</option>
-                            <option value=">">&gt;</option>
-                            <option value=">=">&gt;=</option>
                         </select>
-                        <input id="mpValue" type="number" value="40" />
+                        <input id="mpValue" type="number" value="5" />
                     </div>
                 </div>
                 <p class="hint">Metode tetap AI XEDY_V30. Filter ini dipakai sebagai penanda validasi, tetapi ranking utama sekarang berdasarkan 10 profit terbesar.</p>
@@ -172,6 +172,6 @@
         </section>
     </main>
 
-    <script src="/backtest.js?v=1"></script>
+    <script src="/backtest.js?v=2"></script>
 </body>
 </html>

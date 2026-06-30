@@ -3,7 +3,7 @@
     {
       "name": "FED POLICY",
       "val": "VERY DOVISH",
-      "score": 74,
+      "score": 75,
       "dir": "up",
       "value": "HAWKISH"
     },
@@ -17,7 +17,7 @@
     {
       "name": "DXY INDEX",
       "val": "BULLISH",
-      "score": 60,
+      "score": 58,
       "dir": "up",
       "value": "BULLISH"
     },
@@ -45,7 +45,7 @@
     {
       "name": "EMPLOYMENT",
       "val": "WEAKENING",
-      "score": 73,
+      "score": 75,
       "dir": "up",
       "value": "STRONG"
     },
@@ -59,7 +59,7 @@
     {
       "name": "CAPITAL FLOW",
       "val": "SAFE HAVEN",
-      "score": 46,
+      "score": 47,
       "dir": "down",
       "value": "RISK-OFF"
     },
@@ -73,7 +73,7 @@
     {
       "name": "PHYSICAL GOLD",
       "val": "SUPPLY DEFICIT",
-      "score": 5,
+      "score": 1,
       "dir": "down",
       "value": "BEARISH"
     },
@@ -87,7 +87,7 @@
     {
       "name": "CORRELATION",
       "val": "RISK OFF",
-      "score": 87,
+      "score": 86,
       "dir": "down",
       "value": "STRONG NEG"
     }
@@ -122,32 +122,32 @@
   "news_feed": [
     {
       "time": "CNBC",
-      "title": "Sepuluh saham Tiongkok ini mendukung pusat data AS",
+      "title": "Saham-saham berkapitalisasi kecil menikmati paruh pertama terbaiknya dalam 35 tahun. ",
       "impact": "text-yellow"
     },
     {
       "time": "CNBC",
-      "title": "Mengapa investor mungkin ingin memprioritaskan pasar obligasi di luar AS",
+      "title": "Saham yang melakukan pergerakan terbesar di pasar awal: AeroVironment, Strategy, Merck & lainnya",
       "impact": "text-yellow"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Perdagangan Minyak Mendekati Level Terendahnya dalam Empat Bulan karena AS dan Iran Menghentikan Serangan Baru",
-      "impact": "text-yellow"
+      "title": "S&P 500 Naik di Akhir Kuartal Terbaik Sejak 2020: Market Wrap",
+      "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Saham Naik karena Pembeli Menawar; ",
-      "impact": "text-green"
+      "title": "Bank Dunia Menyetujui Kesepakatan Kenya senilai $750 Juta, Setuju untuk Mendukungnya",
+      "impact": "text-yellow"
     },
     {
       "time": "FOREXLIVE",
-      "title": "Kekhawatiran intervensi membatasi kenaikan USD/JPY karena para pedagang menunggu data penting AS",
-      "impact": "text-green"
+      "title": "Pembeli AUDUSD mulai bermain. ",
+      "impact": "text-yellow"
     },
     {
       "time": "FOREXLIVE",
-      "title": "Persetujuan hipotek Inggris menurun, pertumbuhan kredit konsumen bertahan di bulan Mei",
+      "title": "Hakim Mahkamah Agung AS Samuel Alito pensiun - (Pembaruan NPR mencabut ceritanya)",
       "impact": "text-yellow"
     },
     {
@@ -172,59 +172,79 @@
     },
     {
       "time": "KITCO",
-      "title": "Penurunan berlimpah di Wall Street dan Main Street karena pasar mencerna bias hawkish Fed dengan data gaji bulan Juni sudah siap",
+      "title": "Harga emas menarik penawaran beli yang kecil bahkan ketika JOLTS AS menunjukkan pasar tenaga kerja yang tangguh",
       "impact": "text-yellow"
     },
     {
       "time": "KITCO",
-      "title": "Emas terlihat rusak, tapi satu-satunya yang berubah adalah harganya",
+      "title": "Harga emas spot melonjak ke sesi tertinggi $4,048/oz setelah Kepercayaan Konsumen di 91,2 pada bulan Juni",
+      "impact": "text-green"
+    },
+    {
+      "time": "OILPRICE",
+      "title": "Shell: Permintaan LNG Global Akan Melonjak 65% pada tahun 2050",
       "impact": "text-yellow"
     },
     {
       "time": "OILPRICE",
-      "title": "Produksi Minyak Timur Tengah Melonjak ke 15 Juta Bph",
-      "impact": "text-yellow"
+      "title": "Oil Prices Head for Biggest Quarterly Drop Since Pandemic",
+      "impact": "text-red"
     },
     {
-      "time": "OILPRICE",
-      "title": "Pembelian LNG Tiongkok Kembali Meningkat seiring Meningkatnya Permintaan Listrik di Musim Panas",
+      "time": "YAHOO",
+      "title": "Saham teknologi hari ini: Saham teknologi pulih, menjelang berakhirnya kuartal kedua",
       "impact": "text-yellow"
     },
     {
       "time": "YAHOO",
-      "title": "IRMAA mencapai pensiunan dua tahun setelah penjualan properti",
+      "title": "Perang Iran dan booming AI mendorong pergerakan liar di pasar global",
       "impact": "text-yellow"
     },
     {
-      "time": "YAHOO",
-      "title": "Sakelar ELD Wajib Progresif? ",
+      "time": "CNBC",
+      "title": "Sepuluh saham Tiongkok ini mendukung pusat data AS",
       "impact": "text-yellow"
+    },
+    {
+      "time": "CNBC",
+      "title": "Mengapa investor mungkin ingin memprioritaskan pasar obligasi di luar AS",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Perdagangan Minyak Mendekati Level Terendahnya dalam Empat Bulan karena AS dan Iran Menghentikan Serangan Baru",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Saham Naik karena Pembeli Menawar; ",
+      "impact": "text-green"
     }
   ],
   "assets": [
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,035.33",
-      "change": "+18.69 (+0.47%)",
+      "price": "4,027.48",
+      "change": "+10.84 (+0.27%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3782.18",
-        "high": "4247.08",
-        "bp": "36%",
-        "bearp": "64%",
-        "conf": "64%",
-        "accuracy": "82.0%",
+        "low": "3780.91",
+        "high": "4264.75",
+        "bp": "38%",
+        "bearp": "62%",
+        "conf": "62%",
+        "accuracy": "78.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3521.82",
-        "high": "4507.44",
+        "low": "3530.02",
+        "high": "4515.64",
         "bp": "33%",
         "bearp": "67%",
         "conf": "67%",
@@ -236,14 +256,14 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.491",
-      "change": "+0.55 (+0.34%)",
+      "price": "162.542",
+      "change": "+0.60 (+0.37%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "161.060",
-        "high": "163.742",
+        "low": "161.186",
+        "high": "163.882",
         "bp": "59%",
         "bearp": "41%",
         "conf": "59%",
@@ -254,11 +274,11 @@
       "f1": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "158.750",
-        "high": "166.052",
-        "bp": "62%",
-        "bearp": "38%",
-        "conf": "62%",
+        "low": "158.877",
+        "high": "166.191",
+        "bp": "61%",
+        "bearp": "39%",
+        "conf": "61%",
         "accuracy": "82.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
@@ -267,29 +287,29 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "70.10",
-      "change": "-0.15 (-0.21%)",
+      "price": "70.06",
+      "change": "-0.19 (-0.27%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "63.78",
-        "high": "77.80",
-        "bp": "41%",
-        "bearp": "59%",
-        "conf": "59%",
-        "accuracy": "80.0%",
+        "low": "63.10",
+        "high": "77.12",
+        "bp": "38%",
+        "bearp": "62%",
+        "conf": "62%",
+        "accuracy": "84.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "46.95",
-        "high": "94.63",
-        "bp": "36%",
-        "bearp": "64%",
-        "conf": "64%",
+        "low": "46.27",
+        "high": "93.95",
+        "bp": "37%",
+        "bearp": "63%",
+        "conf": "63%",
         "accuracy": "78.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -299,19 +319,19 @@
   "gauges": {
     "macro_alignment_score": 36,
     "market_regime_score": 55,
-    "market_sentiment_score": 61,
-    "institutional_flow_score": 21
+    "market_sentiment_score": 80,
+    "institutional_flow_score": 20
   },
   "ml_memory": {
-    "sentiment_penalty": -1
+    "sentiment_penalty": 0
   },
   "ml_weights": {
-    "macro": 0.097856307238922,
-    "sentiment": 0.12792269922757446,
-    "flow": 0.3904528958507801,
-    "regime": 0.12792269922757446,
-    "tech": 0.12792269922757446,
-    "cal": 0.12792269922757446
+    "macro": 0.09919220912459671,
+    "sentiment": 0.1209378187881687,
+    "flow": 0.4170565157227285,
+    "regime": 0.1209378187881687,
+    "tech": 0.1209378187881687,
+    "cal": 0.1209378187881687
   },
   "correlation_matrix": {
     "XAUUSD": {
@@ -381,7 +401,7 @@
   "technical_signals": {
     "XAUUSD": {
       "trend": "BEARISH",
-      "rsi": 50,
+      "rsi": 49,
       "ma50": "DOWN"
     },
     "USDJPY": {
@@ -392,7 +412,7 @@
   },
   "economic_calendar": [
     {
-      "time": "23:11",
+      "time": "23:30",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -401,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "00:11",
+      "time": "00:30",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -410,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "02:11",
+      "time": "02:30",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -419,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "03:11",
+      "time": "03:30",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

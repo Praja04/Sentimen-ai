@@ -7,7 +7,6 @@ const elements = {
     startMonth: document.getElementById("startMonth"),
     endMonth: document.getElementById("endMonth"),
     riskPct: document.getElementById("riskPct"),
-    timeframe: document.getElementById("timeframe"),
     ddOperator: document.getElementById("ddOperator"),
     ddValue: document.getElementById("ddValue"),
     wrOperator: document.getElementById("wrOperator"),

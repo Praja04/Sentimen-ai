@@ -1247,16 +1247,16 @@ def api_backtest_search():
                 timeframe=tf,
                 filters={
                     "drawdown": {
-                        "operator": filters.get("drawdown", {}).get("operator", ">"),
-                        "value": float(filters.get("drawdown", {}).get("value", 5)),
+                        "operator": filters.get("drawdown", {}).get("operator", "<"),
+                        "value": float(filters.get("drawdown", {}).get("value", 10.0)),
                     },
                     "win_rate": {
-                        "operator": filters.get("win_rate", {}).get("operator", "<"),
-                        "value": float(filters.get("win_rate", {}).get("value", 80)),
+                        "operator": filters.get("win_rate", {}).get("operator", ">="),
+                        "value": float(filters.get("win_rate", {}).get("value", 50.0)),
                     },
                     "monthly_profit": {
-                        "operator": filters.get("monthly_profit", {}).get("operator", "<"),
-                        "value": float(filters.get("monthly_profit", {}).get("value", 40)),
+                        "operator": filters.get("monthly_profit", {}).get("operator", ">="),
+                        "value": float(filters.get("monthly_profit", {}).get("value", 5.0)),
                     },
                 },
             )
