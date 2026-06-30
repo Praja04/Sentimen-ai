@@ -497,3 +497,38 @@ button {
     font-family: 'Roboto Mono', monospace;
     color: #fff !important;
 }
+/* Unified Account Summary Bar Styling */
+.livetest-account-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(15, 28, 41, 0.4) !important;
+    border: 1px solid var(--border-accent) !important;
+    border-radius: 6px;
+    padding: 12px 20px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+/* override borders for backtest page variables */
+.page-shell .livetest-account-bar {
+    border: 1px solid var(--line) !important;
+    background: rgba(4, 18, 31, 0.7) !important;
+}
+.account-metric {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.account-metric .label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.page-shell .account-metric .label {
+    color: var(--muted);
+}
+.account-metric strong {
+    font-size: 1.25rem;
+    font-family: 'Roboto Mono', monospace;
+}
