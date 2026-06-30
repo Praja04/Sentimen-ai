@@ -24,7 +24,7 @@
     {
       "name": "TREASURY YIELD",
       "val": "FALLING",
-      "score": 36,
+      "score": 35,
       "dir": "down",
       "value": "FALLING"
     },
@@ -45,7 +45,7 @@
     {
       "name": "EMPLOYMENT",
       "val": "WEAKENING",
-      "score": 76,
+      "score": 77,
       "dir": "up",
       "value": "STRONG"
     },
@@ -192,12 +192,12 @@
     },
     {
       "time": "YAHOO",
-      "title": "Mahkamah Agung AS akan mendengarkan banding Apple atas penghinaan dalam gugatan Epic Games",
-      "impact": "text-yellow"
+      "title": "Lupakan SanDisk: Titan Semikonduktor Pegas Melingkar Ini Siap Mengungguli",
+      "impact": "text-green"
     },
     {
       "time": "YAHOO",
-      "title": "Beth Hammack dari Fed Cleveland memperingatkan AI memicu inflasi dan kemungkinan kenaikan suku bunga",
+      "title": "Saham Riset Lam, Rekan Chip Gear Mencapai Rekor Tertinggi",
       "impact": "text-green"
     },
     {
@@ -212,12 +212,12 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "S&P 500 Naik di Akhir Kuartal Terbaik Sejak 2020: Market Wrap",
+      "title": "Arabika Raih Keuntungan Terbesar Sejak 2022 seiring Meningkatnya Risiko Pasokan di Brasil",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Emas Naik Di Atas $4.000 seiring Para Pedagang Menatap Prospek Fed dan Pembicaraan Iran",
+      "title": "S&P 500 Naik di Akhir Kuartal Terbaik Sejak 2020: Market Wrap",
       "impact": "text-green"
     }
   ],
@@ -225,14 +225,14 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,030.16",
-      "change": "+13.52 (+0.34%)",
+      "price": "4,030.30",
+      "change": "+13.66 (+0.34%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3780.91",
-        "high": "4264.75",
+        "low": "3788.88",
+        "high": "4272.72",
         "bp": "38%",
         "bearp": "62%",
         "conf": "62%",
@@ -243,8 +243,8 @@
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3530.02",
-        "high": "4515.64",
+        "low": "3537.99",
+        "high": "4523.61",
         "bp": "33%",
         "bearp": "67%",
         "conf": "67%",
@@ -262,11 +262,11 @@
       "f4": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "161.186",
-        "high": "163.882",
-        "bp": "59%",
-        "bearp": "41%",
-        "conf": "59%",
+        "low": "161.244",
+        "high": "163.980",
+        "bp": "60%",
+        "bearp": "40%",
+        "conf": "60%",
         "accuracy": "66.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
@@ -274,12 +274,12 @@
       "f1": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "158.877",
-        "high": "166.191",
-        "bp": "61%",
-        "bearp": "39%",
-        "conf": "61%",
-        "accuracy": "82.0%",
+        "low": "158.937",
+        "high": "166.287",
+        "bp": "62%",
+        "bearp": "38%",
+        "conf": "62%",
+        "accuracy": "78.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
       }
@@ -287,14 +287,14 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "69.81",
-      "change": "-0.44 (-0.63%)",
+      "price": "69.77",
+      "change": "-0.48 (-0.68%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "63.10",
-        "high": "77.12",
+        "low": "62.73",
+        "high": "76.75",
         "bp": "38%",
         "bearp": "62%",
         "conf": "62%",
@@ -305,12 +305,12 @@
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "46.27",
-        "high": "93.95",
-        "bp": "37%",
-        "bearp": "63%",
-        "conf": "63%",
-        "accuracy": "78.0%",
+        "low": "45.90",
+        "high": "93.58",
+        "bp": "35%",
+        "bearp": "65%",
+        "conf": "65%",
+        "accuracy": "82.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       }
@@ -319,19 +319,19 @@
   "gauges": {
     "macro_alignment_score": 37,
     "market_regime_score": 55,
-    "market_sentiment_score": 70,
+    "market_sentiment_score": 60,
     "institutional_flow_score": 20
   },
   "ml_memory": {
     "sentiment_penalty": 0
   },
   "ml_weights": {
-    "macro": 0.09919220912459671,
-    "sentiment": 0.1209378187881687,
-    "flow": 0.4170565157227285,
-    "regime": 0.1209378187881687,
-    "tech": 0.1209378187881687,
-    "cal": 0.1209378187881687
+    "macro": 0.09932382417606403,
+    "sentiment": 0.11416063704496375,
+    "flow": 0.4440336276440809,
+    "regime": 0.11416063704496375,
+    "tech": 0.11416063704496375,
+    "cal": 0.11416063704496375
   },
   "correlation_matrix": {
     "XAUUSD": {
@@ -412,7 +412,7 @@
   },
   "economic_calendar": [
     {
-      "time": "00:31",
+      "time": "00:35",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "01:31",
+      "time": "01:35",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "03:31",
+      "time": "03:35",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "04:31",
+      "time": "04:35",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

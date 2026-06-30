@@ -303,3 +303,168 @@ function switchTF(tf) {
 }
 
 
+
+// ==========================================================
+// LIVETEST REAL-TIME TICKER & POSITION RENDER
+// ==========================================================
+async function fetchLiveTicks() {
+    try {
+        const res = await fetch(`/api/live_ticks?t=${new Date().getTime()}`, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+        });
+        const data = await res.json();
+        if(!data.error && data.demo) {
+            renderLiveDemo(data.demo);
+        }
+    } catch (e) {
+        console.error("Fast tick fetch failed on backtest page:", e);
+    }
+}
+
+function renderLiveDemo(demo) {
+    // 1. Account Cards
+    document.getElementById("live-balance").innerText = `$${demo.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    document.getElementById("live-equity").innerText = `$${demo.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    
+    const totalProfit = demo.equity - 10000.0;
+    const totalProfitPct = (totalProfit / 10000.0) * 100.0;
+    const profitEl = document.getElementById("live-profit");
+    
+    if (totalProfit >= 0) {
+        profitEl.innerText = `+$${totalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (+${totalProfitPct.toFixed(2)}%)`;
+        profitEl.className = "text-green";
+    } else {
+        profitEl.innerText = `-$${Math.abs(totalProfit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${totalProfitPct.toFixed(2)}%)`;
+        profitEl.className = "text-red";
+    }
+    
+    // 2. Current Status
+    const statusEl = document.getElementById("live-status");
+    const activeList = demo.active_trades || [];
+    if (activeList.length > 0) {
+        const t = activeList[0];
+        statusEl.innerText = `TRADING ${t.type} / ENTRY: ${t.entry_price}`;
+        statusEl.className = t.type === "BUY" ? "text-green" : "text-red";
+    } else {
+        statusEl.innerText = "SCANNING FOR SIGNALS...";
+        statusEl.className = "text-yellow";
+    }
+    
+    // 3. Active Trades Table (MT5 layout)
+    const activeBody = document.getElementById("live-active-trades-body");
+    let activeHtml = "";
+    let runningProfitTotal = 0;
+    
+    if (activeList.length > 0) {
+        activeHtml = activeList.map(t => {
+            runningProfitTotal += t.profit;
+            const formattedProfit = t.profit >= 0 ? `+${t.profit.toFixed(2)}` : t.profit.toFixed(2);
+            return `
+                <tr>
+                    <td>${t.symbol}</td>
+                    <td>${t.ticket}</td>
+                    <td>${t.time}</td>
+                    <td class="${t.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${t.type.toLowerCase()}</td>
+                    <td>${t.lots.toFixed(2)}</td>
+                    <td>${t.entry_price.toFixed(2)}</td>
+                    <td>${t.sl.toFixed(2)}</td>
+                    <td>${t.tp.toFixed(2)}</td>
+                    <td>${t.current_price.toFixed(2)}</td>
+                    <td class="${t.profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
+                        ${formattedProfit}
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    } else {
+        activeHtml = `<tr><td colspan="10" class="empty-state">Tidak ada transaksi aktif saat ini.</td></tr>`;
+    }
+    
+    // Insert MT5 summary row for Trade tab
+    const formattedTotalProfit = runningProfitTotal >= 0 ? `+${runningProfitTotal.toFixed(2)}` : runningProfitTotal.toFixed(2);
+    activeHtml += `
+        <tr class="mt5-summary-row">
+            <td colspan="9">
+                <b>• Balance: ${demo.balance.toFixed(2)} USD Equity: ${demo.equity.toFixed(2)} Free Margin: ${demo.equity.toFixed(2)}</b>
+            </td>
+            <td class="${runningProfitTotal >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
+                ${runningProfitTotal !== 0 ? formattedTotalProfit : '0.00'}
+            </td>
+        </tr>
+    `;
+    activeBody.innerHTML = activeHtml;
+    
+    // 4. Closed History Table (MT5 layout)
+    const historyBody = document.getElementById("live-history-trades-body");
+    const historyList = demo.history || [];
+    let historyHtml = "";
+    let totalClosedProfit = 0;
+    
+    if (historyList.length > 0) {
+        historyHtml = historyList.map(h => {
+            totalClosedProfit += h.net_profit;
+            const formattedProfit = h.net_profit >= 0 ? `+${h.net_profit.toFixed(2)}` : h.net_profit.toFixed(2);
+            
+            // Calculate percentage change return
+            const initialCap = 10000.0;
+            const pctChange = (h.net_profit / initialCap) * 100.0;
+            const formattedChange = pctChange >= 0 ? `+${pctChange.toFixed(3)}%` : `${pctChange.toFixed(3)}%`;
+            
+            return `
+                <tr>
+                    <td>${h.open_time}</td>
+                    <td>${h.symbol || 'XAUUSD'}</td>
+                    <td>${h.ticket}</td>
+                    <td class="${h.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${h.type.toLowerCase()}</td>
+                    <td>${h.lots.toFixed(2)}</td>
+                    <td>${h.entry.toFixed(2)}</td>
+                    <td>${h.sl.toFixed(2)}</td>
+                    <td>${h.tp.toFixed(2)}</td>
+                    <td>${h.close_time}</td>
+                    <td>${h.exit.toFixed(2)}</td>
+                    <td class="${h.net_profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold;">
+                        ${formattedProfit}
+                    </td>
+                    <td class="${h.net_profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
+                        ${formattedChange}
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    } else {
+        historyHtml = `<tr><td colspan="12" class="empty-state">Belum ada riwayat transaksi.</td></tr>`;
+    }
+    
+    // Insert MT5 summary row for History tab
+    const formattedTotalClosed = totalClosedProfit >= 0 ? `+${totalClosedProfit.toFixed(2)}` : totalClosedProfit.toFixed(2);
+    historyHtml += `
+        <tr class="mt5-summary-row">
+            <td colspan="10">
+                <b>• Profit: ${totalClosedProfit.toFixed(2)} Credit: 0.00 Deposit: 10000.00 Withdrawal: 0.00 Balance: ${demo.balance.toFixed(2)}</b>
+            </td>
+            <td class="${totalClosedProfit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;" colspan="2">
+                ${formattedTotalClosed}
+            </td>
+        </tr>
+    `;
+    historyBody.innerHTML = historyHtml;
+}
+
+// Initialise live tick fetch loop
+document.addEventListener("DOMContentLoaded", () => {
+    fetchLiveTicks();
+    setInterval(fetchLiveTicks, 1000);
+    
+    // checklist state persistence
+    const chkLiveReady = document.getElementById("chk-live-ready");
+    if (chkLiveReady) {
+        const savedState = localStorage.getItem("chk-live-ready-state");
+        if (savedState === "true") {
+            chkLiveReady.checked = true;
+        }
+        chkLiveReady.addEventListener("change", (e) => {
+            localStorage.setItem("chk-live-ready-state", e.target.checked);
+        });
+    }
+});
