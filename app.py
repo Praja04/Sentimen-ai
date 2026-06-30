@@ -599,18 +599,17 @@ def entry_signal(strategy, cache, index):
 
     signal = None
     if strategy["type"] == "xedy_v30_ai":
-        combined_score, technical_score = compute_combined_score(cache, index)
-        if technical_score is not None:
+        combined_score, trend_score = compute_combined_score(cache, index)
+        if combined_score is not None:
             stop_distance = atr_value * params["stop_atr"]
-            # Evaluate thresholds against technical_score so counter-trend entries are not mathematically blocked by 80% fundamental weight
-            if technical_score >= params["threshold"] and technical_score >= params["confirmation"]:
+            if combined_score >= params["threshold"] and trend_score >= params["confirmation"]:
                 signal = {
                     "side": 1,
                     "stop_distance": stop_distance,
                     "take_distance": stop_distance * params["rr"],
                     "signal_strength": combined_score,
                 }
-            elif technical_score <= -params["threshold"] and technical_score <= -params["confirmation"]:
+            elif combined_score <= -params["threshold"] and trend_score <= -params["confirmation"]:
                 signal = {
                     "side": -1,
                     "stop_distance": stop_distance,
@@ -619,49 +618,49 @@ def entry_signal(strategy, cache, index):
                 }
 
     elif strategy["type"] == "xedy_trend_pullback":
-        combined_score, technical_score = compute_combined_score(cache, index)
+        combined_score, trend_score = compute_combined_score(cache, index)
         ema_mid = cache["ema_21"][index]
         ema_fast = cache["ema_9"][index]
-        if not (None in (combined_score, technical_score, ema_mid, ema_fast)):
+        if not (None in (combined_score, trend_score, ema_mid, ema_fast)):
             pullback = abs((current_close - ema_mid) / ema_mid) if ema_mid else 0.0
             stop_distance = atr_value * params["stop_atr"]
-            if technical_score > 0 and technical_score > params["confirmation"] and current_close <= ema_fast and pullback <= params["pullback_limit"]:
+            if combined_score > 0 and trend_score > params["confirmation"] and current_close <= ema_fast and pullback <= params["pullback_limit"]:
                 signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-            elif technical_score < 0 and technical_score < -params["confirmation"] and current_close >= ema_fast and pullback <= params["pullback_limit"]:
+            elif combined_score < 0 and trend_score < -params["confirmation"] and current_close >= ema_fast and pullback <= params["pullback_limit"]:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
     elif strategy["type"] == "xedy_mean_revert":
-        combined_score, technical_score = compute_combined_score(cache, index)
+        combined_score, trend_score = compute_combined_score(cache, index)
         rsi_value = cache["rsi_14"][index]
-        if not (None in (combined_score, technical_score, rsi_value)):
+        if not (None in (combined_score, trend_score, rsi_value)):
             stop_distance = atr_value * params["stop_atr"]
-            if technical_score > params["threshold"] and rsi_value <= params["extreme_rsi"]:
+            if combined_score > params["threshold"] and rsi_value <= params["extreme_rsi"]:
                 signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-            elif technical_score < -params["threshold"] and rsi_value >= 100 - params["extreme_rsi"]:
+            elif combined_score < -params["threshold"] and rsi_value >= 100 - params["extreme_rsi"]:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
     elif strategy["type"] == "xedy_breakout_confirm":
-        combined_score, technical_score = compute_combined_score(cache, index)
+        combined_score, trend_score = compute_combined_score(cache, index)
         rolling_high = cache["rolling_high_20"][index]
         rolling_low = cache["rolling_low_20"][index]
-        if not (None in (combined_score, technical_score, rolling_high, rolling_low)):
+        if not (None in (combined_score, trend_score, rolling_high, rolling_low)):
             stop_distance = atr_value * params["stop_atr"]
             breakout_unit = atr_value * params["breakout_buffer"]
-            if technical_score > params["threshold"] and current_close > rolling_high + breakout_unit:
+            if combined_score > params["threshold"] and current_close > rolling_high + breakout_unit:
                 signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-            elif technical_score < -params["threshold"] and current_close < rolling_low - breakout_unit:
+            elif combined_score < -params["threshold"] and current_close < rolling_low - breakout_unit:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
     elif strategy["type"] == "xedy_macd_momentum":
-        combined_score, technical_score = compute_combined_score(cache, index)
+        combined_score, trend_score = compute_combined_score(cache, index)
         macd_line = cache["macd_line"][index]
         macd_sig = cache["macd_signal"][index]
         macd_hist = cache["macd_hist"][index]
-        if not (None in (combined_score, technical_score, macd_line, macd_sig, macd_hist)):
+        if not (None in (combined_score, trend_score, macd_line, macd_sig, macd_hist)):
             stop_distance = atr_value * params["stop_atr"]
-            if technical_score > 0 and macd_hist > params["threshold"]:
+            if combined_score > 0 and macd_hist > params["threshold"]:
                 signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-            elif technical_score < 0 and macd_hist < -params["threshold"]:
+            elif combined_score < 0 and macd_hist < -params["threshold"]:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
     if signal:
