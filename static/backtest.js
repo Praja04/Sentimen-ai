@@ -203,11 +203,10 @@ async function runBacktestSearch() {
             throw new Error(result.error || "Backtest request failed.");
         }
 
-        renderResults(result.data);
-        const iterationText = (result.data.rrr_search?.iterations || [])
-            .map((item) => `${item.phase}:${item.passes}`)
-            .join(" | ");
-        elements.statusText.textContent = `Selesai. Modal $${result.data.initial_capital}, periode ${result.data.range?.start_month || "-"} sampai ${result.data.range?.end_month || "-"}, ${result.data.strategies_tested} variasi diuji. ${passingSummary(result.data)}. Iterasi: ${iterationText || "-"}.`;
+        elements.statusText.textContent = "Selesai! Backtest seluruh TF berhasil dijalankan.";
+        backtestResultsPerTF = result.data.results_per_tf;
+        backtestPayloadInfo = result.data;
+        switchTF("M1");
     } catch (error) {
         elements.resultsContainer.innerHTML = `<div class="empty-state">${error.message}</div>`;
         elements.statusText.textContent = "Backtest gagal dijalankan.";
