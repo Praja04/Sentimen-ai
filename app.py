@@ -62,11 +62,17 @@ def get_live_ticks():
             daily_open = rates[0]['open'] if (rates is not None and len(rates) > 0) else t.bid
             daily_vol = rates[0]['tick_volume'] if (rates is not None and len(rates) > 0) else 0
             daily_change = ((t.bid - daily_open) / daily_open) * 100.0 if daily_open > 0 else 0.0
+            
+            daily_high = rates[0]['high'] if (rates is not None and len(rates) > 0) else t.bid
+            daily_low = rates[0]['low'] if (rates is not None and len(rates) > 0) else t.bid
+            
             ticks[label] = {
                 "bid": t.bid,
                 "ask": t.ask,
                 "change": round(daily_change, 3),
-                "volume": int(daily_vol)
+                "volume": int(daily_vol),
+                "high": daily_high,
+                "low": daily_low
             }
             
     # Livetest Real-time Demo Simulation update

@@ -590,3 +590,43 @@ input[type="checkbox"] {
     color: #fff;
     font-family: 'Roboto Mono', monospace;
 }
+
+/* Sub Ticker Layout Upgrades */
+.ticker-bid-ask {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 4px 0;
+}
+.ticker-bid-ask div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.ticker-bid-ask .sub-label {
+    font-size: 0.55rem;
+    color: var(--muted);
+    line-height: 1;
+    margin-bottom: 2px;
+}
+.ticker-bid-ask .price-large {
+    font-size: 0.95rem !important;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+.ticker-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.55rem;
+    color: var(--muted);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    padding-top: 3px;
+    margin-top: 2px;
+}
+.ticker-footer strong {
+    color: var(--text);
+    font-family: 'Roboto Mono', monospace;
+    font-weight: normal;
+}

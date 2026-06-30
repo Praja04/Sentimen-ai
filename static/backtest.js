@@ -331,6 +331,9 @@ async function fetchLiveTicks() {
                 else if (isDJI) decimals = 1;
                 else if (symbol.includes('EUR') || symbol.includes('GBP')) decimals = 5;
                 
+                const lowEl = document.getElementById(`ticker-low-${key}`);
+                const highEl = document.getElementById(`ticker-high-${key}`);
+                
                 if (bidEl) bidEl.innerText = tickInfo.bid.toFixed(decimals);
                 if (askEl) askEl.innerText = tickInfo.ask.toFixed(decimals);
                 if (chgEl) {
@@ -338,6 +341,8 @@ async function fetchLiveTicks() {
                     chgEl.className = tickInfo.change >= 0 ? "text-green" : "text-red";
                 }
                 if (volEl) volEl.innerText = tickInfo.volume.toLocaleString('en-US');
+                if (lowEl) lowEl.innerText = tickInfo.low.toFixed(decimals);
+                if (highEl) highEl.innerText = tickInfo.high.toFixed(decimals);
             }
         }
         if(!data.error && data.demo) {
