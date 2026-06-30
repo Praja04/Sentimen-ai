@@ -5,6 +5,7 @@ const elements = {
     startMonth: document.getElementById("startMonth"),
     endMonth: document.getElementById("endMonth"),
     riskPct: document.getElementById("riskPct"),
+    timeframe: document.getElementById("timeframe"),
     ddOperator: document.getElementById("ddOperator"),
     ddValue: document.getElementById("ddValue"),
     wrOperator: document.getElementById("wrOperator"),
@@ -154,7 +155,7 @@ function renderResults(payload) {
 async function runBacktestSearch() {
     elements.runBacktest.disabled = true;
     elements.stopBacktest.style.display = "inline-block";
-    elements.statusText.textContent = "Menjalankan AI XEDY_V30 dengan bobot fundamental 80% dan teknikal 20%...";
+    elements.statusText.textContent = `Menjalankan AI XEDY_V30 (${elements.timeframe.value}) dengan bobot fundamental 80% dan teknikal 20%...`;
     
     backtestAbortController = new AbortController();
 
@@ -170,6 +171,7 @@ async function runBacktestSearch() {
         end_month: elements.endMonth.value || null,
         days: 30,
         risk_pct: Number(elements.riskPct.value || 1),
+        timeframe: elements.timeframe.value,
         filters: {
             drawdown: {
                 operator: elements.ddOperator.value,

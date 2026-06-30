@@ -180,15 +180,26 @@ def parse_month_range(start_month=None, end_month=None, days=30):
     return start_date, end_date
 
 
-def fetch_mt5_rates(symbol="XAUUSD", days=30, start_month=None, end_month=None):
+def fetch_mt5_rates(symbol="XAUUSD", days=30, start_month=None, end_month=None, timeframe="M1"):
     ensure_mt5()
     if not mt5.symbol_select(symbol, True):
         raise RuntimeError(f"Unable to select symbol {symbol}.")
 
+    tf_map = {
+        "M1": mt5.TIMEFRAME_M1,
+        "M5": mt5.TIMEFRAME_M5,
+        "M15": mt5.TIMEFRAME_M15,
+        "M30": mt5.TIMEFRAME_M30,
+        "H1": mt5.TIMEFRAME_H1,
+        "H4": mt5.TIMEFRAME_H4,
+        "D1": mt5.TIMEFRAME_D1,
+    }
+    tf_constant = tf_map.get(timeframe, mt5.TIMEFRAME_M1)
+
     start_date, end_date = parse_month_range(start_month=start_month, end_month=end_month, days=days)
-    rates = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_M1, start_date, end_date)
+    rates = mt5.copy_rates_range(symbol, tf_constant, start_date, end_date)
     if rates is None or len(rates) == 0:
-        raise RuntimeError(f"No MT5 data returned for {symbol} M1.")
+        raise RuntimeError(f"No MT5 data returned for {symbol} {timeframe}.")
 
     return [
         {
@@ -982,8 +993,9 @@ def search_backtest_methods(
     start_month=None,
     end_month=None,
     sort_priority=None,
+    timeframe="M1",
 ):
-    rates = fetch_mt5_rates(symbol=symbol, days=days, start_month=start_month, end_month=end_month)
+    rates = fetch_mt5_rates(symbol=symbol, days=days, start_month=start_month, end_month=end_month, timeframe=timeframe)
     risk_context = get_symbol_risk_context(symbol)
 
     filters = filters or {
@@ -1053,7 +1065,7 @@ def search_backtest_methods(
 
     return {
         "symbol": symbol,
-        "timeframe": "M1",
+        "timeframe": timeframe,
         "bars": len(rates),
         "days": days,
         "range": {
@@ -1099,6 +1111,7 @@ def api_backtest_search():
             start_month=payload.get("start_month"),
             end_month=payload.get("end_month"),
             sort_priority=payload.get("sort_priority", ["net_profit", "win_rate", "drawdown"]),
+            timeframe=payload.get("timeframe", "M1"),
             filters={
                 "drawdown": {
                     "operator": filters.get("drawdown", {}).get("operator", ">"),
