@@ -50,7 +50,20 @@ def get_live_ticks():
             ticks["WTI OIL"] = t.bid
             break
             
-    return jsonify(ticks)
+    # Livetest Real-time Demo Simulation update
+    demo_state = None
+    if "XAUUSD" in ticks:
+        try:
+            import livetest_sim
+            bias = compute_xedy_fundamental_bias()
+            demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"], bias)
+        except Exception as err:
+            print("Error in livetest simulation tick update:", err)
+            
+    return jsonify({
+        "ticks": ticks,
+        "demo": demo_state
+    })
 
 @app.route('/api/prices')
 def get_prices():

@@ -253,12 +253,87 @@
             </div>
         </main>
 
+        <!-- LIVETEST DEMO SECTION -->
+        <section class="livetest-section panel-border">
+            <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
+                LIVETEST REAL-TIME DEMO (Rekomendasi: TF M15 / Risk 1.0%)
+                <span class="badge-live" id="live-demo-badge">LIVE SIMULATION RUNNING</span>
+            </h3>
+            <div class="livetest-grid">
+                <div class="livetest-card">
+                    <span class="label">Total Balance</span>
+                    <strong id="live-balance">$10,000.00</strong>
+                </div>
+                <div class="livetest-card">
+                    <span class="label">Total Equity</span>
+                    <strong id="live-equity">$10,000.00</strong>
+                </div>
+                <div class="livetest-card">
+                    <span class="label">Total Profit</span>
+                    <strong id="live-profit" class="text-green">+$0.00 (0.00%)</strong>
+                </div>
+                <div class="livetest-card">
+                    <span class="label">Current Status</span>
+                    <strong id="live-status" class="text-yellow">SCANNING FOR SIGNALS...</strong>
+                </div>
+            </div>
+            
+            <div class="livetest-split">
+                <div class="livetest-frame active-trades">
+                    <h4>Bingkai Transaksi Terjadi (Active Trades)</h4>
+                    <div class="table-scroll">
+                        <table class="livetest-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Symbol</th>
+                                    <th>Type</th>
+                                    <th>Lots</th>
+                                    <th>Entry Price</th>
+                                    <th>Current Price</th>
+                                    <th>Stop Loss</th>
+                                    <th>Take Profit</th>
+                                    <th>Profit ($)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="live-active-trades-body">
+                                <tr><td colspan="9" class="empty-state">Tidak ada transaksi aktif saat ini.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="livetest-frame history-trades">
+                    <h4>Histori Transaksi (Closed Trades)</h4>
+                    <div class="table-scroll">
+                        <table class="livetest-table">
+                            <thead>
+                                <tr>
+                                    <th>Open Time</th>
+                                    <th>Close Time</th>
+                                    <th>Type</th>
+                                    <th>Lots</th>
+                                    <th>Entry</th>
+                                    <th>Exit</th>
+                                    <th>Profit ($)</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody id="live-history-trades-body">
+                                <tr><td colspan="8" class="empty-state">Belum ada riwayat transaksi.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <footer class="cyber-footer">
             <span>DATA SOURCES: FEDERAL RESERVE | FRED | BLS | CME | REUTERS | BLOOMBERG | CFTC | WGC | EIA | IEA | OPEC | LBMA | TRADING ECONOMICS</span>
             <span class="text-blue">XEDY V30 INSTITUTIONAL AI ENGINE</span>
         </footer>
     </div>
     
-    <script src="script.js?v=30"></script>
+    <script src="script.js?v=31"></script>
 </body>
 </html>

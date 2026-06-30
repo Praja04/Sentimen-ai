@@ -63,9 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 cache: 'no-store',
                 headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
             });
-            const ticks = await res.json();
-            if(!ticks.error) {
-                for (const [symbol, price] of Object.entries(ticks)) {
+            const data = await res.json();
+            if(!data.error && data.ticks) {
+                for (const [symbol, price] of Object.entries(data.ticks)) {
                     const el = document.getElementById(`live-price-${symbol.replace(/\s+/g, '-')}`);
                     if (el) {
                         const decimals = symbol.includes('JPY') ? 3 : 2;
@@ -75,9 +75,91 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
                 }
+                
+                // Render Livetest Demo State
+                if (data.demo) {
+                    renderLiveDemo(data.demo);
+                }
             }
         } catch (e) {
             console.error("Fast tick fetch failed:", e);
+        }
+    }
+
+    // RENDER LIVETEST DEMO PANEL
+    function renderLiveDemo(demo) {
+        // 1. Account Cards
+        document.getElementById("live-balance").innerText = `$${demo.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById("live-equity").innerText = `$${demo.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        
+        const totalProfit = demo.equity - 10000.0;
+        const totalProfitPct = (totalProfit / 10000.0) * 100.0;
+        const profitEl = document.getElementById("live-profit");
+        
+        if (totalProfit >= 0) {
+            profitEl.innerText = `+$${totalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (+${totalProfitPct.toFixed(2)}%)`;
+            profitEl.className = "text-green";
+        } else {
+            profitEl.innerText = `-$${Math.abs(totalProfit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${totalProfitPct.toFixed(2)}%)`;
+            profitEl.className = "text-red";
+        }
+        
+        // 2. Current Status
+        const statusEl = document.getElementById("live-status");
+        const activeList = demo.active_trades || [];
+        if (activeList.length > 0) {
+            const t = activeList[0];
+            statusEl.innerText = `TRADING ${t.type} / ENTRY: ${t.entry_price}`;
+            statusEl.className = t.type === "BUY" ? "text-green" : "text-red";
+        } else {
+            statusEl.innerText = "SCANNING FOR SIGNALS...";
+            statusEl.className = "text-yellow";
+        }
+        
+        // 3. Active Trades Table
+        const activeBody = document.getElementById("live-active-trades-body");
+        if (activeList.length > 0) {
+            activeBody.innerHTML = activeList.map(t => `
+                <tr>
+                    <td>${t.time.split(' ')[1]}</td>
+                    <td>${t.symbol}</td>
+                    <td class="${t.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${t.type}</td>
+                    <td>${t.lots.toFixed(2)}</td>
+                    <td>${t.entry_price.toFixed(2)}</td>
+                    <td>${t.current_price.toFixed(2)}</td>
+                    <td>${t.sl.toFixed(2)}</td>
+                    <td>${t.tp.toFixed(2)}</td>
+                    <td class="${t.profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold;">
+                        ${t.profit >= 0 ? '+' : ''}$${t.profit.toFixed(2)}
+                    </td>
+                </tr>
+            `).join("");
+        } else {
+            activeBody.innerHTML = `<tr><td colspan="9" class="empty-state">Tidak ada transaksi aktif saat ini.</td></tr>`;
+        }
+        
+        // 4. Closed History Table
+        const historyBody = document.getElementById("live-history-trades-body");
+        const historyList = demo.history || [];
+        if (historyList.length > 0) {
+            historyBody.innerHTML = historyList.map(h => `
+                <tr>
+                    <td>${h.open_time.split(' ')[1]}</td>
+                    <td>${h.close_time.split(' ')[1]}</td>
+                    <td class="${h.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${h.type}</td>
+                    <td>${h.lots.toFixed(2)}</td>
+                    <td>${h.entry.toFixed(2)}</td>
+                    <td>${h.exit.toFixed(2)}</td>
+                    <td class="${h.profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold;">
+                        ${h.profit >= 0 ? '+' : ''}$${h.profit.toFixed(2)}
+                    </td>
+                    <td class="${h.result === 'PROFIT' ? 'text-green' : 'text-red'}" style="font-weight:bold; font-size:0.55rem; letter-spacing:0.5px;">
+                        ${h.result}
+                    </td>
+                </tr>
+            `).join("");
+        } else {
+            historyBody.innerHTML = `<tr><td colspan="8" class="empty-state">Belum ada riwayat transaksi.</td></tr>`;
         }
     }
 

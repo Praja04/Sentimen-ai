@@ -1,0 +1,169 @@
+import json
+import os
+import time
+from datetime import datetime
+
+DEMO_PATH = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+
+def init_demo_file():
+    if not os.path.exists(DEMO_PATH):
+        initial_data = {
+            "balance": 10543.10,
+            "equity": 10543.10,
+            "active_trades": [],
+            "history": [
+                {
+                    "open_time": "2026-06-29 10:15:30",
+                    "close_time": "2026-06-29 14:22:45",
+                    "type": "SELL",
+                    "lots": 0.52,
+                    "entry": 2335.20,
+                    "exit": 2328.10,
+                    "profit": 369.20,
+                    "result": "PROFIT"
+                },
+                {
+                    "open_time": "2026-06-29 16:45:00",
+                    "close_time": "2026-06-29 18:10:12",
+                    "type": "SELL",
+                    "lots": 0.52,
+                    "entry": 2330.50,
+                    "exit": 2334.80,
+                    "profit": -223.60,
+                    "result": "LOSS"
+                },
+                {
+                    "open_time": "2026-06-30 08:30:00",
+                    "close_time": "2026-06-30 11:15:20",
+                    "type": "SELL",
+                    "lots": 0.53,
+                    "entry": 2328.90,
+                    "exit": 2321.40,
+                    "profit": 397.50,
+                    "result": "PROFIT"
+                }
+            ],
+            "last_update": time.time()
+        }
+        with open(DEMO_PATH, 'w', encoding='utf-8') as f:
+            json.dump(initial_data, f, indent=4)
+
+def get_demo_state():
+    init_demo_file()
+    try:
+        with open(DEMO_PATH, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print("Error reading demo state:", e)
+        return None
+
+def save_demo_state(state):
+    try:
+        with open(DEMO_PATH, 'w', encoding='utf-8') as f:
+            json.dump(state, f, indent=4)
+    except Exception as e:
+        print("Error saving demo state:", e)
+
+def update_livetest_sim(current_gold_price, bias):
+    state = get_demo_state()
+    if not state:
+        return None
+
+    # 1. Update Active Trade
+    active_list = state.get("active_trades", [])
+    if active_list:
+        trade = active_list[0]
+        trade["current_price"] = current_gold_price
+        
+        # Calculate profit in USD (Gold contract size = 100)
+        # Sell trade profit = (entry - current) * lots * 100
+        # Buy trade profit = (current - entry) * lots * 100
+        if trade["type"] == "SELL":
+            profit = (trade["entry_price"] - current_gold_price) * trade["lots"] * 100.0
+        else:
+            profit = (current_gold_price - trade["entry_price"]) * trade["lots"] * 100.0
+            
+        trade["profit"] = round(profit, 2)
+        state["equity"] = round(state["balance"] + profit, 2)
+        
+        # Check SL / TP hits
+        is_closed = False
+        exit_price = current_gold_price
+        result_text = "PROFIT"
+        
+        if trade["type"] == "SELL":
+            if current_gold_price >= trade["sl"]:
+                is_closed = True
+                exit_price = trade["sl"]
+                result_text = "LOSS"
+            elif current_gold_price <= trade["tp"]:
+                is_closed = True
+                exit_price = trade["tp"]
+                result_text = "PROFIT"
+        else:
+            if current_gold_price <= trade["sl"]:
+                is_closed = True
+                exit_price = trade["sl"]
+                result_text = "LOSS"
+            elif current_gold_price >= trade["tp"]:
+                is_closed = True
+                exit_price = trade["tp"]
+                result_text = "PROFIT"
+                
+        if is_closed:
+            # Re-calculate final profit on target exit price
+            if trade["type"] == "SELL":
+                final_profit = (trade["entry_price"] - exit_price) * trade["lots"] * 100.0
+            else:
+                final_profit = (exit_price - trade["entry_price"]) * trade["lots"] * 100.0
+                
+            final_profit = round(final_profit, 2)
+            state["balance"] = round(state["balance"] + final_profit, 2)
+            state["equity"] = state["balance"]
+            
+            # Move to history
+            state["history"].insert(0, {
+                "open_time": trade["time"],
+                "close_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "type": trade["type"],
+                "lots": trade["lots"],
+                "entry": trade["entry_price"],
+                "exit": round(exit_price, 2),
+                "profit": final_profit,
+                "result": result_text
+            })
+            # Clear active trades
+            state["active_trades"] = []
+            
+    # 2. If no active trade, open a new one
+    else:
+        # Open Sell since fundamental bias is Bearish, Buy if Bullish
+        trade_type = "SELL" if bias < 0 else "BUY"
+        lots = 0.50 # Balanced M15 size for 1.0% risk
+        
+        # SL and TP targets
+        sl_dist = 15.0 # ATR average for Gold
+        tp_dist = 22.0 # 1.5x Reward-to-Risk ratio
+        
+        entry_price = current_gold_price
+        sl_price = entry_price + sl_dist if trade_type == "SELL" else entry_price - sl_dist
+        tp_price = entry_price - tp_dist if trade_type == "SELL" else entry_price + tp_dist
+        
+        new_trade = {
+            "ticket": int(time.time() * 100) % 10000000,
+            "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "symbol": "XAUUSD",
+            "type": trade_type,
+            "lots": lots,
+            "entry_price": round(entry_price, 2),
+            "current_price": round(entry_price, 2),
+            "sl": round(sl_price, 2),
+            "tp": round(tp_price, 2),
+            "profit": 0.0
+        }
+        state["active_trades"].append(new_trade)
+        state["equity"] = state["balance"]
+
+    state["last_update"] = time.time()
+    save_demo_state(state)
+    return state
