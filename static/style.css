@@ -563,3 +563,16 @@ body {
     color: var(--text-muted);
     padding: 20px !important;
 }
+
+/* MT5 Summary Row Styling */
+.mt5-summary-row {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    font-size: 0.65rem;
+}
+.mt5-summary-row td {
+    padding: 5px 8px !important;
+    font-family: var(--font-mono);
+    color: #fff !important;
+}

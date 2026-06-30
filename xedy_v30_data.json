@@ -225,8 +225,8 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,030.34",
-      "change": "+13.70 (+0.34%)",
+      "price": "4,030.16",
+      "change": "+13.52 (+0.34%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -256,8 +256,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.634",
-      "change": "+0.69 (+0.43%)",
+      "price": "162.617",
+      "change": "+0.67 (+0.42%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -287,8 +287,8 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "69.86",
-      "change": "-0.39 (-0.56%)",
+      "price": "69.81",
+      "change": "-0.44 (-0.63%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -412,7 +412,7 @@
   },
   "economic_calendar": [
     {
-      "time": "00:26",
+      "time": "00:31",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "01:26",
+      "time": "01:31",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "03:26",
+      "time": "03:31",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "04:26",
+      "time": "04:31",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
