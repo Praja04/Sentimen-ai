@@ -2,6 +2,7 @@ from flask import Flask, jsonify, send_from_directory
 import MetaTrader5 as mt5
 from flask_cors import CORS
 import os
+import json
 from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import product
@@ -151,6 +152,12 @@ def get_news_calendar():
 
 
 # --- BACKTEST CORE LOGIC ---
+
+def ensure_mt5():
+    if mt5 is None:
+        raise RuntimeError("MetaTrader5 Python package is not available.")
+    if not mt5.initialize():
+        raise RuntimeError(f"MetaTrader5 initialize failed: {mt5.last_error()}")
 
 def load_dashboard_data():
     with open('xedy_v30_data.json', 'r', encoding='utf-8') as f:
