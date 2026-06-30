@@ -664,11 +664,9 @@ def entry_signal(strategy, cache, index):
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
     if signal:
-        # Arah market strictly mengikuti Trend Fundamental
-        if signal["side"] == 1 and bias < 0.0:
-            return None
-        if signal["side"] == -1 and bias > 0.0:
-            return None
+        # Check if signal side is counter-trend to fundamental bias
+        is_against = (signal["side"] == 1 and bias < 0.0) or (signal["side"] == -1 and bias > 0.0)
+        signal["against_fundamental"] = is_against
         return signal
     return None
 
@@ -892,6 +890,13 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
                 take_distance = signal["take_distance"]
                 side = signal["side"]
                 lot = estimate_lot_size(stop_distance, equity, risk_pct, risk_context or {})
+                if signal.get("against_fundamental", False):
+                    # Reduce lot size by 50% for trades going against fundamental trend
+                    step = (risk_context or {}).get("volume_step", 0.01) or 0.01
+                    lot = round((lot * 0.5) / step) * step
+                    volume_min = (risk_context or {}).get("volume_min", step) or step
+                    lot = max(lot, volume_min)
+                    
                 position = {
                     "side": side,
                     "entry": entry,
