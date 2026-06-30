@@ -1,3 +1,4 @@
+let backtestAbortController = null;
 const elements = {
     symbol: document.getElementById("symbol"),
     initialCapital: document.getElementById("initialCapital"),
@@ -17,6 +18,7 @@ const elements = {
     priority2: document.getElementById("priority2"),
     priority3: document.getElementById("priority3"),
     runBacktest: document.getElementById("runBacktest"),
+    stopBacktest: document.getElementById("stopBacktest"),
     statusText: document.getElementById("statusText"),
     resultsContainer: document.getElementById("resultsContainer"),
     summarySymbol: document.getElementById("summarySymbol"),
@@ -151,7 +153,10 @@ function renderResults(payload) {
 
 async function runBacktestSearch() {
     elements.runBacktest.disabled = true;
+    elements.stopBacktest.style.display = "inline-block";
     elements.statusText.textContent = "Menjalankan AI XEDY_V30 dengan bobot fundamental 80% dan teknikal 20%...";
+    
+    backtestAbortController = new AbortController();
 
     const payload = {
         symbol: elements.symbol.value.trim() || "XAUUSD",
@@ -186,6 +191,7 @@ async function runBacktestSearch() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
+            signal: backtestAbortController.signal,
         });
         const result = await response.json();
 
@@ -203,6 +209,8 @@ async function runBacktestSearch() {
         elements.statusText.textContent = "Backtest gagal dijalankan.";
     } finally {
         elements.runBacktest.disabled = false;
+        elements.stopBacktest.style.display = "none";
+        backtestAbortController = null;
     }
 }
 
@@ -212,3 +220,22 @@ function passingSummary(payload) {
 }
 
 elements.runBacktest.addEventListener("click", runBacktestSearch);
+
+async function stopBacktestExecution() {
+    try {
+        // Send stop command to backend
+        fetch("/api/backtest/stop", { method: "POST" });
+    } catch (e) {
+        console.error("Failed to notify backend stop:", e);
+    }
+    
+    if (backtestAbortController) {
+        backtestAbortController.abort();
+    }
+    
+    elements.statusText.textContent = "Backtest dihentikan oleh user.";
+    elements.runBacktest.disabled = false;
+    elements.stopBacktest.style.display = "none";
+}
+
+elements.stopBacktest.addEventListener("click", stopBacktestExecution);

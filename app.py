@@ -1,3 +1,4 @@
+stop_backtest_requested = False
 from flask import Flask, jsonify, send_from_directory
 import MetaTrader5 as mt5
 from flask_cors import CORS
@@ -996,11 +997,15 @@ def search_backtest_methods(
     rr_values = dedupe_rr_values([1.0, 1.4, 1.8, 2.2, 2.6])
     iteration_sources = [("grid", make_strategy_library(rr_values))]
 
+    global stop_backtest_requested
     for iteration_index in range(2):
         phase_name, strategies = iteration_sources[-1]
         cache = build_indicator_cache(rates, strategies)
         current_results = []
         for strategy in strategies:
+            if stop_backtest_requested:
+                stop_backtest_requested = False
+                raise RuntimeError("Backtest dihentikan oleh user.")
             result = run_backtest(
                 rates,
                 strategy,
@@ -1080,6 +1085,8 @@ def serve_backtest():
 
 @app.route("/api/backtest/search", methods=["POST"])
 def api_backtest_search():
+    global stop_backtest_requested
+    stop_backtest_requested = False
     payload = request.get_json(silent=True) or {}
     filters = payload.get("filters") or {}
 
@@ -1110,6 +1117,12 @@ def api_backtest_search():
         return jsonify({"success": True, "data": result})
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500
+
+@app.route("/api/backtest/stop", methods=["POST"])
+def api_backtest_stop():
+    global stop_backtest_requested
+    stop_backtest_requested = True
+    return jsonify({"success": True, "message": "Stop requested."})
 
 if __name__ == '__main__':
     # Start the Flask app
