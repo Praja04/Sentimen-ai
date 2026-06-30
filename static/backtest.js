@@ -109,12 +109,33 @@ function renderResults(payload) {
             .map((trade) => `${trade.side} ${trade.reason} | R ${trade.r_multiple} | ${trade.profit_pct}%`)
             .join("<br>");
 
+        // Check if this strategy is currently the active one in the demo state
+        const activeConfig = currentDemoState?.active_config;
+        const isActive = activeConfig &&
+                         activeConfig.timeframe === payload.timeframe &&
+                         activeConfig.strategy_type === item.strategy_type;
+
         return `
-            <article class="result-card">
+            <article class="result-card" style="${isActive ? 'border: 1.5px solid var(--text-yellow); box-shadow: 0 0 15px rgba(255,215,0,0.15);' : ''}">
                 <div class="result-head">
                     <div>
                         <div class="label">#${index + 1} | ${payload.method} | ${item.strategy_type}</div>
                         <h3>${item.strategy_name} <span class="badge tf-badge">${payload.timeframe}</span></h3>
+                    </div>
+                    <!-- Single selection checkbox -->
+                    <div class="strategy-select-container" style="background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.2); padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" class="strategy-selector-chk" 
+                               data-tf="${payload.timeframe}"
+                               data-risk="${payload.risk_percent}"
+                               data-type="${item.strategy_type}"
+                               data-name="${item.strategy_name.replace(/'/g, "\'")}"
+                               data-win="${item.win_rate}"
+                               data-dd="${item.max_drawdown_pct}"
+                               data-profit="${item.net_profit_pct}"
+                               ${isActive ? "checked" : ""}
+                               onchange="handleStrategySelect(this)"
+                               style="width: 14px !important; height: 14px !important; margin: 0; accent-color: var(--text-yellow); cursor: pointer;" />
+                        <span style="font-size: 0.65rem; font-weight: bold; color: var(--text-yellow); font-family: 'Rajdhani', sans-serif; cursor: pointer;" onclick="const chk=this.previousElementSibling; chk.checked=!chk.checked; chk.dispatchEvent(new Event('change'));">SIAP LIVE TEST</span>
                     </div>
                     <div class="badge ${item.passes_filters ? "pass" : "fail"}">
                         ${item.passes_filters ? "LOLOS FILTER" : "TIDAK LOLOS"}
