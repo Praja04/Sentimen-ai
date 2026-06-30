@@ -524,67 +524,71 @@ def entry_signal(strategy, cache, index):
     if atr_value is None or atr_value <= 0:
         return None
 
-    if strategy["type"] == "xedy_v30_ai":
-        combined_score, trend_score = compute_combined_score(cache, index)
-        if combined_score is None:
-            return None
-        stop_distance = atr_value * params["stop_atr"]
-        if combined_score >= params["threshold"] and trend_score >= params["confirmation"]:
-            return {
-                "side": 1,
-                "stop_distance": stop_distance,
-                "take_distance": stop_distance * params["rr"],
-                "signal_strength": combined_score,
-            }
-        if combined_score <= -params["threshold"] and trend_score <= -params["confirmation"]:
-            return {
-                "side": -1,
-                "stop_distance": stop_distance,
-                "take_distance": stop_distance * params["rr"],
-                "signal_strength": combined_score,
-            }
+    bias = cache.get("xedy_fundamental_bias", 0.0)
+    if bias == 0.0:
         return None
 
-    if strategy["type"] == "xedy_trend_pullback":
+    signal = None
+    if strategy["type"] == "xedy_v30_ai":
+        combined_score, trend_score = compute_combined_score(cache, index)
+        if combined_score is not None:
+            stop_distance = atr_value * params["stop_atr"]
+            if combined_score >= params["threshold"] and trend_score >= params["confirmation"]:
+                signal = {
+                    "side": 1,
+                    "stop_distance": stop_distance,
+                    "take_distance": stop_distance * params["rr"],
+                    "signal_strength": combined_score,
+                }
+            elif combined_score <= -params["threshold"] and trend_score <= -params["confirmation"]:
+                signal = {
+                    "side": -1,
+                    "stop_distance": stop_distance,
+                    "take_distance": stop_distance * params["rr"],
+                    "signal_strength": combined_score,
+                }
+
+    elif strategy["type"] == "xedy_trend_pullback":
         combined_score, trend_score = compute_combined_score(cache, index)
         ema_mid = cache["ema_21"][index]
         ema_fast = cache["ema_9"][index]
-        if None in (combined_score, trend_score, ema_mid, ema_fast):
-            return None
-        pullback = abs((current_close - ema_mid) / ema_mid) if ema_mid else 0.0
-        stop_distance = atr_value * params["stop_atr"]
-        if combined_score > 0 and trend_score > params["confirmation"] and current_close <= ema_fast and pullback <= params["pullback_limit"]:
-            return {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-        if combined_score < 0 and trend_score < -params["confirmation"] and current_close >= ema_fast and pullback <= params["pullback_limit"]:
-            return {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-        return None
+        if not (None in (combined_score, trend_score, ema_mid, ema_fast)):
+            pullback = abs((current_close - ema_mid) / ema_mid) if ema_mid else 0.0
+            stop_distance = atr_value * params["stop_atr"]
+            if combined_score > 0 and trend_score > params["confirmation"] and current_close <= ema_fast and pullback <= params["pullback_limit"]:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            elif combined_score < 0 and trend_score < -params["confirmation"] and current_close >= ema_fast and pullback <= params["pullback_limit"]:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
-    if strategy["type"] == "xedy_mean_revert":
+    elif strategy["type"] == "xedy_mean_revert":
         combined_score, trend_score = compute_combined_score(cache, index)
         rsi_value = cache["rsi_14"][index]
-        if None in (combined_score, trend_score, rsi_value):
-            return None
-        stop_distance = atr_value * params["stop_atr"]
-        if combined_score > params["threshold"] and rsi_value <= params["extreme_rsi"]:
-            return {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-        if combined_score < -params["threshold"] and rsi_value >= 100 - params["extreme_rsi"]:
-            return {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-        return None
+        if not (None in (combined_score, trend_score, rsi_value)):
+            stop_distance = atr_value * params["stop_atr"]
+            if combined_score > params["threshold"] and rsi_value <= params["extreme_rsi"]:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            elif combined_score < -params["threshold"] and rsi_value >= 100 - params["extreme_rsi"]:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
-    if strategy["type"] == "xedy_breakout_confirm":
+    elif strategy["type"] == "xedy_breakout_confirm":
         combined_score, trend_score = compute_combined_score(cache, index)
         rolling_high = cache["rolling_high_20"][index]
         rolling_low = cache["rolling_low_20"][index]
-        if None in (combined_score, trend_score, rolling_high, rolling_low):
-            return None
-        stop_distance = atr_value * params["stop_atr"]
-        breakout_unit = atr_value * params["breakout_buffer"]
-        if combined_score > params["threshold"] and current_close > rolling_high + breakout_unit:
-            return {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-        if combined_score < -params["threshold"] and current_close < rolling_low - breakout_unit:
-            return {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
-        return None
+        if not (None in (combined_score, trend_score, rolling_high, rolling_low)):
+            stop_distance = atr_value * params["stop_atr"]
+            breakout_unit = atr_value * params["breakout_buffer"]
+            if combined_score > params["threshold"] and current_close > rolling_high + breakout_unit:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            elif combined_score < -params["threshold"] and current_close < rolling_low - breakout_unit:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
 
+    if signal:
+        # Arah market strictly mengikuti Trend Fundamental
+        if signal["side"] == 1 and bias < 0.0:
+            return None
+        if signal["side"] == -1 and bias > 0.0:
+            return None
+        return signal
     return None
 
 
@@ -611,7 +615,15 @@ def close_position(position, exit_price, exit_time, reason, equity, risk_pct):
         return None, equity
 
     move = (exit_price - position["entry"]) * position["side"]
-    r_multiple = move / stop_distance
+    
+    initial_lot = position["lots"][0] if "lots" in position else position.get("lot", 0.0)
+    total_lot = sum(position["lots"]) if "lots" in position else position.get("lot", 0.0)
+    
+    if initial_lot > 0:
+        r_multiple = (move / stop_distance) * (total_lot / initial_lot)
+    else:
+        r_multiple = move / stop_distance
+        
     pnl_amount = equity * (risk_pct / 100.0) * r_multiple
     new_equity = equity + pnl_amount
 
@@ -625,7 +637,7 @@ def close_position(position, exit_price, exit_time, reason, equity, risk_pct):
         "r_multiple": round(r_multiple, 3),
         "profit_pct": round((pnl_amount / equity) * 100.0, 3) if equity else 0.0,
         "profit_amount": round(pnl_amount, 2),
-        "lot": round(position.get("lot", 0.0), 2),
+        "lot": round(total_lot, 2),
         "mae_r": round(position.get("mae_r", 0.0), 3),
         "mfe_r": round(position.get("mfe_r", 0.0), 3),
     }
@@ -718,6 +730,36 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
 
         if position is not None:
             update_position_excursions(position, bar)
+            
+            # --- AVERAGING / GRID LOGIC ---
+            atr_val = cache["atr_14"][index]
+            if atr_val is not None and atr_val > 0 and len(position["entries"]) < 3:
+                grid_spacing = atr_val * 1.5
+                last_entry_price = position["entries"][-1]
+                
+                should_average = False
+                if position["side"] == 1 and bar["close"] <= last_entry_price - grid_spacing:
+                    should_average = True
+                elif position["side"] == -1 and bar["close"] >= last_entry_price + grid_spacing:
+                    should_average = True
+                    
+                if should_average:
+                    entry_price = bar["close"]
+                    position["entries"].append(entry_price)
+                    position["lots"].append(position["initial_lot"])
+                    
+                    total_lot = sum(position["lots"])
+                    avg_entry = sum(e * l for e, l in zip(position["entries"], position["lots"])) / total_lot
+                    position["entry"] = avg_entry
+                    position["lot"] = total_lot
+                    
+                    if position["side"] == 1:
+                        position["stop"] = avg_entry - position["stop_distance"]
+                        position["take"] = avg_entry + position["take_distance"]
+                    else:
+                        position["stop"] = avg_entry + position["stop_distance"]
+                        position["take"] = avg_entry - position["take_distance"]
+
             exit_price = None
             exit_reason = None
 
@@ -763,11 +805,15 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
                     "side": side,
                     "entry": entry,
                     "stop_distance": stop_distance,
+                    "take_distance": take_distance,
                     "entry_time": bar["time"],
                     "entry_index": index,
                     "stop": entry - stop_distance if side == 1 else entry + stop_distance,
                     "take": entry + take_distance if side == 1 else entry - take_distance,
                     "lot": lot,
+                    "initial_lot": lot,
+                    "lots": [lot],
+                    "entries": [entry],
                     "mae_r": 0.0,
                     "mfe_r": 0.0,
                 }
@@ -852,11 +898,24 @@ def compare_metric(value, operator, threshold):
 
 
 def evaluate_result_against_filters(result, filters):
-    return (
-        compare_metric(result["max_drawdown_pct"], filters["drawdown"]["operator"], filters["drawdown"]["value"])
-        and compare_metric(result["win_rate"], filters["win_rate"]["operator"], filters["win_rate"]["value"])
-        and compare_metric(result["avg_monthly_profit_pct"], filters["monthly_profit"]["operator"], filters["monthly_profit"]["value"])
-    )
+    # Enforce drawdown < 10%
+    if result.get("max_drawdown_pct", 100.0) >= 10.0:
+        return False
+        
+    # Enforce no negative months
+    monthly_report = result.get("monthly_report", [])
+    if monthly_report:
+        for month in monthly_report:
+            if float(month.get("profit_amount", 0.0)) < 0.0:
+                return False
+                
+    # Also apply the win_rate filter if sent
+    wr_operator = filters.get("win_rate", {}).get("operator", ">=")
+    wr_value = float(filters.get("win_rate", {}).get("value", 80.0))
+    if not compare_metric(result["win_rate"], wr_operator, wr_value):
+        return False
+        
+    return True
 
 
 def generate_refined_rr_values(seed_results):
