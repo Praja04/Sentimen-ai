@@ -205,29 +205,29 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,028.73",
-      "change": "+12.09 (+0.30%)",
+      "price": "4,031.01",
+      "change": "+14.37 (+0.36%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3782.46",
-        "high": "4247.36",
-        "bp": "35%",
-        "bearp": "65%",
-        "conf": "65%",
-        "accuracy": "82.0%",
+        "low": "3798.47",
+        "high": "4263.37",
+        "bp": "41%",
+        "bearp": "59%",
+        "conf": "59%",
+        "accuracy": "78.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3522.10",
-        "high": "4507.72",
-        "bp": "31%",
-        "bearp": "69%",
-        "conf": "69%",
+        "low": "3538.11",
+        "high": "4523.73",
+        "bp": "35%",
+        "bearp": "65%",
+        "conf": "65%",
         "accuracy": "86.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -236,17 +236,17 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.398",
-      "change": "+0.45 (+0.28%)",
+      "price": "162.410",
+      "change": "+0.47 (+0.29%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "161.060",
-        "high": "163.566",
-        "bp": "61%",
-        "bearp": "39%",
-        "conf": "61%",
+        "low": "161.149",
+        "high": "163.655",
+        "bp": "56%",
+        "bearp": "44%",
+        "conf": "56%",
         "accuracy": "72.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
@@ -254,12 +254,12 @@
       "f1": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "158.675",
-        "high": "165.951",
-        "bp": "63%",
-        "bearp": "37%",
-        "conf": "63%",
-        "accuracy": "82.0%",
+        "low": "158.764",
+        "high": "166.040",
+        "bp": "58%",
+        "bearp": "42%",
+        "conf": "58%",
+        "accuracy": "78.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
       }
@@ -267,17 +267,17 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "70.62",
-      "change": "+0.37 (+0.53%)",
+      "price": "70.67",
+      "change": "+0.42 (+0.60%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "63.70",
-        "high": "77.52",
-        "bp": "40%",
-        "bearp": "60%",
-        "conf": "60%",
+        "low": "63.72",
+        "high": "77.62",
+        "bp": "44%",
+        "bearp": "56%",
+        "conf": "56%",
         "accuracy": "80.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -285,12 +285,12 @@
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "46.84",
-        "high": "94.38",
-        "bp": "35%",
-        "bearp": "65%",
-        "conf": "65%",
-        "accuracy": "78.0%",
+        "low": "46.89",
+        "high": "94.45",
+        "bp": "40%",
+        "bearp": "60%",
+        "conf": "60%",
+        "accuracy": "74.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       }
@@ -299,19 +299,19 @@
   "gauges": {
     "macro_alignment_score": 34,
     "market_regime_score": 55,
-    "market_sentiment_score": 95,
+    "market_sentiment_score": 56,
     "institutional_flow_score": 20
   },
   "ml_memory": {
     "sentiment_penalty": -1
   },
   "ml_weights": {
-    "macro": 0.12229991133799203,
-    "sentiment": 0.12229991133799203,
-    "flow": 0.38850044331003986,
-    "regime": 0.12229991133799203,
-    "tech": 0.12229991133799203,
-    "cal": 0.12229991133799203
+    "macro": 0.1298887903755467,
+    "sentiment": 0.1298887903755467,
+    "flow": 0.3505560481222665,
+    "regime": 0.1298887903755467,
+    "tech": 0.1298887903755467,
+    "cal": 0.1298887903755467
   },
   "correlation_matrix": {
     "XAUUSD": {
@@ -392,7 +392,7 @@
   },
   "economic_calendar": [
     {
-      "time": "19:36",
+      "time": "19:40",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -401,7 +401,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "20:36",
+      "time": "20:40",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -410,7 +410,7 @@
       "prev": "215K"
     },
     {
-      "time": "22:36",
+      "time": "22:40",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -419,7 +419,7 @@
       "prev": "49.1"
     },
     {
-      "time": "23:36",
+      "time": "23:40",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
@@ -436,7 +436,7 @@
     "GLOBAL LIQUIDITY SHIFT"
   ],
   "liquidity_zones": {
-    "XAUUSD": 4062.0,
+    "XAUUSD": 4032.0,
     "USDJPY": 162.0,
     "WTI OIL": 70.0
   }

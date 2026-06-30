@@ -1193,7 +1193,7 @@ def api_backtest_search():
     payload = request.get_json(silent=True) or {}
     filters = payload.get("filters") or {}
 
-    tfs = ["M1", "M5", "M15", "M30", "H1", "H4", "D1"]
+    tfs = ["M5", "M15", "M30", "H1", "H4"]
     results_per_tf = {}
 
     try:

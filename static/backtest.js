@@ -174,7 +174,7 @@ function renderResults(payload) {
 async function runBacktestSearch() {
     elements.runBacktest.disabled = true;
     elements.stopBacktest.style.display = "inline-block";
-    elements.statusText.textContent = 'Menjalankan AI XEDY_V30 (M1 s/d D1) dengan bobot fundamental 80% dan teknikal 20%...';
+    elements.statusText.textContent = 'Menjalankan AI XEDY_V30 (M5 s/d H4) dengan bobot fundamental 80% dan teknikal 20%...';
     
     backtestAbortController = new AbortController();
 
@@ -223,7 +223,7 @@ async function runBacktestSearch() {
         elements.statusText.textContent = "Selesai! Backtest seluruh TF berhasil dijalankan.";
         backtestResultsPerTF = result.data.results_per_tf;
         backtestPayloadInfo = result.data;
-        switchTF("M1");
+        switchTF("M5");
     } catch (error) {
         elements.resultsContainer.innerHTML = `<div class="empty-state">${error.message}</div>`;
         elements.statusText.textContent = "Backtest gagal dijalankan.";
