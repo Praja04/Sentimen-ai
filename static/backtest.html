@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XEDY V30 AI Backtest Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/backtest.css?v=1">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">MT5 Research Workspace</p>
+                <h1>AI XEDY_V30 Backtest</h1>
+                <p class="hero-copy">Metode yang dipakai sekarang tetap: <strong>Fundamental 80%</strong> dari dataset XEDY V30 dan <strong>Teknikal 20%</strong> dari data <strong>M1 XAUUSD</strong> langsung dari MetaTrader 5. Hasil ditampilkan sebagai <strong>10 profit terbesar</strong>.</p>
+            </div>
+            <a class="ghost-link" href="/">Kembali ke dashboard</a>
+        </section>
+
+        <section class="control-grid">
+            <div class="panel">
+                <h2>Pengaturan Test</h2>
+                <div class="form-grid">
+                    <label>
+                        <span>Symbol</span>
+                        <input id="symbol" value="XAUUSD" readonly />
+                    </label>
+                    <label>
+                        <span>Modal awal ($)</span>
+                        <input id="initialCapital" type="number" min="1000" step="100" value="10000" />
+                    </label>
+                    <div class="period-group">
+                        <span>Periode</span>
+                        <div class="period-row">
+                            <label>
+                                <span>Dari</span>
+                                <input id="startMonth" type="month" value="2026-05" />
+                            </label>
+                            <label>
+                                <span>Ke</span>
+                                <input id="endMonth" type="month" value="2026-06" />
+                            </label>
+                        </div>
+                    </div>
+                    <label>
+                        <span>Risk per trade (%)</span>
+                        <input id="riskPct" type="number" min="0.1" max="5" step="0.1" value="1.0" />
+                    </label>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Filter Validasi</h2>
+                <div class="target-grid">
+                    <div class="target-row">
+                        <span>Drawdown (%)</span>
+                        <select id="ddOperator">
+                            <option value=">">&gt;</option>
+                            <option value=">=">&gt;=</option>
+                            <option value="<">&lt;</option>
+                            <option value="<=">&lt;=</option>
+                        </select>
+                        <input id="ddValue" type="number" value="5" />
+                    </div>
+                    <div class="target-row">
+                        <span>Win rate (%)</span>
+                        <select id="wrOperator">
+                            <option value="<">&lt;</option>
+                            <option value="<=">&lt;=</option>
+                            <option value=">">&gt;</option>
+                            <option value=">=">&gt;=</option>
+                        </select>
+                        <input id="wrValue" type="number" value="80" />
+                    </div>
+                    <div class="target-row">
+                        <span>Profit / bulan (%)</span>
+                        <select id="mpOperator">
+                            <option value="<">&lt;</option>
+                            <option value="<=">&lt;=</option>
+                            <option value=">">&gt;</option>
+                            <option value=">=">&gt;=</option>
+                        </select>
+                        <input id="mpValue" type="number" value="40" />
+                    </div>
+                </div>
+                <p class="hint">Metode tetap AI XEDY_V30. Filter ini dipakai sebagai penanda validasi, tetapi ranking utama sekarang berdasarkan 10 profit terbesar.</p>
+            </div>
+        </section>
+
+        <section class="action-bar">
+            <button id="runBacktest">Jalankan AI XEDY_V30</button>
+            <p id="statusText">Siap menjalankan backtest.</p>
+        </section>
+
+        <section class="summary-grid" id="summaryGrid">
+            <div class="summary-card">
+                <span class="label">Symbol / TF</span>
+                <strong id="summarySymbol">-</strong>
+            </div>
+            <div class="summary-card">
+                <span class="label">Bars</span>
+                <strong id="summaryBars">-</strong>
+            </div>
+            <div class="summary-card">
+                <span class="label">Variasi diuji</span>
+                <strong id="summaryStrategies">-</strong>
+            </div>
+            <div class="summary-card">
+                <span class="label">Target status</span>
+                <strong id="summaryPassing">-</strong>
+            </div>
+        </section>
+
+        <section class="panel results-panel">
+            <div class="results-head">
+                <h2>Top 10 Profit Terbesar</h2>
+                <span class="caption">Urutan: net profit tertinggi, lalu profit bulanan rata-rata.</span>
+            </div>
+            <div id="resultsContainer" class="results-container">
+                <div class="empty-state">Belum ada hasil. Jalankan pencarian dulu.</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/backtest.js?v=1"></script>
+</body>
+</html>
