@@ -508,8 +508,8 @@ body {
     font-family: var(--font-mono);
 }
 .livetest-split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
     margin-top: 15px;
 }
