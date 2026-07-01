@@ -94,6 +94,11 @@ def get_live_ticks():
             import livetest_sim
             bias = compute_xedy_fundamental_bias()
             demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"]["bid"], bias)
+            if demo_state:
+                config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+                if os.path.exists(config_file):
+                    with open(config_file, 'r', encoding='utf-8') as f_cfg:
+                        demo_state["active_config"] = json.load(f_cfg)
         except Exception as err:
             print("Error in livetest simulation tick update:", err)
             
@@ -1373,13 +1378,9 @@ def apply_livetest_parameters():
             sl_dist = 18.0
             tp_dist = 30.0
             
-        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
-        state = {}
-        if os.path.exists(demo_file):
-            with open(demo_file, 'r', encoding='utf-8') as f_demo:
-                state = json.load(f_demo)
-                
-        state["active_config"] = {
+        # Write active config to decoupled config file to prevent write race conditions
+        config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+        config_data = {
             "timeframe": tf,
             "risk_percent": risk,
             "strategy_type": strat_type,
@@ -1390,10 +1391,19 @@ def apply_livetest_parameters():
             "max_drawdown": max_dd,
             "net_profit": net_profit
         }
-        
-        # Force close any existing trade to open a new one with new config
+        with open(config_file, 'w', encoding='utf-8') as f_cfg:
+            json.dump(config_data, f_cfg, indent=4)
+            
+        # Force close active trade by clearing state file
+        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        state = {}
+        if os.path.exists(demo_file):
+            with open(demo_file, 'r', encoding='utf-8') as f_demo:
+                try:
+                    state = json.load(f_demo)
+                except Exception:
+                    pass
         state["active_trades"] = []
-        
         with open(demo_file, 'w', encoding='utf-8') as f_demo:
             json.dump(state, f_demo, indent=4)
             
@@ -1405,18 +1415,19 @@ def apply_livetest_parameters():
 @app.route('/api/livetest/clear_parameters', methods=['POST'])
 def clear_livetest_parameters():
     try:
+        config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+        if os.path.exists(config_file):
+            os.remove(config_file)
+            
         demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
         state = {}
         if os.path.exists(demo_file):
             with open(demo_file, 'r', encoding='utf-8') as f_demo:
-                state = json.load(f_demo)
-                
-        if "active_config" in state:
-            del state["active_config"]
-            
-        # Force close any existing trade
+                try:
+                    state = json.load(f_demo)
+                except Exception:
+                    pass
         state["active_trades"] = []
-            
         with open(demo_file, 'w', encoding='utf-8') as f_demo:
             json.dump(state, f_demo, indent=4)
             
@@ -1430,8 +1441,6 @@ def clear_livetest_parameters():
 def reset_livetest_simulation():
     try:
         demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
-        
-        # Reset to initial state
         initial_data = {
             "balance": 10000.00,
             "equity": 10000.00,
@@ -1439,17 +1448,6 @@ def reset_livetest_simulation():
             "history": [],
             "last_update": time.time()
         }
-        
-        # Preserve active config if it exists
-        if os.path.exists(demo_file):
-            with open(demo_file, 'r', encoding='utf-8') as f_demo:
-                try:
-                    state = json.load(f_demo)
-                    if "active_config" in state:
-                        initial_data["active_config"] = state["active_config"]
-                except Exception:
-                    pass
-                    
         with open(demo_file, 'w', encoding='utf-8') as f_demo:
             json.dump(initial_data, f_demo, indent=4)
             
@@ -1648,14 +1646,13 @@ def serve_trade():
 def get_trade_status():
     import datetime as dt
     try:
-        # Load active config from state if present
-        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        # Load active config from decoupled active_config.json
+        config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
         active_config = {}
-        if os.path.exists(demo_file):
-            with open(demo_file, 'r', encoding='utf-8') as f_demo:
+        if os.path.exists(config_file):
+            with open(config_file, 'r', encoding='utf-8') as f_cfg:
                 try:
-                    state = json.load(f_demo)
-                    active_config = state.get("active_config", {})
+                    active_config = json.load(f_cfg)
                 except Exception:
                     pass
 

@@ -375,6 +375,11 @@ async function fetchLiveTicks() {
         if(!data.error && data.demo) {
             currentDemoState = data.demo;
             renderLiveDemo(data.demo);
+            if (data.demo.active_config) {
+                syncStrategyCheckboxes(data.demo.active_config);
+            } else {
+                syncStrategyCheckboxes(null);
+            }
         }
     } catch (e) {
         console.error("Fast tick fetch failed on backtest page:", e);
@@ -595,4 +600,38 @@ async function clearActiveLiveTestStrategy() {
 }
 async function resetLiveSimulation() {
     // Disabled
+}
+
+function syncStrategyCheckboxes(activeConfig) {
+    const checkboxes = document.querySelectorAll('.strategy-selector-chk');
+    if (!checkboxes.length) return;
+    
+    checkboxes.forEach(chk => {
+        const tf = chk.getAttribute('data-tf');
+        const type = chk.getAttribute('data-type');
+        
+        const matches = activeConfig && 
+                        activeConfig.timeframe === tf && 
+                        activeConfig.strategy_type === type;
+                        
+        if (matches) {
+            if (!chk.checked) {
+                chk.checked = true;
+                const card = chk.closest('.result-card');
+                if (card) {
+                    card.style.border = '1.5px solid var(--text-yellow)';
+                    card.style.boxShadow = '0 0 15px rgba(255,215,0,0.15)';
+                }
+            }
+        } else {
+            if (chk.checked) {
+                chk.checked = false;
+                const card = chk.closest('.result-card');
+                if (card) {
+                    card.style.border = '';
+                    card.style.boxShadow = '';
+                }
+            }
+        }
+    });
 }

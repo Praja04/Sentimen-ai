@@ -165,8 +165,22 @@ def update_livetest_sim(current_gold_price, bias):
             
     # 2. If no active trade, open a new one
     else:
-        # Load active config from state if present
-        config = state.get("active_config", {})
+        # Load active config from decoupled active_config.json
+        config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+        config = {}
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, 'r', encoding='utf-8') as f_cfg:
+                    config = json.load(f_cfg)
+            except Exception:
+                pass
+        
+        # If no config is deployed, do NOT open any simulated trades
+        if not config:
+            state["last_update"] = time.time()
+            save_demo_state(state)
+            return state
+            
         risk_percent = config.get("risk_percent", 1.0)
         sl_dist = config.get("sl_dist", 15.0)
         tp_dist = config.get("tp_dist", 22.0)
