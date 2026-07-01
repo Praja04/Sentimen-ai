@@ -340,6 +340,105 @@
     </header>
 
     <div class="container">
+        <!-- Live Market Ticker Bar -->
+        <div class="market-ticker-bar">
+            <!-- XAUUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">XAUUSD</span>
+                    <span class="ticker-change" id="ticker-chg-XAUUSD">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-XAUUSD">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-XAUUSD">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-XAUUSD">...</strong></span>
+                    <span>H: <strong id="ticker-high-XAUUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-XAUUSD">...</strong></span>
+                </div>
+            </div>
+            <!-- USDJPY -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">USDJPY</span>
+                    <span class="ticker-change" id="ticker-chg-USDJPY">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-USDJPY">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-USDJPY">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-USDJPY">...</strong></span>
+                    <span>H: <strong id="ticker-high-USDJPY">...</strong></span>
+                    <span>V: <strong id="ticker-vol-USDJPY">...</strong></span>
+                </div>
+            </div>
+            <!-- WTI OIL -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">WTI OIL</span>
+                    <span class="ticker-change" id="ticker-chg-WTI-OIL">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-WTI-OIL">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-WTI-OIL">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-WTI-OIL">...</strong></span>
+                    <span>H: <strong id="ticker-high-WTI-OIL">...</strong></span>
+                    <span>V: <strong id="ticker-vol-WTI-OIL">...</strong></span>
+                </div>
+            </div>
+            <!-- DJI -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">DJI</span>
+                    <span class="ticker-change" id="ticker-chg-DJI">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-DJI">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-DJI">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-DJI">...</strong></span>
+                    <span>H: <strong id="ticker-high-DJI">...</strong></span>
+                    <span>V: <strong id="ticker-vol-DJI">...</strong></span>
+                </div>
+            </div>
+            <!-- EURUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">EURUSD</span>
+                    <span class="ticker-change" id="ticker-chg-EURUSD">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-EURUSD">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-EURUSD">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-EURUSD">...</strong></span>
+                    <span>H: <strong id="ticker-high-EURUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-EURUSD">...</strong></span>
+                </div>
+            </div>
+            <!-- GBPUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">GBPUSD</span>
+                    <span class="ticker-change" id="ticker-chg-GBPUSD">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-GBPUSD">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-GBPUSD">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-GBPUSD">...</strong></span>
+                    <span>H: <strong id="ticker-high-GBPUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-GBPUSD">...</strong></span>
+                </div>
+            </div>
+        </div>
         <!-- Setup and Strategy Config Header -->
         <div class="info-banner">
             <div class="info-card">
@@ -478,5 +577,41 @@
     </div>
 
     <script src="/trade.js?v=1"></script>
+    <!-- Edit SL/TP Modal -->
+    <div id="edit-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="terminal-window" style="width: 320px; height: auto; background-color: #f0f0f0; color: #000; border: 3px solid #808080; border-radius: 4px;">
+            <div class="terminal-titlebar">
+                <span>Modify Position</span>
+                <span onclick="closeEditModal()" style="cursor:pointer; font-weight:bold;">✖</span>
+            </div>
+            <div style="padding: 15px; font-family: 'Tahoma', sans-serif; font-size: 0.75rem; display: flex; flex-direction: column; gap: 10px;">
+                <div>
+                    <strong>Position:</strong> <span id="modal-ticket-id">#000</span> (<span id="modal-symbol">XAUUSD</span>)
+                </div>
+                <div>
+                    <strong>Type:</strong> <span id="modal-type">buy</span> &nbsp;|&nbsp; <strong>Volume:</strong> <span id="modal-volume">0.01</span>
+                </div>
+                <div>
+                    <strong>Open Price:</strong> <span id="modal-open-price">0.0</span>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #ccc; margin: 5px 0;">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Stop Loss (S/L):</span>
+                        <input type="number" step="0.01" id="modal-sl-input" style="width: 120px; font-size:0.75rem; padding: 2px;">
+                    </label>
+                    <label style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Take Profit (T/P):</span>
+                        <input type="number" step="0.01" id="modal-tp-input" style="width: 120px; font-size:0.75rem; padding: 2px;">
+                    </label>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end;">
+                    <button onclick="submitModification()" style="padding: 5px 15px; font-size: 0.75rem; font-weight: bold; background-color: #e0e0e0; border: 1px solid #808080; cursor: pointer;">Modify</button>
+                    <button onclick="closeEditModal()" style="padding: 5px 15px; font-size: 0.75rem; background-color: #e0e0e0; border: 1px solid #808080; cursor: pointer;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

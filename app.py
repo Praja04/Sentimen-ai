@@ -1456,6 +1456,104 @@ def reset_livetest_simulation():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+def close_mt5_position(ticket):
+    if not init_mt5():
+        return False, "Failed to initialize MT5 terminal"
+    positions = mt5.positions_get(ticket=ticket)
+    if not positions:
+        return False, f"Position with ticket {ticket} not found"
+    p = positions[0]
+    symbol = p.symbol
+    volume = p.volume
+    position_id = p.ticket
+    opposite_type = mt5.ORDER_TYPE_SELL if p.type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY
+    tick = mt5.symbol_info_tick(symbol)
+    if not tick:
+        return False, f"Failed to retrieve tick for {symbol}"
+    price = tick.bid if opposite_type == mt5.ORDER_TYPE_SELL else tick.ask
+    filling_types = [
+        mt5.ORDER_FILLING_IOC,
+        mt5.ORDER_FILLING_FOK,
+        mt5.ORDER_FILLING_RETURN
+    ]
+    last_error_desc = ""
+    for filling in filling_types:
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": symbol,
+            "volume": volume,
+            "type": opposite_type,
+            "position": position_id,
+            "price": price,
+            "deviation": 20,
+            "magic": 998877,
+            "comment": "Close from Web Dashboard",
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": filling,
+        }
+        result = mt5.order_send(request)
+        if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+            return True, "Position successfully closed"
+        else:
+            if result:
+                last_error_desc = f"Retcode: {result.retcode}, Comment: {result.comment}"
+            else:
+                last_error_desc = f"Error sending order: {mt5.last_error()}"
+    return False, f"Failed to close position: {last_error_desc}"
+
+def modify_mt5_position(ticket, sl, tp):
+    if not init_mt5():
+        return False, "Failed to initialize MT5 terminal"
+    request = {
+        "action": mt5.TRADE_ACTION_SLTP,
+        "position": ticket,
+        "sl": float(sl),
+        "tp": float(tp),
+    }
+    result = mt5.order_send(request)
+    if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+        return True, "Position modified successfully"
+    else:
+        if result:
+            return False, f"Modification failed: {result.comment} (retcode: {result.retcode})"
+        else:
+            return False, f"Modification failed: {mt5.last_error()}"
+
+@app.route('/api/trade/close_position', methods=['POST'])
+def close_position_api():
+    try:
+        data = request.json
+        ticket = data.get("ticket")
+        if not ticket:
+            return jsonify({"status": "error", "message": "Ticket is required"}), 400
+            
+        success, msg = close_mt5_position(int(ticket))
+        if success:
+            return jsonify({"status": "success", "message": msg})
+        else:
+            return jsonify({"status": "error", "message": msg}), 400
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/trade/modify_position', methods=['POST'])
+def modify_position_api():
+    try:
+        data = request.json
+        ticket = data.get("ticket")
+        sl = data.get("sl")
+        tp = data.get("tp")
+        if not ticket:
+            return jsonify({"status": "error", "message": "Ticket is required"}), 400
+            
+        success, msg = modify_mt5_position(int(ticket), sl, tp)
+        if success:
+            return jsonify({"status": "success", "message": msg})
+        else:
+            return jsonify({"status": "error", "message": msg}), 400
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 @app.route('/Trade')
 @app.route('/trade')
 def serve_trade():
@@ -1604,13 +1702,59 @@ def get_trade_status():
                 except Exception:
                     pass
 
+        # Fetch live market ticks (same logic as get_live_ticks)
+        ticks = {}
+        symbols_to_fetch = {
+            "XAUUSD": ["XAUUSD", "GOLD"],
+            "USDJPY": ["USDJPY"],
+            "WTI OIL": ["WTI", "XTIUSD", "USOIL", "CL"],
+            "DJI": ["DJI", "US30", "YM", "DJIA"],
+            "EURUSD": ["EURUSD"],
+            "GBPUSD": ["GBPUSD"]
+        }
+        for label, options in symbols_to_fetch.items():
+            t = None
+            matched_symbol = None
+            for opt in options:
+                t = mt5.symbol_info_tick(opt)
+                if t:
+                    matched_symbol = opt
+                    break
+            if t:
+                rates = mt5.copy_rates_from_pos(matched_symbol, mt5.TIMEFRAME_D1, 0, 1)
+                daily_open = rates[0]['open'] if (rates is not None and len(rates) > 0) else t.bid
+                daily_vol = rates[0]['tick_volume'] if (rates is not None and len(rates) > 0) else 0
+                daily_change = ((t.bid - daily_open) / daily_open) * 100.0 if daily_open > 0 else 0.0
+                daily_high = rates[0]['high'] if (rates is not None and len(rates) > 0) else t.bid
+                daily_low = rates[0]['low'] if (rates is not None and len(rates) > 0) else t.bid
+                ticks[label] = {
+                    "bid": t.bid,
+                    "ask": t.ask,
+                    "change": round(daily_change, 3),
+                    "volume": int(daily_vol),
+                    "high": daily_high,
+                    "low": daily_low
+                }
+
+        # Fetch news feed from xedy_v30_data.json
+        news_feed = []
+        xedy_file = 'xedy_v30_data.json'
+        if os.path.exists(xedy_file):
+            with open(xedy_file, 'r', encoding='utf-8') as f_xedy:
+                try:
+                    xedy_data = json.load(f_xedy)
+                    news_feed = xedy_data.get("news_feed", [])
+                except Exception:
+                    pass
+
         return jsonify({
             "status": "success",
             "active_config": active_config,
             "account_info": acc_dict,
             "positions": positions_list,
             "history": history_list,
-            "news": news_feed
+            "news": news_feed,
+            "ticks": ticks
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

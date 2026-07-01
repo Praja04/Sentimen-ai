@@ -74,11 +74,15 @@ async function fetchStatus() {
                         <td class="${typeClass}">${p.type.toLowerCase()}</td>
                         <td>${p.volume.toFixed(2)}</td>
                         <td>${p.price.toFixed(2)}</td>
-                        <td>${p.sl.toFixed(2)}</td>
-                        <td>${p.tp.toFixed(2)}</td>
+                        <td style="cursor: pointer; text-decoration: underline; color: #0000ff;" onclick="openEditModal(${p.ticket}, '${p.symbol}', '${p.type}', ${p.volume}, ${p.price}, ${p.sl}, ${p.tp})">${p.sl.toFixed(2)}</td>
+                        <td style="cursor: pointer; text-decoration: underline; color: #0000ff;" onclick="openEditModal(${p.ticket}, '${p.symbol}', '${p.type}', ${p.volume}, ${p.price}, ${p.sl}, ${p.tp})">${p.tp.toFixed(2)}</td>
                         <td>${p.price_current.toFixed(2)}</td>
-                        <td class="${profitClass}" style="text-align:right; font-weight:bold; padding-right:15px;">
-                            ${formattedProfit}
+                        <td class="${profitClass}" style="text-align:right; font-weight:bold;">
+                            <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+                                <span>${formattedProfit}</span>
+                                <button onclick="openEditModal(${p.ticket}, '${p.symbol}', '${p.type}', ${p.volume}, ${p.price}, ${p.sl}, ${p.tp})" style="background:none; border:none; color:#555; cursor:pointer; font-size:0.75rem;">⚙</button>
+                                <button onclick="closePosition(${p.ticket})" style="background:none; border:none; color:var(--accent-red); font-weight:bold; cursor:pointer; font-size:0.75rem; padding:0 4px;">✖</button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -215,3 +219,112 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchStatus();
     updateInterval = setInterval(fetchStatus, 1000); // Pull every 1 second
 });
+
+// 5. Update Live Ticker Bar
+function renderTicker(ticks) {
+    if (!ticks) return;
+    for (const [symbol, t] of Object.entries(ticks)) {
+        // IDs format match: ticker-bid-XAUUSD, ticker-ask-XAUUSD, ticker-chg-XAUUSD
+        const domSymbol = symbol.replace(" WTI OIL", "-WTI-OIL").replace(" OIL", "-OIL").replace(" ", "-");
+        
+        const bidEl = document.getElementById(`ticker-bid-${domSymbol}`);
+        const askEl = document.getElementById(`ticker-ask-${domSymbol}`);
+        const chgEl = document.getElementById(`ticker-chg-${domSymbol}`);
+        const lowEl = document.getElementById(`ticker-low-${domSymbol}`);
+        const highEl = document.getElementById(`ticker-high-${domSymbol}`);
+        const volEl = document.getElementById(`ticker-vol-${domSymbol}`);
+        
+        if (bidEl) bidEl.innerText = t.bid.toFixed(symbol.includes("JPY") ? 3 : (symbol.includes("EUR") || symbol.includes("GBP") ? 5 : 2));
+        if (askEl) askEl.innerText = t.ask.toFixed(symbol.includes("JPY") ? 3 : (symbol.includes("EUR") || symbol.includes("GBP") ? 5 : 2));
+        if (lowEl) lowEl.innerText = t.low.toFixed(symbol.includes("JPY") ? 3 : (symbol.includes("EUR") || symbol.includes("GBP") ? 5 : 2));
+        if (highEl) highEl.innerText = t.high.toFixed(symbol.includes("JPY") ? 3 : (symbol.includes("EUR") || symbol.includes("GBP") ? 5 : 2));
+        if (volEl) volEl.innerText = t.volume ? t.volume.toLocaleString() : '...';
+        
+        if (chgEl) {
+            const formattedChg = t.change >= 0 ? `+${t.change.toFixed(2)}%` : `${t.change.toFixed(2)}%`;
+            chgEl.innerText = formattedChg;
+            chgEl.className = `ticker-change ${t.change >= 0 ? 'text-green' : 'text-red'}`;
+        }
+    }
+}
+
+// Intercept tick rendering in fetchStatus
+const oldFetchStatus = fetchStatus;
+fetchStatus = async function() {
+    try {
+        const response = await fetch('/api/trade_status');
+        const data = await response.json();
+        if (data.ticks) {
+            renderTicker(data.ticks);
+        }
+    } catch(e) {}
+    return oldFetchStatus();
+};
+
+// 6. Close and Edit Handlers
+async function closePosition(ticket) {
+    if (!confirm(`Apakah Anda yakin ingin menutup (CLOSE) transaksi #${ticket}?`)) {
+        return;
+    }
+    try {
+        const res = await fetch('/api/trade/close_position', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticket })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+            alert(result.message);
+            fetchStatus();
+        } else {
+            alert(`Error: ${result.message}`);
+        }
+    } catch(err) {
+        alert(`Request failed: ${err}`);
+    }
+}
+
+let activeEditTicket = null;
+
+function openEditModal(ticket, symbol, type, volume, openPrice, sl, tp) {
+    activeEditTicket = ticket;
+    document.getElementById('modal-ticket-id').innerText = `#${ticket}`;
+    document.getElementById('modal-symbol').innerText = symbol;
+    document.getElementById('modal-type').innerText = type.toLowerCase();
+    document.getElementById('modal-volume').innerText = volume.toFixed(2);
+    document.getElementById('modal-open-price').innerText = openPrice.toFixed(2);
+    
+    document.getElementById('modal-sl-input').value = sl;
+    document.getElementById('modal-tp-input').value = tp;
+    
+    document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').style.display = 'none';
+    activeEditTicket = null;
+}
+
+async function submitModification() {
+    if (!activeEditTicket) return;
+    const sl = parseFloat(document.getElementById('modal-sl-input').value);
+    const tp = parseFloat(document.getElementById('modal-tp-input').value);
+    
+    try {
+        const res = await fetch('/api/trade/modify_position', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticket: activeEditTicket, sl, tp })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+            alert(result.message);
+            closeEditModal();
+            fetchStatus();
+        } else {
+            alert(`Error: ${result.message}`);
+        }
+    } catch(err) {
+        alert(`Request failed: ${err}`);
+    }
+}
