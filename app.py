@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 stop_backtest_requested = False
 from flask import Flask, jsonify, send_from_directory
 import MetaTrader5 as mt5
@@ -21,7 +23,15 @@ SYMBOLS = [
 ]
 
 def init_mt5():
-    # Initialize connection to the MetaTrader 5 terminal
+    # Initialize connection to the MetaTrader 5 terminal using credentials if present
+    login_val = os.getenv("MT5_LOGIN")
+    password_val = os.getenv("MT5_PASSWORD")
+    server_val = os.getenv("MT5_SERVER")
+    
+    if login_val and password_val and server_val:
+        if mt5.initialize(login=int(login_val), password=password_val, server=server_val):
+            return True
+            
     if not mt5.initialize():
         print("initialize() failed, error code =", mt5.last_error())
         return False

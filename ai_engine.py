@@ -35,6 +35,14 @@ SYM_JPY = "USDJPY"
 SYM_OIL = "WTI" # Fallback if WTI, often XTIUSD, we'll try WTI first
 
 def init_mt5():
+    login_val = os.getenv("MT5_LOGIN")
+    password_val = os.getenv("MT5_PASSWORD")
+    server_val = os.getenv("MT5_SERVER")
+    
+    if login_val and password_val and server_val:
+        if mt5.initialize(login=int(login_val), password=password_val, server=server_val):
+            return True
+            
     if not mt5.initialize():
         print("initialize() failed, error code =", mt5.last_error())
         return False

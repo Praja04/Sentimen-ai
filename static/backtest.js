@@ -394,6 +394,30 @@ function renderLiveDemo(demo) {
         stratLabel.innerText = "Active: Default M15 (Risk 1.0%)";
     }
     
+    // Update checkbox states to match the active config dynamically
+    const activeConfig = demo.active_config;
+    const allCheckboxes = document.querySelectorAll('.strategy-selector-chk');
+    allCheckboxes.forEach(chk => {
+        const tf = chk.getAttribute('data-tf');
+        const type = chk.getAttribute('data-type');
+        const isActive = activeConfig && 
+                         activeConfig.timeframe === tf && 
+                         activeConfig.strategy_type === type;
+        chk.checked = isActive;
+        
+        // Highlight active card
+        const card = chk.closest('.result-card');
+        if (card) {
+            if (isActive) {
+                card.style.border = '1.5px solid var(--text-yellow)';
+                card.style.boxShadow = '0 0 15px rgba(255,215,0,0.15)';
+            } else {
+                card.style.border = '';
+                card.style.boxShadow = '';
+            }
+        }
+    });
+    
     const totalProfit = demo.equity - 10000.0;
     const totalProfitPct = (totalProfit / 10000.0) * 100.0;
     const profitEl = document.getElementById("live-profit");
@@ -425,20 +449,30 @@ function renderLiveDemo(demo) {
     
     if (activeList.length > 0) {
         activeHtml = activeList.map(t => {
-            runningProfitTotal += t.profit;
-            const formattedProfit = t.profit >= 0 ? `+${t.profit.toFixed(2)}` : t.profit.toFixed(2);
+            const entryVal = t.entry_price !== undefined ? t.entry_price : (t.entry !== undefined ? t.entry : 0);
+            const slVal = t.sl !== undefined ? t.sl : 0;
+            const tpVal = t.tp !== undefined ? t.tp : 0;
+            const curVal = t.current_price !== undefined ? t.current_price : 0;
+            const lotsVal = t.lots !== undefined ? t.lots : 0.01;
+            const ticketVal = t.ticket !== undefined ? t.ticket : '-';
+            const timeVal = t.time !== undefined ? t.time : '-';
+            const typeVal = t.type !== undefined ? t.type : 'BUY';
+            const profitVal = t.profit !== undefined ? t.profit : 0;
+            
+            runningProfitTotal += profitVal;
+            const formattedProfit = profitVal >= 0 ? `+${profitVal.toFixed(2)}` : profitVal.toFixed(2);
             return `
                 <tr>
-                    <td>${t.symbol}</td>
-                    <td>${t.ticket}</td>
-                    <td>${t.time}</td>
-                    <td class="${t.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${t.type.toLowerCase()}</td>
-                    <td>${t.lots.toFixed(2)}</td>
-                    <td>${t.entry_price.toFixed(2)}</td>
-                    <td>${t.sl.toFixed(2)}</td>
-                    <td>${t.tp.toFixed(2)}</td>
-                    <td>${t.current_price.toFixed(2)}</td>
-                    <td class="${t.profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
+                    <td>${t.symbol || 'XAUUSD'}</td>
+                    <td>${ticketVal}</td>
+                    <td>${timeVal}</td>
+                    <td class="${typeVal === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${typeVal.toLowerCase()}</td>
+                    <td>${lotsVal.toFixed(2)}</td>
+                    <td>${entryVal.toFixed(2)}</td>
+                    <td>${slVal.toFixed(2)}</td>
+                    <td>${tpVal.toFixed(2)}</td>
+                    <td>${curVal.toFixed(2)}</td>
+                    <td class="${profitVal >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
                         ${formattedProfit}
                     </td>
                 </tr>
