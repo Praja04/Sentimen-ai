@@ -132,22 +132,22 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Emas Turun untuk Hari Ketiga karena Kekhawatiran Terhadap Prospek Suku Bunga AS Memburuk",
+      "title": "Pembuat Inverter Tiongkok Sungrow Turun 20% karena Potensi Larangan AS",
       "impact": "text-red"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Saham Asia Tergelincir Setelah Reli Dua Hari, Yen Stabil: Pasar Selesai",
+      "title": "Emas Turun untuk Hari Ketiga karena Kekhawatiran Terhadap Prospek Suku Bunga AS Memburuk",
+      "impact": "text-red"
+    },
+    {
+      "time": "FOREXLIVE",
+      "title": "Ketua Federal Reserve Warsh akan berbicara pada hari Rabu",
       "impact": "text-yellow"
     },
     {
       "time": "FOREXLIVE",
       "title": "Kanada dan Meksiko berupaya menyelamatkan USMCA sementara AS menunggu perubahan",
-      "impact": "text-green"
-    },
-    {
-      "time": "FOREXLIVE",
-      "title": "Ekspor Korea melonjak karena booming chip AI karena merosotnya harga saham akibat aksi ambil untung",
       "impact": "text-green"
     },
     {
@@ -192,12 +192,12 @@
     },
     {
       "time": "YAHOO",
-      "title": "Saham Micron Melonjak Setelah Pendapatan Blockbuster. ",
+      "title": "Dimana Stok Cerebras dalam 3 Tahun?",
       "impact": "text-yellow"
     },
     {
       "time": "YAHOO",
-      "title": "Comcast Menetapkan Pemisahan Perusahaan. ",
+      "title": "Apa yang Dibutuhkan untuk Menang di Era Drayage Berikutnya",
       "impact": "text-yellow"
     },
     {
@@ -225,8 +225,8 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "3,983.36",
-      "change": "-24.16 (-0.60%)",
+      "price": "3,977.88",
+      "change": "-29.64 (-0.74%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -256,8 +256,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.780",
-      "change": "+0.25 (+0.15%)",
+      "price": "162.804",
+      "change": "+0.27 (+0.17%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -401,7 +401,7 @@
   "technical_signals": {
     "XAUUSD": {
       "trend": "BEARISH",
-      "rsi": 23,
+      "rsi": 22,
       "ma50": "DOWN"
     },
     "USDJPY": {
@@ -412,7 +412,7 @@
   },
   "economic_calendar": [
     {
-      "time": "11:23",
+      "time": "11:32",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "12:23",
+      "time": "12:32",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "14:23",
+      "time": "14:32",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "15:23",
+      "time": "15:32",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

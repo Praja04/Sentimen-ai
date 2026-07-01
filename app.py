@@ -1456,6 +1456,153 @@ def reset_livetest_simulation():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/Trade')
+@app.route('/trade')
+def serve_trade():
+    return send_from_directory(app.static_folder, 'trade.html')
+
+@app.route('/api/trade_status')
+def get_trade_status():
+    try:
+        # Load active config from state if present
+        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        active_config = {}
+        if os.path.exists(demo_file):
+            with open(demo_file, 'r', encoding='utf-8') as f_demo:
+                try:
+                    state = json.load(f_demo)
+                    active_config = state.get("active_config", {})
+                except Exception:
+                    pass
+
+        # Initialize connection to MT5 using credentials if present
+        login_val = os.getenv("MT5_LOGIN")
+        password_val = os.getenv("MT5_PASSWORD")
+        server_val = os.getenv("MT5_SERVER")
+        
+        initialized = False
+        if login_val and password_val and server_val:
+            if mt5.initialize(login=int(login_val), password=password_val, server=server_val):
+                initialized = True
+        
+        if not initialized:
+            initialized = mt5.initialize()
+
+        if not initialized:
+            return jsonify({
+                "status": "error",
+                "message": f"MT5 terminal initialization failed: {mt5.last_error()}",
+                "active_config": active_config,
+                "account_info": None,
+                "positions": [],
+                "history": []
+            })
+
+        # Fetch account details
+        acc_info = mt5.account_info()
+        acc_dict = acc_info._asdict() if acc_info else None
+
+        # Fetch active trades (positions)
+        positions = mt5.positions_get()
+        positions_list = []
+        if positions:
+            for p in positions:
+                p_dict = p._asdict()
+                p_time = datetime.datetime.fromtimestamp(p_dict["time"]).strftime("%Y.%m.%d %H:%M:%S")
+                p_type = "buy" if p_dict["type"] == 0 else "sell"
+                positions_list.append({
+                    "symbol": p_dict["symbol"],
+                    "ticket": p_dict["ticket"],
+                    "time": p_time,
+                    "type": p_type,
+                    "volume": p_dict["volume"],
+                    "price": p_dict["price_open"],
+                    "sl": p_dict["sl"],
+                    "tp": p_dict["tp"],
+                    "price_current": p_dict["price_current"],
+                    "profit": round(p_dict["profit"], 2)
+                })
+
+        # Fetch closed deals (history) for last 30 days
+        import datetime as dt
+        from_date = dt.datetime.now() - dt.timedelta(days=30)
+        to_date = dt.datetime.now() + dt.timedelta(days=1)
+        deals = mt5.history_deals_get(from_date, to_date)
+        history_list = []
+        if deals:
+            positions_map = {}
+            balance_deals = []
+            for d in deals:
+                d_dict = d._asdict()
+                pid = d_dict.get("position_id", 0)
+                
+                if d_dict.get("type") == 2: # DEAL_TYPE_BALANCE
+                    balance_deals.append({
+                        "time": dt.datetime.fromtimestamp(d_dict["time"]).strftime("%Y.%m.%d %H:%M:%S"),
+                        "symbol": "",
+                        "ticket": d_dict["ticket"],
+                        "type": "balance",
+                        "volume": "",
+                        "price": "",
+                        "sl": "",
+                        "tp": "",
+                        "close_time": "",
+                        "close_price": "",
+                        "profit": d_dict["profit"],
+                        "comment": d_dict.get("comment", "")
+                    })
+                    continue
+                    
+                if pid == 0:
+                    continue
+                    
+                if pid not in positions_map:
+                    positions_map[pid] = []
+                positions_map[pid].append(d_dict)
+
+            closed_trades = []
+            for pid, deal_list in positions_map.items():
+                deal_list.sort(key=lambda x: x["time"])
+                in_deal = None
+                out_deal = None
+                for d in deal_list:
+                    if d["entry"] == 0: # DEAL_ENTRY_IN
+                        in_deal = d
+                    elif d["entry"] == 1: # DEAL_ENTRY_OUT
+                        out_deal = d
+                        
+                if in_deal and out_deal:
+                    trade_type = "buy" if in_deal["type"] == 0 else "sell"
+                    profit = out_deal["profit"] + in_deal.get("commission", 0) + in_deal.get("swap", 0) + out_deal.get("commission", 0) + out_deal.get("swap", 0)
+                    closed_trades.append({
+                        "time": dt.datetime.fromtimestamp(in_deal["time"]).strftime("%Y.%m.%d %H:%M:%S"),
+                        "symbol": in_deal["symbol"],
+                        "ticket": pid,
+                        "type": trade_type,
+                        "volume": in_deal["volume"],
+                        "price": in_deal["price"],
+                        "sl": in_deal.get("sl", 0.0),
+                        "tp": in_deal.get("tp", 0.0),
+                        "close_time": dt.datetime.fromtimestamp(out_deal["time"]).strftime("%Y.%m.%d %H:%M:%S"),
+                        "close_price": out_deal["price"],
+                        "profit": round(profit, 2),
+                        "comment": out_deal.get("comment", "")
+                    })
+            
+            history_list = balance_deals + closed_trades
+            history_list.sort(key=lambda x: x.get("close_time") or x["time"], reverse=True)
+
+        return jsonify({
+            "status": "success",
+            "active_config": active_config,
+            "account_info": acc_dict,
+            "positions": positions_list,
+            "history": history_list
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 if __name__ == '__main__':
     # Start the Flask app
     app.run(debug=True, host='0.0.0.0', port=5000)

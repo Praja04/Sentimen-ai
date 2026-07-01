@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XEDY V30 MT5 Terminal Trade Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #060b13;
+            --panel-bg: #0d1527;
+            --text-gold: #ffd700;
+            --text-white: #ffffff;
+            --text-muted: #8c9ba5;
+            --accent-green: #00ff41;
+            --accent-red: #ff3b30;
+            --border-color: rgba(255, 255, 255, 0.08);
+            
+            /* MT5 Terminal colors (classic styling) */
+            --mt5-bg: #f5f5f5;
+            --mt5-text: #000000;
+            --mt5-border: #cccccc;
+            --mt5-summary-bg: #e0e0e0;
+            --mt5-tab-active-bg: #ffffff;
+            --mt5-tab-hover-bg: #e5e5e5;
+            --mt5-blue: #0000ff;
+            --mt5-red: #ff0000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(180deg, #090f1b, #060b13);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .account-badge {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid var(--text-gold);
+            color: var(--text-gold);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+            border: 1px solid var(--border-color);
+            padding: 5px 12px;
+            border-radius: 4px;
+        }
+
+        .header-links a:hover {
+            color: var(--text-gold);
+            border-color: var(--text-gold);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Strategy & Setup Banner */
+        .info-banner {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-card {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-card .label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .info-card .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-white);
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .info-card .sub-value {
+            font-size: 0.7rem;
+            color: var(--text-gold);
+        }
+
+        /* MT5 Terminal Simulation Outer Window */
+        .terminal-window {
+            background-color: var(--mt5-bg);
+            color: var(--mt5-text);
+            border: 3px solid #808080;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            height: 550px;
+        }
+
+        /* Title bar */
+        .terminal-titlebar {
+            background: linear-gradient(180deg, #0a246a, #a6caf0);
+            background-color: #0a246a;
+            color: white;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #808080;
+        }
+
+        /* Menu bar */
+        .terminal-menubar {
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #d0d0d0;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            display: flex;
+            gap: 15px;
+            color: #000;
+        }
+
+        /* Table Content Frame */
+        .terminal-content {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        .terminal-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Tahoma', 'Inter', sans-serif;
+            font-size: 0.7rem;
+            text-align: left;
+        }
+
+        .terminal-table th {
+            background-color: #f0f0f0;
+            color: #333;
+            font-weight: normal;
+            border-right: 1px solid #d0d0d0;
+            border-bottom: 1px solid #a0a0a0;
+            padding: 3px 6px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .terminal-table tr {
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .terminal-table tr:hover {
+            background-color: #f5f8ff;
+        }
+
+        .terminal-table td {
+            padding: 4px 6px;
+            border-right: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+
+        /* MT5 specific accents */
+        .mt5-buy {
+            color: var(--mt5-blue) !important;
+            font-weight: bold;
+        }
+
+        .mt5-sell {
+            color: var(--mt5-red) !important;
+            font-weight: bold;
+        }
+
+        .mt5-profit-green {
+            color: var(--mt5-blue) !important;
+            font-weight: bold;
+        }
+
+        .mt5-profit-red {
+            color: var(--mt5-red) !important;
+            font-weight: bold;
+        }
+
+        /* Bottom Status Summary Bar (Floating MT5 style) */
+        .terminal-summary-row {
+            background-color: var(--mt5-summary-bg);
+            border-top: 2px solid #808080;
+            border-bottom: 1px solid #808080;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Terminal Toolbox Tab Bar */
+        .terminal-toolbox {
+            background-color: #f0f0f0;
+            border-top: 1px solid #a0a0a0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 10px;
+        }
+
+        .terminal-tabs {
+            display: flex;
+        }
+
+        .terminal-tab {
+            padding: 5px 12px;
+            border-right: 1px solid #d0d0d0;
+            border-top: 1px solid transparent;
+            font-size: 0.7rem;
+            color: #444;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            user-select: none;
+        }
+
+        .terminal-tab:hover {
+            background-color: var(--mt5-tab-hover-bg);
+        }
+
+        .terminal-tab.active {
+            background-color: var(--mt5-tab-active-bg);
+            color: #000;
+            font-weight: bold;
+            border-top: 2px solid #0a246a;
+            margin-top: -1px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .terminal-footer-info {
+            display: flex;
+            gap: 15px;
+            font-size: 0.65rem;
+            color: #555;
+            align-items: center;
+        }
+
+        /* Loader */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            color: #000;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Empty states */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>
+            <span>📈 XEDY V30 MT5 TERMINAL</span>
+            <span class="account-badge" id="header-account">ACC: -</span>
+        </h1>
+        <div class="header-links">
+            <a href="/">FUNDAMENTAL NEWS</a>
+            <a href="/backtest">BACKTEST LAB</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Setup and Strategy Config Header -->
+        <div class="info-banner">
+            <div class="info-card">
+                <span class="label">Urutan Pair Terpilih</span>
+                <div class="value" id="traded-pairs" style="color: var(--text-gold);">XAUUSD</div>
+                <span class="sub-value">Pasangan Mata Uang Aktif</span>
+            </div>
+            <div class="info-card">
+                <span class="label">Metode Trade Terpilih</span>
+                <div class="value" id="trade-method">Default Strategy</div>
+                <span class="sub-value" id="trade-timeframe">TF: - / Risk: -</span>
+            </div>
+            <div class="info-card">
+                <span class="label">Status Koneksi Terminal</span>
+                <div class="value" id="connection-status" style="color: var(--accent-green);">CONNECTED</div>
+                <span class="sub-value" id="account-server">Server: -</span>
+            </div>
+        </div>
+
+        <!-- MetaTrader 5 Simulated Terminal Window -->
+        <div class="terminal-window">
+            <div class="terminal-titlebar">
+                <span>Toolbox</span>
+                <span style="font-family: 'Roboto Mono', monospace; font-size: 0.65rem;">Elev8-Demo2</span>
+            </div>
+            
+            <div class="terminal-menubar">
+                <span>File</span>
+                <span>View</span>
+                <span>Insert</span>
+                <span>Charts</span>
+                <span>Tools</span>
+                <span>Window</span>
+                <span>Help</span>
+            </div>
+
+            <div class="terminal-content">
+                <div class="loader-overlay" id="loading-overlay">Memuat data dari terminal MT5...</div>
+                
+                <!-- Trade Positions View -->
+                <div id="view-trade">
+                    <table class="terminal-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Ticket</th>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Volume</th>
+                                <th>Price</th>
+                                <th>S / L</th>
+                                <th>T / P</th>
+                                <th>Price</th>
+                                <th style="text-align:right; border-right:none; padding-right:15px;">Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trade-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- History View -->
+                <div id="view-history" style="display:none;">
+                    <table class="terminal-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Symbol</th>
+                                <th>Ticket</th>
+                                <th>Type</th>
+                                <th>Volume</th>
+                                <th>Price</th>
+                                <th>S / L</th>
+                                <th>T / P</th>
+                                <th>Time</th>
+                                <th>Price</th>
+                                <th>Profit</th>
+                                <th style="text-align:right; border-right:none; padding-right:15px;">Change</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Status Summary Row -->
+            <div class="terminal-summary-row" id="terminal-summary">
+                <!-- Summary label populated dynamically based on active tab -->
+                <span id="summary-left-txt">• Balance: -</span>
+                <span id="summary-right-profit" style="padding-right:10px;">0.00</span>
+            </div>
+
+            <!-- Toolbox Bottom Navigation Tabs -->
+            <div class="terminal-toolbox">
+                <div class="terminal-tabs">
+                    <div class="terminal-tab active" id="tab-trade" onclick="switchTab('trade')">Trade</div>
+                    <div class="terminal-tab" id="tab-exposure" onclick="switchTab('exposure')">Exposure</div>
+                    <div class="terminal-tab" id="tab-history" onclick="switchTab('history')">History</div>
+                    <div class="terminal-tab" id="tab-news">News <span style="color:red; font-weight:bold;">99</span></div>
+                    <div class="terminal-tab" id="tab-mailbox">Mailbox <span style="color:red; font-weight:bold;">11</span></div>
+                    <div class="terminal-tab" id="tab-calendar">Calendar</div>
+                    <div class="terminal-tab" id="tab-company">Company</div>
+                    <div class="terminal-tab" id="tab-alerts">Alerts</div>
+                    <div class="terminal-tab" id="tab-articles">Articles</div>
+                    <div class="terminal-tab" id="tab-codebase">Code Base</div>
+                    <div class="terminal-tab" id="tab-experts">Experts</div>
+                    <div class="terminal-tab" id="tab-journal">Journal</div>
+                </div>
+                
+                <div class="terminal-footer-info">
+                    <span>🔒 Market</span>
+                    <span>Signals</span>
+                    <span>VPS</span>
+                    <span style="font-weight:bold; color:#0a246a;">💻 Tester</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/trade.js?v=1"></script>
+</body>
+</html>
