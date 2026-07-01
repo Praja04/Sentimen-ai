@@ -239,6 +239,50 @@
             </div>
         </section>
 
+        <!-- AI Strategy Prompt Builder -->
+        <section class="panel prompt-panel" style="margin-top: 16px;">
+            <h2>🧠 AI Strategy Prompt Builder</h2>
+            <p class="hint" style="margin-bottom: 10px;">Tuliskan metode, logika, atau cara mencari strategi yang Anda inginkan. AI Gemini akan membuat parameter strategi berdasarkan prompt Anda, lalu menjalankan backtest secara otomatis.</p>
+            <textarea id="strategyPrompt" rows="6" style="
+                width: 100%;
+                box-sizing: border-box;
+                background: rgba(0,0,0,0.35);
+                border: 1px solid rgba(255,215,0,0.25);
+                border-radius: 8px;
+                color: #e0e0e0;
+                font-family: 'Roboto Mono', monospace;
+                font-size: 0.85rem;
+                padding: 14px 16px;
+                resize: vertical;
+                outline: none;
+                transition: border-color 0.3s ease;
+                line-height: 1.6;
+            " placeholder="Contoh:
+• Cari strategi breakout yang entry saat harga tembus high hari sebelumnya dengan konfirmasi volume tinggi
+• Gunakan RSI oversold di bawah 25 sebagai sinyal buy, dengan SL ketat 1x ATR dan TP 3x ATR
+• Strategi mean reversion: entry saat Bollinger Band menyentuh lower band, exit di middle band
+• Fokus strategi momentum MACD cross dengan filter trend EMA 200"></textarea>
+            <div style="display: flex; align-items: center; gap: 14px; margin-top: 12px;">
+                <button id="generateFromPrompt" style="
+                    background: linear-gradient(135deg, #6c5ce7, #a55eea);
+                    color: white;
+                    border: none;
+                    padding: 10px 24px;
+                    border-radius: 8px;
+                    font-family: 'Rajdhani', sans-serif;
+                    font-size: 0.9rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    letter-spacing: 0.5px;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                ">✨ Generate Strategi dari Prompt</button>
+                <span id="promptStatus" style="color: rgba(255,255,255,0.5); font-size: 0.75rem; font-family: 'Rajdhani', sans-serif;"></span>
+            </div>
+        </section>
+
         <section class="action-bar">
             <button id="runBacktest">Jalankan AI XEDY_V30</button>
             <button id="stopBacktest" style="display: none; background: linear-gradient(135deg, #ff3b30, #ff453a); color: white;">HENTIKAN</button>

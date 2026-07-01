@@ -1176,6 +1176,7 @@ def search_backtest_methods(
     sort_priority=None,
     timeframe="M1",
     fundamental_bias=None,
+    custom_strategies=None,
 ):
     rates = fetch_mt5_rates(symbol=symbol, days=days, start_month=start_month, end_month=end_month, timeframe=timeframe)
     risk_context = get_symbol_risk_context(symbol)
@@ -1189,7 +1190,11 @@ def search_backtest_methods(
     all_results = []
     learning_iterations = []
     rr_values = dedupe_rr_values([1.0, 1.4, 1.8, 2.2, 2.6])
-    iteration_sources = [("grid", make_strategy_library(rr_values))]
+    if custom_strategies:
+        initial_library = custom_strategies + make_strategy_library(rr_values)
+    else:
+        initial_library = make_strategy_library(rr_values)
+    iteration_sources = [("grid", initial_library)]
 
     global stop_backtest_requested
     for iteration_index in range(3):
@@ -1304,6 +1309,7 @@ def api_backtest_search():
                 sort_priority=payload.get("sort_priority", ["net_profit", "win_rate", "drawdown"]),
                 timeframe=tf,
                 fundamental_bias=bias_val,
+                custom_strategies=payload.get("custom_strategies"),
                 filters={
                     "drawdown": {
                         "operator": filters.get("drawdown", {}).get("operator", "<"),
@@ -1332,7 +1338,7 @@ def api_backtest_search():
         return jsonify({
             "success": True, 
             "data": {
-                "symbol": payload.get("symbol", "XAUUSD"),
+                        "symbol": payload.get("symbol", "XAUUSD"),
                 "method": method_name,
                 "risk_pct": float(payload.get("risk_pct", 1.0)),
                 "results_per_tf": results_per_tf
@@ -1346,6 +1352,86 @@ def api_backtest_stop():
     global stop_backtest_requested
     stop_backtest_requested = True
     return jsonify({"success": True, "message": "Stop requested."})
+
+
+@app.route("/api/backtest/generate_from_prompt", methods=["POST"])
+def api_generate_from_prompt():
+    """Use Gemini AI to parse user's strategy prompt into backtest parameters."""
+    try:
+        import google.generativeai as genai
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            return jsonify({"success": False, "error": "GEMINI_API_KEY tidak ditemukan di environment variables."}), 400
+        genai.configure(api_key=api_key)
+
+        payload = request.get_json(silent=True) or {}
+        user_prompt = payload.get("prompt", "").strip()
+        if not user_prompt:
+            return jsonify({"success": False, "error": "Prompt tidak boleh kosong."}), 400
+
+        system_instruction = """You are a quantitative trading strategy parameter generator for gold (XAUUSD) backtesting.
+
+The backtest engine supports these strategy types with their tunable parameters:
+
+1. "xedy_v30_ai" - Core AI strategy using composite fundamental+technical scoring
+   params: threshold (0.05-0.50), confirmation (0.05-0.20), stop_atr (0.8-3.0), rr (0.8-4.0), max_hold_bars (15-120)
+
+2. "xedy_trend_pullback" - Trend-following with pullback entries
+   params: pullback_limit (0.03-0.20), confirmation (0.05-0.20), stop_atr (0.8-3.0), rr (0.8-4.0), max_hold_bars (15-120)
+
+3. "xedy_mean_revert" - Mean reversion using RSI extremes
+   params: extreme_rsi (15-35), threshold (0.05-0.50), stop_atr (0.8-3.0), rr (0.8-4.0), max_hold_bars (15-120)
+
+4. "xedy_breakout_confirm" - Breakout with confirmation filter
+   params: breakout_buffer (0.05-0.30), threshold (0.05-0.50), stop_atr (0.8-3.0), rr (0.8-4.0), max_hold_bars (15-120)
+
+5. "xedy_macd_momentum" - MACD momentum crossover strategy
+   params: threshold (0.02-0.30), stop_atr (0.8-3.0), rr (0.8-4.0), max_hold_bars (15-120)
+
+Based on the user's description, select the most appropriate strategy type(s) and generate 3-8 parameter variations to test.
+For each variation, provide a descriptive name and the parameter values.
+
+Reply ONLY with valid JSON array. Each element must have: "name" (string), "type" (string), "params" (object).
+Example:
+[{"name":"Breakout Aggressive B0.10","type":"xedy_breakout_confirm","params":{"breakout_buffer":0.10,"threshold":0.15,"stop_atr":1.5,"rr":2.5,"max_hold_bars":60}}]
+
+Do NOT include any markdown, explanation, or text outside the JSON array."""
+
+        model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_instruction)
+        response = model.generate_content(user_prompt)
+        raw_text = response.text.strip()
+
+        # Clean markdown fences if present
+        if raw_text.startswith("```"):
+            raw_text = raw_text.split("```")[1]
+            if raw_text.startswith("json"):
+                raw_text = raw_text[4:]
+            raw_text = raw_text.strip()
+
+        strategies = json.loads(raw_text)
+        if not isinstance(strategies, list):
+            strategies = [strategies]
+
+        # Validate & sanitize
+        valid_types = {"xedy_v30_ai", "xedy_trend_pullback", "xedy_mean_revert", "xedy_breakout_confirm", "xedy_macd_momentum"}
+        validated = []
+        for s in strategies:
+            if isinstance(s, dict) and s.get("type") in valid_types and isinstance(s.get("params"), dict):
+                validated.append({
+                    "name": str(s.get("name", f"AI Generated {s['type']}")),
+                    "type": s["type"],
+                    "params": {k: float(v) for k, v in s["params"].items() if isinstance(v, (int, float))}
+                })
+
+        if not validated:
+            return jsonify({"success": False, "error": "AI tidak menghasilkan strategi yang valid. Coba tulis prompt yang lebih spesifik."}), 400
+
+        return jsonify({"success": True, "strategies": validated, "count": len(validated)})
+
+    except json.JSONDecodeError:
+        return jsonify({"success": False, "error": "AI response gagal di-parse sebagai JSON. Coba lagi."}), 500
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 

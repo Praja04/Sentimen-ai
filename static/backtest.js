@@ -235,6 +235,11 @@ async function runBacktestSearch() {
         },
     };
 
+    // Include AI-generated custom strategies if available
+    if (window._aiGeneratedStrategies && window._aiGeneratedStrategies.length > 0) {
+        payload.custom_strategies = window._aiGeneratedStrategies;
+    }
+
     try {
         const response = await fetch("/api/backtest/search", {
             method: "POST",
@@ -622,3 +627,88 @@ function syncStrategyCheckboxes(activeConfig) {
         }
     });
 }
+
+// ==========================================================
+// AI STRATEGY PROMPT BUILDER
+// ==========================================================
+window._aiGeneratedStrategies = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+    const generateBtn = document.getElementById("generateFromPrompt");
+    const promptArea = document.getElementById("strategyPrompt");
+    const statusSpan = document.getElementById("promptStatus");
+
+    if (generateBtn && promptArea) {
+        // Focus styling
+        promptArea.addEventListener("focus", () => {
+            promptArea.style.borderColor = "rgba(108,92,231,0.7)";
+            promptArea.style.boxShadow = "0 0 12px rgba(108,92,231,0.15)";
+        });
+        promptArea.addEventListener("blur", () => {
+            promptArea.style.borderColor = "rgba(255,215,0,0.25)";
+            promptArea.style.boxShadow = "none";
+        });
+
+        generateBtn.addEventListener("click", async () => {
+            const prompt = promptArea.value.trim();
+            if (!prompt) {
+                alert("Silakan tulis deskripsi strategi yang ingin di-generate terlebih dahulu.");
+                return;
+            }
+
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = "⏳ Generating...";
+            statusSpan.textContent = "Mengirim prompt ke AI Gemini...";
+            statusSpan.style.color = "rgba(108,92,231,0.9)";
+
+            try {
+                const res = await fetch("/api/backtest/generate_from_prompt", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt }),
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || "Generate gagal.");
+                }
+
+                window._aiGeneratedStrategies = data.strategies;
+                const count = data.count;
+                statusSpan.textContent = `✅ ${count} strategi berhasil di-generate! Klik "Jalankan AI XEDY_V30" untuk backtest.`;
+                statusSpan.style.color = "#00d2d3";
+
+                // Show preview of generated strategies below the prompt
+                let previewHtml = '<div style="margin-top: 12px; padding: 12px 16px; background: rgba(108,92,231,0.08); border: 1px solid rgba(108,92,231,0.2); border-radius: 8px;">';
+                previewHtml += '<div style="font-size: 0.75rem; font-weight: 700; color: #a55eea; font-family: Rajdhani, sans-serif; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">📋 Strategi AI Generated (' + count + ')</div>';
+                data.strategies.forEach((s, i) => {
+                    const paramStr = Object.entries(s.params).map(([k, v]) => `${k}:${typeof v === 'number' ? v.toFixed(2) : v}`).join(' | ');
+                    previewHtml += `<div style="font-size: 0.78rem; color: #e0e0e0; font-family: 'Roboto Mono', monospace; margin-bottom: 4px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: #ffd700; font-weight: 600;">#${i + 1}</span> 
+                        <span style="color: #00d2d3;">${s.name}</span> 
+                        <span style="color: rgba(255,255,255,0.4);">|</span> 
+                        <span style="color: #a55eea;">${s.type}</span>
+                        <br><span style="color: rgba(255,255,255,0.35); font-size: 0.7rem;">${paramStr}</span>
+                    </div>`;
+                });
+                previewHtml += '</div>';
+
+                // Remove old preview if exists
+                const oldPreview = document.getElementById("ai-strategy-preview");
+                if (oldPreview) oldPreview.remove();
+
+                const previewEl = document.createElement("div");
+                previewEl.id = "ai-strategy-preview";
+                previewEl.innerHTML = previewHtml;
+                promptArea.parentElement.appendChild(previewEl);
+
+            } catch (err) {
+                statusSpan.textContent = `❌ ${err.message}`;
+                statusSpan.style.color = "#ff3b30";
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = "✨ Generate Strategi dari Prompt";
+            }
+        });
+    }
+});
