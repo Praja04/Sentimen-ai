@@ -1405,6 +1405,39 @@ def clear_livetest_parameters():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
+
+@app.route('/api/livetest/reset_simulation', methods=['POST'])
+def reset_livetest_simulation():
+    try:
+        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        
+        # Reset to initial state
+        initial_data = {
+            "balance": 10000.00,
+            "equity": 10000.00,
+            "active_trades": [],
+            "history": [],
+            "last_update": time.time()
+        }
+        
+        # Preserve active config if it exists
+        if os.path.exists(demo_file):
+            with open(demo_file, 'r', encoding='utf-8') as f_demo:
+                try:
+                    state = json.load(f_demo)
+                    if "active_config" in state:
+                        initial_data["active_config"] = state["active_config"]
+                except Exception:
+                    pass
+                    
+        with open(demo_file, 'w', encoding='utf-8') as f_demo:
+            json.dump(initial_data, f_demo, indent=4)
+            
+        return jsonify({"status": "success", "message": "Simulation reset successfully"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 if __name__ == '__main__':
     # Start the Flask app
     app.run(debug=True, host='0.0.0.0', port=5000)

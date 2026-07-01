@@ -273,9 +273,12 @@
         </section>
         <!-- LIVETEST DEMO SECTION -->
         <section class="livetest-section panel-border">
-            <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
-                LIVETEST REAL-TIME DEMO (Rekomendasi: TF M15 / Risk 1.0%)
-                <span class="badge-live" id="live-demo-badge">LIVE SIMULATION RUNNING</span>
+            <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
+                <span>LIVETEST REAL-TIME DEMO (Rekomendasi: TF M15 / Risk 1.0%)</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="badge-live" id="live-demo-badge">LIVE SIMULATION RUNNING</span>
+                    <button onclick="resetLiveSimulation()" style="background: linear-gradient(135deg, #ff3b30, #ff453a); color: white; border: none; padding: 4px 8px; font-size: 0.65rem; border-radius: 4px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: bold;">RESET SIMULATION</button>
+                </div>
             </h3>
             
             <!-- Recommendations & Checklist Row -->
@@ -399,6 +402,6 @@
         </section>
     </main>
 
-    <script src="/backtest.js?v=15"></script>
+    <script src="/backtest.js?v=20"></script>
 </body>
 </html>

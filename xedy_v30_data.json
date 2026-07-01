@@ -17,7 +17,7 @@
     {
       "name": "DXY INDEX",
       "val": "BULLISH",
-      "score": 58,
+      "score": 59,
       "dir": "up",
       "value": "BULLISH"
     },
@@ -87,7 +87,7 @@
     {
       "name": "CORRELATION",
       "val": "RISK OFF",
-      "score": 86,
+      "score": 87,
       "dir": "down",
       "value": "STRONG NEG"
     }
@@ -123,6 +123,86 @@
     {
       "time": "CNBC",
       "title": "Aktor-aktor yang memiliki hubungan dengan Tiongkok menargetkan lebih dari sekadar teknologi seiring dengan semakin ketatnya persaingan AI dengan AS",
+      "impact": "text-red"
+    },
+    {
+      "time": "CNBC",
+      "title": "Michael Burry mengatakan dia melakukan short terhadap Caterpillar untuk pertama kalinya setelah hampir dua kali lipatnya pada reli berbasis AI pada tahun 2026",
+      "impact": "text-red"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Alcoa Bertaruh pada Boom Aluminium Dengan Kesepakatan South32 $5,6 Miliar",
+      "impact": "text-green"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Trump Melaporkan Setidaknya $1.4 Miliar pada Pendapatan Kripto 2025",
+      "impact": "text-green"
+    },
+    {
+      "time": "FOREXLIVE",
+      "title": "WSJ: Trump mempertimbangkan perang habis-habisan terhadap Iran tetapi memilih untuk tetap melakukan pembicaraan",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "FOREXLIVE",
+      "title": "Dikonfirmasi - Lutnick mengumumkan Anthropic Fable 5 disetujui",
+      "impact": "text-green"
+    },
+    {
+      "time": "INVESTING",
+      "title": "Deutsche Bank memperkirakan S&P 500 akan mencapai level 7000 pada akhir tahun 2025",
+      "impact": "text-green"
+    },
+    {
+      "time": "INVESTING",
+      "title": "Tarif Trump, risalah rapat The Fed, pembelian Bitcoin oleh Rumble - hal-hal yang menggerakkan pasar",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "WSJ",
+      "title": "Saham-Saham Tenggelam Akibat Kehancuran AI yang Dipicu oleh DeepSeek Tiongkok",
+      "impact": "text-red"
+    },
+    {
+      "time": "WSJ",
+      "title": "Emas Comex, Perak Berakhir Lebih Rendah",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "KITCO",
+      "title": "Koreksi emas adalah peluang pembelian karena pemerintah tidak akan mentolerir penderitaan ekonomi - Dunkley dari Waratah Capital",
+      "impact": "text-red"
+    },
+    {
+      "time": "KITCO",
+      "title": "Perak menguat sementara emas memudar karena risiko Fed membatasi rebound - Laporan Kitco PM",
+      "impact": "text-red"
+    },
+    {
+      "time": "OILPRICE",
+      "title": "Booming Minyak Rusia di India Bertahan Lebih Lama dari Kejutan Hormuz",
+      "impact": "text-green"
+    },
+    {
+      "time": "OILPRICE",
+      "title": "Eksplorasi Minyak dan Gas Australia Menuju Renaisans",
+      "impact": "text-green"
+    },
+    {
+      "time": "YAHOO",
+      "title": "Inflasi Dapat Menghancurkan Pensiun Anda. ",
+      "impact": "text-red"
+    },
+    {
+      "time": "YAHOO",
+      "title": "Apa yang Dibutuhkan untuk Menang di Era Drayage Berikutnya",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "CNBC",
+      "title": "Aktor-aktor yang memiliki hubungan dengan Tiongkok menargetkan lebih dari sekadar teknologi seiring dengan semakin ketatnya persaingan AI dengan AS",
       "impact": "text-yellow"
     },
     {
@@ -139,112 +219,32 @@
       "time": "BLOOMBERG",
       "title": "Presiden Kolombia Berikutnya menunjuk Gómez sebagai Kepala Keuangan Baru",
       "impact": "text-yellow"
-    },
-    {
-      "time": "FOREXLIVE",
-      "title": "Dikonfirmasi - Lutnick mengumumkan Anthropic Fable 5 disetujui",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "FOREXLIVE",
-      "title": "Pratinjau RBNZ: Westpac memperkirakan suku bunga akan dipertahankan pada 8 Juli. ",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "INVESTING",
-      "title": "Deutsche Bank memperkirakan S&P 500 akan mencapai level 7000 pada akhir tahun 2025",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "INVESTING",
-      "title": "Tarif Trump, risalah rapat The Fed, pembelian Bitcoin oleh Rumble - hal-hal yang menggerakkan pasar",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "WSJ",
-      "title": "Saham-Saham Tenggelam Akibat Kehancuran AI yang Dipicu oleh DeepSeek Tiongkok",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "WSJ",
-      "title": "Emas Comex, Perak Berakhir Lebih Rendah",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "KITCO",
-      "title": "Koreksi emas adalah peluang pembelian karena pemerintah tidak akan mentolerir penderitaan ekonomi - Dunkley dari Waratah Capital",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "KITCO",
-      "title": "Perak menguat sementara emas memudar karena risiko Fed membatasi rebound - Laporan Kitco PM",
-      "impact": "text-green"
-    },
-    {
-      "time": "OILPRICE",
-      "title": "Booming Minyak Rusia di India Bertahan Lebih Lama dari Kejutan Hormuz",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "OILPRICE",
-      "title": "Eksplorasi Minyak dan Gas Australia Menuju Renaisans",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "YAHOO",
-      "title": "Saham Micron Melonjak Setelah Pendapatan Blockbuster. ",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "YAHOO",
-      "title": "3 Alasan Mengapa Chipotle Turun 53% Sejak Stock Split 50-untuk-1",
-      "impact": "text-red"
-    },
-    {
-      "time": "CNBC",
-      "title": "Michael Burry mengatakan dia melakukan short terhadap Caterpillar untuk pertama kalinya setelah hampir dua kali lipatnya pada reli berbasis AI pada tahun 2026",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "CNBC",
-      "title": "Presiden Fed Cleveland Hammack mengatakan AI dapat memicu inflasi, dan kenaikan suku bunga mungkin diperlukan",
-      "impact": "text-green"
-    },
-    {
-      "time": "BLOOMBERG",
-      "title": "Saham Asia Akan Naik Setelah Stellar Quarter: Market Wrap",
-      "impact": "text-green"
-    },
-    {
-      "time": "BLOOMBERG",
-      "title": "Nike Melihat Kelemahan Masih Ada Saat Kesabaran Wall Street Semakin Menipis",
-      "impact": "text-yellow"
     }
   ],
   "assets": [
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,006.10",
-      "change": "-4.42 (-0.11%)",
+      "price": "4,006.40",
+      "change": "-4.12 (-0.10%)",
       "cColor": "text-red",
       "f4": {
-        "dir": "BEARISH",
-        "dirClass": "text-red arrow-down",
-        "low": "3814.04",
-        "high": "4219.72",
-        "bp": "42%",
-        "bearp": "58%",
-        "conf": "58%",
-        "accuracy": "78.0%",
-        "action": "SELL RALLY",
-        "btn": "btn-red"
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "3802.39",
+        "high": "4209.49",
+        "bp": "85%",
+        "bearp": "15%",
+        "conf": "99%",
+        "accuracy": "82.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3524.07",
-        "high": "4509.69",
+        "low": "3513.13",
+        "high": "4498.75",
         "bp": "36%",
         "bearp": "64%",
         "conf": "64%",
@@ -256,29 +256,29 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.627",
-      "change": "+0.05 (+0.03%)",
+      "price": "162.656",
+      "change": "+0.08 (+0.05%)",
       "cColor": "text-green",
       "f4": {
-        "dir": "BULLISH",
-        "dirClass": "text-green arrow-up",
-        "low": "161.450",
-        "high": "163.754",
-        "bp": "57%",
-        "bearp": "43%",
-        "conf": "57%",
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "161.468",
+        "high": "163.796",
+        "bp": "85%",
+        "bearp": "15%",
+        "conf": "99%",
         "accuracy": "66.0%",
-        "action": "BUY DIP",
-        "btn": "btn-green"
+        "action": "SELL RALLY",
+        "btn": "btn-red"
       },
       "f1": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "158.927",
-        "high": "166.277",
-        "bp": "60%",
-        "bearp": "40%",
-        "conf": "60%",
+        "low": "158.957",
+        "high": "166.307",
+        "bp": "61%",
+        "bearp": "39%",
+        "conf": "61%",
         "accuracy": "82.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
@@ -287,26 +287,26 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "69.95",
-      "change": "+0.07 (+0.10%)",
+      "price": "69.92",
+      "change": "+0.04 (+0.06%)",
       "cColor": "text-green",
       "f4": {
-        "dir": "BEARISH",
-        "dirClass": "text-red arrow-down",
-        "low": "63.79",
-        "high": "75.93",
-        "bp": "41%",
-        "bearp": "59%",
-        "conf": "59%",
-        "accuracy": "84.0%",
-        "action": "SELL RALLY",
-        "btn": "btn-red"
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "63.89",
+        "high": "76.03",
+        "bp": "85%",
+        "bearp": "15%",
+        "conf": "99%",
+        "accuracy": "80.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "46.01",
-        "high": "93.71",
+        "low": "46.11",
+        "high": "93.81",
         "bp": "36%",
         "bearp": "64%",
         "conf": "64%",
@@ -319,19 +319,19 @@
   "gauges": {
     "macro_alignment_score": 37,
     "market_regime_score": 55,
-    "market_sentiment_score": 85,
+    "market_sentiment_score": 95,
     "institutional_flow_score": 20
   },
   "ml_memory": {
     "sentiment_penalty": 0
   },
   "ml_weights": {
-    "macro": 0.12045078856226307,
-    "sentiment": 0.12236248590112131,
-    "flow": 0.39009926783325166,
-    "regime": 0.12236248590112131,
-    "tech": 0.12236248590112131,
-    "cal": 0.12236248590112131
+    "macro": 0.11445078856226307,
+    "sentiment": 0.1163624859011213,
+    "flow": 0.4200992678332517,
+    "regime": 0.1163624859011213,
+    "tech": 0.1163624859011213,
+    "cal": 0.1163624859011213
   },
   "correlation_matrix": {
     "XAUUSD": {
@@ -412,7 +412,7 @@
   },
   "economic_calendar": [
     {
-      "time": "07:53",
+      "time": "08:00",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "08:53",
+      "time": "09:00",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "10:53",
+      "time": "11:00",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "11:53",
+      "time": "12:00",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

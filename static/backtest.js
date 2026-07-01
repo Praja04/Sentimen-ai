@@ -252,6 +252,11 @@ async function runBacktestSearch() {
         backtestResultsPerTF = result.data.results_per_tf;
         backtestPayloadInfo = result.data;
         
+        // Save to localStorage for persistence across refreshes
+        localStorage.setItem("xedy_backtest_results", JSON.stringify(backtestResultsPerTF));
+        localStorage.setItem("xedy_backtest_payload", JSON.stringify(backtestPayloadInfo));
+        if (typeof toggleResetBacktestBtn === "function") toggleResetBacktestBtn();
+        
         // Dynamically build TF tabs based on keys returned
         const activeTFs = Object.keys(backtestResultsPerTF);
         const tfTabsContainer = document.getElementById("tfTabs");
@@ -617,3 +622,97 @@ async function clearActiveLiveTestStrategy() {
         alert(`❌ Error: ${e.message}`);
     }
 }
+
+
+// Toggle visibility of the Reset Backtest button
+function toggleResetBacktestBtn() {
+    const btnReset = document.getElementById("resetBacktest");
+    if (btnReset) {
+        if (localStorage.getItem("xedy_backtest_results")) {
+            btnReset.style.display = "inline-block";
+        } else {
+            btnReset.style.display = "none";
+        }
+    }
+}
+
+// Reset the live test simulation (balance back to $10,000, empty history and active trades)
+async function resetLiveSimulation() {
+    if (confirm("⚠️ PERINGATAN!\n\nApakah Anda yakin ingin me-reset simulasi Live Test?\nSemua riwayat transaksi dan perdagangan aktif akan dihapus, dan modal akan dikembalikan ke $10,000.00.")) {
+        try {
+            const res = await fetch('/api/livetest/reset_simulation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                alert("✅ Reset Sukses! Simulasi Live Test dikembalikan ke modal awal.");
+                location.reload();
+            } else {
+                alert(`❌ Gagal reset: ${data.message}`);
+            }
+        } catch (e) {
+            console.error("Reset simulation failed:", e);
+            alert(`❌ Error: ${e.message}`);
+        }
+    }
+}
+
+// Initialize persistence and button wiring on DOMContentLoaded
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Wire up reset backtest button
+    const btnReset = document.getElementById("resetBacktest");
+    if (btnReset) {
+        toggleResetBacktestBtn();
+        btnReset.addEventListener("click", () => {
+            if (confirm("Apakah Anda yakin ingin menghapus seluruh hasil backtest yang tersimpan?")) {
+                localStorage.removeItem("xedy_backtest_results");
+                localStorage.removeItem("xedy_backtest_payload");
+                backtestResultsPerTF = null;
+                backtestPayloadInfo = null;
+                elements.resultsContainer.innerHTML = '<div class="empty-state">Belum ada hasil. Jalankan pencarian dulu.</div>';
+                
+                // Hide tabs
+                const tfTabsContainer = document.getElementById("tfTabs");
+                if (tfTabsContainer) tfTabsContainer.innerHTML = "";
+                
+                toggleResetBacktestBtn();
+            }
+        });
+    }
+    
+    // 2. Restore saved backtest results from localStorage
+    const savedResults = localStorage.getItem("xedy_backtest_results");
+    const savedPayload = localStorage.getItem("xedy_backtest_payload");
+    if (savedResults && savedPayload) {
+        try {
+            backtestResultsPerTF = JSON.parse(savedResults);
+            backtestPayloadInfo = JSON.parse(savedPayload);
+            
+            elements.statusText.textContent = "Selesai! Hasil pencarian backtest tersimpan dipulihkan.";
+            
+            const activeTFs = Object.keys(backtestResultsPerTF);
+            const tfTabsContainer = document.getElementById("tfTabs");
+            if (tfTabsContainer) {
+                tfTabsContainer.innerHTML = activeTFs.map((tf, index) => {
+                    const activeClass = index === 0 ? "active" : "";
+                    return `<button class="tf-tab ${activeClass}" data-tf="${tf}">${tf}</button>`;
+                }).join("");
+                
+                document.querySelectorAll(".tf-tab").forEach(tab => {
+                    tab.addEventListener("click", () => {
+                        const tf = tab.getAttribute("data-tf");
+                        switchTF(tf);
+                    });
+                });
+            }
+            
+            if (activeTFs.length > 0) {
+                switchTF(activeTFs[0]);
+            }
+            toggleResetBacktestBtn();
+        } catch (e) {
+            console.error("Failed to restore saved backtest results:", e);
+        }
+    }
+});
