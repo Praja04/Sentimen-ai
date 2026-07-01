@@ -225,8 +225,8 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "3,977.88",
-      "change": "-29.64 (-0.74%)",
+      "price": "3,977.02",
+      "change": "-30.50 (-0.76%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -256,8 +256,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.804",
-      "change": "+0.27 (+0.17%)",
+      "price": "162.826",
+      "change": "+0.29 (+0.18%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -412,7 +412,7 @@
   },
   "economic_calendar": [
     {
-      "time": "11:32",
+      "time": "11:34",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "12:32",
+      "time": "12:34",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "14:32",
+      "time": "14:34",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "15:32",
+      "time": "15:34",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

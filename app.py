@@ -1463,6 +1463,7 @@ def serve_trade():
 
 @app.route('/api/trade_status')
 def get_trade_status():
+    import datetime as dt
     try:
         # Load active config from state if present
         demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
@@ -1508,7 +1509,7 @@ def get_trade_status():
         if positions:
             for p in positions:
                 p_dict = p._asdict()
-                p_time = datetime.datetime.fromtimestamp(p_dict["time"]).strftime("%Y.%m.%d %H:%M:%S")
+                p_time = dt.datetime.fromtimestamp(p_dict["time"]).strftime("%Y.%m.%d %H:%M:%S")
                 p_type = "buy" if p_dict["type"] == 0 else "sell"
                 positions_list.append({
                     "symbol": p_dict["symbol"],
