@@ -4,6 +4,7 @@ import MetaTrader5 as mt5
 from flask_cors import CORS
 import os
 import json
+import time
 from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import product
