@@ -1397,19 +1397,77 @@ Example:
 
 Do NOT include any markdown, explanation, or text outside the JSON array."""
 
-        # Use user-selected model with whitelist validation
-        allowed_models = {
-            "gemini-2.5-flash", "gemini-2.5-pro",
-            "gemini-2.0-flash", "gemini-2.0-flash-lite",
-            "gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.5-flash-8b"
-        }
         selected_model = payload.get("model", "gemini-2.5-flash")
-        if selected_model not in allowed_models:
-            selected_model = "gemini-2.5-flash"
 
-        model = genai.GenerativeModel(selected_model, system_instruction=system_instruction)
-        response = model.generate_content(user_prompt)
-        raw_text = response.text.strip()
+        # Route to the correct provider
+        gemini_models = {"gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.5-flash-8b"}
+        claude_models = {"claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"}
+        deepseek_models = {"deepseek-chat", "deepseek-reasoner"}
+
+        raw_text = ""
+
+        if selected_model in gemini_models:
+            # --- GEMINI via SDK ---
+            model = genai.GenerativeModel(selected_model, system_instruction=system_instruction)
+            response = model.generate_content(user_prompt)
+            raw_text = response.text.strip()
+
+        elif selected_model in claude_models:
+            # --- CLAUDE via Anthropic HTTP API ---
+            import requests as http_req
+            claude_key = os.getenv("ANTHROPIC_API_KEY")
+            if not claude_key:
+                return jsonify({"success": False, "error": "ANTHROPIC_API_KEY tidak ditemukan di .env. Tambahkan key Anda."}), 400
+            claude_resp = http_req.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": claude_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json={
+                    "model": selected_model,
+                    "max_tokens": 4096,
+                    "system": system_instruction,
+                    "messages": [{"role": "user", "content": user_prompt}],
+                },
+                timeout=120,
+            )
+            if claude_resp.status_code != 200:
+                return jsonify({"success": False, "error": f"Claude API error {claude_resp.status_code}: {claude_resp.text[:300]}"}), 500
+            claude_data = claude_resp.json()
+            raw_text = claude_data.get("content", [{}])[0].get("text", "").strip()
+
+        elif selected_model in deepseek_models:
+            # --- DEEPSEEK via OpenAI-compatible API ---
+            import requests as http_req
+            ds_key = os.getenv("DEEPSEEK_API_KEY")
+            if not ds_key:
+                return jsonify({"success": False, "error": "DEEPSEEK_API_KEY tidak ditemukan di .env. Tambahkan key Anda."}), 400
+            ds_resp = http_req.post(
+                "https://api.deepseek.com/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {ds_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": selected_model,
+                    "messages": [
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    "max_tokens": 4096,
+                    "temperature": 0.7,
+                },
+                timeout=120,
+            )
+            if ds_resp.status_code != 200:
+                return jsonify({"success": False, "error": f"DeepSeek API error {ds_resp.status_code}: {ds_resp.text[:300]}"}), 500
+            ds_data = ds_resp.json()
+            raw_text = ds_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+
+        else:
+            return jsonify({"success": False, "error": f"Model '{selected_model}' tidak didukung."}), 400
 
         # Clean markdown fences if present
         if raw_text.startswith("```"):
