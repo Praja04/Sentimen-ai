@@ -3,7 +3,7 @@
     {
       "name": "FED POLICY",
       "val": "VERY DOVISH",
-      "score": 73,
+      "score": 55,
       "dir": "up",
       "value": "HAWKISH"
     },
@@ -24,7 +24,7 @@
     {
       "name": "TREASURY YIELD",
       "val": "FALLING",
-      "score": 39,
+      "score": 28,
       "dir": "down",
       "value": "FALLING"
     },
@@ -87,7 +87,7 @@
     {
       "name": "CORRELATION",
       "val": "RISK OFF",
-      "score": 77,
+      "score": 76,
       "dir": "down",
       "value": "STRONG NEG"
     }
@@ -132,13 +132,13 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Dolar Menguat Menjelang Pidato Warsh, Saham Goyah: Pasar Terbungkus",
-      "impact": "text-green"
+      "title": "Cheveley: Emas Akan Pulih Dalam Beberapa Bulan Kedepan",
+      "impact": "text-yellow"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Trader Waspadai 'Garis Merah' Yen Berikutnya | ",
-      "impact": "text-yellow"
+      "title": "Dolar Menguat Menjelang Pidato Warsh, Emas Turun: Pasar Terbungkus",
+      "impact": "text-green"
     },
     {
       "time": "FOREXLIVE",
@@ -192,12 +192,12 @@
     },
     {
       "time": "YAHOO",
-      "title": "Opsi Saham SpaceX Sekarang Murah Dengan Inklusi Nasdaq-100 Mendatang",
+      "title": "Apakah Brookfield Corporation (BN) Saham Yang Bagus Untuk Dibeli Sekarang?",
       "impact": "text-yellow"
     },
     {
       "time": "YAHOO",
-      "title": "Mengapa Saham Axon Enterprise Muncul Hari Ini",
+      "title": "Roblox Menunjukkan Aktivitas Call Option yang Besar dan Tidak Biasa - Apakah Saham RBLX Terlalu Murah?",
       "impact": "text-yellow"
     },
     {
@@ -212,12 +212,12 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Minyak Stabil Seiring Berlanjutnya Pembicaraan Damai, Lalu Lintas Hormuz Pulih",
-      "impact": "text-yellow"
+      "title": "Dolar Menguat Menjelang Pidato Warsh, Emas Turun: Pasar Terbungkus",
+      "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Prakiraan Hujan Bulan Juli yang Di Bawah Normal di India Berisiko pada Perkiraan Tanaman",
+      "title": "Kepala Valas Jepang Mengatakan Intervensi Yen di Masa Lalu Telah Menunjukkan Dampaknya",
       "impact": "text-yellow"
     }
   ],
@@ -225,8 +225,8 @@
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "3,979.57",
-      "change": "-27.95 (-0.70%)",
+      "price": "3,975.85",
+      "change": "-31.67 (-0.79%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -256,8 +256,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.691",
-      "change": "+0.16 (+0.10%)",
+      "price": "162.709",
+      "change": "+0.18 (+0.11%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -287,8 +287,8 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "69.58",
-      "change": "-0.24 (-0.34%)",
+      "price": "69.57",
+      "change": "-0.25 (-0.36%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -317,9 +317,9 @@
     }
   ],
   "gauges": {
-    "macro_alignment_score": 36,
+    "macro_alignment_score": 34,
     "market_regime_score": 55,
-    "market_sentiment_score": 90,
+    "market_sentiment_score": 80,
     "institutional_flow_score": 20
   },
   "ml_memory": {
@@ -401,7 +401,7 @@
   "technical_signals": {
     "XAUUSD": {
       "trend": "BEARISH",
-      "rsi": 22,
+      "rsi": 24,
       "ma50": "DOWN"
     },
     "USDJPY": {
@@ -412,7 +412,7 @@
   },
   "economic_calendar": [
     {
-      "time": "12:54",
+      "time": "13:38",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "13:54",
+      "time": "14:38",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "15:54",
+      "time": "16:38",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "16:54",
+      "time": "17:38",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

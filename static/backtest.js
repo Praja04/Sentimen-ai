@@ -589,19 +589,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-async function handleStrategySelect(checkbox) {
-    // Disabled
-}
-async function deployToLiveTest(timeframe, riskPercent, strategyType, strategyName, winRate, maxDrawdown, netProfit) {
-    // Disabled
-}
-async function clearActiveLiveTestStrategy() {
-    // Disabled
-}
-async function resetLiveSimulation() {
-    // Disabled
-}
-
 function syncStrategyCheckboxes(activeConfig) {
     const checkboxes = document.querySelectorAll('.strategy-selector-chk');
     if (!checkboxes.length) return;
