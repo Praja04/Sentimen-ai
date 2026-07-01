@@ -328,3 +328,74 @@ async function submitModification() {
         alert(`Request failed: ${err}`);
     }
 }
+
+// 7. Order Placement Modal Logic
+let activeOrderSymbol = null;
+let activeOrderType = null;
+
+function openOrderModal(symbol, type) {
+    activeOrderSymbol = symbol;
+    activeOrderType = type;
+    
+    document.getElementById('order-modal-title').innerText = `New Order - ${symbol}`;
+    document.getElementById('order-symbol').innerText = symbol;
+    
+    const typeEl = document.getElementById('order-type');
+    typeEl.innerText = type.toUpperCase();
+    typeEl.style.color = type === 'buy' ? 'var(--accent-green)' : 'var(--accent-red)';
+    
+    // Fetch latest price from ticker UI
+    const domSymbol = symbol.replace(" WTI OIL", "-WTI-OIL").replace(" OIL", "-OIL").replace(" ", "-");
+    const priceId = type === 'buy' ? `ticker-ask-${domSymbol}` : `ticker-bid-${domSymbol}`;
+    const priceEl = document.getElementById(priceId);
+    const currentPrice = priceEl ? priceEl.innerText : '...';
+    document.getElementById('order-current-price').innerText = currentPrice;
+    
+    // Reset values
+    document.getElementById('order-volume-input').value = 0.01;
+    document.getElementById('order-sl-input').value = '';
+    document.getElementById('order-tp-input').value = '';
+    
+    document.getElementById('order-modal').style.display = 'flex';
+}
+
+function closeOrderModal() {
+    document.getElementById('order-modal').style.display = 'none';
+    activeOrderSymbol = null;
+    activeOrderType = null;
+}
+
+async function submitOrder() {
+    if (!activeOrderSymbol || !activeOrderType) return;
+    const volume = parseFloat(document.getElementById('order-volume-input').value);
+    const sl = parseFloat(document.getElementById('order-sl-input').value) || null;
+    const tp = parseFloat(document.getElementById('order-tp-input').value) || null;
+    
+    try {
+        const btn = document.getElementById('order-submit-btn');
+        btn.disabled = true;
+        btn.innerText = "Placing...";
+        
+        const res = await fetch('/api/trade/place_order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ symbol: activeOrderSymbol, type: activeOrderType, volume, sl, tp })
+        });
+        
+        const result = await res.json();
+        btn.disabled = false;
+        btn.innerText = "Place Order";
+        
+        if (result.status === 'success') {
+            alert(result.message);
+            closeOrderModal();
+            fetchStatus();
+        } else {
+            alert(`Error: ${result.message}`);
+        }
+    } catch(err) {
+        alert(`Request failed: ${err}`);
+        document.getElementById('order-submit-btn').disabled = false;
+        document.getElementById('order-submit-btn').innerText = "Place Order";
+    }
+}

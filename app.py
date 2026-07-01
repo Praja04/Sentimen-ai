@@ -64,6 +64,7 @@ def get_live_ticks():
         t = None
         matched_symbol = None
         for opt in options:
+            mt5.symbol_select(opt, True)
             t = mt5.symbol_info_tick(opt)
             if t:
                 matched_symbol = opt
@@ -1456,6 +1457,90 @@ def reset_livetest_simulation():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/api/trade/place_order', methods=['POST'])
+def place_order_api():
+    try:
+        data = request.json
+        symbol = data.get("symbol")
+        order_type_str = data.get("type", "").lower() # 'buy' or 'sell'
+        volume = float(data.get("volume", 0.01))
+        sl = data.get("sl")
+        tp = data.get("tp")
+        
+        if not symbol or order_type_str not in ['buy', 'sell']:
+            return jsonify({"status": "error", "message": "Invalid symbol or order type"}), 400
+            
+        if not init_mt5():
+            return jsonify({"status": "error", "message": "Failed to connect to MT5"}), 500
+            
+        # Map symbol label to actual MT5 symbol
+        symbol_map = {
+            "XAUUSD": "XAUUSD",
+            "GOLD": "XAUUSD",
+            "USDJPY": "USDJPY",
+            "WTI OIL": "XTIUSD",
+            "WTI": "XTIUSD",
+            "DJI": "US30",
+            "US30": "US30",
+            "EURUSD": "EURUSD",
+            "GBPUSD": "GBPUSD"
+        }
+        mt5_symbol = symbol_map.get(symbol, symbol)
+        
+        # Verify symbol select
+        mt5.symbol_select(mt5_symbol, True)
+        
+        # Get current tick for price
+        tick = mt5.symbol_info_tick(mt5_symbol)
+        if not tick:
+            return jsonify({"status": "error", "message": f"Failed to retrieve tick for {mt5_symbol}"}), 400
+            
+        price = tick.ask if order_type_str == 'buy' else tick.bid
+        order_type = mt5.ORDER_TYPE_BUY if order_type_str == 'buy' else mt5.ORDER_TYPE_SELL
+        
+        # Build request
+        req = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": mt5_symbol,
+            "volume": volume,
+            "type": order_type,
+            "price": price,
+            "deviation": 20,
+            "magic": 998877,
+            "comment": "Order from Web Dashboard",
+            "type_time": mt5.ORDER_TIME_GTC,
+        }
+        
+        if sl:
+            req["sl"] = float(sl)
+        if tp:
+            req["tp"] = float(tp)
+            
+        # Try multiple filling types
+        filling_types = [
+            mt5.ORDER_FILLING_FOK,
+            mt5.ORDER_FILLING_IOC,
+            mt5.ORDER_FILLING_RETURN
+        ]
+        
+        last_error_desc = ""
+        for filling in filling_types:
+            req["type_filling"] = filling
+            result = mt5.order_send(req)
+            if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+                return jsonify({"status": "success", "message": f"Order {order_type_str.upper()} placed successfully (Ticket: {result.order})"})
+            else:
+                if result:
+                    last_error_desc = f"Retcode: {result.retcode}, Comment: {result.comment}"
+                else:
+                    last_error_desc = f"Error sending order: {mt5.last_error()}"
+                    
+        return jsonify({"status": "error", "message": f"Order failed: {last_error_desc}"}), 400
+        
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 def close_mt5_position(ticket):
     if not init_mt5():
         return False, "Failed to initialize MT5 terminal"
@@ -1716,6 +1801,7 @@ def get_trade_status():
             t = None
             matched_symbol = None
             for opt in options:
+                mt5.symbol_select(opt, True)
                 t = mt5.symbol_info_tick(opt)
                 if t:
                     matched_symbol = opt
