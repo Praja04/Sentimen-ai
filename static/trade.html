@@ -325,6 +325,96 @@
             color: #777;
             font-style: italic;
         }
+    
+        /* Market Ticker Bar Styling */
+        .market-ticker-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 24, 45, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            gap: 12px;
+            overflow-x: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .ticker-item {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .ticker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 3px;
+        }
+        .ticker-symbol {
+            font-weight: bold;
+            color: var(--text-gold);
+            font-size: 0.75rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .ticker-change {
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+        .ticker-bid-ask {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 4px 0;
+        }
+        .ticker-bid-ask div {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .ticker-bid-ask .sub-label {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        .ticker-bid-ask .price-large {
+            font-size: 0.95rem !important;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+        .ticker-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            padding-top: 3px;
+            margin-top: 2px;
+        }
+        .ticker-footer strong {
+            color: var(--text-white);
+            font-family: 'Roboto Mono', monospace;
+            font-weight: normal;
+        }
+        .text-green {
+            color: var(--accent-green) !important;
+        }
+        .text-red {
+            color: var(--accent-red) !important;
+        }
+
     </style>
 </head>
 <body>
@@ -340,6 +430,106 @@
     </header>
 
     <div class="container">
+        <!-- Live Market Ticker Bar -->
+        <div class="market-ticker-bar">
+            <!-- XAUUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">XAUUSD</span>
+                    <span class="ticker-change" id="ticker-chg-XAUUSD">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-XAUUSD">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-XAUUSD">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-XAUUSD">...</strong></span>
+                    <span>H: <strong id="ticker-high-XAUUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-XAUUSD">...</strong></span>
+                </div>
+            </div>
+            <!-- USDJPY -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">USDJPY</span>
+                    <span class="ticker-change" id="ticker-chg-USDJPY">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-USDJPY">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-USDJPY">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-USDJPY">...</strong></span>
+                    <span>H: <strong id="ticker-high-USDJPY">...</strong></span>
+                    <span>V: <strong id="ticker-vol-USDJPY">...</strong></span>
+                </div>
+            </div>
+            <!-- WTI OIL -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">WTI OIL</span>
+                    <span class="ticker-change" id="ticker-chg-WTI-OIL">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-WTI-OIL">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-WTI-OIL">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-WTI-OIL">...</strong></span>
+                    <span>H: <strong id="ticker-high-WTI-OIL">...</strong></span>
+                    <span>V: <strong id="ticker-vol-WTI-OIL">...</strong></span>
+                </div>
+            </div>
+            <!-- DJI -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">DJI</span>
+                    <span class="ticker-change" id="ticker-chg-DJI">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-DJI">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-DJI">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-DJI">...</strong></span>
+                    <span>H: <strong id="ticker-high-DJI">...</strong></span>
+                    <span>V: <strong id="ticker-vol-DJI">...</strong></span>
+                </div>
+            </div>
+            <!-- EURUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">EURUSD</span>
+                    <span class="ticker-change" id="ticker-chg-EURUSD">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-EURUSD">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-EURUSD">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-EURUSD">...</strong></span>
+                    <span>H: <strong id="ticker-high-EURUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-EURUSD">...</strong></span>
+                </div>
+            </div>
+            <!-- GBPUSD -->
+            <div class="ticker-item">
+                <div class="ticker-header">
+                    <span class="ticker-symbol">GBPUSD</span>
+                    <span class="ticker-change" id="ticker-chg-GBPUSD">...</span>
+                </div>
+                <div class="ticker-bid-ask">
+                    <div><span class="sub-label">BID</span><strong class="price-large" id="ticker-bid-GBPUSD">...</strong></div>
+                    <div><span class="sub-label">ASK</span><strong class="price-large" id="ticker-ask-GBPUSD">...</strong></div>
+                </div>
+                <div class="ticker-footer">
+                    <span>L: <strong id="ticker-low-GBPUSD">...</strong></span>
+                    <span>H: <strong id="ticker-high-GBPUSD">...</strong></span>
+                    <span>V: <strong id="ticker-vol-GBPUSD">...</strong></span>
+                </div>
+            </div>
+        </div>
+
         <!-- Setup and Strategy Config Header -->
         <div class="info-banner">
             <div class="info-card">
