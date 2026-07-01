@@ -426,6 +426,21 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- News View -->
+                <div id="view-news" style="display:none;">
+                    <table class="terminal-table">
+                        <thead>
+                            <tr>
+                                <th style="width:120px;">Source</th>
+                                <th style="border-right:none; padding-right:15px;">Headline</th>
+                            </tr>
+                        </thead>
+                        <tbody id="news-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Status Summary Row -->
@@ -441,7 +456,7 @@
                     <div class="terminal-tab active" id="tab-trade" onclick="switchTab('trade')">Trade</div>
                     <div class="terminal-tab" id="tab-exposure" onclick="switchTab('exposure')">Exposure</div>
                     <div class="terminal-tab" id="tab-history" onclick="switchTab('history')">History</div>
-                    <div class="terminal-tab" id="tab-news">News <span style="color:red; font-weight:bold;">99</span></div>
+                    <div class="terminal-tab" id="tab-news" onclick="switchTab('news')">News <span style="color:red; font-weight:bold;" id="news-count-badge">0</span></div>
                     <div class="terminal-tab" id="tab-mailbox">Mailbox <span style="color:red; font-weight:bold;">11</span></div>
                     <div class="terminal-tab" id="tab-calendar">Calendar</div>
                     <div class="terminal-tab" id="tab-company">Company</div>

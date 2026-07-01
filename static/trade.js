@@ -11,6 +11,7 @@ function switchTab(tab) {
     // Update views visibility
     document.getElementById('view-trade').style.display = tab === 'trade' ? 'block' : 'none';
     document.getElementById('view-history').style.display = tab === 'history' ? 'block' : 'none';
+    document.getElementById('view-news').style.display = tab === 'news' ? 'block' : 'none';
     
     // Refresh content immediately
     fetchStatus();
@@ -140,6 +141,28 @@ async function fetchStatus() {
             historyTbody.innerHTML = hHtml;
         }
 
+        // Update news tab badge count
+        if (data.news) {
+            document.getElementById('news-count-badge').innerText = data.news.length;
+        }
+
+        // Render News Tab Table
+        const newsTbody = document.getElementById('news-tbody');
+        if (data.news && data.news.length > 0) {
+            let nHtml = '';
+            data.news.forEach(n => {
+                nHtml += `
+                    <tr>
+                        <td style="font-weight:bold; color:#555;">[${n.time || 'INFO'}]</td>
+                        <td style="color:#000; white-space: normal; line-height: 1.4;">${n.title}</td>
+                    </tr>
+                `;
+            });
+            newsTbody.innerHTML = nHtml;
+        } else {
+            newsTbody.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada berita fundamental saat ini.</td></tr>`;
+        }
+
         // 4. Update Status Summary Row at Bottom
         const summaryRow = document.getElementById('terminal-summary');
         const summaryLeft = document.getElementById('summary-left-txt');
@@ -173,6 +196,10 @@ async function fetchStatus() {
                 summaryRight.innerText = totalProfit >= 0 ? `+${totalProfit.toFixed(2)}` : totalProfit.toFixed(2);
                 summaryRight.className = totalProfit >= 0 ? 'mt5-profit-green' : 'mt5-profit-red';
             }
+        } else if (activeTab === 'news') {
+            summaryLeft.innerHTML = `• Berita Aktif: <strong>${data.news ? data.news.length : 0} Headline Fundamental (Bahasa Indonesia)</strong>`;
+            summaryRight.innerText = 'OK';
+            summaryRight.className = 'mt5-profit-green';
         } else {
             summaryLeft.innerText = '';
             summaryRight.innerText = '';

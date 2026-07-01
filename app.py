@@ -1593,12 +1593,24 @@ def get_trade_status():
             history_list = balance_deals + closed_trades
             history_list.sort(key=lambda x: x.get("close_time") or x["time"], reverse=True)
 
+        # Fetch news feed from xedy_v30_data.json
+        news_feed = []
+        xedy_file = 'xedy_v30_data.json'
+        if os.path.exists(xedy_file):
+            with open(xedy_file, 'r', encoding='utf-8') as f_xedy:
+                try:
+                    xedy_data = json.load(f_xedy)
+                    news_feed = xedy_data.get("news_feed", [])
+                except Exception:
+                    pass
+
         return jsonify({
             "status": "success",
             "active_config": active_config,
             "account_info": acc_dict,
             "positions": positions_list,
-            "history": history_list
+            "history": history_list,
+            "news": news_feed
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
