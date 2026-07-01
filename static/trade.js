@@ -22,6 +22,11 @@ async function fetchStatus() {
         const response = await fetch('/api/trade_status');
         const data = await response.json();
         
+        // Update Live Tickers if available
+        if (data.ticks) {
+            renderTicker(data.ticks);
+        }
+        
         // Hide loader overlay once loaded
         document.getElementById('loading-overlay').style.display = 'none';
 
@@ -248,18 +253,7 @@ function renderTicker(ticks) {
     }
 }
 
-// Intercept tick rendering in fetchStatus
-const oldFetchStatus = fetchStatus;
-fetchStatus = async function() {
-    try {
-        const response = await fetch('/api/trade_status');
-        const data = await response.json();
-        if (data.ticks) {
-            renderTicker(data.ticks);
-        }
-    } catch(e) {}
-    return oldFetchStatus();
-};
+
 
 // 6. Close and Edit Handlers
 async function closePosition(ticket) {
