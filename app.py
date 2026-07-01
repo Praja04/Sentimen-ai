@@ -1308,10 +1308,16 @@ def api_backtest_search():
             stop_backtest_requested = False
             return jsonify({"success": False, "error": "Backtest dihentikan oleh user."}), 400
 
+        # Extract primary sorting method
+        sort_pri = payload.get("sort_priority", ["win_rate"])
+        method_name = sort_pri[0] if isinstance(sort_pri, list) and len(sort_pri) > 0 else "win_rate"
+
         return jsonify({
             "success": True, 
             "data": {
                 "symbol": payload.get("symbol", "XAUUSD"),
+                "method": method_name,
+                "risk_pct": float(payload.get("risk_pct", 1.0)),
                 "results_per_tf": results_per_tf
             }
         })
@@ -1334,7 +1340,8 @@ def apply_livetest_parameters():
             return jsonify({"status": "error", "message": "Empty payload"}), 400
             
         tf = req.get("timeframe", "M15")
-        risk = float(req.get("risk_percent", 1.0))
+        risk_val = req.get("risk_percent")
+        risk = float(risk_val) if risk_val is not None else 1.0
         strat_type = req.get("strategy_type", "xedy_v30_ai")
         strat_name = req.get("strategy_name", "AI XEDY_V30 Core")
         win_rate = req.get("win_rate", 68)

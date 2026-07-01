@@ -1,21 +1,21 @@
 {
     "balance": 11641.6,
-    "equity": 11637.76,
+    "equity": 11643.28,
     "active_trades": [
         {
-            "ticket": 26380049,
-            "time": "2026-07-01 06:56:40",
+            "ticket": 26548084,
+            "time": "2026-07-01 07:24:40",
             "symbol": "XAUUSD",
             "type": "SELL",
             "lots": 0.08,
-            "entry_price": 4005.91,
-            "current_price": 4006.39,
-            "sl": 4020.91,
-            "tp": 3983.91,
+            "entry_price": 4004.57,
+            "current_price": 4004.36,
+            "sl": 4019.57,
+            "tp": 3982.57,
             "commission": -1.5,
             "swap": 0.0,
             "status": "RUNNING",
-            "profit": -3.84
+            "profit": 1.68
         }
     ],
     "history": [
@@ -84,5 +84,16 @@
             "result": "PROFIT"
         }
     ],
-    "last_update": 1782864116.525978
+    "last_update": 1782865484.8127282,
+    "active_config": {
+        "timeframe": "M15",
+        "risk_percent": 1.0,
+        "strategy_type": "xedy_v30_ai",
+        "strategy_name": "AI XEDY_V30 Core",
+        "sl_dist": 15.0,
+        "tp_dist": 22.0,
+        "win_rate": 68,
+        "max_drawdown": 7.2,
+        "net_profit": 68.0
+    }
 }
