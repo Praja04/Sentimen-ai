@@ -251,6 +251,16 @@ function renderTicker(ticks) {
             chgEl.className = `ticker-change ${t.change >= 0 ? 'text-green' : 'text-red'}`;
         }
     }
+    
+    // Dynamic price updates for active order popup
+    if (activeOrderSymbol && ticks[activeOrderSymbol]) {
+        const t = ticks[activeOrderSymbol];
+        const priceEl = document.getElementById('order-current-price');
+        if (priceEl) {
+            const priceVal = activeOrderType === 'buy' ? t.ask : t.bid;
+            priceEl.innerText = priceVal.toFixed(activeOrderSymbol.includes("JPY") ? 3 : (activeOrderSymbol.includes("EUR") || activeOrderSymbol.includes("GBP") ? 5 : 2));
+        }
+    }
 }
 
 
