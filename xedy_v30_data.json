@@ -132,23 +132,23 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Minyak Turun karena AS Mengatakan Pembicaraan Tidak Langsung dengan Iran Adalah Positif",
+      "title": "CEO Nissan Mengatakan Masih Masuk Akal Membuat Mobil di AS",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Perusahaan AS Menambah 98.000 Pekerjaan di Bulan Juni, Kata ADP",
+      "title": "Saham Jatuh dan Imbal Hasil Obligasi Naik karena Fokus yang Warsh: Pasar Bungkus",
+      "impact": "text-red"
+    },
+    {
+      "time": "FOREXLIVE",
+      "title": "Forum ECB: Lagarde memiliki prospek kebijakan moneter yang sempurna untuk menaikkan suku bunga.",
       "impact": "text-green"
     },
     {
       "time": "FOREXLIVE",
-      "title": "Di mana Anda bisa menonton Forum ECB tentang Perbankan Sentral?",
+      "title": "Pentingnya Analisis Pasar Harian Sebelum Setiap Perdagangan",
       "impact": "text-yellow"
-    },
-    {
-      "time": "FOREXLIVE",
-      "title": "Meta mengatakan mereka sedang membangun bisnis cloud untuk menjual kelebihan komputasi AI",
-      "impact": "text-green"
     },
     {
       "time": "INVESTING",
@@ -158,7 +158,7 @@
     {
       "time": "INVESTING",
       "title": "Tarif Trump, risalah rapat The Fed, pembelian Bitcoin oleh Rumble - hal-hal yang menggerakkan pasar",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "WSJ",
@@ -168,17 +168,17 @@
     {
       "time": "WSJ",
       "title": "Emas Comex, Perak Berakhir Lebih Rendah",
-      "impact": "text-yellow"
+      "impact": "text-red"
     },
     {
       "time": "KITCO",
       "title": "Emas diperdagangkan mendekati sesi tertinggi setelah ADP mengatakan 98 ribu pekerjaan bersih ditambahkan pada bulan Juni",
-      "impact": "text-red"
+      "impact": "text-green"
     },
     {
       "time": "KITCO",
       "title": "Koreksi emas adalah peluang pembelian karena pemerintah tidak akan mentolerir penderitaan ekonomi - Dunkley dari Waratah Capital",
-      "impact": "text-red"
+      "impact": "text-green"
     },
     {
       "time": "OILPRICE",
@@ -192,13 +192,13 @@
     },
     {
       "time": "YAHOO",
-      "title": "Trump tentang pengungkapan keuangan: Semua orang mendapat untung karena pasar saham sedang naik",
+      "title": "Saham teknologi hari ini: Saham teknologi pulih menjelang berakhirnya kuartal kedua",
       "impact": "text-green"
     },
     {
       "time": "YAHOO",
-      "title": "Snail menetapkan pemecahan saham terbalik 1-untuk-5",
-      "impact": "text-yellow"
+      "title": "JFrog Ltd. (FROG) Jatuh Karena Aksi Jual “Claude Trade”.",
+      "impact": "text-red"
     },
     {
       "time": "CNBC",
@@ -208,25 +208,25 @@
     {
       "time": "CNBC",
       "title": "Xi memuji pengaruh global Partai Komunis Tiongkok dalam pidato peringatan 105 tahunnya",
-      "impact": "text-red"
+      "impact": "text-yellow"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Minyak Turun karena AS Mengatakan Pembicaraan Tidak Langsung dengan Iran Adalah Positif",
+      "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
       "title": "Perusahaan AS Menambah 98.000 Pekerjaan di Bulan Juni, Kata ADP",
       "impact": "text-green"
-    },
-    {
-      "time": "BLOOMBERG",
-      "title": "Trump Melaporkan Setidaknya $1.4 Miliar pada Pendapatan Kripto 2025",
-      "impact": "text-yellow"
     }
   ],
   "assets": [
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,029.93",
-      "change": "+22.41 (+0.56%)",
+      "price": "4,030.55",
+      "change": "+23.03 (+0.57%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -256,8 +256,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.662",
-      "change": "+0.13 (+0.08%)",
+      "price": "162.598",
+      "change": "+0.07 (+0.04%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -287,8 +287,8 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "68.82",
-      "change": "-1.00 (-1.43%)",
+      "price": "68.81",
+      "change": "-1.01 (-1.45%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -319,7 +319,7 @@
   "gauges": {
     "macro_alignment_score": 37,
     "market_regime_score": 45,
-    "market_sentiment_score": 50,
+    "market_sentiment_score": 30,
     "institutional_flow_score": 20
   },
   "ml_memory": {
@@ -406,13 +406,13 @@
     },
     "USDJPY": {
       "trend": "BULLISH",
-      "rsi": 84,
+      "rsi": 80,
       "ma50": "UP"
     }
   },
   "economic_calendar": [
     {
-      "time": "21:18",
+      "time": "21:22",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "22:18",
+      "time": "22:22",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "00:18",
+      "time": "00:22",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "01:18",
+      "time": "01:22",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

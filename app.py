@@ -1397,7 +1397,17 @@ Example:
 
 Do NOT include any markdown, explanation, or text outside the JSON array."""
 
-        model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_instruction)
+        # Use user-selected model with whitelist validation
+        allowed_models = {
+            "gemini-2.5-flash", "gemini-2.5-pro",
+            "gemini-2.0-flash", "gemini-2.0-flash-lite",
+            "gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.5-flash-8b"
+        }
+        selected_model = payload.get("model", "gemini-2.5-flash")
+        if selected_model not in allowed_models:
+            selected_model = "gemini-2.5-flash"
+
+        model = genai.GenerativeModel(selected_model, system_instruction=system_instruction)
         response = model.generate_content(user_prompt)
         raw_text = response.text.strip()
 

@@ -658,14 +658,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             generateBtn.disabled = true;
             generateBtn.innerHTML = "⏳ Generating...";
-            statusSpan.textContent = "Mengirim prompt ke AI Gemini...";
+            const modelSelect = document.getElementById("aiModelSelect");
+            const selectedModel = modelSelect ? modelSelect.value : "gemini-2.5-flash";
+            statusSpan.textContent = `Mengirim prompt ke ${selectedModel}...`;
             statusSpan.style.color = "rgba(108,92,231,0.9)";
 
             try {
                 const res = await fetch("/api/backtest/generate_from_prompt", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt }),
+                    body: JSON.stringify({ prompt, model: selectedModel }),
                 });
                 const data = await res.json();
 

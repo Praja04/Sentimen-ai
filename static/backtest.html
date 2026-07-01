@@ -262,7 +262,36 @@
 • Gunakan RSI oversold di bawah 25 sebagai sinyal buy, dengan SL ketat 1x ATR dan TP 3x ATR
 • Strategi mean reversion: entry saat Bollinger Band menyentuh lower band, exit di middle band
 • Fokus strategi momentum MACD cross dengan filter trend EMA 200"></textarea>
-            <div style="display: flex; align-items: center; gap: 14px; margin-top: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="aiModelSelect" style="font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.5); font-family: 'Rajdhani', sans-serif; white-space: nowrap;">🤖 AI Model:</label>
+                    <select id="aiModelSelect" style="
+                        background: rgba(0,0,0,0.4);
+                        border: 1px solid rgba(108,92,231,0.35);
+                        border-radius: 6px;
+                        color: #e0e0e0;
+                        font-family: 'Roboto Mono', monospace;
+                        font-size: 0.75rem;
+                        padding: 6px 12px;
+                        cursor: pointer;
+                        outline: none;
+                        min-width: 220px;
+                    ">
+                        <optgroup label="Gemini 2.5 (Latest)">
+                            <option value="gemini-2.5-flash" selected>⚡ Gemini 2.5 Flash (Cepat)</option>
+                            <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Akurat)</option>
+                        </optgroup>
+                        <optgroup label="Gemini 2.0">
+                            <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash</option>
+                            <option value="gemini-2.0-flash-lite">💨 Gemini 2.0 Flash Lite</option>
+                        </optgroup>
+                        <optgroup label="Gemini 1.5 (Legacy)">
+                            <option value="gemini-1.5-pro">🧠 Gemini 1.5 Pro</option>
+                            <option value="gemini-1.5-flash">⚡ Gemini 1.5 Flash</option>
+                            <option value="gemini-1.5-flash-8b">💨 Gemini 1.5 Flash 8B</option>
+                        </optgroup>
+                    </select>
+                </div>
                 <button id="generateFromPrompt" style="
                     background: linear-gradient(135deg, #6c5ce7, #a55eea);
                     color: white;
