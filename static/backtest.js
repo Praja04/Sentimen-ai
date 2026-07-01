@@ -382,174 +382,7 @@ async function fetchLiveTicks() {
 }
 
 function renderLiveDemo(demo) {
-    // 1. Account Cards
-    document.getElementById("live-balance").innerText = `$${demo.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    document.getElementById("live-equity").innerText = `$${demo.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    
-    // Update active strategy label
-    const stratLabel = document.getElementById("active-strat-label");
-    if (stratLabel && demo.active_config) {
-        stratLabel.innerText = `Active: ${demo.active_config.strategy_name} (${demo.active_config.timeframe} / Risk ${demo.active_config.risk_percent}%)`;
-    } else if (stratLabel) {
-        stratLabel.innerText = "Active: Default M15 (Risk 1.0%)";
-    }
-    
-    // Update checkbox states to match the active config dynamically
-    const activeConfig = demo.active_config;
-    const allCheckboxes = document.querySelectorAll('.strategy-selector-chk');
-    allCheckboxes.forEach(chk => {
-        const tf = chk.getAttribute('data-tf');
-        const type = chk.getAttribute('data-type');
-        const isActive = activeConfig && 
-                         activeConfig.timeframe === tf && 
-                         activeConfig.strategy_type === type;
-        chk.checked = isActive;
-        
-        // Highlight active card
-        const card = chk.closest('.result-card');
-        if (card) {
-            if (isActive) {
-                card.style.border = '1.5px solid var(--text-yellow)';
-                card.style.boxShadow = '0 0 15px rgba(255,215,0,0.15)';
-            } else {
-                card.style.border = '';
-                card.style.boxShadow = '';
-            }
-        }
-    });
-    
-    const totalProfit = demo.equity - 10000.0;
-    const totalProfitPct = (totalProfit / 10000.0) * 100.0;
-    const profitEl = document.getElementById("live-profit");
-    
-    if (totalProfit >= 0) {
-        profitEl.innerText = `+$${totalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (+${totalProfitPct.toFixed(2)}%)`;
-        profitEl.className = "text-green";
-    } else {
-        profitEl.innerText = `-$${Math.abs(totalProfit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${totalProfitPct.toFixed(2)}%)`;
-        profitEl.className = "text-red";
-    }
-    
-    // 2. Current Status
-    const statusEl = document.getElementById("live-status");
-    const activeList = demo.active_trades || [];
-    if (activeList.length > 0) {
-        const t = activeList[0];
-        statusEl.innerText = `TRADING ${t.type} / ENTRY: ${t.entry_price}`;
-        statusEl.className = t.type === "BUY" ? "text-green" : "text-red";
-    } else {
-        statusEl.innerText = "SCANNING FOR SIGNALS...";
-        statusEl.className = "text-yellow";
-    }
-    
-    // 3. Active Trades Table (MT5 layout)
-    const activeBody = document.getElementById("live-active-trades-body");
-    let activeHtml = "";
-    let runningProfitTotal = 0;
-    
-    if (activeList.length > 0) {
-        activeHtml = activeList.map(t => {
-            const entryVal = t.entry_price !== undefined ? t.entry_price : (t.entry !== undefined ? t.entry : 0);
-            const slVal = t.sl !== undefined ? t.sl : 0;
-            const tpVal = t.tp !== undefined ? t.tp : 0;
-            const curVal = t.current_price !== undefined ? t.current_price : 0;
-            const lotsVal = t.lots !== undefined ? t.lots : 0.01;
-            const ticketVal = t.ticket !== undefined ? t.ticket : '-';
-            const timeVal = t.time !== undefined ? t.time : '-';
-            const typeVal = t.type !== undefined ? t.type : 'BUY';
-            const profitVal = t.profit !== undefined ? t.profit : 0;
-            
-            runningProfitTotal += profitVal;
-            const formattedProfit = profitVal >= 0 ? `+${profitVal.toFixed(2)}` : profitVal.toFixed(2);
-            return `
-                <tr>
-                    <td>${t.symbol || 'XAUUSD'}</td>
-                    <td>${ticketVal}</td>
-                    <td>${timeVal}</td>
-                    <td class="${typeVal === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${typeVal.toLowerCase()}</td>
-                    <td>${lotsVal.toFixed(2)}</td>
-                    <td>${entryVal.toFixed(2)}</td>
-                    <td>${slVal.toFixed(2)}</td>
-                    <td>${tpVal.toFixed(2)}</td>
-                    <td>${curVal.toFixed(2)}</td>
-                    <td class="${profitVal >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
-                        ${formattedProfit}
-                    </td>
-                </tr>
-            `;
-        }).join("");
-    } else {
-        activeHtml = `<tr><td colspan="10" class="empty-state">Tidak ada transaksi aktif saat ini.</td></tr>`;
-    }
-    
-    // Insert MT5 summary row for Trade tab
-    const formattedTotalProfit = runningProfitTotal >= 0 ? `+${runningProfitTotal.toFixed(2)}` : runningProfitTotal.toFixed(2);
-    activeHtml += `
-        <tr class="mt5-summary-row">
-            <td colspan="9">
-                <b>• Balance: ${demo.balance.toFixed(2)} USD Equity: ${demo.equity.toFixed(2)} Free Margin: ${demo.equity.toFixed(2)}</b>
-            </td>
-            <td class="${runningProfitTotal >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
-                ${runningProfitTotal !== 0 ? formattedTotalProfit : '0.00'}
-            </td>
-        </tr>
-    `;
-    activeBody.innerHTML = activeHtml;
-    
-    // 4. Closed History Table (MT5 layout)
-    const historyBody = document.getElementById("live-history-trades-body");
-    const historyList = demo.history || [];
-    let historyHtml = "";
-    let totalClosedProfit = 0;
-    
-    if (historyList.length > 0) {
-        historyHtml = historyList.map(h => {
-            totalClosedProfit += h.net_profit;
-            const formattedProfit = h.net_profit >= 0 ? `+${h.net_profit.toFixed(2)}` : h.net_profit.toFixed(2);
-            
-            // Calculate percentage change return
-            const initialCap = 10000.0;
-            const pctChange = (h.net_profit / initialCap) * 100.0;
-            const formattedChange = pctChange >= 0 ? `+${pctChange.toFixed(3)}%` : `${pctChange.toFixed(3)}%`;
-            
-            return `
-                <tr>
-                    <td>${h.open_time}</td>
-                    <td>${h.symbol || 'XAUUSD'}</td>
-                    <td>${h.ticket}</td>
-                    <td class="${h.type === 'BUY' ? 'text-green' : 'text-red'}" style="font-weight:bold;">${h.type.toLowerCase()}</td>
-                    <td>${h.lots.toFixed(2)}</td>
-                    <td>${h.entry.toFixed(2)}</td>
-                    <td>${h.sl.toFixed(2)}</td>
-                    <td>${h.tp.toFixed(2)}</td>
-                    <td>${h.close_time}</td>
-                    <td>${h.exit.toFixed(2)}</td>
-                    <td class="${h.net_profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold;">
-                        ${formattedProfit}
-                    </td>
-                    <td class="${h.net_profit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;">
-                        ${formattedChange}
-                    </td>
-                </tr>
-            `;
-        }).join("");
-    } else {
-        historyHtml = `<tr><td colspan="12" class="empty-state">Belum ada riwayat transaksi.</td></tr>`;
-    }
-    
-    // Insert MT5 summary row for History tab
-    const formattedTotalClosed = totalClosedProfit >= 0 ? `+${totalClosedProfit.toFixed(2)}` : totalClosedProfit.toFixed(2);
-    historyHtml += `
-        <tr class="mt5-summary-row">
-            <td colspan="10">
-                <b>• Profit: ${totalClosedProfit.toFixed(2)} Credit: 0.00 Deposit: 10000.00 Withdrawal: 0.00 Balance: ${demo.balance.toFixed(2)}</b>
-            </td>
-            <td class="${totalClosedProfit >= 0 ? 'text-green' : 'text-red'}" style="font-weight:bold; text-align:right;" colspan="2">
-                ${formattedTotalClosed}
-            </td>
-        </tr>
-    `;
-    historyBody.innerHTML = historyHtml;
+    // Live test demo rendering disabled
 }
 
 // Initialise live tick fetch loop
@@ -750,3 +583,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+
+async function handleStrategySelect(checkbox) {
+    // Disabled
+}
+async function deployToLiveTest(timeframe, riskPercent, strategyType, strategyName, winRate, maxDrawdown, netProfit) {
+    // Disabled
+}
+async function clearActiveLiveTestStrategy() {
+    // Disabled
+}
+async function resetLiveSimulation() {
+    // Disabled
+}
