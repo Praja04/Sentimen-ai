@@ -1431,6 +1431,143 @@ def api_keys_save():
     return jsonify({"success": True, "message": f"{updated_count} key berhasil disimpan.", "updated": updated_count})
 
 
+@app.route("/api/keys/validate", methods=["POST"])
+def api_keys_validate():
+    """Validate all AI API keys by making minimal test calls."""
+    import requests as http_req
+
+    # Read keys from .env
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    env_vals = {}
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if "=" in line and not line.startswith("#"):
+                    k, v = line.split("=", 1)
+                    env_vals[k.strip()] = v.strip()
+
+    results = {}
+
+    # --- Gemini: list models ---
+    gemini_key = env_vals.get("GEMINI_API_KEY", "") or os.getenv("GEMINI_API_KEY", "")
+    if gemini_key:
+        try:
+            resp = http_req.get(
+                f"https://generativelanguage.googleapis.com/v1beta/models?key={gemini_key}",
+                timeout=15,
+            )
+            if resp.status_code == 200:
+                models_data = resp.json()
+                model_count = len(models_data.get("models", []))
+                results["gemini"] = {"valid": True, "status": f"✅ Valid — {model_count} models tersedia", "detail": "API key aktif dan berfungsi"}
+            elif resp.status_code == 429:
+                results["gemini"] = {"valid": True, "status": "⚠️ Valid tapi Rate Limited", "detail": "Key valid, quota sementara habis. Tunggu 1-2 menit."}
+            elif resp.status_code == 403:
+                results["gemini"] = {"valid": False, "status": "❌ Key disabled/forbidden", "detail": "Key dinonaktifkan atau project tidak aktif"}
+            else:
+                err = resp.text[:150]
+                results["gemini"] = {"valid": False, "status": f"❌ Error {resp.status_code}", "detail": err}
+        except Exception as e:
+            results["gemini"] = {"valid": False, "status": "❌ Connection error", "detail": str(e)[:100]}
+    else:
+        results["gemini"] = {"valid": False, "status": "⬜ Belum diisi", "detail": "Tambahkan GEMINI_API_KEY"}
+
+    # --- OpenAI: list models ---
+    openai_key = env_vals.get("OPENAI_API_KEY", "") or os.getenv("OPENAI_API_KEY", "")
+    if openai_key:
+        try:
+            resp = http_req.get(
+                "https://api.openai.com/v1/models",
+                headers={"Authorization": f"Bearer {openai_key}"},
+                timeout=15,
+            )
+            if resp.status_code == 200:
+                models_data = resp.json()
+                model_count = len(models_data.get("data", []))
+                results["openai"] = {"valid": True, "status": f"✅ Valid — {model_count} models tersedia", "detail": "API key aktif"}
+            elif resp.status_code == 429:
+                results["openai"] = {"valid": True, "status": "⚠️ Valid tapi Rate Limited", "detail": "Key valid, tapi quota habis. Top-up saldo."}
+            elif resp.status_code == 401:
+                results["openai"] = {"valid": False, "status": "❌ Invalid API Key", "detail": "Key salah atau sudah expired"}
+            elif resp.status_code == 403:
+                results["openai"] = {"valid": False, "status": "❌ Akses ditolak", "detail": "Key tidak punya permission"}
+            else:
+                err_data = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {"error": {"message": resp.text[:150]}}
+                msg = err_data.get("error", {}).get("message", resp.text[:150])
+                results["openai"] = {"valid": False, "status": f"❌ Error {resp.status_code}", "detail": msg[:150]}
+        except Exception as e:
+            results["openai"] = {"valid": False, "status": "❌ Connection error", "detail": str(e)[:100]}
+    else:
+        results["openai"] = {"valid": False, "status": "⬜ Belum diisi", "detail": "Tambahkan OPENAI_API_KEY"}
+
+    # --- Anthropic: minimal message to check auth ---
+    anthropic_key = env_vals.get("ANTHROPIC_API_KEY", "") or os.getenv("ANTHROPIC_API_KEY", "")
+    if anthropic_key:
+        try:
+            resp = http_req.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": anthropic_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json={
+                    "model": "claude-3-5-haiku-20241022",
+                    "max_tokens": 1,
+                    "messages": [{"role": "user", "content": "hi"}],
+                },
+                timeout=20,
+            )
+            if resp.status_code == 200:
+                results["anthropic"] = {"valid": True, "status": "✅ Valid — Key aktif", "detail": "API key berfungsi dengan baik"}
+            elif resp.status_code == 401:
+                results["anthropic"] = {"valid": False, "status": "❌ Invalid API Key", "detail": "Key salah atau expired"}
+            elif resp.status_code == 403:
+                results["anthropic"] = {"valid": False, "status": "❌ Forbidden", "detail": "Key tidak punya akses"}
+            elif resp.status_code == 429:
+                results["anthropic"] = {"valid": True, "status": "⚠️ Valid tapi Rate Limited", "detail": "Key valid, quota sementara habis"}
+            elif resp.status_code == 400:
+                # 400 can mean the key works but request is bad - still valid key
+                err_text = resp.text[:150]
+                if "credit" in err_text.lower() or "billing" in err_text.lower():
+                    results["anthropic"] = {"valid": True, "status": "⚠️ Valid tapi Saldo Habis", "detail": "Key valid, perlu top-up kredit"}
+                else:
+                    results["anthropic"] = {"valid": True, "status": "✅ Valid — Key terautentikasi", "detail": "Key aktif (test minimal)"}
+            else:
+                results["anthropic"] = {"valid": False, "status": f"❌ Error {resp.status_code}", "detail": resp.text[:150]}
+        except Exception as e:
+            results["anthropic"] = {"valid": False, "status": "❌ Connection error", "detail": str(e)[:100]}
+    else:
+        results["anthropic"] = {"valid": False, "status": "⬜ Belum diisi", "detail": "Tambahkan ANTHROPIC_API_KEY"}
+
+    # --- DeepSeek: list models ---
+    deepseek_key = env_vals.get("DEEPSEEK_API_KEY", "") or os.getenv("DEEPSEEK_API_KEY", "")
+    if deepseek_key:
+        try:
+            resp = http_req.get(
+                "https://api.deepseek.com/models",
+                headers={"Authorization": f"Bearer {deepseek_key}"},
+                timeout=15,
+            )
+            if resp.status_code == 200:
+                models_data = resp.json()
+                model_count = len(models_data.get("data", []))
+                results["deepseek"] = {"valid": True, "status": f"✅ Valid — {model_count} models tersedia", "detail": "API key aktif"}
+            elif resp.status_code == 401:
+                results["deepseek"] = {"valid": False, "status": "❌ Invalid API Key", "detail": "Key salah atau expired"}
+            elif resp.status_code == 429:
+                results["deepseek"] = {"valid": True, "status": "⚠️ Valid tapi Rate Limited", "detail": "Key valid, quota habis"}
+            else:
+                results["deepseek"] = {"valid": False, "status": f"❌ Error {resp.status_code}", "detail": resp.text[:150]}
+        except Exception as e:
+            results["deepseek"] = {"valid": False, "status": "❌ Connection error", "detail": str(e)[:100]}
+    else:
+        results["deepseek"] = {"valid": False, "status": "⬜ Belum diisi", "detail": "Tambahkan DEEPSEEK_API_KEY"}
+
+    return jsonify({"success": True, "results": results})
+
+
 @app.route("/api/backtest/generate_from_prompt", methods=["POST"])
 def api_generate_from_prompt():
     """Use Gemini AI to parse user's strategy prompt into backtest parameters."""

@@ -132,8 +132,8 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Saham Korea Jatuh Karena Kegelisahan Terhadap Meta dan Apple Memukul Produsen Chip",
-      "impact": "text-red"
+      "title": "Citi's Luet: Waralaba Tiongkok Telah Tumbuh Sangat Kuat",
+      "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
@@ -142,13 +142,13 @@
     },
     {
       "time": "FOREXLIVE",
-      "title": "Jepang beralih ke taktik penyergapan terhadap spekulan yen, sumber mengatakan kepada Reuters",
-      "impact": "text-yellow"
+      "title": "Reserve Bank of India kemungkinan akan melakukan intervensi untuk menjual USD/INR dan mendukung rupee",
+      "impact": "text-green"
     },
     {
       "time": "FOREXLIVE",
-      "title": "InvestmentRingkasan berita FX Asia-Pasifik langsung: Aksi jual teknologi mengecam Kospi, Nikkei juga melemah",
-      "impact": "text-red"
+      "title": "Jepang beralih ke taktik penyergapan terhadap spekulan yen, sumber mengatakan kepada Reuters",
+      "impact": "text-yellow"
     },
     {
       "time": "INVESTING",
@@ -197,7 +197,7 @@
     },
     {
       "time": "YAHOO",
-      "title": "Perusahaan Solana Bermitra Dengan Kota Alatau untuk Memajukan Dorongan Blockchain di Asia Tengah",
+      "title": "FactSet Menyambut Agen Google Lebih Dalam",
       "impact": "text-yellow"
     },
     {
@@ -212,21 +212,21 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Aksi Jual Chip Meluas ke Korea Selatan, Minyak Turun: Pasar Membungkus",
+      "title": "Saham Korea Jatuh Karena Kegelisahan Terhadap Meta dan Apple Memukul Produsen Chip",
       "impact": "text-red"
     },
     {
       "time": "BLOOMBERG",
-      "title": "CATL Mengatakan Penambangan, Bukan Pemurnian, Adalah Rintangan Besar dalam Pembuatan Baterai",
-      "impact": "text-yellow"
+      "title": "Aksi Jual Chip Meluas ke Korea Selatan, Minyak Turun: Pasar Membungkus",
+      "impact": "text-red"
     }
   ],
   "assets": [
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,072.25",
-      "change": "+42.60 (+1.06%)",
+      "price": "4,070.56",
+      "change": "+40.91 (+1.02%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
@@ -256,8 +256,8 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.499",
-      "change": "-0.06 (-0.04%)",
+      "price": "162.387",
+      "change": "-0.18 (-0.11%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BULLISH",
@@ -287,8 +287,8 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "67.67",
-      "change": "-0.27 (-0.40%)",
+      "price": "67.68",
+      "change": "-0.26 (-0.38%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
@@ -406,13 +406,13 @@
     },
     "USDJPY": {
       "trend": "BULLISH",
-      "rsi": 68,
+      "rsi": 64,
       "ma50": "UP"
     }
   },
   "economic_calendar": [
     {
-      "time": "11:55",
+      "time": "12:03",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "12:55",
+      "time": "13:03",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "14:55",
+      "time": "15:03",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "15:55",
+      "time": "16:03",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",

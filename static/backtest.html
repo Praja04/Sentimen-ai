@@ -349,7 +349,10 @@
                             border-radius: 6px; color: #e0e0e0; font-family: 'Roboto Mono', monospace; font-size: 0.75rem;
                             padding: 8px 12px; outline: none;
                         " />
-                        <a href="https://aistudio.google.com/apikey" target="_blank" style="font-size: 0.65rem; color: rgba(255,215,0,0.5); margin-top: 4px; display: inline-block;">📎 Dapatkan key di aistudio.google.com</a>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
+                            <a href="https://aistudio.google.com/apikey" target="_blank" style="font-size: 0.65rem; color: rgba(255,215,0,0.5);">📎 Dapatkan key di aistudio.google.com</a>
+                        </div>
+                        <div id="validateGemini" style="margin-top: 6px; font-size: 0.7rem; font-family: 'Rajdhani', sans-serif; min-height: 18px;"></div>
                     </div>
                     <!-- OpenAI -->
                     <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(16,163,127,0.2); border-radius: 10px; padding: 14px;">
@@ -363,7 +366,10 @@
                             border-radius: 6px; color: #e0e0e0; font-family: 'Roboto Mono', monospace; font-size: 0.75rem;
                             padding: 8px 12px; outline: none;
                         " />
-                        <a href="https://platform.openai.com/api-keys" target="_blank" style="font-size: 0.65rem; color: rgba(16,163,127,0.5); margin-top: 4px; display: inline-block;">📎 Dapatkan key di platform.openai.com</a>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
+                            <a href="https://platform.openai.com/api-keys" target="_blank" style="font-size: 0.65rem; color: rgba(16,163,127,0.5);">📎 Dapatkan key di platform.openai.com</a>
+                        </div>
+                        <div id="validateOpenAI" style="margin-top: 6px; font-size: 0.7rem; font-family: 'Rajdhani', sans-serif; min-height: 18px;"></div>
                     </div>
                     <!-- Anthropic -->
                     <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(204,135,75,0.2); border-radius: 10px; padding: 14px;">
@@ -377,7 +383,10 @@
                             border-radius: 6px; color: #e0e0e0; font-family: 'Roboto Mono', monospace; font-size: 0.75rem;
                             padding: 8px 12px; outline: none;
                         " />
-                        <a href="https://console.anthropic.com/settings/keys" target="_blank" style="font-size: 0.65rem; color: rgba(204,135,75,0.5); margin-top: 4px; display: inline-block;">📎 Dapatkan key di console.anthropic.com</a>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
+                            <a href="https://console.anthropic.com/settings/keys" target="_blank" style="font-size: 0.65rem; color: rgba(204,135,75,0.5);">📎 Dapatkan key di console.anthropic.com</a>
+                        </div>
+                        <div id="validateAnthropic" style="margin-top: 6px; font-size: 0.7rem; font-family: 'Rajdhani', sans-serif; min-height: 18px;"></div>
                     </div>
                     <!-- DeepSeek -->
                     <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(66,133,244,0.2); border-radius: 10px; padding: 14px;">
@@ -391,7 +400,10 @@
                             border-radius: 6px; color: #e0e0e0; font-family: 'Roboto Mono', monospace; font-size: 0.75rem;
                             padding: 8px 12px; outline: none;
                         " />
-                        <a href="https://platform.deepseek.com/api_keys" target="_blank" style="font-size: 0.65rem; color: rgba(66,133,244,0.5); margin-top: 4px; display: inline-block;">📎 Dapatkan key di platform.deepseek.com</a>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
+                            <a href="https://platform.deepseek.com/api_keys" target="_blank" style="font-size: 0.65rem; color: rgba(66,133,244,0.5);">📎 Dapatkan key di platform.deepseek.com</a>
+                        </div>
+                        <div id="validateDeepSeek" style="margin-top: 6px; font-size: 0.7rem; font-family: 'Rajdhani', sans-serif; min-height: 18px;"></div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px;">
@@ -406,6 +418,12 @@
                         padding: 10px 18px; border-radius: 8px; font-family: 'Rajdhani', sans-serif;
                         font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
                     ">🔄 Refresh Status</button>
+                    <button id="validateAllBtn" onclick="validateAllKeys()" style="
+                        background: linear-gradient(135deg, #6c5ce7, #a55eea); color: white; border: none;
+                        padding: 10px 24px; border-radius: 8px; font-family: 'Rajdhani', sans-serif;
+                        font-size: 0.85rem; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;
+                        transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+                    ">🔍 Cek Semua API Valid</button>
                     <span id="apiKeysStatus" style="color: rgba(255,255,255,0.5); font-size: 0.75rem; font-family: 'Rajdhani', sans-serif;"></span>
                 </div>
             </div>

@@ -816,3 +816,72 @@ async function saveApiKeys() {
         statusEl.style.color = "#ff3b30";
     }
 }
+
+async function validateAllKeys() {
+    const btn = document.getElementById("validateAllBtn");
+    const statusEl = document.getElementById("apiKeysStatus");
+    const validateEls = {
+        gemini: document.getElementById("validateGemini"),
+        openai: document.getElementById("validateOpenAI"),
+        anthropic: document.getElementById("validateAnthropic"),
+        deepseek: document.getElementById("validateDeepSeek"),
+    };
+
+    // Set loading state
+    btn.disabled = true;
+    btn.innerHTML = "⏳ Mengecek...";
+    statusEl.textContent = "⏳ Menghubungi semua API provider...";
+    statusEl.style.color = "rgba(255,255,255,0.5)";
+
+    for (const el of Object.values(validateEls)) {
+        if (el) {
+            el.innerHTML = '<span style="color: rgba(255,255,255,0.4);">⏳ Checking...</span>';
+        }
+    }
+
+    try {
+        const resp = await fetch("/api/keys/validate", { method: "POST" });
+        const data = await resp.json();
+
+        if (data.success) {
+            let validCount = 0;
+            let totalCount = 0;
+
+            for (const [label, el] of Object.entries(validateEls)) {
+                if (!el) continue;
+                const info = data.results[label];
+                totalCount++;
+
+                if (!info) {
+                    el.innerHTML = '<span style="color: #666;">—</span>';
+                    continue;
+                }
+
+                const isValid = info.valid;
+                const statusColor = isValid ? (info.status.includes("⚠️") ? "#ffd700" : "#10a37f") : (info.status.includes("⬜") ? "#666" : "#ff3b30");
+                const bgColor = isValid ? (info.status.includes("⚠️") ? "rgba(255,215,0,0.08)" : "rgba(16,163,127,0.08)") : "rgba(255,59,48,0.08)";
+
+                if (isValid) validCount++;
+
+                el.innerHTML = `
+                    <div style="background: ${bgColor}; border-radius: 6px; padding: 6px 10px; margin-top: 2px;">
+                        <div style="color: ${statusColor}; font-weight: 600; font-size: 0.75rem;">${info.status}</div>
+                        <div style="color: rgba(255,255,255,0.4); font-size: 0.65rem; margin-top: 2px;">${info.detail}</div>
+                    </div>
+                `;
+            }
+
+            statusEl.textContent = `✅ Selesai: ${validCount}/${totalCount} API key valid`;
+            statusEl.style.color = validCount === totalCount ? "#10a37f" : (validCount > 0 ? "#ffd700" : "#ff3b30");
+        } else {
+            statusEl.textContent = `❌ ${data.error || "Gagal memvalidasi."}`;
+            statusEl.style.color = "#ff3b30";
+        }
+    } catch (e) {
+        statusEl.textContent = `❌ Error: ${e.message}`;
+        statusEl.style.color = "#ff3b30";
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = "🔍 Cek Semua API Valid";
+    }
+}
