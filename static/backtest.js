@@ -713,4 +713,106 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // Auto-load API key status on page load
+    loadApiKeys();
 });
+
+// ========== API Keys Management ==========
+function toggleApiKeysPanel() {
+    const content = document.getElementById("apiKeysContent");
+    const arrow = document.getElementById("apiKeysArrow");
+    if (content.style.display === "none") {
+        content.style.display = "block";
+        arrow.textContent = "▼";
+        arrow.style.transform = "rotate(0deg)";
+        loadApiKeys();
+    } else {
+        content.style.display = "none";
+        arrow.textContent = "▶";
+    }
+}
+
+async function loadApiKeys() {
+    const statusMap = {
+        gemini: document.getElementById("statusGemini"),
+        openai: document.getElementById("statusOpenAI"),
+        anthropic: document.getElementById("statusAnthropic"),
+        deepseek: document.getElementById("statusDeepSeek"),
+    };
+    try {
+        const resp = await fetch("/api/keys/status");
+        const data = await resp.json();
+        if (data.success) {
+            for (const [label, el] of Object.entries(statusMap)) {
+                if (!el) continue;
+                const info = data.keys[label];
+                if (info && info.exists) {
+                    el.textContent = `✅ ${info.masked}`;
+                    el.style.background = "rgba(16,163,127,0.15)";
+                    el.style.color = "#10a37f";
+                } else {
+                    el.textContent = "❌ Belum diisi";
+                    el.style.background = "rgba(255,59,48,0.15)";
+                    el.style.color = "#ff3b30";
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Failed to load API key status:", e);
+    }
+}
+
+async function saveApiKeys() {
+    const payload = {};
+    const fields = {
+        gemini: document.getElementById("keyGemini"),
+        openai: document.getElementById("keyOpenAI"),
+        anthropic: document.getElementById("keyAnthropic"),
+        deepseek: document.getElementById("keyDeepSeek"),
+    };
+    const statusEl = document.getElementById("apiKeysStatus");
+
+    let hasAny = false;
+    for (const [label, input] of Object.entries(fields)) {
+        const val = input ? input.value.trim() : "";
+        if (val) {
+            payload[label] = val;
+            hasAny = true;
+        }
+    }
+
+    if (!hasAny) {
+        statusEl.textContent = "⚠️ Isi minimal 1 key untuk disimpan.";
+        statusEl.style.color = "#ffd700";
+        return;
+    }
+
+    statusEl.textContent = "⏳ Menyimpan...";
+    statusEl.style.color = "rgba(255,255,255,0.5)";
+
+    try {
+        const resp = await fetch("/api/keys/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        const data = await resp.json();
+        if (data.success) {
+            statusEl.textContent = `✅ ${data.message}`;
+            statusEl.style.color = "#10a37f";
+            // Clear input fields after save
+            for (const input of Object.values(fields)) {
+                if (input) input.value = "";
+            }
+            // Refresh status badges
+            await loadApiKeys();
+        } else {
+            statusEl.textContent = `❌ ${data.error || "Gagal menyimpan."}`;
+            statusEl.style.color = "#ff3b30";
+        }
+    } catch (e) {
+        statusEl.textContent = `❌ Error: ${e.message}`;
+        statusEl.style.color = "#ff3b30";
+    }
+}

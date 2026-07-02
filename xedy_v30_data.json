@@ -3,30 +3,30 @@
     {
       "name": "FED POLICY",
       "val": "VERY DOVISH",
-      "score": 74,
+      "score": 69,
       "dir": "up",
       "value": "HAWKISH"
     },
     {
       "name": "REAL YIELD",
       "val": "NEGATIVE",
-      "score": 50,
+      "score": 41,
       "dir": "up",
       "value": "RISING"
     },
     {
       "name": "DXY INDEX",
       "val": "BULLISH",
-      "score": 61,
+      "score": 59,
       "dir": "up",
       "value": "BULLISH"
     },
     {
       "name": "TREASURY YIELD",
       "val": "FALLING",
-      "score": 52,
-      "dir": "up",
-      "value": "RISING"
+      "score": 47,
+      "dir": "down",
+      "value": "FALLING"
     },
     {
       "name": "LIQUIDITY (RRP)",
@@ -45,14 +45,14 @@
     {
       "name": "EMPLOYMENT",
       "val": "WEAKENING",
-      "score": 78,
+      "score": 82,
       "dir": "up",
       "value": "STRONG"
     },
     {
       "name": "GDP GROWTH",
       "val": "SLOWING",
-      "score": 44,
+      "score": 45,
       "dir": "down",
       "value": "SLOWING"
     },
@@ -66,14 +66,14 @@
     {
       "name": "CENTRAL BANK",
       "val": "HEAVY BUYING",
-      "score": 1,
+      "score": 12,
       "dir": "down",
       "value": "EASING"
     },
     {
       "name": "PHYSICAL GOLD",
       "val": "SUPPLY DEFICIT",
-      "score": 1,
+      "score": 21,
       "dir": "down",
       "value": "BEARISH"
     },
@@ -87,7 +87,7 @@
     {
       "name": "CORRELATION",
       "val": "RISK OFF",
-      "score": 77,
+      "score": 87,
       "dir": "down",
       "value": "STRONG NEG"
     }
@@ -122,38 +122,38 @@
   "news_feed": [
     {
       "time": "CNBC",
-      "title": "Saham yang mengalami pergerakan terbesar di pasar awal: Nike, ServiceNow, Constellation Brands & masih banyak lagi",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "CNBC",
-      "title": "Xi memuji pengaruh global Partai Komunis Tiongkok dalam pidato peringatan 105 tahunnya",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "BLOOMBERG",
-      "title": "CEO Nissan Mengatakan Masih Masuk Akal Membuat Mobil di AS",
+      "title": "Ant Group yang berafiliasi dengan Alibaba meluncurkan robot humanoid dengan selusin kesepakatan dalam 18 bulan",
       "impact": "text-green"
     },
     {
+      "time": "CNBC",
+      "title": "Analis teknologi produktif Dan Ives keluar dari Wedbush untuk usaha baru",
+      "impact": "text-yellow"
+    },
+    {
       "time": "BLOOMBERG",
-      "title": "Saham Jatuh dan Imbal Hasil Obligasi Naik karena Fokus yang Warsh: Pasar Bungkus",
+      "title": "Saham Korea Jatuh Karena Kegelisahan Terhadap Meta dan Apple Memukul Produsen Chip",
+      "impact": "text-red"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Aksi Jual Chip Meluas ke Korea Selatan, Minyak Turun: Pasar Membungkus",
       "impact": "text-red"
     },
     {
       "time": "FOREXLIVE",
-      "title": "Forum ECB: Lagarde memiliki prospek kebijakan moneter yang sempurna untuk menaikkan suku bunga.",
-      "impact": "text-green"
+      "title": "Jepang beralih ke taktik penyergapan terhadap spekulan yen, sumber mengatakan kepada Reuters",
+      "impact": "text-yellow"
     },
     {
       "time": "FOREXLIVE",
-      "title": "Pentingnya Analisis Pasar Harian Sebelum Setiap Perdagangan",
-      "impact": "text-yellow"
+      "title": "InvestmentRingkasan berita FX Asia-Pasifik langsung: Aksi jual teknologi mengecam Kospi, Nikkei juga melemah",
+      "impact": "text-red"
     },
     {
       "time": "INVESTING",
       "title": "Deutsche Bank memperkirakan S&P 500 akan mencapai level 7000 pada akhir tahun 2025",
-      "impact": "text-green"
+      "impact": "text-yellow"
     },
     {
       "time": "INVESTING",
@@ -163,88 +163,88 @@
     {
       "time": "WSJ",
       "title": "Saham-Saham Tenggelam Akibat Kehancuran AI yang Dipicu oleh DeepSeek Tiongkok",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "WSJ",
       "title": "Emas Comex, Perak Berakhir Lebih Rendah",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "KITCO",
-      "title": "Emas diperdagangkan mendekati sesi tertinggi setelah ADP mengatakan 98 ribu pekerjaan bersih ditambahkan pada bulan Juni",
+      "title": "Emas dan perak naik karena risiko NFP membatasi dolar dan imbal hasil dalam penawaran beli - Laporan PM Kitco",
       "impact": "text-green"
     },
     {
       "time": "KITCO",
-      "title": "Koreksi emas adalah peluang pembelian karena pemerintah tidak akan mentolerir penderitaan ekonomi - Dunkley dari Waratah Capital",
+      "title": "Ini adalah faktor-faktor kunci yang dapat memulai kembali kenaikan harga emas tahun ini, atau mendorong harga lebih rendah lagi – World Gold Council H2 Outlook",
       "impact": "text-green"
     },
     {
       "time": "OILPRICE",
-      "title": "Eni Membentuk Usaha Perdagangan Dengan Mercuria untuk Meningkatkan Keuntungan Komoditas",
-      "impact": "text-green"
+      "title": "5 Saham di Bawah Radar yang Memicu Revolusi AI",
+      "impact": "text-yellow"
     },
     {
       "time": "OILPRICE",
-      "title": "KKR dan SK Meluncurkan Platform Energi Terbarukan Terbesar di Korea Selatan",
+      "title": "Trump Menargetkan California Lagi dalam Perseteruan SpaceX",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "YAHOO",
+      "title": "Mantan raksasa ritel menutup lebih dari 1.000 lokasi",
       "impact": "text-green"
     },
     {
       "time": "YAHOO",
-      "title": "Saham teknologi hari ini: Saham teknologi pulih menjelang berakhirnya kuartal kedua",
+      "title": "Perusahaan Solana Bermitra Dengan Kota Alatau untuk Memajukan Dorongan Blockchain di Asia Tengah",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "CNBC",
+      "title": "Ant Group yang berafiliasi dengan Alibaba meluncurkan robot humanoid dengan selusin kesepakatan dalam 18 bulan",
       "impact": "text-green"
     },
     {
-      "time": "YAHOO",
-      "title": "JFrog Ltd. (FROG) Jatuh Karena Aksi Jual “Claude Trade”.",
+      "time": "CNBC",
+      "title": "Analis teknologi produktif Dan Ives keluar dari Wedbush untuk usaha baru",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Aksi Jual Chip Meluas ke Korea Selatan, Minyak Turun: Pasar Membungkus",
       "impact": "text-red"
     },
     {
-      "time": "CNBC",
-      "title": "Saham yang mengalami pergerakan terbesar di pasar awal: Nike, ServiceNow, Constellation Brands & masih banyak lagi",
-      "impact": "text-yellow"
-    },
-    {
-      "time": "CNBC",
-      "title": "Xi memuji pengaruh global Partai Komunis Tiongkok dalam pidato peringatan 105 tahunnya",
-      "impact": "text-yellow"
-    },
-    {
       "time": "BLOOMBERG",
-      "title": "Minyak Turun karena AS Mengatakan Pembicaraan Tidak Langsung dengan Iran Adalah Positif",
-      "impact": "text-green"
-    },
-    {
-      "time": "BLOOMBERG",
-      "title": "Perusahaan AS Menambah 98.000 Pekerjaan di Bulan Juni, Kata ADP",
-      "impact": "text-green"
+      "title": "CATL Mengatakan Penambangan, Bukan Pemurnian, Adalah Rintangan Besar dalam Pembuatan Baterai",
+      "impact": "text-yellow"
     }
   ],
   "assets": [
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,041.27",
-      "change": "+33.75 (+0.84%)",
+      "price": "4,072.25",
+      "change": "+42.60 (+1.06%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3804.68",
-        "high": "4244.92",
-        "bp": "85%",
-        "bearp": "15%",
-        "conf": "99%",
-        "accuracy": "78.0%",
+        "low": "3821.80",
+        "high": "4290.68",
+        "bp": "40%",
+        "bearp": "60%",
+        "conf": "60%",
+        "accuracy": "68.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3528.58",
-        "high": "4521.08",
+        "low": "3555.95",
+        "high": "4556.53",
         "bp": "32%",
         "bearp": "68%",
         "conf": "68%",
@@ -256,29 +256,29 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.584",
-      "change": "+0.05 (+0.03%)",
-      "cColor": "text-green",
+      "price": "162.499",
+      "change": "-0.06 (-0.04%)",
+      "cColor": "text-red",
       "f4": {
-        "dir": "BEARISH",
-        "dirClass": "text-red arrow-down",
-        "low": "161.436",
-        "high": "163.936",
-        "bp": "85%",
-        "bearp": "15%",
-        "conf": "99%",
-        "accuracy": "66.0%",
-        "action": "SELL RALLY",
-        "btn": "btn-red"
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "161.349",
+        "high": "163.721",
+        "bp": "60%",
+        "bearp": "40%",
+        "conf": "60%",
+        "accuracy": "68.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
       },
       "f1": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "158.939",
-        "high": "166.433",
-        "bp": "64%",
-        "bearp": "36%",
-        "conf": "64%",
+        "low": "158.788",
+        "high": "166.282",
+        "bp": "65%",
+        "bearp": "35%",
+        "conf": "65%",
         "accuracy": "82.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
@@ -287,26 +287,26 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "68.85",
-      "change": "-0.97 (-1.39%)",
+      "price": "67.67",
+      "change": "-0.27 (-0.40%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "62.65",
-        "high": "75.19",
-        "bp": "37%",
-        "bearp": "63%",
-        "conf": "63%",
-        "accuracy": "84.0%",
+        "low": "61.73",
+        "high": "73.39",
+        "bp": "36%",
+        "bearp": "64%",
+        "conf": "64%",
+        "accuracy": "88.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "44.60",
-        "high": "93.24",
+        "low": "43.15",
+        "high": "91.97",
         "bp": "33%",
         "bearp": "67%",
         "conf": "67%",
@@ -317,21 +317,21 @@
     }
   ],
   "gauges": {
-    "macro_alignment_score": 37,
-    "market_regime_score": 45,
-    "market_sentiment_score": 60,
+    "macro_alignment_score": 39,
+    "market_regime_score": 55,
+    "market_sentiment_score": 50,
     "institutional_flow_score": 20
   },
   "ml_memory": {
     "sentiment_penalty": 0
   },
   "ml_weights": {
-    "macro": 0.11194862121686452,
-    "sentiment": 0.10033951318316399,
-    "flow": 0.45186600194937787,
-    "regime": 0.11194862121686452,
-    "tech": 0.11194862121686452,
-    "cal": 0.11194862121686452
+    "macro": 0.13027523420494053,
+    "sentiment": 0.12263439451829859,
+    "flow": 0.3896591685064564,
+    "regime": 0.13027523420494053,
+    "tech": 0.09688073436042349,
+    "cal": 0.13027523420494053
   },
   "correlation_matrix": {
     "XAUUSD": {
@@ -400,19 +400,19 @@
   },
   "technical_signals": {
     "XAUUSD": {
-      "trend": "BEARISH",
-      "rsi": 48,
-      "ma50": "DOWN"
+      "trend": "BULLISH",
+      "rsi": 58,
+      "ma50": "UP"
     },
     "USDJPY": {
       "trend": "BULLISH",
-      "rsi": 79,
+      "rsi": 68,
       "ma50": "UP"
     }
   },
   "economic_calendar": [
     {
-      "time": "21:25",
+      "time": "11:55",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -421,7 +421,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "22:25",
+      "time": "12:55",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -430,7 +430,7 @@
       "prev": "215K"
     },
     {
-      "time": "00:25",
+      "time": "14:55",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -439,7 +439,7 @@
       "prev": "49.1"
     },
     {
-      "time": "01:25",
+      "time": "15:55",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
@@ -450,7 +450,7 @@
   ],
   "top_drivers": [
     "DXY SURGE: BULLISH",
-    "RISING YIELDS: RISING",
+    "FALLING YIELDS: FALLING",
     "MARKET INDECISION",
     "LOW VOLATILITY REGIME",
     "GLOBAL LIQUIDITY SHIFT"
@@ -458,6 +458,6 @@
   "liquidity_zones": {
     "XAUUSD": 4030.0,
     "USDJPY": 162.5,
-    "WTI OIL": 70.5
+    "WTI OIL": 68.0
   }
 }

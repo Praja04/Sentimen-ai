@@ -1354,6 +1354,83 @@ def api_backtest_stop():
     return jsonify({"success": True, "message": "Stop requested."})
 
 
+@app.route("/api/keys/status", methods=["GET"])
+def api_keys_status():
+    """Return masked status of all AI API keys."""
+    key_map = {
+        "GEMINI_API_KEY": "gemini",
+        "OPENAI_API_KEY": "openai",
+        "ANTHROPIC_API_KEY": "anthropic",
+        "DEEPSEEK_API_KEY": "deepseek",
+    }
+    result = {}
+    # Read directly from .env file for fresh data
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    env_vals = {}
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if "=" in line and not line.startswith("#"):
+                    k, v = line.split("=", 1)
+                    env_vals[k.strip()] = v.strip()
+    for env_key, label in key_map.items():
+        val = env_vals.get(env_key, "") or os.getenv(env_key, "")
+        if val:
+            masked = val[:6] + "..." + val[-4:] if len(val) > 12 else "***set***"
+            result[label] = {"exists": True, "masked": masked}
+        else:
+            result[label] = {"exists": False, "masked": ""}
+    return jsonify({"success": True, "keys": result})
+
+
+@app.route("/api/keys/save", methods=["POST"])
+def api_keys_save():
+    """Save AI API keys to .env file."""
+    payload = request.get_json(silent=True) or {}
+    key_map = {
+        "gemini": "GEMINI_API_KEY",
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "deepseek": "DEEPSEEK_API_KEY",
+    }
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+
+    # Read existing .env
+    existing = {}
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line_stripped = line.strip()
+                if "=" in line_stripped and not line_stripped.startswith("#"):
+                    k, v = line_stripped.split("=", 1)
+                    existing[k.strip()] = v.strip()
+
+    # Update with new keys (only if not empty)
+    updated_count = 0
+    for label, env_key in key_map.items():
+        new_val = payload.get(label, "").strip()
+        if new_val:
+            existing[env_key] = new_val
+            os.environ[env_key] = new_val  # Also set in current process
+            updated_count += 1
+
+    # Write back to .env
+    with open(env_path, "w", encoding="utf-8") as f:
+        for k, v in existing.items():
+            f.write(f"{k}={v}\n")
+
+    # Reconfigure Gemini if key was updated
+    if "gemini" in payload and payload["gemini"].strip():
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=payload["gemini"].strip())
+        except Exception:
+            pass
+
+    return jsonify({"success": True, "message": f"{updated_count} key berhasil disimpan.", "updated": updated_count})
+
+
 @app.route("/api/backtest/generate_from_prompt", methods=["POST"])
 def api_generate_from_prompt():
     """Use Gemini AI to parse user's strategy prompt into backtest parameters."""
@@ -1403,14 +1480,37 @@ Do NOT include any markdown, explanation, or text outside the JSON array."""
         gemini_models = {"gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.5-flash-8b"}
         claude_models = {"claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"}
         deepseek_models = {"deepseek-chat", "deepseek-reasoner"}
+        openai_models = {"gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "o3-mini"}
+
 
         raw_text = ""
 
         if selected_model in gemini_models:
-            # --- GEMINI via SDK ---
-            model = genai.GenerativeModel(selected_model, system_instruction=system_instruction)
-            response = model.generate_content(user_prompt)
-            raw_text = response.text.strip()
+            # --- GEMINI via SDK with auto-retry & fallback ---
+            import time as _time
+            fallback_order = [selected_model] + [m for m in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-lite", "gemini-1.5-flash-8b", "gemini-2.5-pro"] if m != selected_model]
+            last_err = None
+            for try_model in fallback_order:
+                for attempt in range(3):
+                    try:
+                        model = genai.GenerativeModel(try_model, system_instruction=system_instruction)
+                        response = model.generate_content(user_prompt)
+                        raw_text = response.text.strip()
+                        last_err = None
+                        break
+                    except Exception as e:
+                        last_err = e
+                        err_str = str(e)
+                        if "429" in err_str or "rate" in err_str.lower() or "quota" in err_str.lower():
+                            wait_secs = (attempt + 1) * 20
+                            _time.sleep(wait_secs)
+                            continue
+                        else:
+                            raise
+                if last_err is None:
+                    break
+            if last_err is not None:
+                return jsonify({"success": False, "error": f"Semua model Gemini kena rate limit. Coba lagi dalam 1-2 menit. Detail: {str(last_err)[:200]}"}), 429
 
         elif selected_model in claude_models:
             # --- CLAUDE via Anthropic HTTP API ---
@@ -1466,6 +1566,33 @@ Do NOT include any markdown, explanation, or text outside the JSON array."""
             ds_data = ds_resp.json()
             raw_text = ds_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
 
+        elif selected_model in openai_models:
+            # --- OPENAI via ChatGPT API ---
+            import requests as http_req
+            openai_key = os.getenv("OPENAI_API_KEY")
+            if not openai_key:
+                return jsonify({"success": False, "error": "OPENAI_API_KEY tidak ditemukan di .env. Tambahkan key Anda."}), 400
+            openai_resp = http_req.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {openai_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": selected_model,
+                    "messages": [
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    "max_tokens": 4096,
+                    "temperature": 0.7,
+                },
+                timeout=120,
+            )
+            if openai_resp.status_code != 200:
+                return jsonify({"success": False, "error": f"OpenAI API error {openai_resp.status_code}: {openai_resp.text[:300]}"}), 500
+            openai_data = openai_resp.json()
+            raw_text = openai_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
         else:
             return jsonify({"success": False, "error": f"Model '{selected_model}' tidak didukung."}), 400
 
