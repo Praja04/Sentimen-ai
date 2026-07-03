@@ -549,6 +549,105 @@
             </div>
         </div>
 
+        <!-- 🧠 AI Decision Explainer Panel -->
+        <div class="panel" id="ai-decision-panel" style="
+            background: var(--panel-bg);
+            border: 1px solid rgba(108, 92, 231, 0.25);
+            border-radius: 6px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        ">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="
+                    margin: 0;
+                    font-family: 'Rajdhani', sans-serif;
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: var(--text-gold);
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                ">
+                    <span>🧠</span> ALUR PENGAMBILAN KEPUTUSAN AI
+                </h2>
+                <span id="explainer-bias-badge" style="
+                    font-family: 'Roboto Mono', monospace;
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                    padding: 3px 10px;
+                    border-radius: 12px;
+                ">LOADING BIAS...</span>
+            </div>
+
+            <div style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 18px;
+            ">
+                <!-- Column 1: Market Analysis -->
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="font-family: 'Rajdhani', sans-serif; font-size: 0.82rem; font-weight: 700; color: #74b9ff; display: flex; align-items: center; gap: 6px;">
+                        <span>🔍</span> 1. ANALISA MULTI-DIMENSI
+                    </div>
+                    <p style="margin: 0; font-size: 0.72rem; line-height: 1.6; color: var(--text-muted);">
+                        AI secara kontinyu menggabungkan dua dimensi utama dengan porsi:
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; margin-top: 2px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #ffd700;">■ Fundamental (80% Bobot)</span>
+                            <strong id="explainer-fund-val" style="font-family: 'Roboto Mono', monospace;">-</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #a29bfe;">■ Teknikal (20% Bobot)</span>
+                            <strong id="explainer-tech-val" style="font-family: 'Roboto Mono', monospace; color: #a29bfe;">EMA Pullback, RSI</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Decision Making -->
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="font-family: 'Rajdhani', sans-serif; font-size: 0.82rem; font-weight: 700; color: #55efc4; display: flex; align-items: center; gap: 6px;">
+                        <span>⚡</span> 2. STRATEGI & KEPUTUSAN ENTRY
+                    </div>
+                    <p style="margin: 0; font-size: 0.72rem; line-height: 1.6; color: var(--text-muted);">
+                        AI mengukur kecocokan arah tren sebelum membuka order:
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; margin-top: 2px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Arah Order Utama:</span>
+                            <strong id="explainer-main-dir" style="color: #ffd700;">-</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Sikap Counter-Trend:</span>
+                            <span id="explainer-counter-rule" style="color: #55efc4; font-weight: 600;">Lot 50% (Teknikal)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Target Management -->
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="font-family: 'Rajdhani', sans-serif; font-size: 0.82rem; font-weight: 700; color: #fd79a8; display: flex; align-items: center; gap: 6px;">
+                        <span>🎯</span> 3. MANAGEMENT TARGET (SL/TP)
+                    </div>
+                    <p style="margin: 0; font-size: 0.72rem; line-height: 1.6; color: var(--text-muted);">
+                        SL dan TP ditentukan berdasarkan volatilitas pasar aktual (ATR):
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; margin-top: 2px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Stop Loss (SL):</span>
+                            <strong id="explainer-sl-value" style="font-family: 'Roboto Mono', monospace; color: #ff7675;">-</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Take Profit (TP):</span>
+                            <strong id="explainer-tp-value" style="font-family: 'Roboto Mono', monospace; color: #55efc4;">-</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- MetaTrader 5 Simulated Terminal Window -->
         <div class="terminal-window">
             <div class="terminal-titlebar">

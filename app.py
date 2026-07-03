@@ -2412,7 +2412,8 @@ def get_trade_status():
             "positions": positions_list,
             "history": history_list,
             "news": news_feed,
-            "ticks": ticks
+            "ticks": ticks,
+            "fundamental_bias": round(compute_xedy_fundamental_bias(), 3)
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

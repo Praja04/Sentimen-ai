@@ -49,9 +49,58 @@ async function fetchStatus() {
         if (data.active_config && Object.keys(data.active_config).length > 0) {
             document.getElementById('trade-method').innerText = data.active_config.strategy_name;
             document.getElementById('trade-timeframe').innerText = `TF: ${data.active_config.timeframe} / Risk: ${data.active_config.risk_percent}%`;
+            
+            // Populate AI Decision Explainer elements
+            const bias = data.fundamental_bias !== undefined ? data.fundamental_bias : 0.0;
+            const biasBadge = document.getElementById('explainer-bias-badge');
+            const fundVal = document.getElementById('explainer-fund-val');
+            const mainDir = document.getElementById('explainer-main-dir');
+            const slVal = document.getElementById('explainer-sl-value');
+            const tpVal = document.getElementById('explainer-tp-value');
+            
+            if (biasBadge) {
+                const isBullish = bias > 0;
+                biasBadge.innerText = `BIAS FUNDAMENTAL: ${bias > 0 ? '+' : ''}${bias.toFixed(3)} (${isBullish ? 'BULLISH' : 'BEARISH'})`;
+                biasBadge.style.background = isBullish ? 'rgba(0, 255, 65, 0.15)' : 'rgba(255, 59, 48, 0.15)';
+                biasBadge.style.color = isBullish ? 'var(--accent-green)' : 'var(--accent-red)';
+                biasBadge.style.border = `1px solid ${isBullish ? 'var(--accent-green)' : 'var(--accent-red)'}`;
+            }
+            
+            if (fundVal) {
+                fundVal.innerText = `${bias > 0 ? 'Bullish' : 'Bearish'} (${(bias * 100).toFixed(0)}%)`;
+                fundVal.style.color = bias > 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+            }
+            
+            if (mainDir) {
+                mainDir.innerText = bias > 0 ? 'BUY (LONG)' : 'SELL (SHORT)';
+                mainDir.style.color = bias > 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+            }
+            
+            if (slVal) {
+                const slDist = data.active_config.sl_dist || data.active_config.stop_atr || 1.2;
+                slVal.innerText = `${slDist} * ATR`;
+            }
+            
+            if (tpVal) {
+                const tpDist = data.active_config.tp_dist || data.active_config.rr || 1.5;
+                tpVal.innerText = `SL * ${tpDist} R`;
+            }
         } else {
             document.getElementById('trade-method').innerText = 'No Strategy Chosen';
             document.getElementById('trade-timeframe').innerText = 'Go to Backtest page to select and deploy';
+            
+            // Reset Explainer elements
+            const biasBadge = document.getElementById('explainer-bias-badge');
+            if (biasBadge) {
+                biasBadge.innerText = 'NO ACTIVE STRATEGY';
+                biasBadge.style.background = 'rgba(255,255,255,0.05)';
+                biasBadge.style.color = 'var(--text-muted)';
+                biasBadge.style.border = '1px solid var(--border-color)';
+            }
+            document.getElementById('explainer-fund-val').innerText = '-';
+            document.getElementById('explainer-main-dir').innerText = '-';
+            document.getElementById('explainer-sl-value').innerText = '-';
+            document.getElementById('explainer-tp-value').innerText = '-';
         }
 
         // Collect all unique symbols currently being traded (Urutan Pair)
