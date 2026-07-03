@@ -447,6 +447,7 @@ button:active {
 }
 
 .result-head {
+    display: grid;
     grid-template-columns: minmax(0, 1.8fr) 130px 100px;
     align-items: center;
 }
@@ -480,6 +481,7 @@ button:active {
 }
 
 .metrics-grid {
+    display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     margin-top: 8px;
     gap: 8px !important;
@@ -509,6 +511,7 @@ button:active {
 }
 
 .param-row {
+    display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     margin-top: 14px;
 }
