@@ -12,6 +12,7 @@ function switchTab(tab) {
     document.getElementById('view-trade').style.display = tab === 'trade' ? 'block' : 'none';
     document.getElementById('view-history').style.display = tab === 'history' ? 'block' : 'none';
     document.getElementById('view-news').style.display = tab === 'news' ? 'block' : 'none';
+    document.getElementById('view-calendar').style.display = tab === 'calendar' ? 'block' : 'none';
     
     // Refresh content immediately
     fetchStatus();
@@ -237,6 +238,30 @@ async function fetchStatus() {
             newsTbody.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada berita fundamental saat ini.</td></tr>`;
         }
 
+        // Render Calendar Tab Table
+        const calendarTbody = document.getElementById('calendar-tbody');
+        if (calendarTbody && data.calendar) {
+            if (data.calendar.length > 0) {
+                let cHtml = '';
+                data.calendar.forEach(c => {
+                    const countryBadge = `<span style="background: rgba(108,92,231,0.15); color: #a29bfe; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.65rem;">${c.country}</span>`;
+                    cHtml += `
+                        <tr>
+                            <td style="color:var(--text-muted); font-weight: 500;">${c.time}</td>
+                            <td>${countryBadge}</td>
+                            <td style="color:#000; font-weight:500; white-space: normal; line-height: 1.4;">${c.event}</td>
+                            <td style="font-weight:bold; color:var(--mt5-blue);">${c.actual || '-'}</td>
+                            <td style="color:#444;">${c.forecast || '-'}</td>
+                            <td style="color:#666; padding-right:15px;">${c.previous || '-'}</td>
+                        </tr>
+                    `;
+                });
+                calendarTbody.innerHTML = cHtml;
+            } else {
+                calendarTbody.innerHTML = `<tr><td colspan="6" class="empty-state">Tidak ada event kalender ekonomi hari ini.</td></tr>`;
+            }
+        }
+
         // 4. Update Status Summary Row at Bottom
         const summaryRow = document.getElementById('terminal-summary');
         const summaryLeft = document.getElementById('summary-left-txt');
@@ -271,8 +296,12 @@ async function fetchStatus() {
                 summaryRight.className = totalProfit >= 0 ? 'mt5-profit-green' : 'mt5-profit-red';
             }
         } else if (activeTab === 'news') {
-            summaryLeft.innerHTML = `• Berita Aktif: <strong>${data.news ? data.news.length : 0} Headline Fundamental (Bahasa Indonesia)</strong>`;
+            summaryLeft.innerHTML = `• Berita Aktif: <strong>${data.news ? data.news.length : 0} Headline Fundamental (Live Yahoo Finance)</strong>`;
             summaryRight.innerText = 'OK';
+            summaryRight.className = 'mt5-profit-green';
+        } else if (activeTab === 'calendar') {
+            summaryLeft.innerHTML = `• Kalender Ekonomi Hari Ini: <strong>${data.calendar ? data.calendar.length : 0} Event Terjadwal (Live Yahoo Finance)</strong>`;
+            summaryRight.innerText = 'LIVE';
             summaryRight.className = 'mt5-profit-green';
         } else {
             summaryLeft.innerText = '';

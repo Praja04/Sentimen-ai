@@ -2217,6 +2217,84 @@ def modify_position_api():
 def serve_trade():
     return send_from_directory(app.static_folder, 'trade.html')
 
+_cached_calendar = []
+_cached_news = []
+_last_scrape_time = 0
+
+def fetch_live_calendar_and_news():
+    global _cached_calendar, _cached_news, _last_scrape_time
+    now = time.time()
+    
+    # Cache for 3 minutes (180 seconds) to keep it responsive but light
+    if now - _last_scrape_time < 180 and _cached_calendar and _cached_news:
+        return _cached_calendar, _cached_news
+        
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    
+    # 1. Fetch Calendar from Yahoo Finance
+    calendar_events = []
+    try:
+        r = requests.get('https://finance.yahoo.com/calendar/economic/', headers=headers, timeout=5)
+        if r.status_code == 200:
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(r.text, 'html.parser')
+            table = soup.find('table')
+            if table:
+                rows = table.find_all('tr')
+                # Skip header row
+                for row in rows[1:30]:  # limit to top 29 events
+                    tds = row.find_all('td')
+                    if len(tds) >= 7:
+                        calendar_events.append({
+                            "event": tds[0].get_text(strip=True),
+                            "country": tds[1].get_text(strip=True),
+                            "time": tds[2].get_text(strip=True),
+                            "actual": tds[4].get_text(strip=True),
+                            "forecast": tds[5].get_text(strip=True),
+                            "previous": tds[6].get_text(strip=True),
+                        })
+    except Exception as e:
+        print("Error fetching live calendar:", e)
+        
+    if calendar_events:
+        _cached_calendar = calendar_events
+        
+    # 2. Fetch News from Yahoo Finance RSS
+    news_items = []
+    try:
+        r = requests.get('https://finance.yahoo.com/news/rssindex', headers=headers, timeout=5)
+        if r.status_code == 200:
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(r.text, 'html.parser')
+            items = soup.find_all('item')
+            for item in items[:20]: # limit to top 20 news items
+                title = item.find('title')
+                pubdate = item.find('pubdate')
+                
+                t_str = ""
+                if pubdate:
+                    raw_t = pubdate.get_text(strip=True)
+                    if ' ' in raw_t:
+                        parts = raw_t.split(' ')
+                        if len(parts) >= 5:
+                            t_str = parts[4] # HH:MM:SS
+                            
+                news_items.append({
+                    "title": title.get_text(strip=True) if title else "No Title",
+                    "time": t_str
+                })
+    except Exception as e:
+        print("Error fetching live news:", e)
+        
+    if news_items:
+        _cached_news = news_items
+        
+    _last_scrape_time = now
+    return _cached_calendar, _cached_news
+
+
 _trade_live_logs = []
 _last_log_time = 0
 
@@ -2493,16 +2571,8 @@ def get_trade_status():
                     "low": daily_low
                 }
 
-        # Fetch news feed from xedy_v30_data.json
-        news_feed = []
-        xedy_file = 'xedy_v30_data.json'
-        if os.path.exists(xedy_file):
-            with open(xedy_file, 'r', encoding='utf-8') as f_xedy:
-                try:
-                    xedy_data = json.load(f_xedy)
-                    news_feed = xedy_data.get("news_feed", [])
-                except Exception:
-                    pass
+        # Fetch live calendar and news from Yahoo Finance
+        live_cal, live_news = fetch_live_calendar_and_news()
 
         bias_val = round(compute_xedy_fundamental_bias(), 3)
         live_logs = get_live_trade_logs(active_config, positions_list, ticks, bias_val)
@@ -2512,7 +2582,8 @@ def get_trade_status():
             "account_info": acc_dict,
             "positions": positions_list,
             "history": history_list,
-            "news": news_feed,
+            "news": live_news,
+            "calendar": live_cal,
             "ticks": ticks,
             "fundamental_bias": bias_val,
             "ai_live_logs": live_logs

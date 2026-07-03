@@ -788,6 +788,25 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Calendar View -->
+                <div id="view-calendar" style="display:none;">
+                    <table class="terminal-table">
+                        <thead>
+                            <tr>
+                                <th style="width:110px;">Time</th>
+                                <th style="width:70px;">Country</th>
+                                <th>Economic Event</th>
+                                <th style="width:90px;">Actual</th>
+                                <th style="width:90px;">Forecast</th>
+                                <th style="width:90px; border-right:none; padding-right:15px;">Previous</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendar-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Status Summary Row -->
@@ -805,7 +824,7 @@
                     <div class="terminal-tab" id="tab-history" onclick="switchTab('history')">History</div>
                     <div class="terminal-tab" id="tab-news" onclick="switchTab('news')">News <span style="color:red; font-weight:bold;" id="news-count-badge">0</span></div>
                     <div class="terminal-tab" id="tab-mailbox">Mailbox <span style="color:red; font-weight:bold;">11</span></div>
-                    <div class="terminal-tab" id="tab-calendar">Calendar</div>
+                    <div class="terminal-tab" id="tab-calendar" onclick="switchTab('calendar')">Calendar</div>
                     <div class="terminal-tab" id="tab-company">Company</div>
                     <div class="terminal-tab" id="tab-alerts">Alerts</div>
                     <div class="terminal-tab" id="tab-articles">Articles</div>
