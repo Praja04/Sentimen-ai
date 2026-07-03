@@ -2223,6 +2223,10 @@ _last_scrape_time = 0
 
 def fetch_live_calendar_and_news():
     global _cached_calendar, _cached_news, _last_scrape_time
+    import requests
+    import warnings
+    from bs4 import XMLParsedAsHTMLWarning
+    warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
     now = time.time()
     
     # Cache for 3 minutes (180 seconds) to keep it responsive but light
