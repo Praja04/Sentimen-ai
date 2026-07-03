@@ -2297,6 +2297,32 @@ def convert_utc_to_local(utc_str):
     except Exception:
         return utc_str
 
+_news_translation_cache = {}
+
+def translate_headline_to_id(text):
+    global _news_translation_cache
+    if not text:
+        return ""
+        
+    text_clean = text.strip()
+    if text_clean in _news_translation_cache:
+        return _news_translation_cache[text_clean]
+        
+    import urllib.parse
+    import requests
+    url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=id&dt=t&q=' + urllib.parse.quote(text_clean)
+    try:
+        r = requests.get(url, timeout=3)
+        if r.status_code == 200:
+            res = r.json()
+            translated = res[0][0][0]
+            _news_translation_cache[text_clean] = translated
+            return translated
+    except Exception as e:
+        print("Error translating news:", e)
+        
+    return text_clean
+
 def fetch_live_calendar_and_news():
     global _cached_calendar, _cached_news, _last_scrape_time
     import requests
@@ -2365,8 +2391,10 @@ def fetch_live_calendar_and_news():
                         if len(parts) >= 5:
                             t_str = parts[4] # HH:MM:SS
                             
+                raw_title = title.get_text(strip=True) if title else "No Title"
+                translated_title = translate_headline_to_id(raw_title)
                 news_items.append({
-                    "title": title.get_text(strip=True) if title else "No Title",
+                    "title": translated_title,
                     "time": t_str
                 })
     except Exception as e:
