@@ -1194,6 +1194,8 @@ def build_self_learning_strategies(seed_results):
     refined = []
     for item in seed_results[:6]:
         params = item["parameters"]
+        
+        # 1. Standard Perturbation Strategies
         for delta_threshold in [-0.02, 0.0, 0.02]:
             for delta_confirmation in [-0.02, 0.0, 0.02]:
                 tuned = dict(params)
@@ -1210,6 +1212,63 @@ def build_self_learning_strategies(seed_results):
                         "params": tuned,
                     }
                 )
+        
+        # 2. AI MAE/MFE Advanced Optimization
+        avg_mae = float(item.get("avg_mae_r", 0.5))
+        avg_mfe = float(item.get("avg_mfe_r", 1.5))
+        current_stop = float(params.get("stop_atr", 1.2))
+        current_rr = float(params.get("rr", 1.5))
+        
+        # Optimize Stop Loss (MAE-driven)
+        if avg_mae < 0.5:
+            # Shallow drawdown: tighten Stop Loss to improve Risk-Reward multiplier
+            opt_stop = current_stop * max(0.6, avg_mae * 1.35)
+        elif avg_mae > 0.85:
+            # Deep drawdown: widen Stop Loss slightly to avoid premature stop-outs
+            opt_stop = current_stop * 1.2
+        else:
+            opt_stop = current_stop
+        opt_stop = round(clamp(opt_stop, 0.8, 2.5), 2)
+        
+        # Optimize Take Profit (MFE-driven)
+        if avg_mfe < current_rr * 1.1:
+            # Favorable excursion was shallow or reversed: pull in Take Profit to lock in winrate
+            opt_rr = avg_mfe * 0.85
+        elif avg_mfe > current_rr * 1.6:
+            # Favorable excursion went much further: stretch Take Profit target
+            opt_rr = current_rr * 1.3
+        else:
+            opt_rr = current_rr
+        opt_rr = round(clamp(opt_rr, 0.8, 3.5), 2)
+        
+        # MAE-optimized Stop Loss strategy
+        params_mae = dict(params)
+        params_mae["stop_atr"] = opt_stop
+        refined.append({
+            "name": f"{item['strategy_name']} (MAE-Opt)",
+            "type": item["strategy_type"],
+            "params": params_mae
+        })
+        
+        # MFE-optimized Take Profit strategy
+        params_mfe = dict(params)
+        params_mfe["rr"] = opt_rr
+        refined.append({
+            "name": f"{item['strategy_name']} (MFE-Opt)",
+            "type": item["strategy_type"],
+            "params": params_mfe
+        })
+        
+        # Combined Expectancy optimized strategy
+        params_both = dict(params)
+        params_both["stop_atr"] = opt_stop
+        params_both["rr"] = opt_rr
+        refined.append({
+            "name": f"{item['strategy_name']} (Expectancy-Opt)",
+            "type": item["strategy_type"],
+            "params": params_both
+        })
+        
     return refined
 
 
