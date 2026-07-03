@@ -2221,6 +2221,66 @@ _cached_calendar = []
 _cached_news = []
 _last_scrape_time = 0
 
+_COUNTRY_MAP = {
+    'US': 'United States',
+    'GB': 'United Kingdom',
+    'UK': 'United Kingdom',
+    'EU': 'Eurozone',
+    'JP': 'Japan',
+    'DE': 'Germany',
+    'FR': 'France',
+    'IT': 'Italy',
+    'ES': 'Spain',
+    'CA': 'Canada',
+    'AU': 'Australia',
+    'NZ': 'New Zealand',
+    'CH': 'Switzerland',
+    'CN': 'China',
+    'IN': 'India',
+    'BR': 'Brazil',
+    'RU': 'Russia',
+    'KR': 'South Korea',
+    'MX': 'Mexico',
+    'ZA': 'South Africa',
+    'SG': 'Singapore',
+    'HK': 'Hong Kong',
+    'ID': 'Indonesia',
+    'TH': 'Thailand',
+    'TR': 'Turkey',
+    'IE': 'Ireland',
+    'OM': 'Oman',
+    'EG': 'Egypt',
+    'QA': 'Qatar',
+    'AE': 'United Arab Emirates',
+    'SE': 'Sweden',
+    'NO': 'Norway',
+    'FI': 'Finland',
+    'DK': 'Denmark',
+    'PL': 'Poland',
+    'GR': 'Greece',
+    'PT': 'Portugal',
+    'NL': 'Netherlands',
+    'BE': 'Belgium',
+    'AT': 'Austria',
+    'MY': 'Malaysia',
+    'PH': 'Philippines',
+    'VN': 'Vietnam',
+    'SA': 'Saudi Arabia',
+    'IL': 'Israel',
+    'CO': 'Colombia',
+    'CL': 'Chile',
+    'PE': 'Peru',
+    'AR': 'Argentina',
+    'CZ': 'Czech Republic',
+    'HU': 'Hungary',
+    'RO': 'Romania',
+    'UA': 'Ukraine',
+}
+
+def get_full_country_name(code):
+    clean_code = str(code).strip().upper()
+    return _COUNTRY_MAP.get(clean_code, clean_code)
+
 def convert_utc_to_local(utc_str):
     try:
         if 'UTC' not in utc_str and 'GMT' not in utc_str:
@@ -2269,9 +2329,11 @@ def fetch_live_calendar_and_news():
                     if len(tds) >= 7:
                         raw_time = tds[2].get_text(strip=True)
                         local_time = convert_utc_to_local(raw_time)
+                        raw_country = tds[1].get_text(strip=True)
+                        full_country = get_full_country_name(raw_country)
                         calendar_events.append({
                             "event": tds[0].get_text(strip=True),
-                            "country": tds[1].get_text(strip=True),
+                            "country": full_country,
                             "time": local_time,
                             "actual": tds[4].get_text(strip=True),
                             "forecast": tds[5].get_text(strip=True),
