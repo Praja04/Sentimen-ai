@@ -103,6 +103,22 @@ async function fetchStatus() {
             document.getElementById('explainer-tp-value').innerText = '-';
         }
 
+        // Render Live AI Activity Logs
+        const logsContainer = document.getElementById('ai-logs-container');
+        if (logsContainer && data.ai_live_logs) {
+            let logHtml = '';
+            data.ai_live_logs.forEach(log => {
+                logHtml += `
+                    <div class="trade-log-${log.type || 'info'}">
+                        <span style="color: rgba(255,255,255,0.25);">[${log.t}]</span> ${log.msg}
+                    </div>
+                `;
+            });
+            logsContainer.innerHTML = logHtml;
+            // Auto scroll to bottom
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
         // Collect all unique symbols currently being traded (Urutan Pair)
         const activeSymbols = new Set(data.positions.map(p => p.symbol));
         const historySymbols = new Set(data.history.map(h => h.symbol).filter(s => s));

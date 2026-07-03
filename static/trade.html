@@ -648,6 +648,64 @@
             </div>
         </div>
 
+        <!-- 🤖 LIVE AI DECISION LOGS & ACTIVITY MONITOR -->
+        <div class="panel" id="ai-logs-panel" style="
+            background: var(--panel-bg);
+            border: 1px solid rgba(108, 92, 231, 0.25);
+            border-radius: 6px;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: -10px;
+        ">
+            <h2 style="
+                margin: 0;
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: #55efc4;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            ">
+                <span style="animation: pulse-dot-green 1.2s infinite; width: 8px; height: 8px; border-radius: 50%; background: #55efc4; display: inline-block;"></span>
+                🤖 LOG AKTIVITAS & KEPUTUSAN LIVE AI
+            </h2>
+            
+            <div id="ai-logs-container" style="
+                background: #040810;
+                border: 1px solid rgba(255,255,255,0.04);
+                border-radius: 4px;
+                padding: 10px 14px;
+                height: 150px;
+                overflow-y: auto;
+                font-family: 'Roboto Mono', monospace;
+                font-size: 0.7rem;
+                line-height: 1.6;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                scroll-behavior: smooth;
+            ">
+                <div style="color: rgba(255,255,255,0.35);">Menunggu log pertama dari live engine...</div>
+            </div>
+        </div>
+
+        <style>
+        @keyframes pulse-dot-green {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+        .trade-log-tick { color: #b2bec3; }
+        .trade-log-fund { color: #ffeaa7; }
+        .trade-log-tech { color: #a29bfe; }
+        .trade-log-calc { color: #74b9ff; }
+        .trade-log-pos  { color: #fd79a8; font-weight: 600; }
+        .trade-log-wait { color: #81ecec; }
+        .trade-log-warn { color: #ff7675; }
+        </style>
+
         <!-- MetaTrader 5 Simulated Terminal Window -->
         <div class="terminal-window">
             <div class="terminal-titlebar">
@@ -766,7 +824,7 @@
         </div>
     </div>
 
-    <script src="/trade.js?v=1"></script>
+    <script src="/trade.js?v=2"></script>
         <!-- New Order Modal -->
     <div id="order-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
         <div class="terminal-window" style="width: 320px; height: auto; background-color: #f0f0f0; color: #000; border: 3px solid #808080; border-radius: 4px;">
