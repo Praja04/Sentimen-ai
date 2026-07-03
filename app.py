@@ -706,6 +706,22 @@ def entry_signal(strategy, cache, index):
                     "take_distance": stop_distance * params["rr"],
                     "signal_strength": combined_score,
                 }
+            # Bypassing negative combined score if technical trend is strongly bullish (counter-trend entry)
+            elif trend_score >= params["confirmation"]:
+                signal = {
+                    "side": 1,
+                    "stop_distance": stop_distance,
+                    "take_distance": stop_distance * params["rr"],
+                    "signal_strength": trend_score,
+                }
+            # Bypassing positive combined score if technical trend is strongly bearish (counter-trend entry)
+            elif trend_score <= -params["confirmation"]:
+                signal = {
+                    "side": -1,
+                    "stop_distance": stop_distance,
+                    "take_distance": stop_distance * params["rr"],
+                    "signal_strength": trend_score,
+                }
 
     elif strategy["type"] == "xedy_trend_pullback":
         combined_score, trend_score = compute_combined_score(cache, index)
@@ -718,6 +734,11 @@ def entry_signal(strategy, cache, index):
                 signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
             elif combined_score < 0 and trend_score < -params["confirmation"] and current_close >= ema_fast and pullback <= params["pullback_limit"]:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            # Counter-trend entry based on technicals
+            elif trend_score > params["confirmation"] and current_close <= ema_fast and pullback <= params["pullback_limit"]:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
+            elif trend_score < -params["confirmation"] and current_close >= ema_fast and pullback <= params["pullback_limit"]:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
 
     elif strategy["type"] == "xedy_mean_revert":
         combined_score, trend_score = compute_combined_score(cache, index)
@@ -728,6 +749,11 @@ def entry_signal(strategy, cache, index):
                 signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
             elif combined_score < -params["threshold"] and rsi_value >= 100 - params["extreme_rsi"]:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            # Counter-trend entry based on technicals
+            elif rsi_value <= params["extreme_rsi"]:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
+            elif rsi_value >= 100 - params["extreme_rsi"]:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
 
     elif strategy["type"] == "xedy_breakout_confirm":
         combined_score, trend_score = compute_combined_score(cache, index)
@@ -740,6 +766,11 @@ def entry_signal(strategy, cache, index):
                 signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
             elif combined_score < -params["threshold"] and current_close < rolling_low - breakout_unit:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            # Counter-trend entry based on technicals
+            elif current_close > rolling_high + breakout_unit:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
+            elif current_close < rolling_low - breakout_unit:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
 
     elif strategy["type"] == "xedy_macd_momentum":
         combined_score, trend_score = compute_combined_score(cache, index)
@@ -752,6 +783,11 @@ def entry_signal(strategy, cache, index):
                 signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
             elif combined_score < 0 and macd_hist < -params["threshold"]:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            # Counter-trend entry based on technicals
+            elif macd_hist > params["threshold"]:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
+            elif macd_hist < -params["threshold"]:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
 
     if signal:
         # Check if signal side is counter-trend to fundamental bias

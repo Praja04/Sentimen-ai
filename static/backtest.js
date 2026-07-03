@@ -176,7 +176,7 @@ function renderResults(payload) {
                                 item.strategy_type === 'xedy_breakout_confirm' ? 'Support/Resistance channel breakout' :
                                 'MACD Momentum Crossover confirmation'
                             }<br>
-                            <strong>Aturan Grid Averaging:</strong> Multi-Level Entry (maks. 3 tingkat, step 1.5 * ATR), Arah order wajib searah dengan Trend Fundamental (Strictly ${payload.fundamental_bias > 0 ? 'LONG Only' : 'SHORT Only'}).
+                            <strong>Aturan Grid Averaging:</strong> Multi-Level Entry (maks. 3 tingkat, step 1.5 * ATR), Arah order utama mengikuti Trend Fundamental (${payload.fundamental_bias > 0 ? 'LONG' : 'SHORT'}), counter-trend diperbolehkan (teknikal saja) dengan lot dikurangi 50%.
                         </div>
                     </div>
                 </div>
