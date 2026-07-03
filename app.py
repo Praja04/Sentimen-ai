@@ -1788,7 +1788,10 @@ Do NOT include any markdown, explanation, or text outside the JSON array."""
                 for attempt in range(3):
                     try:
                         model = genai.GenerativeModel(try_model, system_instruction=system_instruction)
-                        response = model.generate_content(user_prompt)
+                        response = model.generate_content(
+                            user_prompt,
+                            generation_config={"response_mime_type": "application/json"}
+                        )
                         raw_text = response.text.strip()
                         last_err = None
                         break
