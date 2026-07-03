@@ -114,7 +114,8 @@ function renderResults(payload) {
         const activeConfig = currentDemoState?.active_config;
         const isActive = activeConfig &&
                          activeConfig.timeframe === payload.timeframe &&
-                         activeConfig.strategy_type === item.strategy_type;
+                         activeConfig.strategy_type === item.strategy_type &&
+                         activeConfig.strategy_name === item.strategy_name;
 
         return `
             <article class="result-card" style="${isActive ? 'border: 1.5px solid var(--text-yellow); box-shadow: 0 0 15px rgba(255,215,0,0.15);' : ''}">
@@ -486,7 +487,7 @@ async function deployToLiveTest(timeframe, riskPercent, strategyType, strategyNa
         const data = await res.json();
         if (data.status === "success") {
             alert(`🚀 SUKSES!\n\nParameter Strategi "${strategyName}" (${timeframe}) berhasil diterapkan ke Live Test.`);
-            location.reload(); // Reload to refresh layouts and configurations
+            fetchLiveTicks(); // Refresh live config without reloading page
         } else {
             alert(`❌ Gagal menerapkan parameter: ${data.message}`);
         }
@@ -620,7 +621,8 @@ function syncStrategyCheckboxes(activeConfig) {
         
         const matches = activeConfig && 
                         activeConfig.timeframe === tf && 
-                        activeConfig.strategy_type === type;
+                        activeConfig.strategy_type === type &&
+                        activeConfig.strategy_name === chk.getAttribute('data-name');
                         
         if (matches) {
             if (!chk.checked) {

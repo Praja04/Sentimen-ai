@@ -1,11 +1,11 @@
 {
     "timeframe": "H1",
     "risk_percent": 1.0,
-    "strategy_type": "xedy_v30_ai",
-    "strategy_name": "AI XEDY_V30 Core T0.18 C0.08 Self-Learning Self-Learning",
+    "strategy_type": "xedy_macd_momentum",
+    "strategy_name": "AI XEDY_V30 MACD Momentum T0.05 (Expectancy-Opt)",
     "sl_dist": 15.0,
     "tp_dist": 22.0,
-    "win_rate": 66.67,
-    "max_drawdown": 37.96,
-    "net_profit": 683.14
+    "win_rate": 50.67,
+    "max_drawdown": 7.91,
+    "net_profit": 31.2
 }
