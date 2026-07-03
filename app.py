@@ -1978,7 +1978,15 @@ def apply_livetest_parameters():
                     state = json.load(f_demo)
                 except Exception:
                     pass
+        if not isinstance(state, dict):
+            state = {}
         state["active_trades"] = []
+        if "balance" not in state:
+            state["balance"] = 10543.10
+        if "equity" not in state:
+            state["equity"] = 10543.10
+        if "history" not in state:
+            state["history"] = []
         with open(demo_file, 'w', encoding='utf-8') as f_demo:
             json.dump(state, f_demo, indent=4)
             
@@ -2002,7 +2010,15 @@ def clear_livetest_parameters():
                     state = json.load(f_demo)
                 except Exception:
                     pass
+        if not isinstance(state, dict):
+            state = {}
         state["active_trades"] = []
+        if "balance" not in state:
+            state["balance"] = 10543.10
+        if "equity" not in state:
+            state["equity"] = 10543.10
+        if "history" not in state:
+            state["history"] = []
         with open(demo_file, 'w', encoding='utf-8') as f_demo:
             json.dump(state, f_demo, indent=4)
             

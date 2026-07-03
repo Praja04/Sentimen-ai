@@ -6,7 +6,19 @@ from datetime import datetime
 DEMO_PATH = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
 
 def init_demo_file():
+    needs_init = False
     if not os.path.exists(DEMO_PATH):
+        needs_init = True
+    else:
+        try:
+            with open(DEMO_PATH, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if not isinstance(data, dict) or "balance" not in data or "equity" not in data or "active_trades" not in data:
+                    needs_init = True
+        except Exception:
+            needs_init = True
+            
+    if needs_init:
         initial_data = {
             "balance": 10543.10,
             "equity": 10543.10,
@@ -63,6 +75,7 @@ def init_demo_file():
             ],
             "last_update": time.time()
         }
+        os.makedirs(os.path.dirname(DEMO_PATH), exist_ok=True)
         with open(DEMO_PATH, 'w', encoding='utf-8') as f:
             json.dump(initial_data, f, indent=4)
 
