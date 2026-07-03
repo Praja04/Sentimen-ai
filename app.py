@@ -2221,6 +2221,22 @@ _cached_calendar = []
 _cached_news = []
 _last_scrape_time = 0
 
+def convert_utc_to_local(utc_str):
+    try:
+        if 'UTC' not in utc_str and 'GMT' not in utc_str:
+            return utc_str
+            
+        time_part = utc_str.replace('UTC', '').replace('GMT', '').strip()
+        from datetime import datetime, timezone
+        dt_utc = datetime.strptime(time_part, '%I:%M %p')
+        
+        now = datetime.now()
+        dt_utc = dt_utc.replace(year=now.year, month=now.month, day=now.day, tzinfo=timezone.utc)
+        dt_local = dt_utc.astimezone()
+        return dt_local.strftime('%H:%M')
+    except Exception:
+        return utc_str
+
 def fetch_live_calendar_and_news():
     global _cached_calendar, _cached_news, _last_scrape_time
     import requests
@@ -2251,10 +2267,12 @@ def fetch_live_calendar_and_news():
                 for row in rows[1:30]:  # limit to top 29 events
                     tds = row.find_all('td')
                     if len(tds) >= 7:
+                        raw_time = tds[2].get_text(strip=True)
+                        local_time = convert_utc_to_local(raw_time)
                         calendar_events.append({
                             "event": tds[0].get_text(strip=True),
                             "country": tds[1].get_text(strip=True),
-                            "time": tds[2].get_text(strip=True),
+                            "time": local_time,
                             "actual": tds[4].get_text(strip=True),
                             "forecast": tds[5].get_text(strip=True),
                             "previous": tds[6].get_text(strip=True),
