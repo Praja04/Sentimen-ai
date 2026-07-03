@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-stop_backtest_requested = False
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, request
 import MetaTrader5 as mt5
 from flask_cors import CORS
 import os
@@ -11,7 +10,32 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import product
 from pathlib import Path
-from flask import request
+
+stop_backtest_requested = False
+
+# Real-time progress tracking
+_progress_log = []       # list of {t, level, msg} dicts
+_progress_stats = {}     # live stats: phase, iteration, tested, total, tf, found
+_progress_running = False
+
+def _push_log(msg, level="info"):
+    """Append a timestamped log entry to the global progress log."""
+    global _progress_log
+    _progress_log.append({
+        "t": datetime.now().strftime("%H:%M:%S.%f")[:-3],
+        "level": level,
+        "msg": msg,
+    })
+    if len(_progress_log) > 500:
+        _progress_log = _progress_log[-500:]
+
+def _reset_progress():
+    global _progress_log, _progress_stats, _progress_running
+    _progress_log = []
+    _progress_stats = {}
+    _progress_running = True
+
+
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
@@ -44,6 +68,16 @@ def serve_index():
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory(app.static_folder, path)
+
+
+@app.route('/api/backtest/progress', methods=['GET'])
+def api_backtest_progress():
+    """Return the current real-time backtest progress log and stats."""
+    return jsonify({
+        "running": _progress_running,
+        "stats": _progress_stats,
+        "log": _progress_log[-80:],  # last 80 entries
+    })
 
 @app.route('/api/live_ticks')
 def get_live_ticks():
@@ -1180,6 +1214,8 @@ def search_backtest_methods(
 ):
     rates = fetch_mt5_rates(symbol=symbol, days=days, start_month=start_month, end_month=end_month, timeframe=timeframe)
     risk_context = get_symbol_risk_context(symbol)
+    _push_log(f"📊 [{timeframe}] Data loaded: {len(rates)} bars dari MT5", "info")
+    _progress_stats.update({"tf": timeframe, "bars": len(rates)})
 
     filters = filters or {
         "drawdown": {"operator": ">", "value": 5},
@@ -1192,18 +1228,23 @@ def search_backtest_methods(
     rr_values = dedupe_rr_values([1.0, 1.4, 1.8, 2.2, 2.6])
     if custom_strategies:
         initial_library = custom_strategies + make_strategy_library(rr_values)
+        _push_log(f"🤖 AI custom strategies injected: {len(custom_strategies)} strategi", "ai")
     else:
         initial_library = make_strategy_library(rr_values)
     iteration_sources = [("grid", initial_library)]
+    _push_log(f"📋 Library awal: {len(initial_library)} kombinasi strategi", "info")
 
     global stop_backtest_requested
     for iteration_index in range(3):
         phase_name, strategies = iteration_sources[-1]
         cache = build_indicator_cache(rates, strategies, fundamental_bias=fundamental_bias)
         current_results = []
-        for strategy in strategies:
+        _push_log(f"🔄 Iterasi {iteration_index+1} — Phase: {phase_name} | {len(strategies)} strategi", "phase")
+        _progress_stats.update({"iteration": iteration_index + 1, "phase": phase_name, "total": len(strategies), "tested": 0, "found": len(all_results)})
+        for idx, strategy in enumerate(strategies):
             if stop_backtest_requested:
                 stop_backtest_requested = False
+                _push_log("⛔ Backtest dihentikan oleh user.", "warn")
                 raise RuntimeError("Backtest dihentikan oleh user.")
             result = run_backtest(
                 rates,
@@ -1217,10 +1258,17 @@ def search_backtest_methods(
                 continue
             result["passes_filters"] = evaluate_result_against_filters(result, filters)
             current_results.append(result)
+            # Update stats every 25 strategies
+            if (idx + 1) % 25 == 0 or idx == len(strategies) - 1:
+                _progress_stats.update({"tested": idx + 1, "found": len(all_results) + len(current_results)})
+                best = max(current_results, key=lambda x: x.get("net_profit_pct", 0), default=None)
+                if best:
+                    _push_log(f"  ⚡ {idx+1}/{len(strategies)} diuji | Ditemukan: {len(current_results)} | Best profit: {best['net_profit_pct']:.1f}%", "progress")
         rank_results(current_results, sort_priority=sort_priority)
         all_results.extend(current_results)
         passes = sum(1 for item in current_results if item["passes_filters"])
         positive_passing = sum(1 for item in current_results if item["passes_filters"] and item["net_profit_pct"] > 0.0)
+        _push_log(f"✅ Phase '{phase_name}' selesai: {len(current_results)} hasil valid | {passes} lolos filter | {positive_passing} profit positif", "success")
         learning_iterations.append(
             {
                 "phase": phase_name,
@@ -1230,11 +1278,13 @@ def search_backtest_methods(
             }
         )
         if positive_passing > 0 and iteration_index >= 1:
+            _push_log(f"🎯 Kriteria terpenuhi! Stop di iterasi {iteration_index+1}.", "success")
             break
         seed_results = current_results[:6]
         rr_values = generate_refined_rr_values(seed_results)
         next_phase = "self_learning" if iteration_index == 0 else f"self_learning_{iteration_index}"
         next_strategies = build_self_learning_strategies(seed_results) + make_strategy_library(rr_values)
+        _push_log(f"🧬 Self-learning: mengembangkan {len(next_strategies)} strategi baru", "ai")
         iteration_sources.append((next_phase, next_strategies))
 
     deduped = {}
@@ -1285,20 +1335,24 @@ def serve_backtest():
 
 @app.route("/api/backtest/search", methods=["POST"])
 def api_backtest_search():
-    global stop_backtest_requested
+    global stop_backtest_requested, _progress_running
     stop_backtest_requested = False
+    _reset_progress()
     payload = request.get_json(silent=True) or {}
     filters = payload.get("filters") or {}
 
     tfs = payload.get("timeframes") or ["M5", "M15", "M30", "H1", "H4"]
     results_per_tf = {}
+    _push_log(f"🚀 Backtest dimulai — {len(tfs)} timeframe: {', '.join(tfs)}", "info")
 
     try:
         bias_val = compute_xedy_fundamental_bias()
-        for tf in tfs:
+        _push_log(f"🌐 Fundamental bias: {round(bias_val, 3)} (80% weight)", "info")
+        for tf_idx, tf in enumerate(tfs):
             if stop_backtest_requested:
                 break
-                
+            _push_log(f"━━━ TF {tf_idx+1}/{len(tfs)}: [{tf}] mulai diproses ━━━", "phase")
+            _progress_stats.update({"tf": tf, "tf_idx": tf_idx + 1, "tf_total": len(tfs)})
             tf_result = search_backtest_methods(
                 symbol=payload.get("symbol", "XAUUSD"),
                 days=int(payload.get("days", 30)),
@@ -1326,10 +1380,16 @@ def api_backtest_search():
                 },
             )
             results_per_tf[tf] = tf_result
+            _push_log(f"✅ [{tf}] Selesai: {tf_result.get('strategies_tested',0)} diuji, top {len(tf_result.get('results',[]))} ditemukan", "success")
 
         if stop_backtest_requested:
             stop_backtest_requested = False
+            _progress_running = False
+            _push_log("⛔ Backtest dihentikan.", "warn")
             return jsonify({"success": False, "error": "Backtest dihentikan oleh user."}), 400
+
+        _progress_running = False
+        _push_log(f"🏁 SELESAI — Semua {len(tfs)} timeframe diproses.", "success")
 
         # Extract primary sorting method
         sort_pri = payload.get("sort_priority", ["win_rate"])
@@ -1345,6 +1405,8 @@ def api_backtest_search():
             }
         })
     except Exception as exc:
+        _progress_running = False
+        _push_log(f"❌ Error: {str(exc)[:200]}", "error")
         return jsonify({"success": False, "error": str(exc)}), 500
 
 @app.route("/api/backtest/stop", methods=["POST"])

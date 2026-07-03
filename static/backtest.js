@@ -203,7 +203,23 @@ async function runBacktestSearch() {
         return;
     }
     elements.statusText.textContent = `Menjalankan AI XEDY_V30 (${selectedTFs.join(", ")}) dengan bobot fundamental 80% dan teknikal 20%...`;
-    
+
+    // Show & reset real-time progress panel
+    const progressPanel = document.getElementById("aiProgressPanel");
+    if (progressPanel) {
+        progressPanel.style.display = "block";
+        progressPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        document.getElementById("progressLogFeed").innerHTML = "";
+        document.getElementById("progressBar").style.width = "0%";
+        document.getElementById("pStatTF").textContent = "-";
+        document.getElementById("pStatPhase").textContent = "-";
+        document.getElementById("pStatTested").textContent = "0";
+        document.getElementById("pStatTotal").textContent = "-";
+        document.getElementById("pStatFound").textContent = "0";
+        document.getElementById("progressTFBadge").textContent = `0 / ${selectedTFs.length} TF`;
+    }
+    startProgressPolling(selectedTFs.length);
+
     backtestAbortController = new AbortController();
 
     const payload = {
@@ -884,4 +900,85 @@ async function validateAllKeys() {
         btn.disabled = false;
         btn.innerHTML = "🔍 Cek Semua API Valid";
     }
+}
+
+// ========== Real-Time AI Progress Polling ==========
+let _progressPollTimer = null;
+let _lastLogCount = 0;
+
+function startProgressPolling(totalTFs) {
+    stopProgressPolling();
+    _lastLogCount = 0;
+    _progressPollTimer = setInterval(() => pollProgress(totalTFs), 800);
+}
+
+function stopProgressPolling() {
+    if (_progressPollTimer) {
+        clearInterval(_progressPollTimer);
+        _progressPollTimer = null;
+    }
+}
+
+async function pollProgress(totalTFs) {
+    try {
+        const resp = await fetch("/api/backtest/progress");
+        if (!resp.ok) return;
+        const data = await resp.json();
+
+        const feed = document.getElementById("progressLogFeed");
+        const stats = data.stats || {};
+        const log = data.log || [];
+
+        // Render only NEW log lines
+        if (log.length > _lastLogCount) {
+            const newLines = log.slice(_lastLogCount);
+            for (const entry of newLines) {
+                const div = document.createElement("div");
+                div.className = `log-${entry.level || "info"}`;
+                div.innerHTML = `<span style="color: rgba(255,255,255,0.25);">[${entry.t}]</span> ${escapeHtml(entry.msg)}`;
+                feed.appendChild(div);
+            }
+            _lastLogCount = log.length;
+            // Auto-scroll to bottom
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        // Update stat cards
+        if (stats.tf) document.getElementById("pStatTF").textContent = stats.tf;
+        if (stats.phase) document.getElementById("pStatPhase").textContent = stats.phase;
+        if (stats.tested !== undefined) document.getElementById("pStatTested").textContent = stats.tested;
+        if (stats.total !== undefined) document.getElementById("pStatTotal").textContent = stats.total;
+        if (stats.found !== undefined) document.getElementById("pStatFound").textContent = stats.found;
+
+        // TF badge
+        if (stats.tf_idx !== undefined && stats.tf_total !== undefined) {
+            document.getElementById("progressTFBadge").textContent = `TF ${stats.tf_idx} / ${stats.tf_total}`;
+        }
+
+        // Progress bar: based on tested/total within current TF, combined with TF progress
+        if (stats.total > 0 && stats.tested !== undefined) {
+            const tfProgress = stats.tf_idx && stats.tf_total ? (stats.tf_idx - 1) / stats.tf_total : 0;
+            const withinTF = stats.tested / stats.total;
+            const tfWeight = 1 / (stats.tf_total || 1);
+            const pct = Math.round((tfProgress + withinTF * tfWeight) * 100);
+            document.getElementById("progressBar").style.width = Math.min(pct, 99) + "%";
+        }
+
+        // Stop polling when done
+        if (!data.running && _lastLogCount === log.length) {
+            document.getElementById("progressBar").style.width = "100%";
+            const pulse = document.getElementById("progressPulse");
+            if (pulse) { pulse.style.background = "#55efc4"; pulse.style.animation = "none"; }
+            stopProgressPolling();
+        }
+    } catch (e) {
+        // Silently ignore poll errors during backtest
+    }
+}
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 }

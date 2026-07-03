@@ -435,6 +435,78 @@
             <p id="statusText">Siap menjalankan backtest.</p>
         </section>
 
+        <!-- Real-time AI Progress Panel -->
+        <section class="panel" id="aiProgressPanel" style="margin-top: 16px; border: 1px solid rgba(108,92,231,0.3); display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <span id="progressPulse" style="width:10px; height:10px; border-radius:50%; background:#6c5ce7; display:inline-block; animation: pulse-dot 1s infinite;"></span>
+                    🧠 AI Progress Real-Time
+                </h2>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="progressTFBadge" style="background: rgba(108,92,231,0.2); color: #a29bfe; padding: 3px 10px; border-radius: 20px; font-family: 'Rajdhani', sans-serif; font-size: 0.78rem; font-weight: 600;"></span>
+                    <button onclick="document.getElementById('aiProgressPanel').style.display='none'" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); padding: 3px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">✕ Tutup</button>
+                </div>
+            </div>
+
+            <!-- Stats row -->
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px;">
+                <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                    <div style="color: rgba(255,255,255,0.4); font-size: 0.65rem; font-family: 'Rajdhani', sans-serif;">TIMEFRAME</div>
+                    <div id="pStatTF" style="color: #a29bfe; font-family: 'Roboto Mono', monospace; font-size: 1.1rem; font-weight: 700;">-</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                    <div style="color: rgba(255,255,255,0.4); font-size: 0.65rem; font-family: 'Rajdhani', sans-serif;">PHASE</div>
+                    <div id="pStatPhase" style="color: #ffd700; font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; font-weight: 700;">-</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                    <div style="color: rgba(255,255,255,0.4); font-size: 0.65rem; font-family: 'Rajdhani', sans-serif;">DIUJI</div>
+                    <div id="pStatTested" style="color: #74b9ff; font-family: 'Roboto Mono', monospace; font-size: 1.1rem; font-weight: 700;">0</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                    <div style="color: rgba(255,255,255,0.4); font-size: 0.65rem; font-family: 'Rajdhani', sans-serif;">TOTAL</div>
+                    <div id="pStatTotal" style="color: #e0e0e0; font-family: 'Roboto Mono', monospace; font-size: 1.1rem; font-weight: 700;">-</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; text-align: center;">
+                    <div style="color: rgba(255,255,255,0.4); font-size: 0.65rem; font-family: 'Rajdhani', sans-serif;">DITEMUKAN</div>
+                    <div id="pStatFound" style="color: #55efc4; font-family: 'Roboto Mono', monospace; font-size: 1.1rem; font-weight: 700;">0</div>
+                </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 6px; height: 8px; margin-bottom: 14px; overflow: hidden;">
+                <div id="progressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #6c5ce7, #a55eea); border-radius: 6px; transition: width 0.5s ease;"></div>
+            </div>
+
+            <!-- Log feed -->
+            <div id="progressLogFeed" style="
+                background: rgba(0,0,0,0.4);
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 8px;
+                padding: 12px;
+                height: 260px;
+                overflow-y: auto;
+                font-family: 'Roboto Mono', monospace;
+                font-size: 0.72rem;
+                line-height: 1.7;
+                scroll-behavior: smooth;
+            "></div>
+        </section>
+
+        <style>
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.75); }
+        }
+        .log-info    { color: #b2bec3; }
+        .log-phase   { color: #a29bfe; font-weight: 700; }
+        .log-ai      { color: #fd79a8; }
+        .log-progress{ color: #74b9ff; }
+        .log-success { color: #55efc4; }
+        .log-warn    { color: #ffeaa7; }
+        .log-error   { color: #ff7675; }
+        </style>
+
+
         <section class="summary-grid" id="summaryGrid">
             <div class="summary-card">
                 <span class="label">Symbol / TF</span>
@@ -466,6 +538,6 @@
         </section>
             </main>    </main>
 
-    <script src="/backtest.js?v=25"></script>
+    <script src="/backtest.js?v=26"></script>
 </body>
 </html>
