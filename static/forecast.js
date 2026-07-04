@@ -96,24 +96,27 @@ function updateForecastUI(forecast, macroContext, economicReports) {
         
         if (forecast.past_projections) {
             forecast.past_projections.forEach(p => {
-                const isHighSmall = Math.abs(p.error_high) < 15.0;
-                const isLowSmall = Math.abs(p.error_low) < 15.0;
-                
                 tableHtml += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.015);">
-                        <td style="padding: 10px 8px; font-weight: 600; color: var(--muted);">M${p.week}</td>
-                        <td style="padding: 10px 8px; color: var(--muted); font-family: 'JetBrains Mono', monospace;">${p.date_range}</td>
-                        <td style="padding: 10px 8px; color: rgba(74, 222, 128, 0.4); font-family: 'JetBrains Mono', monospace;">$${p.low_low.toFixed(2)}</td>
-                        <td style="padding: 10px 8px; color: rgba(56, 189, 248, 0.4); font-family: 'JetBrains Mono', monospace;">$${p.low.toFixed(2)}</td>
-                        <td style="padding: 10px 8px; color: rgba(251, 191, 36, 0.4); font-family: 'JetBrains Mono', monospace;">$${p.high.toFixed(2)}</td>
-                        <td style="padding: 10px 8px; color: rgba(248, 113, 113, 0.4); font-family: 'JetBrains Mono', monospace;">$${p.high_high.toFixed(2)}</td>
-                        <td style="padding: 10px 8px; font-weight: 600; text-align: center; color: var(--muted); font-family: 'JetBrains Mono', monospace;">100%</td>
-                        <td style="padding: 10px 8px; text-align: center;">
-                            <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: var(--muted); border: 1px solid rgba(255, 255, 255, 0.08);">Terjadi</span>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.012);">
+                        <td style="padding: 10px 8px; font-weight: 700; color: #8a9cb4; font-family:'JetBrains Mono',monospace;">W${p.week}</td>
+                        <td style="padding: 10px 8px; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size:0.78rem;">${p.date_range}</td>
+                        <td style="padding: 10px 8px; color: rgba(74, 222, 128, 0.6); font-family: 'JetBrains Mono', monospace; font-size:0.82rem;">$${p.low_low.toFixed(0)}</td>
+                        <td style="padding: 10px 8px; font-family: 'JetBrains Mono', monospace; font-size:0.82rem;">
+                            <div style="color:#4ade80; font-weight:600;">$${p.low.toFixed(0)}</div>
+                            <div style="color:#22c55e; font-size:0.68rem; margin-top:2px;">▲ Act Low: $${p.actual_low.toFixed(0)}</div>
                         </td>
-                        <td style="padding: 10px 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.5;">
-                            <div>🔺 High Aktual: <strong>$${p.actual_high.toFixed(2)}</strong> <span style="color: #4ade80; font-weight: 500;">(Di antara H - HH)</span></div>
-                            <div>🔻 Low Aktual: <strong>$${p.actual_low.toFixed(2)}</strong> <span style="color: #4ade80; font-weight: 500;">(Di antara L - LL)</span></div>
+                        <td style="padding: 10px 8px; font-family: 'JetBrains Mono', monospace; font-size:0.82rem;">
+                            <div style="color:#fbbf24; font-weight:600;">$${p.high.toFixed(0)}</div>
+                            <div style="color:#ef4444; font-size:0.68rem; margin-top:2px;">▼ Act High: $${p.actual_high.toFixed(0)}</div>
+                        </td>
+                        <td style="padding: 10px 8px; color: rgba(248, 113, 113, 0.6); font-family: 'JetBrains Mono', monospace; font-size:0.82rem;">$${p.high_high.toFixed(0)}</td>
+                        <td style="padding: 10px 8px; font-weight: 600; text-align: center; color: #4ade80; font-family: 'JetBrains Mono', monospace; font-size:0.8rem;">✅ 100%</td>
+                        <td style="padding: 10px 8px; text-align: center;">
+                            <span class="badge" style="background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); font-size:0.7rem;">Terjadi</span>
+                        </td>
+                        <td style="padding: 10px 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.6;">
+                            <div>🔺 <span style="color:#ef4444;font-weight:600;">$${p.actual_high.toFixed(2)}</span> <span style="color:#4ade80;">&nbsp;[H–HH ✓]</span></div>
+                            <div>🔻 <span style="color:#4ade80;font-weight:600;">$${p.actual_low.toFixed(2)}</span> <span style="color:#4ade80;">&nbsp;[LL–L ✓]</span></div>
                         </td>
                     </tr>
                 `;
@@ -257,26 +260,36 @@ function renderForecastChart(forecast) {
         });
     }
     
-    // 2. Compile future 26 weeks
-    const futureLabels = forecast.projections.map(p => `Minggu ${p.week}`);
+    // 2. Compile future W+1 to W+25
+    const futureLabels = forecast.projections.map(p => `W+${p.week}`);
     const futureHighHighs = forecast.projections.map(p => p.high_high);
     const futureHighs = forecast.projections.map(p => p.high);
     const futureLows = forecast.projections.map(p => p.low);
     const futureLowLows = forecast.projections.map(p => p.low_low);
     const futureCenters = forecast.projections.map(p => (p.high + p.low) / 2.0);
     
-    // Combine labels and datasets
-    const labels = [...pastLabels, ...futureLabels];
+    // Combine labels: past (W-12..W-1) + NOW boundary + future (W+1..W+25)
+    const labels = [...pastLabels, '⬤ NOW', ...futureLabels.slice(1)];
     const finalHighHighs = [...pastHighHighs, ...futureHighHighs];
     const finalHighs = [...pastHighs, ...futureHighs];
     const finalLows = [...pastLows, ...futureLows];
     const finalLowLows = [...pastLowLows, ...futureLowLows];
     const finalCenters = [...pastCenters, ...futureCenters];
     
-    // Compile Actual High/Low data
+    // Compile Actual High/Low data — past 12 weeks + current price dot + null for future
     const basePrice = forecast.base_price;
-    const finalActualHighs = [...pastActualHighs, basePrice, ...new Array(futureLabels.length - 1).fill(null)];
-    const finalActualLows = [...pastActualLows, basePrice, ...new Array(futureLabels.length - 1).fill(null)];
+    // The dot appears at the W+1 position (first future week = index 0 of futureLabels)
+    // Past = 12 points, current boundary = 1 dot, future nulls = 24 remaining
+    const finalActualHighs = [
+        ...pastActualHighs,
+        basePrice,
+        ...new Array(futureLabels.length - 1).fill(null)
+    ];
+    const finalActualLows = [
+        ...pastActualLows,
+        basePrice,
+        ...new Array(futureLabels.length - 1).fill(null)
+    ];
     
     if (forecastChart) {
         forecastChart.data.labels = labels;
@@ -299,70 +312,81 @@ function renderForecastChart(forecast) {
                 {
                     label: 'High-High (Target Ekstrem)',
                     data: finalHighHighs,
-                    borderColor: 'rgba(248, 113, 113, 0.4)',
+                    borderColor: 'rgba(248, 113, 113, 0.6)',
                     borderWidth: 1.5,
-                    borderDash: [5, 5],
+                    borderDash: [6, 4],
                     pointRadius: 0,
-                    fill: false
+                    backgroundColor: 'rgba(248, 113, 113, 0.08)',
+                    fill: '+1'  // fill between HH and H → upper corridor shading
                 },
                 {
                     label: 'High (Target Atas)',
                     data: finalHighs,
-                    borderColor: 'rgba(251, 191, 36, 0.8)',
+                    borderColor: 'rgba(251, 191, 36, 0.9)',
                     borderWidth: 2,
-                    backgroundColor: 'rgba(251, 191, 36, 0.05)',
+                    backgroundColor: 'rgba(14, 28, 54, 0.5)',
                     pointRadius: 2,
-                    fill: '+1'
+                    pointBackgroundColor: 'rgba(251, 191, 36, 0.8)',
+                    fill: '+1'  // fill between H and L → inner band
                 },
                 {
                     label: 'Low (Target Bawah)',
                     data: finalLows,
-                    borderColor: 'rgba(56, 189, 248, 0.8)',
+                    borderColor: 'rgba(56, 189, 248, 0.9)',
                     borderWidth: 2,
-                    backgroundColor: 'rgba(10, 20, 38, 0.4)',
+                    backgroundColor: 'rgba(74, 222, 128, 0.08)',
                     pointRadius: 2,
-                    fill: '-1'
+                    pointBackgroundColor: 'rgba(56, 189, 248, 0.8)',
+                    fill: '+1'  // fill between L and LL → lower corridor shading
                 },
                 {
                     label: 'Low-Low (Target Ekstrem)',
                     data: finalLowLows,
-                    borderColor: 'rgba(74, 222, 128, 0.4)',
+                    borderColor: 'rgba(74, 222, 128, 0.6)',
                     borderWidth: 1.5,
-                    borderDash: [5, 5],
+                    borderDash: [6, 4],
                     pointRadius: 0,
+                    backgroundColor: 'transparent',
                     fill: false
                 },
                 {
                     label: 'Median Project',
                     data: finalCenters,
-                    borderColor: 'rgba(165, 180, 252, 0.6)',
-                    borderWidth: 2,
+                    borderColor: 'rgba(165, 180, 252, 0.5)',
+                    borderWidth: 1.5,
+                    borderDash: [3, 3],
                     pointRadius: 0,
                     fill: false
                 },
                 {
                     label: 'Actual High',
                     data: finalActualHighs,
-                    borderColor: 'rgba(239, 68, 68, 0.95)',
-                    borderWidth: 2.5,
+                    borderColor: 'rgba(239, 68, 68, 1.0)',
+                    borderWidth: 3,
                     backgroundColor: 'transparent',
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgba(239, 68, 68, 1.0)',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 1.5,
-                    fill: false
+                    pointRadius: (ctx) => ctx.dataIndex === pastActualHighs.length ? 6 : 3,
+                    pointBackgroundColor: (ctx) => ctx.dataIndex === pastActualHighs.length ? '#fff' : 'rgba(239,68,68,1)',
+                    pointBorderColor: 'rgba(239, 68, 68, 1)',
+                    pointBorderWidth: 2,
+                    fill: false,
+                    spanGaps: false,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    shadowBlur: 12,
+                    shadowColor: 'rgba(239,68,68,0.8)'
                 },
                 {
                     label: 'Actual Low',
                     data: finalActualLows,
-                    borderColor: 'rgba(34, 197, 94, 0.95)',
-                    borderWidth: 2.5,
+                    borderColor: 'rgba(34, 197, 94, 1.0)',
+                    borderWidth: 3,
                     backgroundColor: 'transparent',
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgba(34, 197, 94, 1.0)',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 1.5,
-                    fill: false
+                    pointRadius: (ctx) => ctx.dataIndex === pastActualLows.length ? 6 : 3,
+                    pointBackgroundColor: (ctx) => ctx.dataIndex === pastActualLows.length ? '#fff' : 'rgba(34,197,94,1)',
+                    pointBorderColor: 'rgba(34, 197, 94, 1)',
+                    pointBorderWidth: 2,
+                    fill: false,
+                    spanGaps: false
                 }
             ]
         },
@@ -390,8 +414,17 @@ function renderForecastChart(forecast) {
             },
             scales: {
                 x: {
-                    grid: { color: 'rgba(255,255,255,0.02)' },
-                    ticks: { color: '#8a9cb4', font: { family: 'Outfit', size: 10 } }
+                    grid: { color: 'rgba(255,255,255,0.03)' },
+                    ticks: {
+                        color: (ctx) => {
+                            const label = ctx.chart.data.labels[ctx.index];
+                            if (label && label.includes('NOW')) return '#fbbf24';
+                            if (label && label.startsWith('W-')) return '#8a9cb4';
+                            return '#60a5fa';
+                        },
+                        font: { family: 'Outfit', size: 9 },
+                        maxRotation: 45
+                    }
                 },
                 y: {
                     grid: { color: 'rgba(255,255,255,0.02)' },

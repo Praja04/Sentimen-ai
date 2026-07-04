@@ -97,7 +97,7 @@ def recalculate_projections(state, current_price, fundamental_bias):
         mt5.initialize()
         
     # Calculate rolling averages of past weekly high/low offsets from MT5
-    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 19)
+    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 15)
     avg_high_offset = 95.0
     avg_low_offset = 120.0
     if rates_w1 is not None and len(rates_w1) > 1:
@@ -138,7 +138,7 @@ def recalculate_projections(state, current_price, fundamental_bias):
     adjusted_base = state.get("base_price", current_price) + ec
     
     new_projections = []
-    for w in range(1, 27):
+    for w in range(1, 26):
         week_start = start_monday + timedelta(weeks=w-1)
         week_end = week_start + timedelta(days=6)
         date_range_str = f"{week_start.strftime('%d %b')} - {week_end.strftime('%d %b')}"
@@ -187,11 +187,11 @@ def recalculate_projections(state, current_price, fundamental_bias):
 
 
 def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
-    """Retrieves the last 16 weekly High and Low prices from MT5 and calculates rolling forecasts using rolling weekly offsets."""
+    """Retrieves the last 12 weekly High and Low prices from MT5 and calculates rolling forecasts using rolling weekly offsets."""
     if not mt5.initialize():
         mt5.initialize()
         
-    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 19)
+    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 15)
     now = datetime.now()
     past_projections = []
     
@@ -212,13 +212,13 @@ def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
             avg_high_offset = sum(high_offsets) / len(high_offsets)
             avg_low_offset = sum(low_offsets) / len(low_offsets)
             
-    rates_to_process = rates_w1[-17:] if rates_w1 is not None else []
+    rates_to_process = rates_w1[-13:] if rates_w1 is not None else []
     
-    for idx in range(1, 17):
+    for idx in range(1, 13):
         prev_rate = rates_to_process[idx - 1] if (rates_to_process is not None and len(rates_to_process) > idx - 1) else None
         rate = rates_to_process[idx] if (rates_to_process is not None and len(rates_to_process) > idx) else None
         
-        w_idx = -17 + idx
+        w_idx = -13 + idx
         actual_high = rate['high'] if rate else (base_price + w_idx * 6.5 + 12.0)
         actual_low = rate['low'] if rate else (base_price + w_idx * 6.5 - 12.0)
         actual_close = rate['close'] if rate else (base_price + w_idx * 6.5)
