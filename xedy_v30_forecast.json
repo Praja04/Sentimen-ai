@@ -10,9 +10,9 @@
     "learning_rate": 0.05
   },
   "metrics": {
-    "mae": 3.37,
+    "mae": 2.7,
     "accuracy": 99.8,
-    "ticks_monitored": 347
+    "ticks_monitored": 414
   },
   "projections": [
     {
@@ -377,8 +377,10 @@
       "high": 4516.83,
       "high_high": 4733.59,
       "center": 4191.69,
-      "actual": 4328.56,
-      "error": 136.87,
+      "actual_high": 4545.93,
+      "actual_low": 4311.72,
+      "error_high": 29.1,
+      "error_low": 445.17,
       "confidence": 100.0,
       "status": "COMPLETED",
       "hits": {}
@@ -391,8 +393,10 @@
       "high": 4469.05,
       "high_high": 4656.77,
       "center": 4187.47,
-      "actual": 4219.32,
-      "error": 31.85,
+      "actual_high": 4363.21,
+      "actual_low": 4023.68,
+      "error_high": -105.84,
+      "error_low": 117.79,
       "confidence": 100.0,
       "status": "COMPLETED",
       "hits": {}
@@ -405,8 +409,10 @@
       "high": 4413.16,
       "high_high": 4566.43,
       "center": 4183.25,
-      "actual": 4155.47,
-      "error": -27.78,
+      "actual_high": 4382.44,
+      "actual_low": 4121.61,
+      "error_high": -30.72,
+      "error_low": 168.27,
       "confidence": 100.0,
       "status": "COMPLETED",
       "hits": {}
@@ -419,8 +425,10 @@
       "high": 4341.6,
       "high_high": 4449.98,
       "center": 4179.03,
-      "actual": 4088.55,
-      "error": -90.48,
+      "actual_high": 4220.93,
+      "actual_low": 3958.85,
+      "error_high": -120.67,
+      "error_low": -57.61,
       "confidence": 100.0,
       "status": "COMPLETED",
       "hits": {}

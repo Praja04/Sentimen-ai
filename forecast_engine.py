@@ -180,13 +180,13 @@ def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
     if not mt5.initialize():
         mt5.initialize()
         
-    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 4)
+    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 12)
     now = datetime.now()
     past_projections = []
     
     weekly_fundamental_drift = fundamental_bias * 25.0 * fund_w
     
-    for idx, w_idx in enumerate(range(-4, 0)):
+    for idx, w_idx in enumerate(range(-12, 0)):
         rate = rates_w1[idx] if (rates_w1 is not None and len(rates_w1) > idx) else None
         
         actual_high = rate['high'] if rate else (base_price + w_idx * 6.5 + 12.0)
