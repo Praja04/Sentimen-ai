@@ -10,9 +10,9 @@
     "learning_rate": 0.05
   },
   "metrics": {
-    "mae": 3.55,
+    "mae": 3.37,
     "accuracy": 99.8,
-    "ticks_monitored": 329
+    "ticks_monitored": 347
   },
   "projections": [
     {
@@ -367,5 +367,63 @@
     "\u2699\ufe0f [ERROR-CORRECT] Proportional Feedback Loop: Adjusted error offset to +0.51 (Error: +4.22).",
     "[09:13:55] Model initialized with base price 4174.81 and fundamental bias -0.211."
   ],
-  "error_correction": 4.219
+  "error_correction": 4.219,
+  "past_projections": [
+    {
+      "week": -4,
+      "date_range": "06 Jun - 12 Jun",
+      "low_low": 3649.79,
+      "low": 3866.55,
+      "high": 4516.83,
+      "high_high": 4733.59,
+      "center": 4191.69,
+      "actual": 4328.56,
+      "error": 136.87,
+      "confidence": 100.0,
+      "status": "COMPLETED",
+      "hits": {}
+    },
+    {
+      "week": -3,
+      "date_range": "13 Jun - 19 Jun",
+      "low_low": 3718.17,
+      "low": 3905.89,
+      "high": 4469.05,
+      "high_high": 4656.77,
+      "center": 4187.47,
+      "actual": 4219.32,
+      "error": 31.85,
+      "confidence": 100.0,
+      "status": "COMPLETED",
+      "hits": {}
+    },
+    {
+      "week": -2,
+      "date_range": "20 Jun - 26 Jun",
+      "low_low": 3800.07,
+      "low": 3953.34,
+      "high": 4413.16,
+      "high_high": 4566.43,
+      "center": 4183.25,
+      "actual": 4155.47,
+      "error": -27.78,
+      "confidence": 100.0,
+      "status": "COMPLETED",
+      "hits": {}
+    },
+    {
+      "week": -1,
+      "date_range": "27 Jun - 03 Jul",
+      "low_low": 3908.08,
+      "low": 4016.46,
+      "high": 4341.6,
+      "high_high": 4449.98,
+      "center": 4179.03,
+      "actual": 4088.55,
+      "error": -90.48,
+      "confidence": 100.0,
+      "status": "COMPLETED",
+      "hits": {}
+    }
+  ]
 }

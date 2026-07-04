@@ -176,7 +176,7 @@ def recalculate_projections(state, current_price, fundamental_bias):
 
 
 def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
-    """Retrieves the last 4 weekly closed prices from MT5 and calculates past forecast vs actual."""
+    """Retrieves the last 4 weekly High and Low prices from MT5 and calculates past forecast vs actual."""
     if not mt5.initialize():
         mt5.initialize()
         
@@ -188,7 +188,9 @@ def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
     
     for idx, w_idx in enumerate(range(-4, 0)):
         rate = rates_w1[idx] if (rates_w1 is not None and len(rates_w1) > idx) else None
-        actual_close = rate['close'] if rate else (base_price + w_idx * 6.5)
+        
+        actual_high = rate['high'] if rate else (base_price + w_idx * 6.5 + 12.0)
+        actual_low = rate['low'] if rate else (base_price + w_idx * 6.5 - 12.0)
         
         expected_drift = weekly_fundamental_drift * w_idx
         vol_factor = math.sqrt(abs(w_idx)) * vol_mult
@@ -199,7 +201,8 @@ def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
         high_high = base_price + expected_drift + (atr * 2.5 * vol_factor)
         center = base_price + expected_drift
         
-        err = actual_close - center
+        err_high = actual_high - high
+        err_low = actual_low - low
         
         w_start = now - timedelta(weeks=abs(w_idx))
         w_end = w_start + timedelta(days=6)
@@ -213,8 +216,10 @@ def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
             "high": round(high, 2),
             "high_high": round(high_high, 2),
             "center": round(center, 2),
-            "actual": round(actual_close, 2),
-            "error": round(err, 2),
+            "actual_high": round(actual_high, 2),
+            "actual_low": round(actual_low, 2),
+            "error_high": round(err_high, 2),
+            "error_low": round(err_low, 2),
             "confidence": 100.0,
             "status": "COMPLETED",
             "hits": {}

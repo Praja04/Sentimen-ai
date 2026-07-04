@@ -93,6 +93,33 @@ function updateForecastUI(forecast, macroContext, economicReports) {
     const tableBody = document.getElementById("forecastTableBody");
     if (tableBody) {
         let tableHtml = "";
+        
+        if (forecast.past_projections) {
+            forecast.past_projections.forEach(p => {
+                const isHighSmall = Math.abs(p.error_high) < 15.0;
+                const isLowSmall = Math.abs(p.error_low) < 15.0;
+                
+                tableHtml += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.015);">
+                        <td style="padding: 10px 8px; font-weight: 600; color: var(--muted);">M${p.week}</td>
+                        <td style="padding: 10px 8px; color: var(--muted); font-family: 'JetBrains Mono', monospace;">${p.date_range}</td>
+                        <td style="padding: 10px 8px; color: rgba(74, 222, 128, 0.4); font-family: 'JetBrains Mono', monospace;">$${p.low_low.toFixed(2)}</td>
+                        <td style="padding: 10px 8px; color: rgba(56, 189, 248, 0.4); font-family: 'JetBrains Mono', monospace;">$${p.low.toFixed(2)}</td>
+                        <td style="padding: 10px 8px; color: rgba(251, 191, 36, 0.4); font-family: 'JetBrains Mono', monospace;">$${p.high.toFixed(2)}</td>
+                        <td style="padding: 10px 8px; color: rgba(248, 113, 113, 0.4); font-family: 'JetBrains Mono', monospace;">$${p.high_high.toFixed(2)}</td>
+                        <td style="padding: 10px 8px; font-weight: 600; text-align: center; color: var(--muted); font-family: 'JetBrains Mono', monospace;">100%</td>
+                        <td style="padding: 10px 8px; text-align: center;">
+                            <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: var(--muted); border: 1px solid rgba(255, 255, 255, 0.08);">Terjadi</span>
+                        </td>
+                        <td style="padding: 10px 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.45;">
+                            <div>🔺 High Aktual: <strong>$${p.actual_high.toFixed(2)}</strong> <span style="color: ${isHighSmall ? '#4ade80' : '#f87171'}">(Deviasi: ${p.error_high >= 0 ? '+' : ''}${p.error_high.toFixed(2)})</span></div>
+                            <div>🔻 Low Aktual: <strong>$${p.actual_low.toFixed(2)}</strong> <span style="color: ${isLowSmall ? '#4ade80' : '#f87171'}">(Deviasi: ${p.error_low >= 0 ? '+' : ''}${p.error_low.toFixed(2)})</span></div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
         forecast.projections.forEach(p => {
             let statusBadge = `<span class="badge badge-pending">Pending</span>`;
             if (p.status.includes("ACTIVE")) {
@@ -214,7 +241,8 @@ function renderForecastChart(forecast) {
     const pastLows = [];
     const pastLowLows = [];
     const pastCenters = [];
-    const pastActuals = [];
+    const pastActualHighs = [];
+    const pastActualLows = [];
     
     if (forecast.past_projections) {
         forecast.past_projections.forEach(p => {
@@ -224,7 +252,8 @@ function renderForecastChart(forecast) {
             pastLows.push(p.low);
             pastLowLows.push(p.low_low);
             pastCenters.push(p.center);
-            pastActuals.push(p.actual);
+            pastActualHighs.push(p.actual_high);
+            pastActualLows.push(p.actual_low);
         });
     }
     
@@ -244,9 +273,10 @@ function renderForecastChart(forecast) {
     const finalLowLows = [...pastLowLows, ...futureLowLows];
     const finalCenters = [...pastCenters, ...futureCenters];
     
-    // Compile Actual Price data
+    // Compile Actual High/Low data
     const basePrice = forecast.base_price;
-    const finalActuals = [...pastActuals, basePrice, ...new Array(futureLabels.length - 1).fill(null)];
+    const finalActualHighs = [...pastActualHighs, basePrice, ...new Array(futureLabels.length - 1).fill(null)];
+    const finalActualLows = [...pastActualLows, basePrice, ...new Array(futureLabels.length - 1).fill(null)];
     
     if (forecastChart) {
         forecastChart.data.labels = labels;
@@ -255,7 +285,8 @@ function renderForecastChart(forecast) {
         forecastChart.data.datasets[2].data = finalLows;
         forecastChart.data.datasets[3].data = finalLowLows;
         forecastChart.data.datasets[4].data = finalCenters;
-        forecastChart.data.datasets[5].data = finalActuals;
+        forecastChart.data.datasets[5].data = finalActualHighs;
+        forecastChart.data.datasets[6].data = finalActualLows;
         forecastChart.update('none');
         return;
     }
@@ -310,13 +341,25 @@ function renderForecastChart(forecast) {
                     fill: false
                 },
                 {
-                    label: 'Actual Price',
-                    data: finalActuals,
-                    borderColor: 'rgba(0, 210, 255, 1.0)',
-                    borderWidth: 3,
+                    label: 'Actual High',
+                    data: finalActualHighs,
+                    borderColor: 'rgba(239, 68, 68, 0.95)',
+                    borderWidth: 2.5,
                     backgroundColor: 'transparent',
                     pointRadius: 4,
-                    pointBackgroundColor: 'rgba(0, 210, 255, 1.0)',
+                    pointBackgroundColor: 'rgba(239, 68, 68, 1.0)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 1.5,
+                    fill: false
+                },
+                {
+                    label: 'Actual Low',
+                    data: finalActualLows,
+                    borderColor: 'rgba(34, 197, 94, 0.95)',
+                    borderWidth: 2.5,
+                    backgroundColor: 'transparent',
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgba(34, 197, 94, 1.0)',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 1.5,
                     fill: false
