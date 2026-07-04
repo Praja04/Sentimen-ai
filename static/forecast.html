@@ -253,8 +253,17 @@
             <!-- Right Column: AI Self-Learning Monitor -->
             <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                    <h2>AI Self-Learning Agent</h2>
-                    <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 12px;">Agen AI memantau pergerakan harga real-time dan mengadaptasi parameter secara mandiri.</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <h2 style="margin:0;">AI Self-Learning Agent</h2>
+                        <div class="badge badge-active" id="agentActiveSymbol" style="font-size:0.7rem; color:var(--accent);">XAUUSD</div>
+                    </div>
+                    <!-- Live Symbol Price tag -->
+                    <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; padding:6px 12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">Live Bid Price:</span>
+                        <span id="agentActivePrice" style="font-family:'JetBrains Mono',monospace; font-size:0.95rem; font-weight:700; color:#fff;">-</span>
+                    </div>
+                    <p id="agentActiveDesc" style="font-size: 0.72rem; color: var(--muted); margin-bottom: 12px; min-height: 32px;">Agen AI memantau pergerakan harga real-time dan mengadaptasi parameter secara mandiri.</p>
+
                     
                     <div class="stats-grid">
                         <div class="stat-box">

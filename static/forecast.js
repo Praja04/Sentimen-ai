@@ -77,6 +77,35 @@ function updateForecastUI(forecast, macroContext, economicReports) {
     const isUSDJPY = currentSymbolTab === "USDJPY";
     const isOIL = currentSymbolTab === "XTIUSD";
     const currencyPrefix = isUSDJPY ? "¥" : "$";
+    const decimals = isUSDJPY ? 3 : 2;
+
+    // Dynamically update active agent label, price, and description details
+    const agentSymbolEl = document.getElementById("agentActiveSymbol");
+    const agentPriceEl = document.getElementById("agentActivePrice");
+    const agentDescEl = document.getElementById("agentActiveDesc");
+
+    if (agentSymbolEl) {
+        agentSymbolEl.textContent = currentSymbolTab;
+        if (currentSymbolTab === "XAUUSD") {
+            agentSymbolEl.style.cssText = "background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.3); font-size:0.7rem;";
+        } else if (currentSymbolTab === "USDJPY") {
+            agentSymbolEl.style.cssText = "background:rgba(165,180,252,0.15); color:#a5b4fc; border:1px solid rgba(165,180,252,0.3); font-size:0.7rem;";
+        } else if (currentSymbolTab === "XTIUSD") {
+            agentSymbolEl.style.cssText = "background:rgba(251,146,60,0.15); color:#fb923c; border:1px solid rgba(251,146,60,0.3); font-size:0.7rem;";
+        }
+    }
+    if (agentPriceEl) {
+        agentPriceEl.textContent = `${currencyPrefix}${forecast.base_price.toFixed(decimals)}`;
+    }
+    if (agentDescEl) {
+        if (currentSymbolTab === "XAUUSD") {
+            agentDescEl.textContent = "Mengkalibrasi deviasi pergerakan emas berdasarkan parameter likuiditas global & aliran safe-haven.";
+        } else if (currentSymbolTab === "USDJPY") {
+            agentDescEl.textContent = "Mengadaptasi model sensitivitas Yen terhadap volatilitas suku bunga BoJ dan carry trade unwind.";
+        } else if (currentSymbolTab === "XTIUSD") {
+            agentDescEl.textContent = "Memantau rentang volatilitas WTI berdasarkan suplai global, rig count, dan pemotongan OPEC+.";
+        }
+    }
 
     // 1. Update Self-Learning stats
     document.getElementById("modelAccuracy").textContent = `${forecast.metrics.accuracy.toFixed(1)}%`;
