@@ -463,7 +463,6 @@ const TAB_STYLES = {
 const TAB_BTNS = { 'XAUUSD': 'tab-xauusd', 'USDJPY': 'tab-usdjpy', 'XTIUSD': 'tab-oil' };
 
 function switchSymbolTab(symbol) {
-    if (currentSymbolTab === symbol) return;
     currentSymbolTab = symbol;
 
     // Update tab button styles
