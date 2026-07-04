@@ -1,4 +1,4 @@
-let forecastChart = null;
+let forecastChart = null;  // legacy — now keyed via symbolCharts['XAUUSD']
 
 document.addEventListener("DOMContentLoaded", () => {
     // Initial fetch of forecast data
@@ -153,8 +153,8 @@ function updateForecastUI(forecast, macroContext, economicReports) {
             }
             
             tableHtml += `
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); hover: background: rgba(255,255,255,0.01);">
-                    <td style="padding: 10px 8px; font-weight: 600; color: #fff;">M${p.week}</td>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <td style="padding: 10px 8px; font-weight: 600; color: #fff; font-family:'JetBrains Mono',monospace;">W+${p.week}</td>
                     <td style="padding: 10px 8px; color: var(--muted); font-family: 'JetBrains Mono', monospace;">${p.date_range}</td>
                     <td style="padding: 10px 8px; color: #4ade80; font-family: 'JetBrains Mono', monospace; font-weight: 500;">$${p.low_low.toFixed(2)}</td>
                     <td style="padding: 10px 8px; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">$${p.low.toFixed(2)}</td>
@@ -234,7 +234,8 @@ function updateForecastUI(forecast, macroContext, economicReports) {
 }
 
 function renderForecastChart(forecast) {
-    const ctx = document.getElementById("forecastChart");
+    // Use new unified canvas for XAUUSD
+    const ctx = document.getElementById('forecastChartXAUUSD');
     if (!ctx) return;
     
     // 1. Compile past 4 weeks if available
@@ -249,7 +250,7 @@ function renderForecastChart(forecast) {
     
     if (forecast.past_projections) {
         forecast.past_projections.forEach(p => {
-            pastLabels.push(`Minggu ${p.week}`);
+            pastLabels.push(`W${p.week}`);
             pastHighHighs.push(p.high_high);
             pastHighs.push(p.high);
             pastLows.push(p.low);
@@ -291,20 +292,21 @@ function renderForecastChart(forecast) {
         ...new Array(futureLabels.length - 1).fill(null)
     ];
     
-    if (forecastChart) {
-        forecastChart.data.labels = labels;
-        forecastChart.data.datasets[0].data = finalHighHighs;
-        forecastChart.data.datasets[1].data = finalHighs;
-        forecastChart.data.datasets[2].data = finalLows;
-        forecastChart.data.datasets[3].data = finalLowLows;
-        forecastChart.data.datasets[4].data = finalCenters;
-        forecastChart.data.datasets[5].data = finalActualHighs;
-        forecastChart.data.datasets[6].data = finalActualLows;
-        forecastChart.update('none');
+    // Use symbolCharts registry for XAUUSD
+    if (symbolCharts['XAUUSD']) {
+        symbolCharts['XAUUSD'].data.labels = labels;
+        symbolCharts['XAUUSD'].data.datasets[0].data = finalHighHighs;
+        symbolCharts['XAUUSD'].data.datasets[1].data = finalHighs;
+        symbolCharts['XAUUSD'].data.datasets[2].data = finalLows;
+        symbolCharts['XAUUSD'].data.datasets[3].data = finalLowLows;
+        symbolCharts['XAUUSD'].data.datasets[4].data = finalCenters;
+        symbolCharts['XAUUSD'].data.datasets[5].data = finalActualHighs;
+        symbolCharts['XAUUSD'].data.datasets[6].data = finalActualLows;
+        symbolCharts['XAUUSD'].update('none');
         return;
     }
-    
-    forecastChart = new Chart(ctx, {
+
+    symbolCharts['XAUUSD'] = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
@@ -469,12 +471,24 @@ function switchSymbolTab(symbol) {
         panel.style.animation = 'fadeInUp 0.3s ease-out';
     }
 
-    // Fetch data if not XAUUSD (which is always pre-rendered)
-    if (symbol !== 'XAUUSD') {
-        loadSymbolForecast(symbol);
-    } else {
-        // Render XAUUSD confidence bars and chart
+    const titleEl = document.getElementById('weeklyTableTitle');
+    const badgeEl = document.getElementById('weeklyTableBadge');
+    const biasTagEl = document.getElementById('weeklyTableBiasTag');
+
+    if (symbol === 'XAUUSD') {
+        if (titleEl) titleEl.textContent = '📅 Rencana Proyeksi Mingguan XAUUSD';
+        if (badgeEl) {
+            badgeEl.textContent = 'GOLD/USD · W-12 → W+25';
+            badgeEl.className = 'badge badge-active';
+            badgeEl.style.cssText = '';
+        }
+        if (biasTagEl) biasTagEl.innerHTML = '';
+        
+        // Restore XAUUSD table contents
+        fetchForecastData();
         renderConfidenceBars('XAUUSD', null);
+    } else {
+        loadSymbolForecast(symbol);
     }
 
     // Update price tag
@@ -508,17 +522,28 @@ async function loadSymbolForecast(symbol) {
 
         const fc = data.forecast;
 
+        // Update headers in unified table
+        const titleEl = document.getElementById('weeklyTableTitle');
+        const badgeEl = document.getElementById('weeklyTableBadge');
+        const biasTagEl = document.getElementById('weeklyTableBiasTag');
+
+        if (titleEl) titleEl.textContent = `📅 Rencana Proyeksi Mingguan ${fc.display_name}`;
+        if (badgeEl) {
+            badgeEl.textContent = `${fc.symbol} · W-12 → W+25`;
+            if (symbol === 'USDJPY') {
+                badgeEl.style.cssText = 'background:rgba(165,180,252,0.1); color:#a5b4fc; border:1px solid rgba(165,180,252,0.3);';
+            } else {
+                badgeEl.style.cssText = 'background:rgba(251,146,60,0.1); color:#fb923c; border:1px solid rgba(251,146,60,0.3);';
+            }
+        }
+        if (biasTagEl) {
+            biasTagEl.innerHTML = `Trend Bias: <strong style="color:${fc.trend_bias >= 0 ? '#4ade80' : '#f87171'}">${fc.trend_bias >= 0 ? '▲' : '▼'} ${(fc.trend_bias * 100).toFixed(2)}%</strong>`;
+        }
+
         // Update desc/bias labels
-        if (symbol === 'USDJPY') {
-            const desc = document.getElementById('usdJpyDesc');
-            const bias = document.getElementById('usdJpyBias');
-            if (desc) desc.textContent = `${fc.description} | Bid: ${fc.base_price} | Drift/week: ${fc.weekly_drift > 0 ? '+' : ''}${fc.weekly_drift}`;
-            if (bias) bias.innerHTML = `Trend Bias: <strong style="color:${fc.trend_bias >= 0 ? '#4ade80' : '#f87171'}">${fc.trend_bias >= 0 ? '▲' : '▼'} ${(fc.trend_bias * 100).toFixed(2)}%</strong>`;
-        } else if (symbol === 'XTIUSD') {
-            const desc = document.getElementById('oilDesc');
-            const bias = document.getElementById('oilBias');
-            if (desc) desc.textContent = `${fc.description} | Bid: $${fc.base_price} | Drift/week: $${fc.weekly_drift > 0 ? '+' : ''}${fc.weekly_drift}`;
-            if (bias) bias.innerHTML = `Trend Bias: <strong style="color:${fc.trend_bias >= 0 ? '#4ade80' : '#f87171'}">${fc.trend_bias >= 0 ? '▲' : '▼'} ${(fc.trend_bias * 100).toFixed(2)}%</strong>`;
+        const descRow = document.getElementById('symbolDescRow');
+        if (descRow) {
+            descRow.textContent = `${fc.description} | Bid: ${symbol === 'USDJPY' ? '' : '$'}${fc.base_price} | Drift/week: ${fc.weekly_drift > 0 ? '+' : ''}${fc.weekly_drift}`;
         }
 
         // Update price tag
@@ -533,14 +558,13 @@ async function loadSymbolForecast(symbol) {
         // Render confidence bars
         renderConfidenceBars(symbol, fc.projections);
 
-        // Render table
+        // Render table in unified body
         renderSymbolTable(symbol, fc);
 
     } catch (err) {
         console.error('Error loading symbol forecast:', err);
-        const tableId = symbol === 'USDJPY' ? 'forecastTableUSDJPY' : 'forecastTableXTIUSD';
-        const tbody = document.getElementById(tableId);
-        if (tbody) tbody.innerHTML = `<tr><td colspan="8" style="padding:20px;text-align:center;color:#f87171;">❌ Error: ${err.message}</td></tr>`;
+        const tbody = document.getElementById('forecastTableBody');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="padding:20px;text-align:center;color:#f87171;">❌ Error: ${err.message}</td></tr>`;
     } finally {
         if (spinner) spinner.style.display = 'none';
     }
@@ -633,10 +657,8 @@ function renderConfidenceBars(symbol, projections) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Use XAUUSD data from existing state if projections is null
     let bars = projections;
     if (!bars) {
-        // Build synthetic bars for XAUUSD from known formula
         bars = [];
         for (let w = 1; w <= 25; w++) {
             bars.push({ week: w, confidence: Math.max(50, Math.round((95.0 - (w - 1) * 1.8) * 10) / 10) });
@@ -646,8 +668,8 @@ function renderConfidenceBars(symbol, projections) {
     container.innerHTML = '';
     bars.forEach(p => {
         const conf = p.confidence;
-        const pct = ((conf - 50) / 45) * 100;  // scale 50-95% → 0-100%
-        const hue = pct > 60 ? 141 : pct > 30 ? 48 : 0;  // green → yellow → red
+        const pct = ((conf - 50) / 45) * 100;
+        const hue = pct > 60 ? 141 : pct > 30 ? 48 : 0;
         const bar = document.createElement('div');
         bar.style.cssText = `flex:1; height:${Math.max(8, pct * 0.6)}px; background:hsla(${hue},80%,55%,0.6); border-radius:2px 2px 0 0; transition:all 0.3s; cursor:default; min-width:4px;`;
         bar.title = `W+${p.week}: ${conf}%`;
@@ -659,8 +681,7 @@ function renderConfidenceBars(symbol, projections) {
 }
 
 function renderSymbolTable(symbol, fc) {
-    const tableId = symbol === 'USDJPY' ? 'forecastTableUSDJPY' : 'forecastTableXTIUSD';
-    const tbody = document.getElementById(tableId);
+    const tbody = document.getElementById('forecastTableBody');
     if (!tbody) return;
 
     const isOil = symbol === 'XTIUSD';
@@ -687,11 +708,23 @@ function renderSymbolTable(symbol, fc) {
                 <td style="padding:9px 8px;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:${isPast ? '#8a9cb4' : '#e2ecf8'};">${weekLabel}</td>
                 <td style="padding:9px 8px;color:var(--muted);font-size:0.75rem;">${p.date_range}</td>
                 <td style="padding:9px 8px;color:rgba(74,222,128,0.7);font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${prefix}${parseFloat(p.low_low).toFixed(decimals)}</td>
-                <td style="padding:9px 8px;color:#38bdf8;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${prefix}${parseFloat(p.low).toFixed(decimals)}${isPast ? `<div style="color:#22c55e;font-size:0.65rem;">Act:${prefix}${parseFloat(p.actual_low).toFixed(decimals)}</div>` : ''}</td>
-                <td style="padding:9px 8px;color:#fbbf24;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${prefix}${parseFloat(p.high).toFixed(decimals)}${isPast ? `<div style="color:#ef4444;font-size:0.65rem;">Act:${prefix}${parseFloat(p.actual_high).toFixed(decimals)}</div>` : ''}</td>
+                <td style="padding:9px 8px;color:#38bdf8;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">
+                    <div>${prefix}${parseFloat(p.low).toFixed(decimals)}</div>
+                    ${isPast ? `<div style="color:#22c55e;font-size:0.65rem;margin-top:2px;">▲ Act Low: ${prefix}${parseFloat(p.actual_low).toFixed(decimals)}</div>` : ''}
+                </td>
+                <td style="padding:9px 8px;color:#fbbf24;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">
+                    <div>${prefix}${parseFloat(p.high).toFixed(decimals)}</div>
+                    ${isPast ? `<div style="color:#ef4444;font-size:0.65rem;margin-top:2px;">▼ Act High: ${prefix}${parseFloat(p.actual_high).toFixed(decimals)}</div>` : ''}
+                </td>
                 <td style="padding:9px 8px;color:rgba(248,113,113,0.7);font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${prefix}${parseFloat(p.high_high).toFixed(decimals)}</td>
                 <td style="padding:9px 8px;text-align:center;font-weight:700;font-family:'JetBrains Mono',monospace;color:${confColor};font-size:0.8rem;">${conf}%</td>
                 <td style="padding:9px 8px;text-align:center;">${statusHtml}</td>
+                <td style="padding:9px 8px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.6;">
+                    ${isPast ? `
+                        <div>🔺 <span style="color:#ef4444;font-weight:600;">${prefix}${parseFloat(p.actual_high).toFixed(decimals)}</span> <span style="color:#4ade80;">&nbsp;[H–HH ✓]</span></div>
+                        <div>🔻 <span style="color:#4ade80;font-weight:600;">${prefix}${parseFloat(p.actual_low).toFixed(decimals)}</span> <span style="color:#4ade80;">&nbsp;[LL–L ✓]</span></div>
+                    ` : '<span style="color:var(--muted); font-size:0.7rem;">Menunggu pergerakan harga...</span>'}
+                </td>
             </tr>`;
     });
 
@@ -702,8 +735,8 @@ function renderSymbolTable(symbol, fc) {
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         renderConfidenceBars('XAUUSD', null);
-        // Also bind XAUUSD tab button style
         const btn = document.getElementById('tab-xauusd');
         if (btn) btn.style.cssText += ';' + TAB_STYLES['XAUUSD'].active;
     }, 800);
 });
+
