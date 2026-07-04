@@ -112,6 +112,33 @@ function updateForecastUI(forecast, macroContext, economicReports) {
         }
     }
 
+    // Dynamically update Demand Analysis titles & labels based on Active Tab
+    const demandTitleEl = document.getElementById("macroDemandTitle");
+    const demandLabel1El = document.getElementById("macroDemandLabel1");
+    const demandLabel2El = document.getElementById("macroDemandLabel2");
+    const demandLabel3El = document.getElementById("macroDemandLabel3");
+    const ecoTableImpactHeaderEl = document.getElementById("ecoTableImpactHeader");
+
+    if (currentSymbolTab === "XAUUSD") {
+        if (demandTitleEl) demandTitleEl.textContent = "📦 Analisa Permintaan Emas";
+        if (demandLabel1El) demandLabel1El.textContent = "Pembelian Bank Sentral:";
+        if (demandLabel2El) demandLabel2El.textContent = "Arus Likuiditas ETF (SPDR):";
+        if (demandLabel3El) demandLabel3El.textContent = "Permintaan Retail & Perhiasan:";
+        if (ecoTableImpactHeaderEl) ecoTableImpactHeaderEl.textContent = "Dampak Terhadap Emas";
+    } else if (currentSymbolTab === "USDJPY") {
+        if (demandTitleEl) demandTitleEl.textContent = "📦 Analisa Permintaan & Arus Yen";
+        if (demandLabel1El) demandLabel1El.textContent = "Intervensi Moneter & Obligasi BoJ:";
+        if (demandLabel2El) demandLabel2El.textContent = "Aliran Repatriasi Carry Trade:";
+        if (demandLabel3El) demandLabel3El.textContent = "Aktivitas Konsumsi Domestik Jepang:";
+        if (ecoTableImpactHeaderEl) ecoTableImpactHeaderEl.textContent = "Dampak Terhadap JPY";
+    } else if (currentSymbolTab === "XTIUSD") {
+        if (demandTitleEl) demandTitleEl.textContent = "📦 Analisa Permintaan Minyak Bumi";
+        if (demandLabel1El) demandLabel1El.textContent = "Cadangan Minyak Strategis (SPR):";
+        if (demandLabel2El) demandLabel2El.textContent = "Kontrak Berjangka & Inflow ETF:";
+        if (demandLabel3El) demandLabel3El.textContent = "Konsumsi Sektor Kilang & Transportasi:";
+        if (ecoTableImpactHeaderEl) ecoTableImpactHeaderEl.textContent = "Dampak Terhadap Minyak (WTI)";
+    }
+
     // 1. Update Self-Learning stats
     document.getElementById("modelAccuracy").textContent = `${forecast.metrics.accuracy.toFixed(1)}%`;
     document.getElementById("modelMae").textContent = `${currencyPrefix}${forecast.metrics.mae.toFixed(2)}`;

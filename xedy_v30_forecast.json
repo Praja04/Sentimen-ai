@@ -13,7 +13,7 @@
   "metrics": {
     "mae": 1.24,
     "accuracy": 99.8,
-    "ticks_monitored": 268
+    "ticks_monitored": 333
   },
   "projections": [
     {
