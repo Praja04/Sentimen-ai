@@ -2814,7 +2814,12 @@ def get_forecast_data():
                 
         bias_val = compute_xedy_fundamental_bias()
         state = forecast_engine.get_forecast_state(current_price, bias_val)
-        return jsonify({"status": "success", "forecast": state})
+        macro_ctx = forecast_engine.get_forecast_macro_context()
+        return jsonify({
+            "status": "success",
+            "forecast": state,
+            "macro_context": macro_ctx
+        })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 

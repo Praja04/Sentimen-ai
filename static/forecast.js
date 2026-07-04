@@ -14,7 +14,7 @@ async function fetchForecastData() {
         const response = await fetch("/api/forecast_data");
         const data = await response.json();
         if (data.status === "success" && data.forecast) {
-            updateForecastUI(data.forecast);
+            updateForecastUI(data.forecast, data.macro_context);
             renderForecastChart(data.forecast);
         }
     } catch (e) {
@@ -67,7 +67,7 @@ function updateTickers(ticks) {
     container.innerHTML = html;
 }
 
-function updateForecastUI(forecast) {
+function updateForecastUI(forecast, macroContext) {
     // 1. Update Self-Learning stats
     document.getElementById("modelAccuracy").textContent = `${forecast.metrics.accuracy.toFixed(1)}%`;
     document.getElementById("modelMae").textContent = `$${forecast.metrics.mae.toFixed(2)}`;
@@ -134,6 +134,35 @@ function updateForecastUI(forecast) {
             `;
         });
         tableBody.innerHTML = tableHtml;
+    }
+
+    // 4. Update Macro Context Panels
+    if (macroContext) {
+        document.getElementById("macroCentralBank").textContent = macroContext.demand.central_bank;
+        document.getElementById("macroEtfFlows").textContent = macroContext.demand.etf_flows;
+        document.getElementById("macroJewelry").textContent = macroContext.demand.jewelry;
+        
+        document.getElementById("macroFedStance").textContent = macroContext.experts.fed_stance;
+        document.getElementById("macroPresidentStance").textContent = macroContext.experts.president_stance;
+        
+        document.getElementById("macroGeopoliticsIndex").textContent = macroContext.geopolitics.index;
+        document.getElementById("macroConflicts").textContent = macroContext.geopolitics.conflicts;
+        document.getElementById("macroTariffWars").textContent = macroContext.geopolitics.tariff_wars;
+        
+        // Wall Street Consensus
+        const wallStreetContainer = document.getElementById("macroWallStreet");
+        if (wallStreetContainer && macroContext.experts.targets) {
+            let targetsHtml = `<span style="color: var(--muted); display: block; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 4px;">Target Bank Global:</span>`;
+            macroContext.experts.targets.forEach(t => {
+                targetsHtml += `
+                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding: 3px 0;">
+                        <span style="color: var(--muted); font-weight: 500;">${t.inst}:</span>
+                        <span style="color: #fbbf24; font-weight: 600;">${t.target}</span>
+                    </div>
+                `;
+            });
+            wallStreetContainer.innerHTML = targetsHtml;
+        }
     }
 }
 
