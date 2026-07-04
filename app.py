@@ -1,3 +1,12 @@
+try:
+    import shutil, os
+    src = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\forecast_engine.py'
+    dst = r'C:\Users\ACER\OneDrive\Documents\PROJECT\forecast_engine.py'
+    if os.path.exists(src):
+        shutil.copy2(src, dst)
+except Exception:
+    pass
+
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, jsonify, send_from_directory, request
@@ -5,6 +14,7 @@ import MetaTrader5 as mt5
 from flask_cors import CORS
 import os
 import json
+import forecast_engine
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -134,6 +144,10 @@ def get_live_ticks():
                 if os.path.exists(config_file):
                     with open(config_file, 'r', encoding='utf-8') as f_cfg:
                         demo_state["active_config"] = json.load(f_cfg)
+            try:
+                forecast_engine.update_forecast_tick(ticks["XAUUSD"]["bid"], bias)
+            except Exception as fe_err:
+                print("Error in forecast tick update:", fe_err)
         except Exception as err:
             print("Error in livetest simulation tick update:", err)
             
@@ -2780,6 +2794,31 @@ def get_trade_status():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route('/Forecast')
+def forecast_page():
+    return send_from_directory('static', 'forecast.html')
+
+
+@app.route('/api/forecast_data')
+def get_forecast_data():
+    try:
+        current_price = 2300.0
+        if not mt5.initialize():
+            mt5.initialize()
+        for opt in ["XAUUSD", "GOLD"]:
+            mt5.symbol_select(opt, True)
+            t = mt5.symbol_info_tick(opt)
+            if t:
+                current_price = t.bid
+                break
+                
+        bias_val = compute_xedy_fundamental_bias()
+        state = forecast_engine.get_forecast_state(current_price, bias_val)
+        return jsonify({"status": "success", "forecast": state})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 if __name__ == '__main__':
     try:
         src = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_sim.py'
@@ -2791,7 +2830,7 @@ if __name__ == '__main__':
             
         src_dir = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\static'
         dst_dir = r'C:\Users\ACER\OneDrive\Documents\PROJECT\static'
-        for f in ['backtest.html', 'backtest.js', 'backtest.css']:
+        for f in ['backtest.html', 'backtest.js', 'backtest.css', 'forecast.html', 'forecast.js', 'index.html', 'trade.html']:
             src_f = os.path.join(src_dir, f)
             dst_f = os.path.join(dst_dir, f)
             if os.path.exists(src_f):
