@@ -231,8 +231,8 @@ async function runBacktestSearch() {
             elements.priority3.value
         ],
         initial_capital: Number(elements.initialCapital.value || 10000),
-        start_month: elements.startMonth.value || null,
-        end_month: elements.endMonth.value || null,
+        start_month: `${document.getElementById("startYear").value}-${document.getElementById("startMonth").value}`,
+        end_month: `${document.getElementById("endYear").value}-${document.getElementById("endMonth").value}`,
         days: 30,
         risk_pct: Number(elements.riskPct.value || 1),
         timeframes: Array.from(document.querySelectorAll('input[name="tf_select"]:checked')).map(el => el.value),

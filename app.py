@@ -2788,6 +2788,16 @@ if __name__ == '__main__':
             import shutil
             shutil.copy2(src, dst)
             print("Programmatic sync of livetest_sim.py successful!")
+            
+        src_dir = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\static'
+        dst_dir = r'C:\Users\ACER\OneDrive\Documents\PROJECT\static'
+        for f in ['backtest.html', 'backtest.js']:
+            src_f = os.path.join(src_dir, f)
+            dst_f = os.path.join(dst_dir, f)
+            if os.path.exists(src_f):
+                import shutil
+                shutil.copy2(src_f, dst_f)
+                print(f"Programmatic sync of {f} successful!")
     except Exception as e:
         print("Programmatic sync failed:", e)
 
