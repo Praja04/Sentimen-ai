@@ -207,29 +207,56 @@ function renderForecastChart(forecast) {
     const ctx = document.getElementById("forecastChart");
     if (!ctx) return;
     
-    // Extract datasets
-    const labels = forecast.projections.map(p => `Minggu ${p.week}`);
-    const lowLows = forecast.projections.map(p => p.low_low);
-    const lows = forecast.projections.map(p => p.low);
-    const highs = forecast.projections.map(p => p.high);
-    const highHighs = forecast.projections.map(p => p.high_high);
-    const centers = forecast.projections.map(p => (p.high + p.low) / 2.0);
+    // 1. Compile past 4 weeks if available
+    const pastLabels = [];
+    const pastHighHighs = [];
+    const pastHighs = [];
+    const pastLows = [];
+    const pastLowLows = [];
+    const pastCenters = [];
+    const pastActuals = [];
     
+    if (forecast.past_projections) {
+        forecast.past_projections.forEach(p => {
+            pastLabels.push(`Minggu ${p.week}`);
+            pastHighHighs.push(p.high_high);
+            pastHighs.push(p.high);
+            pastLows.push(p.low);
+            pastLowLows.push(p.low_low);
+            pastCenters.push(p.center);
+            pastActuals.push(p.actual);
+        });
+    }
+    
+    // 2. Compile future 26 weeks
+    const futureLabels = forecast.projections.map(p => `Minggu ${p.week}`);
+    const futureHighHighs = forecast.projections.map(p => p.high_high);
+    const futureHighs = forecast.projections.map(p => p.high);
+    const futureLows = forecast.projections.map(p => p.low);
+    const futureLowLows = forecast.projections.map(p => p.low_low);
+    const futureCenters = forecast.projections.map(p => (p.high + p.low) / 2.0);
+    
+    // Combine labels and datasets
+    const labels = [...pastLabels, ...futureLabels];
+    const finalHighHighs = [...pastHighHighs, ...futureHighHighs];
+    const finalHighs = [...pastHighs, ...futureHighs];
+    const finalLows = [...pastLows, ...futureLows];
+    const finalLowLows = [...pastLowLows, ...futureLowLows];
+    const finalCenters = [...pastCenters, ...futureCenters];
+    
+    // Compile Actual Price data
     const basePrice = forecast.base_price;
-    const actualData = new Array(labels.length).fill(null);
-    actualData[0] = basePrice; // Start actual line from base price
-    
-    // Draw running actual ticks if we have hit events showing recent price ticks
-    // For visual simulation, we can draw a slight line tracking recent prices
+    const finalActuals = [...pastActuals, basePrice, ...new Array(futureLabels.length - 1).fill(null)];
     
     if (forecastChart) {
-        // Just update values and update chart to avoid flickering
-        forecastChart.data.datasets[0].data = highHighs;
-        forecastChart.data.datasets[1].data = highs;
-        forecastChart.data.datasets[2].data = lows;
-        forecastChart.data.datasets[3].data = lowLows;
-        forecastChart.data.datasets[4].data = centers;
-        forecastChart.update('none'); // silent update
+        forecastChart.data.labels = labels;
+        forecastChart.data.datasets[0].data = finalHighHighs;
+        forecastChart.data.datasets[1].data = finalHighs;
+        forecastChart.data.datasets[2].data = finalLows;
+        forecastChart.data.datasets[3].data = finalLowLows;
+        forecastChart.data.datasets[4].data = finalCenters;
+        forecastChart.data.datasets[5].data = finalActuals;
+        forecastChart.update('none');
         return;
     }
     
@@ -240,7 +267,7 @@ function renderForecastChart(forecast) {
             datasets: [
                 {
                     label: 'High-High (Target Ekstrem)',
-                    data: highHighs,
+                    data: finalHighHighs,
                     borderColor: 'rgba(248, 113, 113, 0.4)',
                     borderWidth: 1.5,
                     borderDash: [5, 5],
@@ -249,25 +276,25 @@ function renderForecastChart(forecast) {
                 },
                 {
                     label: 'High (Target Atas)',
-                    data: highs,
+                    data: finalHighs,
                     borderColor: 'rgba(251, 191, 36, 0.8)',
                     borderWidth: 2,
                     backgroundColor: 'rgba(251, 191, 36, 0.05)',
                     pointRadius: 2,
-                    fill: '+1' // fill up to High-High
+                    fill: '+1'
                 },
                 {
                     label: 'Low (Target Bawah)',
-                    data: lows,
+                    data: finalLows,
                     borderColor: 'rgba(56, 189, 248, 0.8)',
                     borderWidth: 2,
                     backgroundColor: 'rgba(10, 20, 38, 0.4)',
                     pointRadius: 2,
-                    fill: '-1' // fill down to Low-Low
+                    fill: '-1'
                 },
                 {
                     label: 'Low-Low (Target Ekstrem)',
-                    data: lowLows,
+                    data: finalLowLows,
                     borderColor: 'rgba(74, 222, 128, 0.4)',
                     borderWidth: 1.5,
                     borderDash: [5, 5],
@@ -276,10 +303,22 @@ function renderForecastChart(forecast) {
                 },
                 {
                     label: 'Median Project',
-                    data: centers,
-                    borderColor: 'rgba(0, 210, 255, 0.9)',
+                    data: finalCenters,
+                    borderColor: 'rgba(165, 180, 252, 0.6)',
                     borderWidth: 2,
                     pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'Actual Price',
+                    data: finalActuals,
+                    borderColor: 'rgba(0, 210, 255, 1.0)',
+                    borderWidth: 3,
+                    backgroundColor: 'transparent',
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgba(0, 210, 255, 1.0)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 1.5,
                     fill: false
                 }
             ]
