@@ -2791,7 +2791,7 @@ if __name__ == '__main__':
             
         src_dir = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\static'
         dst_dir = r'C:\Users\ACER\OneDrive\Documents\PROJECT\static'
-        for f in ['backtest.html', 'backtest.js']:
+        for f in ['backtest.html', 'backtest.js', 'backtest.css']:
             src_f = os.path.join(src_dir, f)
             dst_f = os.path.join(dst_dir, f)
             if os.path.exists(src_f):

@@ -43,12 +43,16 @@ body {
 .panel,
 .summary-card,
 .livetest-section {
-    border: 1px solid var(--line);
-    background: var(--panel);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(145deg, rgba(12, 24, 48, 0.9) 0%, rgba(6, 12, 26, 0.95) 100%);
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.5), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 0 1px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 12px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .hero-card:hover,
@@ -175,13 +179,14 @@ input,
 select,
 button {
     font-family: "Outfit", sans-serif;
-    border: 1px solid var(--line);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 8px;
-    background: var(--panel-soft);
+    background: rgba(4, 8, 16, 0.5);
     color: var(--text);
     padding: 10px 14px;
     font-size: 0.85rem;
     outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.04);
     transition: all 0.2s ease;
 }
 
@@ -195,8 +200,8 @@ select {
 input:focus,
 select:focus {
     border-color: var(--accent);
-    background: rgba(18, 32, 58, 0.85);
-    box-shadow: 0 0 8px rgba(0, 210, 255, 0.15);
+    background: rgba(4, 8, 16, 0.7);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 8px rgba(0, 210, 255, 0.25);
 }
 
 .checkbox-label {
@@ -231,25 +236,36 @@ select:focus {
 
 button {
     cursor: pointer;
-    background: linear-gradient(135deg, var(--accent), #0e7cf6);
+    background: linear-gradient(180deg, var(--accent) 0%, #0c72e0 100%);
     color: #02060e;
-    font-weight: 500;
-    border: none;
+    font-weight: 600;
+    border: 1px solid rgba(0, 210, 255, 0.3);
     padding: 12px 28px;
     border-radius: 8px;
     font-size: 0.88rem;
     letter-spacing: 0.02em;
-    box-shadow: 0 4px 15px rgba(0, 210, 255, 0.15);
+    box-shadow: 
+        0 4px 15px rgba(0, 210, 255, 0.25), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
 }
 
 button:hover {
-    opacity: 0.95;
-    box-shadow: 0 4px 20px rgba(0, 210, 255, 0.3);
-    transform: translateY(-1px);
+    box-shadow: 
+        0 6px 20px rgba(0, 210, 255, 0.4), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        0 1px 2px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1.5px);
 }
 
 button:active {
-    transform: translateY(0);
+    box-shadow: 
+        0 2px 8px rgba(0, 210, 255, 0.2), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 1px 1px rgba(0, 0, 0, 0.4);
+    transform: translateY(0.5px);
 }
 
 #statusText {
