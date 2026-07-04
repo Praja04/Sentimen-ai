@@ -86,6 +86,21 @@ async function fetchStatus() {
                 const tpDist = data.active_config.tp_dist || data.active_config.rr || 1.5;
                 tpVal.innerText = `SL * ${tpDist} R`;
             }
+
+            // Dynamically update Fundamental & Technical weight labels based on ML weights
+            const fundLabel = document.getElementById('explainer-fund-label');
+            const techLabel = document.getElementById('explainer-tech-label');
+            if (data.ml_weights && Object.keys(data.ml_weights).length > 0) {
+                const w = data.ml_weights;
+                const fSum = (w.macro || 0.166) + (w.sentiment || 0.166) + (w.flow || 0.166) + (w.regime || 0.166);
+                const fPct = Math.round(fSum * 100);
+                const tPct = 100 - fPct; // Ensure they sum to 100%
+                if (fundLabel) fundLabel.innerText = `■ Fundamental (${fPct}% Bobot)`;
+                if (techLabel) techLabel.innerText = `■ Teknikal (${tPct}% Bobot)`;
+            } else {
+                if (fundLabel) fundLabel.innerText = '■ Fundamental (80% Bobot)';
+                if (techLabel) techLabel.innerText = '■ Teknikal (20% Bobot)';
+            }
         } else {
             document.getElementById('trade-method').innerText = 'No Strategy Chosen';
             document.getElementById('trade-timeframe').innerText = 'Go to Backtest page to select and deploy';
@@ -102,6 +117,10 @@ async function fetchStatus() {
             document.getElementById('explainer-main-dir').innerText = '-';
             document.getElementById('explainer-sl-value').innerText = '-';
             document.getElementById('explainer-tp-value').innerText = '-';
+            const fLbl = document.getElementById('explainer-fund-label');
+            const tLbl = document.getElementById('explainer-tech-label');
+            if (fLbl) fLbl.innerText = '■ Fundamental (80% Bobot)';
+            if (tLbl) tLbl.innerText = '■ Teknikal (20% Bobot)';
         }
 
         // Render Live AI Activity Logs
