@@ -74,9 +74,14 @@ function updateTickers(ticks) {
 }
 
 function updateForecastUI(forecast, macroContext, economicReports) {
+    // Determine currency symbol based on current active tab
+    const isUSDJPY = currentSymbolTab === "USDJPY";
+    const isOIL = currentSymbolTab === "XTIUSD";
+    const currencyPrefix = isUSDJPY ? "¥" : "$";
+
     // 1. Update Self-Learning stats
     document.getElementById("modelAccuracy").textContent = `${forecast.metrics.accuracy.toFixed(1)}%`;
-    document.getElementById("modelMae").textContent = `$${forecast.metrics.mae.toFixed(2)}`;
+    document.getElementById("modelMae").textContent = `${currencyPrefix}${forecast.metrics.mae.toFixed(2)}`;
     
     // Weights
     document.getElementById("learningRateVal").textContent = forecast.model_weights.learning_rate.toFixed(2);
@@ -85,7 +90,7 @@ function updateForecastUI(forecast, macroContext, economicReports) {
     document.getElementById("volMultVal").textContent = forecast.model_weights.volatility_multiplier.toFixed(3);
     const ecVal = forecast.error_correction || 0.0;
     const sign = ecVal >= 0 ? "+" : "";
-    document.getElementById("errorCorrectionVal").textContent = `${sign}$${ecVal.toFixed(2)}`;
+    document.getElementById("errorCorrectionVal").textContent = `${sign}${currencyPrefix}${ecVal.toFixed(2)}`;
     
     // 2. Learning logs terminal
     const logBox = document.getElementById("learningLogs");
