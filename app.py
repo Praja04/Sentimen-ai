@@ -2826,6 +2826,27 @@ def get_forecast_data():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route('/api/symbol_forecast')
+def get_symbol_forecast_api():
+    """Returns forecast data for a given symbol (USDJPY, XTIUSD, etc.)"""
+    try:
+        symbol = request.args.get('symbol', 'USDJPY').upper()
+        allowed = ['USDJPY', 'XTIUSD']
+        if symbol not in allowed:
+            return jsonify({"status": "error", "message": f"Symbol {symbol} not supported. Use: {allowed}"}), 400
+        data = forecast_engine.get_symbol_forecast(symbol)
+        if 'error' in data:
+            return jsonify({"status": "error", "message": data['error']}), 500
+        return jsonify({
+            "status": "success",
+            "forecast": data,
+            "macro_context": data.get("macro_context"),
+            "economic_reports": data.get("economic_reports")
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 if __name__ == '__main__':
     try:
         src = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_sim.py'

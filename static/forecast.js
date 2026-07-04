@@ -521,6 +521,8 @@ async function loadSymbolForecast(symbol) {
         if (data.status !== 'success') throw new Error(data.message);
 
         const fc = data.forecast;
+        const macro = data.macro_context;
+        const reports = data.economic_reports;
 
         // Update headers in unified table
         const titleEl = document.getElementById('weeklyTableTitle');
@@ -551,6 +553,11 @@ async function loadSymbolForecast(symbol) {
         const nameEl = document.getElementById('symbolPriceName');
         const valEl = document.getElementById('symbolPriceValue');
         if (tag) { tag.style.display = 'flex'; nameEl.textContent = fc.display_name + ' BID'; valEl.textContent = fc.base_price; }
+
+        // Update the Global Macro and Economic Reports Panels dynamically
+        if (macro && reports) {
+            updateForecastUI(fc, macro, reports);
+        }
 
         // Render chart
         renderSymbolChart(symbol, fc);
