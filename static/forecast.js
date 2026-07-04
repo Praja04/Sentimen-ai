@@ -112,7 +112,8 @@ function updateForecastUI(forecast, macroContext, economicReports) {
     document.getElementById("modelMae").textContent = `${currencyPrefix}${forecast.metrics.mae.toFixed(2)}`;
     
     // Weights
-    document.getElementById("learningRateVal").textContent = forecast.model_weights.learning_rate.toFixed(2);
+    const lr = forecast.model_weights.learning_rate !== undefined ? forecast.model_weights.learning_rate : 0.05;
+    document.getElementById("learningRateVal").textContent = lr.toFixed(2);
     document.getElementById("fundWeightVal").textContent = `${(forecast.model_weights.fundamental * 100).toFixed(0)}%`;
     document.getElementById("techWeightVal").textContent = `${(forecast.model_weights.technical * 100).toFixed(0)}%`;
     document.getElementById("volMultVal").textContent = forecast.model_weights.volatility_multiplier.toFixed(3);
