@@ -14,8 +14,11 @@ async function fetchForecastData() {
         const response = await fetch("/api/forecast_data");
         const data = await response.json();
         if (data.status === "success" && data.forecast) {
-            updateForecastUI(data.forecast, data.macro_context, data.economic_reports);
-            renderForecastChart(data.forecast);
+            // Only update the main macro/UI panels if the user is currently on XAUUSD
+            if (currentSymbolTab === "XAUUSD") {
+                updateForecastUI(data.forecast, data.macro_context, data.economic_reports);
+                renderForecastChart(data.forecast);
+            }
         }
     } catch (e) {
         console.error("Error fetching forecast data:", e);
@@ -29,10 +32,13 @@ async function pollLiveTicks() {
         if (data.ticks) {
             updateTickers(data.ticks);
         }
-        // If there's active demo state, we can also refresh forecast parameters
+        // If there's active demo state, refresh forecast parameters
         if (data.demo) {
-            // Re-fetch forecast variables to keep logs and hit states animated
-            fetchForecastData();
+            if (currentSymbolTab === "XAUUSD") {
+                fetchForecastData();
+            } else {
+                loadSymbolForecast(currentSymbolTab);
+            }
         }
     } catch (e) {
         console.error("Error polling live ticks:", e);
