@@ -242,6 +242,20 @@ function updateForecastUI(forecast, macroContext, economicReports) {
     }
 
     // 4. Update Macro Context Panels
+    const macroTrendBadgeEl = document.getElementById("macroTrendBadge");
+    if (macroTrendBadgeEl) {
+        const trendVal = forecast.trend_bias !== undefined ? forecast.trend_bias : 0.0;
+        const trendPct = (trendVal * 100).toFixed(2);
+        macroTrendBadgeEl.style.display = "inline-block";
+        if (trendVal >= 0) {
+            macroTrendBadgeEl.textContent = `📈 TREND: BULLISH (+${trendPct}%)`;
+            macroTrendBadgeEl.style.cssText = "font-size:0.7rem;padding:3px 10px;border-radius:6px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3);margin-left:12px;";
+        } else {
+            macroTrendBadgeEl.textContent = `📉 TREND: BEARISH (${trendPct}%)`;
+            macroTrendBadgeEl.style.cssText = "font-size:0.7rem;padding:3px 10px;border-radius:6px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);margin-left:12px;";
+        }
+    }
+
     if (macroContext) {
         const demand = macroContext.demand || {};
         const experts = macroContext.experts || {};
