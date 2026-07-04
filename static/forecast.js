@@ -84,8 +84,11 @@ function updateForecastUI(forecast, macroContext, economicReports) {
     const agentPriceEl = document.getElementById("agentActivePrice");
     const agentDescEl = document.getElementById("agentActiveDesc");
 
+    // Map XTIUSD to OIL WTI display
+    const symbolDisplay = currentSymbolTab === "XTIUSD" ? "OIL WTI" : currentSymbolTab;
+
     if (agentSymbolEl) {
-        agentSymbolEl.textContent = currentSymbolTab;
+        agentSymbolEl.textContent = symbolDisplay;
         if (currentSymbolTab === "XAUUSD") {
             agentSymbolEl.style.cssText = "background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.3); font-size:0.7rem;";
         } else if (currentSymbolTab === "USDJPY") {

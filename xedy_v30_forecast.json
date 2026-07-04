@@ -1,6 +1,6 @@
 {
   "symbol": "XAUUSD",
-  "generated_at": "2026-07-04 12:00:30",
+  "generated_at": "2026-07-04 12:09:30",
   "base_price": 4174.81,
   "fundamental_bias": -0.211,
   "error_correction": 40.204,
@@ -11,9 +11,9 @@
     "learning_rate": 0.05
   },
   "metrics": {
-    "mae": 1.78,
+    "mae": 4.52,
     "accuracy": 99.8,
-    "ticks_monitored": 193
+    "ticks_monitored": 74
   },
   "projections": [
     {
@@ -378,7 +378,7 @@
     "\u2699\ufe0f [ERROR-CORRECT] Proportional Feedback Loop: Adjusted error offset to +9.16 (Error: +35.70).",
     "\u2699\ufe0f [SELF-LEARN] Drift adjustment: Fundamental weight reduced to 0.79 due to counter-bias price rally.",
     "\u2699\ufe0f [ERROR-CORRECT] Proportional Feedback Loop: Adjusted error offset to +4.88 (Error: +40.63).",
-    "[12:00:30] Model initialized with base price 4174.81 and fundamental bias -0.211."
+    "[12:09:30] Model initialized with base price 4174.81 and fundamental bias -0.211."
   ],
   "past_projections": [
     {
