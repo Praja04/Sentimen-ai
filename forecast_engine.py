@@ -176,31 +176,49 @@ def recalculate_projections(state, current_price, fundamental_bias):
 
 
 def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
-    """Retrieves the last 4 weekly High and Low prices from MT5 and calculates past forecast vs actual."""
+    """Retrieves the last 12 weekly High and Low prices from MT5 and simulates the closed-loop error-correction path."""
     if not mt5.initialize():
         mt5.initialize()
         
-    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 12)
+    # Retrieve 13 weekly bars (1 extra bar to get the baseline close price from 13 weeks ago)
+    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 13)
     now = datetime.now()
     past_projections = []
     
     weekly_fundamental_drift = fundamental_bias * 25.0 * fund_w
     
-    for idx, w_idx in enumerate(range(-12, 0)):
+    # Determine baseline price 13 weeks ago
+    if rates_w1 is not None and len(rates_w1) > 0:
+        past_base_price = rates_w1[0]['close']
+    else:
+        past_base_price = base_price - (12 * weekly_fundamental_drift)
+        
+    run_ec = 0.0
+    for idx in range(1, 13):
         rate = rates_w1[idx] if (rates_w1 is not None and len(rates_w1) > idx) else None
+        w_idx = -13 + idx  # Weeks: -12, -11, ..., -1
+        step = idx
         
-        actual_high = rate['high'] if rate else (base_price + w_idx * 6.5 + 12.0)
-        actual_low = rate['low'] if rate else (base_price + w_idx * 6.5 - 12.0)
+        expected_drift = weekly_fundamental_drift * step
+        vol_factor = math.sqrt(step) * vol_mult
         
-        expected_drift = weekly_fundamental_drift * w_idx
-        vol_factor = math.sqrt(abs(w_idx)) * vol_mult
+        # Apply accumulated error correction feedback dynamically
+        center = past_base_price + expected_drift + run_ec
         
-        low = base_price + expected_drift - (atr * 1.5 * vol_factor)
-        low_low = base_price + expected_drift - (atr * 2.5 * vol_factor)
-        high = base_price + expected_drift + (atr * 1.5 * vol_factor)
-        high_high = base_price + expected_drift + (atr * 2.5 * vol_factor)
-        center = base_price + expected_drift
+        low = center - (atr * 1.5 * vol_factor)
+        low_low = center - (atr * 2.5 * vol_factor)
+        high = center + (atr * 1.5 * vol_factor)
+        high_high = center + (atr * 2.5 * vol_factor)
         
+        actual_high = rate['high'] if rate else (past_base_price + expected_drift + 12.0)
+        actual_low = rate['low'] if rate else (past_base_price + expected_drift - 12.0)
+        actual_close = rate['close'] if rate else (past_base_price + expected_drift)
+        
+        # Update running error correction feedback offset (PI loop)
+        err_close = actual_close - center
+        run_ec += 0.45 * err_close
+        
+        # Calculate deviations (actuals vs forecast boundaries)
         err_high = actual_high - high
         err_low = actual_low - low
         
