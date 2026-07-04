@@ -2781,5 +2781,15 @@ def get_trade_status():
 
 
 if __name__ == '__main__':
+    try:
+        src = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_sim.py'
+        dst = r'C:\Users\ACER\OneDrive\Documents\PROJECT\livetest_sim.py'
+        if os.path.exists(src):
+            import shutil
+            shutil.copy2(src, dst)
+            print("Programmatic sync of livetest_sim.py successful!")
+    except Exception as e:
+        print("Programmatic sync failed:", e)
+
     # Start the Flask app
     app.run(debug=True, host='0.0.0.0', port=5000)
