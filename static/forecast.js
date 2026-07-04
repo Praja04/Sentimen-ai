@@ -612,9 +612,7 @@ async function loadSymbolForecast(symbol) {
         if (tag) { tag.style.display = 'flex'; nameEl.textContent = fc.display_name + ' BID'; valEl.textContent = fc.base_price; }
 
         // Update the Global Macro and Economic Reports Panels dynamically
-        if (macro && reports) {
-            updateForecastUI(fc, macro, reports);
-        }
+        updateForecastUI(fc, macro || fc.macro_context || {}, reports || fc.economic_reports || []);
 
         // Render chart
         renderSymbolChart(symbol, fc);
