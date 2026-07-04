@@ -699,11 +699,7 @@ function renderSymbolChart(symbol, fc) {
                 x: {
                     grid: { color: 'rgba(255,255,255,0.03)' },
                     ticks: {
-                        color: (ctx) => {
-                            const lbl = ctx.chart.data.labels[ctx.index];
-                            if (lbl && lbl.includes('NOW')) return '#fbbf24';
-                            return lbl && lbl.startsWith('W-') ? '#8a9cb4' : (symbol === 'USDJPY' ? '#a5b4fc' : '#fb923c');
-                        },
+                        color: '#8a9cb4',
                         font: { family: 'Outfit', size: 9 }, maxRotation: 45
                     }
                 },
