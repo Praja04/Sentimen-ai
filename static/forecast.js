@@ -285,6 +285,8 @@ function updateForecastUI(forecast, macroContext, economicReports) {
         if (wallStreetContainer) {
             let targetsHtml = `<span style="color: var(--muted); display: block; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 4px;">Target Bank Global:</span>`;
             const targets = experts.targets || [];
+            let sum = 0;
+            let count = 0;
             targets.forEach(t => {
                 targetsHtml += `
                     <div style="display: flex; justify-content: space-between; font-size: 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding: 3px 0;">
@@ -292,7 +294,61 @@ function updateForecastUI(forecast, macroContext, economicReports) {
                         <span style="color: #fbbf24; font-weight: 600;">${t.target}</span>
                     </div>
                 `;
+                let clean = t.target.replace(/[^0-9.]/g, '');
+                let val = parseFloat(clean);
+                if (!isNaN(val)) {
+                    sum += val;
+                    count++;
+                }
             });
+            
+            let wsAvg = count > 0 ? sum / count : 0;
+            if (wsAvg > 0 && forecast.projections && forecast.projections.length > 0) {
+                const finalProj = forecast.projections[forecast.projections.length - 1];
+                const aiTarget = (finalProj.high + finalProj.low) / 2;
+                const diffPct = ((aiTarget - wsAvg) / wsAvg) * 100;
+                
+                let alignText = 'NEUTRAL';
+                let alignColor = '#fbbf24';
+                if (Math.abs(diffPct) <= 3.0) {
+                    alignText = 'HIGHLY ALIGNED';
+                    alignColor = '#4ade80';
+                } else if (Math.abs(diffPct) > 7.0) {
+                    alignText = 'DIVERGENT BIAS';
+                    alignColor = '#f87171';
+                } else {
+                    alignText = 'MODERATE';
+                    alignColor = '#fbbf24';
+                }
+                
+                const isOil = forecast.symbol === 'XTIUSD' || forecast.symbol === 'WTI OIL';
+                const isGold = forecast.symbol === 'XAUUSD' || forecast.symbol === 'GOLD/USD';
+                let prefix = (isOil || isGold) ? '$' : '';
+                let formattedWsAvg = prefix + wsAvg.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                let formattedAiTarget = prefix + aiTarget.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                
+                targetsHtml += `
+                    <div style="margin-top: 12px; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: #00d2ff; display: block; font-size: 0.62rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 6px;">🧠 AI vs Wall Street Consensus:</span>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 3px;">
+                            <span style="color: var(--muted);">Konsensus Bank (Avg):</span>
+                            <span style="color: #fff; font-weight: 500;">${formattedWsAvg}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 3px;">
+                            <span style="color: var(--muted);">AI Target (W+25 Median):</span>
+                            <span style="color: #fff; font-weight: 500;">${formattedAiTarget}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 3px;">
+                            <span style="color: var(--muted);">Deviasi / Selisih:</span>
+                            <span style="color: ${diffPct >= 0 ? '#4ade80' : '#f87171'}; font-weight: 600;">${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(2)}%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.68rem; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 5px; align-items: center;">
+                            <span style="color: var(--muted); font-size: 0.6rem; text-transform: uppercase;">Alignment Status:</span>
+                            <span style="color: ${alignColor}; font-weight: 700; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; padding: 1px 6px; border-radius: 4px; background: ${alignColor}15; border: 1px solid ${alignColor}30;">${alignText}</span>
+                        </div>
+                    </div>
+                `;
+            }
             wallStreetContainer.innerHTML = targetsHtml;
         }
     }
