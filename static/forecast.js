@@ -461,12 +461,7 @@ function renderForecastChart(forecast) {
                 x: {
                     grid: { color: 'rgba(255,255,255,0.03)' },
                     ticks: {
-                        color: (ctx) => {
-                            const label = ctx.chart.data.labels[ctx.index];
-                            if (label && label.includes('NOW')) return '#fbbf24';
-                            if (label && label.startsWith('W-')) return '#8a9cb4';
-                            return '#60a5fa';
-                        },
+                        color: '#8a9cb4',
                         font: { family: 'Outfit', size: 9 },
                         maxRotation: 45
                     }
