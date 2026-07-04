@@ -668,7 +668,7 @@ function renderSymbolChart(symbol, fc) {
         data: {
             labels,
             datasets: [
-                { label: 'High-High (R2)', data: allHH, borderColor: `rgba(248,113,113,0.6)`, borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, backgroundColor: 'rgba(248,113,113,0.07)', fill: '+1' },
+                { label: 'High-High (R2)', data: allHH, borderColor: 'rgba(248,113,113,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, backgroundColor: 'rgba(248,113,113,0.07)', fill: '+1' },
                 { label: 'High (R1)', data: allH, borderColor: `${accentHigh}0.9)`, borderWidth: 2, backgroundColor: 'rgba(14,28,54,0.45)', pointRadius: 1.5, fill: '+1' },
                 { label: 'Low (S1)', data: allL, borderColor: `${accentLow}0.9)`, borderWidth: 2, backgroundColor: `${accentLow}0.07)`, pointRadius: 1.5, fill: '+1' },
                 { label: 'Low-Low (S2)', data: allLL, borderColor: 'rgba(74,222,128,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
