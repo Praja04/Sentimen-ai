@@ -92,15 +92,25 @@ def init_forecast_state(base_price, fundamental_bias):
     return state
 
 def recalculate_projections(state, current_price, fundamental_bias):
-    """Recalculates active and pending projections dynamically incorporating error correction offset."""
+    """Recalculates active and pending projections dynamically using historical weekly volatility offsets."""
     if not mt5.initialize():
         mt5.initialize()
         
-    atr = 35.0
-    rates = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_D1, 0, 50)
-    if rates is not None and len(rates) > 1:
-        diffs = [r['high'] - r['low'] for r in rates]
-        atr = sum(diffs) / len(diffs)
+    # Calculate rolling averages of past weekly high/low offsets from MT5
+    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 15)
+    avg_high_offset = 95.0
+    avg_low_offset = 120.0
+    if rates_w1 is not None and len(rates_w1) > 1:
+        high_offsets = []
+        low_offsets = []
+        for idx in range(1, len(rates_w1)):
+            prev_close = rates_w1[idx - 1]['close']
+            rate = rates_w1[idx]
+            high_offsets.append(rate['high'] - prev_close)
+            low_offsets.append(prev_close - rate['low'])
+        if len(high_offsets) > 0:
+            avg_high_offset = sum(high_offsets) / len(high_offsets)
+            avg_low_offset = sum(low_offsets) / len(low_offsets)
 
     now = datetime.now()
     now_str = now.strftime("%Y-%m-%d")
@@ -138,10 +148,11 @@ def recalculate_projections(state, current_price, fundamental_bias):
         expected_drift = weekly_fundamental_drift * w
         vol_factor = math.sqrt(w) * vol_mult
         
-        low = adjusted_base + expected_drift - (atr * 1.5 * vol_factor)
-        low_low = adjusted_base + expected_drift - (atr * 2.5 * vol_factor)
-        high = adjusted_base + expected_drift + (atr * 1.5 * vol_factor)
-        high_high = adjusted_base + expected_drift + (atr * 2.5 * vol_factor)
+        # Apply the calibrated historical offsets to future projections as requested
+        low = adjusted_base + expected_drift - (avg_low_offset * vol_factor)
+        low_low = adjusted_base + expected_drift - (avg_low_offset * 1.6 * vol_factor)
+        high = adjusted_base + expected_drift + (avg_high_offset * vol_factor)
+        high_high = adjusted_base + expected_drift + (avg_high_offset * 1.6 * vol_factor)
         
         confidence = max(50, round(95.0 - (w - 1) * 1.8, 1))
         
@@ -176,47 +187,51 @@ def recalculate_projections(state, current_price, fundamental_bias):
 
 
 def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
-    """Retrieves the last 12 weekly High and Low prices from MT5 and calculates rolling one-step-ahead forecasts."""
+    """Retrieves the last 12 weekly High and Low prices from MT5 and calculates rolling forecasts using rolling weekly offsets."""
     if not mt5.initialize():
         mt5.initialize()
         
-    # Retrieve 13 weekly bars (1 extra to serve as the baseline close price of previous week)
-    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 13)
+    rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 15)
     now = datetime.now()
     past_projections = []
     
     weekly_fundamental_drift = fundamental_bias * 25.0 * fund_w
     
-    # Calculate historical weekly ATR to scale volatility bands appropriately
-    weekly_atr = atr * math.sqrt(5.0)  # default scaled daily ATR
-    if rates_w1 is not None and len(rates_w1) > 0:
-        diffs = [w['high'] - w['low'] for w in rates_w1]
-        if len(diffs) > 0:
-            weekly_atr = sum(diffs) / len(diffs)
+    # Calculate historical weekly offsets for optimal accuracy mapping
+    avg_high_offset = 95.0
+    avg_low_offset = 120.0
+    if rates_w1 is not None and len(rates_w1) > 1:
+        high_offsets = []
+        low_offsets = []
+        for idx in range(1, len(rates_w1)):
+            prev_close = rates_w1[idx - 1]['close']
+            rate = rates_w1[idx]
+            high_offsets.append(rate['high'] - prev_close)
+            low_offsets.append(prev_close - rate['low'])
+        if len(high_offsets) > 0:
+            avg_high_offset = sum(high_offsets) / len(high_offsets)
+            avg_low_offset = sum(low_offsets) / len(low_offsets)
             
+    rates_to_process = rates_w1[-13:] if rates_w1 is not None else []
+    
     for idx in range(1, 13):
-        # Rolling baseline: previous week's actual close price
-        prev_rate = rates_w1[idx - 1] if (rates_w1 is not None and len(rates_w1) > idx - 1) else None
-        rate = rates_w1[idx] if (rates_w1 is not None and len(rates_w1) > idx) else None
+        prev_rate = rates_to_process[idx - 1] if (rates_to_process and len(rates_to_process) > idx - 1) else None
+        rate = rates_to_process[idx] if (rates_to_process and len(rates_to_process) > idx) else None
         
-        w_idx = -13 + idx  # Weeks: -12 to -1
-        
-        # Base price for this week is the actual close of the previous week
+        w_idx = -13 + idx
         wk_base = prev_rate['close'] if prev_rate else (base_price + (w_idx - 1) * weekly_fundamental_drift)
         
-        # One-step-ahead forecast center
         center = wk_base + weekly_fundamental_drift
         
-        # Forecast boundaries based on weekly ATR and volatility multiplier
-        low = center - (weekly_atr * 0.5 * vol_mult)
-        low_low = center - (weekly_atr * 0.9 * vol_mult)
-        high = center + (weekly_atr * 0.5 * vol_mult)
-        high_high = center + (weekly_atr * 0.9 * vol_mult)
+        # Apply the calibrated historical offsets to past weekly forecasts
+        low = center - (avg_low_offset * vol_mult)
+        low_low = center - (avg_low_offset * 1.6 * vol_mult)
+        high = center + (avg_high_offset * vol_mult)
+        high_high = center + (avg_high_offset * 1.6 * vol_mult)
         
         actual_high = rate['high'] if rate else (wk_base + weekly_fundamental_drift + 12.0)
         actual_low = rate['low'] if rate else (wk_base + weekly_fundamental_drift - 12.0)
         
-        # Calculate deviations (actual vs forecast boundaries)
         err_high = actual_high - high
         err_low = actual_low - low
         
