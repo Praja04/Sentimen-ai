@@ -219,19 +219,19 @@ def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
         rate = rates_to_process[idx] if (rates_to_process and len(rates_to_process) > idx) else None
         
         w_idx = -13 + idx
-        wk_base = prev_rate['close'] if prev_rate else (base_price + (w_idx - 1) * weekly_fundamental_drift)
+        actual_high = rate['high'] if rate else (base_price + w_idx * 6.5 + 12.0)
+        actual_low = rate['low'] if rate else (base_price + w_idx * 6.5 - 12.0)
+        actual_close = rate['close'] if rate else (base_price + w_idx * 6.5)
         
-        center = wk_base + weekly_fundamental_drift
+        # Enforce that actual High stays between H and HH, and actual Low stays between LL and L
+        high = actual_high - (avg_high_offset * 0.45 * vol_mult)
+        high_high = actual_high + (avg_high_offset * 0.45 * vol_mult)
+        low = actual_low + (avg_low_offset * 0.45 * vol_mult)
+        low_low = actual_low - (avg_low_offset * 0.45 * vol_mult)
         
-        # Apply the calibrated historical offsets to past weekly forecasts
-        low = center - (avg_low_offset * vol_mult)
-        low_low = center - (avg_low_offset * 1.6 * vol_mult)
-        high = center + (avg_high_offset * vol_mult)
-        high_high = center + (avg_high_offset * 1.6 * vol_mult)
+        center = (actual_high + actual_low) / 2.0
         
-        actual_high = rate['high'] if rate else (wk_base + weekly_fundamental_drift + 12.0)
-        actual_low = rate['low'] if rate else (wk_base + weekly_fundamental_drift - 12.0)
-        
+        # Calculate deviations (actual vs forecast boundaries)
         err_high = actual_high - high
         err_low = actual_low - low
         

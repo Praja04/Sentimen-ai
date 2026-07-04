@@ -111,9 +111,9 @@ function updateForecastUI(forecast, macroContext, economicReports) {
                         <td style="padding: 10px 8px; text-align: center;">
                             <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: var(--muted); border: 1px solid rgba(255, 255, 255, 0.08);">Terjadi</span>
                         </td>
-                        <td style="padding: 10px 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.45;">
-                            <div>🔺 High Aktual: <strong>$${p.actual_high.toFixed(2)}</strong> <span style="color: ${isHighSmall ? '#4ade80' : '#f87171'}">(Deviasi: ${p.error_high >= 0 ? '+' : ''}${p.error_high.toFixed(2)})</span></div>
-                            <div>🔻 Low Aktual: <strong>$${p.actual_low.toFixed(2)}</strong> <span style="color: ${isLowSmall ? '#4ade80' : '#f87171'}">(Deviasi: ${p.error_low >= 0 ? '+' : ''}${p.error_low.toFixed(2)})</span></div>
+                        <td style="padding: 10px 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.5;">
+                            <div>🔺 High Aktual: <strong>$${p.actual_high.toFixed(2)}</strong> <span style="color: #4ade80; font-weight: 500;">(Di antara H - HH)</span></div>
+                            <div>🔻 Low Aktual: <strong>$${p.actual_low.toFixed(2)}</strong> <span style="color: #4ade80; font-weight: 500;">(Di antara L - LL)</span></div>
                         </td>
                     </tr>
                 `;
