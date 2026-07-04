@@ -628,83 +628,87 @@ async function loadSymbolForecast(symbol) {
 }
 
 function renderSymbolChart(symbol, fc) {
-    const canvasId = 'forecastChart' + symbol;
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return;
+    try {
+        const canvasId = 'forecastChart' + symbol;
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) return;
 
-    const past = fc.past_projections || [];
-    const future = fc.projections || [];
-    const decimals = symbol === 'USDJPY' ? 3 : 2;
-    const isOil = symbol === 'XTIUSD';
-    const accentHigh = symbol === 'USDJPY' ? 'rgba(165,180,252,0.9)' : 'rgba(251,146,60,0.9)';
-    const accentLow  = symbol === 'USDJPY' ? 'rgba(52,211,153,0.9)' : 'rgba(56,189,248,0.9)';
-    const accentHighBg = 'rgba(14,28,54,0.45)';
-    const accentLowBg = symbol === 'USDJPY' ? 'rgba(52,211,153,0.07)' : 'rgba(56,189,248,0.07)';
+        const past = fc.past_projections || [];
+        const future = fc.projections || [];
+        const decimals = symbol === 'USDJPY' ? 3 : 2;
+        const isOil = symbol === 'XTIUSD';
+        const accentHigh = symbol === 'USDJPY' ? 'rgba(165,180,252,0.9)' : 'rgba(251,146,60,0.9)';
+        const accentLow  = symbol === 'USDJPY' ? 'rgba(52,211,153,0.9)' : 'rgba(56,189,248,0.9)';
+        const accentHighBg = 'rgba(14,28,54,0.45)';
+        const accentLowBg = symbol === 'USDJPY' ? 'rgba(52,211,153,0.07)' : 'rgba(56,189,248,0.07)';
 
-    // Build labels
-    const pastLabels   = past.map(p => `W${p.week}`);
-    const futureLabels = future.map(p => `W+${p.week}`);
-    const labels = [...pastLabels, '⬤ NOW', ...futureLabels.slice(1)];
+        // Build labels
+        const pastLabels   = past.map(p => `W${p.week}`);
+        const futureLabels = future.map(p => `W+${p.week}`);
+        const labels = [...pastLabels, '⬤ NOW', ...futureLabels.slice(1)];
 
-    // Band data (past + future combined)
-    const allHH = [...past.map(p => p.high_high), ...future.map(p => p.high_high)];
-    const allH  = [...past.map(p => p.high),      ...future.map(p => p.high)];
-    const allL  = [...past.map(p => p.low),        ...future.map(p => p.low)];
-    const allLL = [...past.map(p => p.low_low),    ...future.map(p => p.low_low)];
-    const allCt = [...past.map(p => p.center || (p.high+p.low)/2), ...future.map(p => (p.high+p.low)/2)];
+        // Band data (past + future combined)
+        const allHH = [...past.map(p => p.high_high), ...future.map(p => p.high_high)];
+        const allH  = [...past.map(p => p.high),      ...future.map(p => p.high)];
+        const allL  = [...past.map(p => p.low),        ...future.map(p => p.low)];
+        const allLL = [...past.map(p => p.low_low),    ...future.map(p => p.low_low)];
+        const allCt = [...past.map(p => p.center || (p.high+p.low)/2), ...future.map(p => (p.high+p.low)/2)];
 
-    // Actual lines (past only + current dot + nulls)
-    const actH = [...past.map(p => p.actual_high), fc.base_price, ...new Array(future.length - 1).fill(null)];
-    const actL = [...past.map(p => p.actual_low),  fc.base_price, ...new Array(future.length - 1).fill(null)];
+        // Actual lines (past only + current dot + nulls)
+        const actH = [...past.map(p => p.actual_high), fc.base_price, ...new Array(future.length - 1).fill(null)];
+        const actL = [...past.map(p => p.actual_low),  fc.base_price, ...new Array(future.length - 1).fill(null)];
 
-    // Destroy old chart if exists
-    if (symbolCharts[symbol]) { symbolCharts[symbol].destroy(); }
+        // Destroy old chart if exists
+        if (symbolCharts[symbol]) { symbolCharts[symbol].destroy(); }
 
-    symbolCharts[symbol] = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [
-                { label: 'High-High (R2)', data: allHH, borderColor: 'rgba(248,113,113,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, backgroundColor: 'transparent', fill: false },
-                { label: 'High (R1)', data: allH, borderColor: accentHigh, borderWidth: 2, backgroundColor: 'transparent', pointRadius: 1.5, fill: false },
-                { label: 'Low (S1)', data: allL, borderColor: accentLow, borderWidth: 2, backgroundColor: 'transparent', pointRadius: 1.5, fill: false },
-                { label: 'Low-Low (S2)', data: allLL, borderColor: 'rgba(74,222,128,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
-                { label: 'Median', data: allCt, borderColor: 'rgba(165,180,252,0.4)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false },
-                { label: 'Actual High', data: actH, borderColor: 'rgba(239,68,68,1)', borderWidth: 2.5, pointRadius: (ctx) => ctx.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (ctx) => ctx.dataIndex === past.length ? '#fff' : 'rgba(239,68,68,1)', fill: false, spanGaps: false },
-                { label: 'Actual Low', data: actL, borderColor: 'rgba(34,197,94,1)', borderWidth: 2.5, pointRadius: (ctx) => ctx.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (ctx) => ctx.dataIndex === past.length ? '#fff' : 'rgba(34,197,94,1)', fill: false, spanGaps: false },
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            animation: { duration: 600, easing: 'easeInOutCubic' },
-            plugins: {
-                legend: { position: 'top', labels: { color: '#8a9cb4', font: { family: 'Outfit', size: 10 } } },
-                tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(6,12,26,0.95)', titleColor: '#fff', bodyColor: '#e2ecf8', borderColor: 'rgba(0,210,255,0.2)', borderWidth: 1, bodyFont: { family: 'JetBrains Mono', size: 11 },
-                    callbacks: {
-                        label: (ctx) => {
-                            const v = ctx.raw;
-                            if (v === null || v === undefined) return null;
-                            const prefix = isOil ? '$' : (symbol === 'USDJPY' ? '¥' : '$');
-                            return ` ${ctx.dataset.label}: ${prefix}${parseFloat(v).toFixed(decimals)}`;
+        symbolCharts[symbol] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    { label: 'High-High (R2)', data: allHH, borderColor: 'rgba(248,113,113,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, backgroundColor: 'transparent', fill: false },
+                    { label: 'High (R1)', data: allH, borderColor: accentHigh, borderWidth: 2, backgroundColor: 'transparent', pointRadius: 1.5, fill: false },
+                    { label: 'Low (S1)', data: allL, borderColor: accentLow, borderWidth: 2, backgroundColor: 'transparent', pointRadius: 1.5, fill: false },
+                    { label: 'Low-Low (S2)', data: allLL, borderColor: 'rgba(74,222,128,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
+                    { label: 'Median', data: allCt, borderColor: 'rgba(165,180,252,0.4)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false },
+                    { label: 'Actual High', data: actH, borderColor: 'rgba(239,68,68,1)', borderWidth: 2.5, pointRadius: (ctx) => ctx.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (ctx) => ctx.dataIndex === past.length ? '#fff' : 'rgba(239,68,68,1)', fill: false, spanGaps: false },
+                    { label: 'Actual Low', data: actL, borderColor: 'rgba(34,197,94,1)', borderWidth: 2.5, pointRadius: (ctx) => ctx.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (ctx) => ctx.dataIndex === past.length ? '#fff' : 'rgba(34,197,94,1)', fill: false, spanGaps: false },
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                animation: { duration: 600, easing: 'easeInOutCubic' },
+                plugins: {
+                    legend: { position: 'top', labels: { color: '#8a9cb4', font: { family: 'Outfit', size: 10 } } },
+                    tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(6,12,26,0.95)', titleColor: '#fff', bodyColor: '#e2ecf8', borderColor: 'rgba(0,210,255,0.2)', borderWidth: 1, bodyFont: { family: 'JetBrains Mono', size: 11 },
+                        callbacks: {
+                            label: (ctx) => {
+                                const v = ctx.raw;
+                                if (v === null || v === undefined) return null;
+                                const prefix = isOil ? '$' : (symbol === 'USDJPY' ? '¥' : '$');
+                                return ` ${ctx.dataset.label}: ${prefix}${parseFloat(v).toFixed(decimals)}`;
+                            }
                         }
                     }
-                }
-            },
-            scales: {
-                x: {
-                    grid: { color: 'rgba(255,255,255,0.03)' },
-                    ticks: {
-                        color: '#8a9cb4',
-                        font: { family: 'Outfit', size: 9 }, maxRotation: 45
-                    }
                 },
-                y: {
-                    grid: { color: 'rgba(255,255,255,0.02)' },
-                    ticks: { color: '#8a9cb4', font: { family: 'JetBrains Mono', size: 10 } }
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.03)' },
+                        ticks: {
+                            color: '#8a9cb4',
+                            font: { family: 'Outfit', size: 9 }, maxRotation: 45
+                        }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.02)' },
+                        ticks: { color: '#8a9cb4', font: { family: 'JetBrains Mono', size: 10 } }
+                    }
                 }
             }
-        }
-    });
+        });
+    } catch (e) {
+        console.error("Error rendering symbol chart:", e);
+    }
 }
 
 function renderConfidenceBars(symbol, projections) {
