@@ -32,13 +32,12 @@ async function pollLiveTicks() {
         if (data.ticks) {
             updateTickers(data.ticks);
         }
-        // If there's active demo state, refresh forecast parameters
-        if (data.demo) {
-            if (currentSymbolTab === "XAUUSD") {
-                fetchForecastData();
-            } else {
-                loadSymbolForecast(currentSymbolTab);
-            }
+        
+        // Refresh forecast UI values based on current active tab regularly to keep AI Agent metrics updated
+        if (currentSymbolTab === "XAUUSD") {
+            fetchForecastData();
+        } else {
+            loadSymbolForecast(currentSymbolTab);
         }
     } catch (e) {
         console.error("Error polling live ticks:", e);
