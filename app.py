@@ -1330,7 +1330,7 @@ def search_backtest_methods(
     _push_log(f"📋 Library awal: {len(initial_library)} kombinasi strategi", "info")
 
     global stop_backtest_requested
-    for iteration_index in range(3):
+    for iteration_index in range(6):
         phase_name, strategies = iteration_sources[-1]
         cache = build_indicator_cache(rates, strategies, fundamental_bias=fundamental_bias)
         current_results = []
@@ -1358,7 +1358,7 @@ def search_backtest_methods(
                 _progress_stats.update({"tested": idx + 1, "found": len(all_results) + len(current_results)})
                 best = max(current_results, key=lambda x: x.get("net_profit_pct", 0), default=None)
                 if best:
-                    _push_log(f"  ⚡ {idx+1}/{len(strategies)} diuji | Ditemukan: {len(current_results)} | Best profit: {best['net_profit_pct']:.1f}%", "progress")
+                    _push_log(f"  ⚡ {idx+1}/{len(strategies)} diuji | Ditemukan: {len(current_results)} | Best - Profit: {best['net_profit_pct']:.1f}%, DD: {best['max_drawdown_pct']:.1f}%, WR: {best['win_rate']:.1f}%", "progress")
         rank_results(current_results, sort_priority=sort_priority)
         all_results.extend(current_results)
         passes = sum(1 for item in current_results if item["passes_filters"])
@@ -1372,8 +1372,10 @@ def search_backtest_methods(
                 "passes": passes,
             }
         )
-        if positive_passing > 0 and iteration_index >= 1:
-            _push_log(f"🎯 Kriteria terpenuhi! Stop di iterasi {iteration_index+1}.", "success")
+        passing_strategies = [item for item in current_results if item["passes_filters"]]
+        if passing_strategies and iteration_index >= 1:
+            best_passing = max(passing_strategies, key=lambda x: x.get("net_profit_pct", 0))
+            _push_log(f"🎯 Target %DD, %Winrate, %Profit tercapai pada iterasi {iteration_index+1}! (Best - Profit: {best_passing['net_profit_pct']:.1f}%, DD: {best_passing['max_drawdown_pct']:.1f}%, WR: {best_passing['win_rate']:.1f}%)", "success")
             break
         seed_results = current_results[:6]
         rr_values = generate_refined_rr_values(seed_results)
