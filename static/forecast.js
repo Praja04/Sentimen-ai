@@ -507,14 +507,29 @@ function updateSymbolPriceTag(symbol) {
     const valEl = document.getElementById('symbolPriceValue');
     if (!tag) return;
 
-    fetch(`/api/symbol_forecast?symbol=${symbol === 'XAUUSD' ? 'USDJPY' : symbol}`)
-        .then(r => r.json()).then(d => {
-        if (d.status === 'success') {
-            tag.style.display = 'flex';
-            nameEl.textContent = d.forecast.display_name + ' BID';
-            valEl.textContent = d.forecast.base_price.toFixed(symbol === 'USDJPY' ? 3 : 2);
-        }
-    }).catch(() => {});
+    // Use current active symbol (mapping XAUUSD to XAUUSD request, USDJPY to USDJPY, etc.)
+    const targetSymbol = symbol === 'XAUUSD' ? 'XAUUSD' : symbol;
+    
+    // For XAUUSD we use /api/forecast_data, else we use /api/symbol_forecast
+    if (targetSymbol === 'XAUUSD') {
+        fetch('/api/forecast_data')
+            .then(r => r.json()).then(d => {
+                if (d.status === 'success') {
+                    tag.style.display = 'flex';
+                    nameEl.textContent = 'XAUUSD BID';
+                    valEl.textContent = d.forecast.base_price.toFixed(2);
+                }
+            }).catch(() => {});
+    } else {
+        fetch(`/api/symbol_forecast?symbol=${targetSymbol}`)
+            .then(r => r.json()).then(d => {
+                if (d.status === 'success') {
+                    tag.style.display = 'flex';
+                    nameEl.textContent = d.forecast.display_name + ' BID';
+                    valEl.textContent = d.forecast.base_price.toFixed(symbol === 'USDJPY' ? 3 : 2);
+                }
+            }).catch(() => {});
+    }
 }
 
 async function loadSymbolForecast(symbol) {
