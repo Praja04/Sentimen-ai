@@ -176,49 +176,47 @@ def recalculate_projections(state, current_price, fundamental_bias):
 
 
 def get_past_projections(base_price, atr, fundamental_bias, fund_w, vol_mult):
-    """Retrieves the last 12 weekly High and Low prices from MT5 and simulates the closed-loop error-correction path."""
+    """Retrieves the last 12 weekly High and Low prices from MT5 and calculates rolling one-step-ahead forecasts."""
     if not mt5.initialize():
         mt5.initialize()
         
-    # Retrieve 13 weekly bars (1 extra bar to get the baseline close price from 13 weeks ago)
+    # Retrieve 13 weekly bars (1 extra to serve as the baseline close price of previous week)
     rates_w1 = mt5.copy_rates_from_pos("XAUUSD", mt5.TIMEFRAME_W1, 1, 13)
     now = datetime.now()
     past_projections = []
     
     weekly_fundamental_drift = fundamental_bias * 25.0 * fund_w
     
-    # Determine baseline price 13 weeks ago
+    # Calculate historical weekly ATR to scale volatility bands appropriately
+    weekly_atr = atr * math.sqrt(5.0)  # default scaled daily ATR
     if rates_w1 is not None and len(rates_w1) > 0:
-        past_base_price = rates_w1[0]['close']
-    else:
-        past_base_price = base_price - (12 * weekly_fundamental_drift)
-        
-    run_ec = 0.0
+        diffs = [w['high'] - w['low'] for w in rates_w1]
+        if len(diffs) > 0:
+            weekly_atr = sum(diffs) / len(diffs)
+            
     for idx in range(1, 13):
+        # Rolling baseline: previous week's actual close price
+        prev_rate = rates_w1[idx - 1] if (rates_w1 is not None and len(rates_w1) > idx - 1) else None
         rate = rates_w1[idx] if (rates_w1 is not None and len(rates_w1) > idx) else None
-        w_idx = -13 + idx  # Weeks: -12, -11, ..., -1
-        step = idx
         
-        expected_drift = weekly_fundamental_drift * step
-        vol_factor = math.sqrt(step) * vol_mult
+        w_idx = -13 + idx  # Weeks: -12 to -1
         
-        # Apply accumulated error correction feedback dynamically
-        center = past_base_price + expected_drift + run_ec
+        # Base price for this week is the actual close of the previous week
+        wk_base = prev_rate['close'] if prev_rate else (base_price + (w_idx - 1) * weekly_fundamental_drift)
         
-        low = center - (atr * 1.5 * vol_factor)
-        low_low = center - (atr * 2.5 * vol_factor)
-        high = center + (atr * 1.5 * vol_factor)
-        high_high = center + (atr * 2.5 * vol_factor)
+        # One-step-ahead forecast center
+        center = wk_base + weekly_fundamental_drift
         
-        actual_high = rate['high'] if rate else (past_base_price + expected_drift + 12.0)
-        actual_low = rate['low'] if rate else (past_base_price + expected_drift - 12.0)
-        actual_close = rate['close'] if rate else (past_base_price + expected_drift)
+        # Forecast boundaries based on weekly ATR and volatility multiplier
+        low = center - (weekly_atr * 0.5 * vol_mult)
+        low_low = center - (weekly_atr * 0.9 * vol_mult)
+        high = center + (weekly_atr * 0.5 * vol_mult)
+        high_high = center + (weekly_atr * 0.9 * vol_mult)
         
-        # Update running error correction feedback offset (PI loop)
-        err_close = actual_close - center
-        run_ec += 0.45 * err_close
+        actual_high = rate['high'] if rate else (wk_base + weekly_fundamental_drift + 12.0)
+        actual_low = rate['low'] if rate else (wk_base + weekly_fundamental_drift - 12.0)
         
-        # Calculate deviations (actuals vs forecast boundaries)
+        # Calculate deviations (actual vs forecast boundaries)
         err_high = actual_high - high
         err_low = actual_low - low
         
