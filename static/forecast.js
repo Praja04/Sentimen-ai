@@ -244,7 +244,7 @@ function updateForecastUI(forecast, macroContext, economicReports) {
     // 4. Update Macro Context Panels
     const macroTrendBadgeEl = document.getElementById("macroTrendBadge");
     if (macroTrendBadgeEl) {
-        const trendVal = forecast.trend_bias !== undefined ? forecast.trend_bias : 0.0;
+        const trendVal = forecast.trend_bias !== undefined ? forecast.trend_bias : (forecast.fundamental_bias !== undefined ? forecast.fundamental_bias : 0.0);
         const trendPct = (trendVal * 100).toFixed(2);
         macroTrendBadgeEl.style.display = "inline-block";
         if (trendVal >= 0) {
