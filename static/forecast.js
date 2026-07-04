@@ -361,28 +361,28 @@ function renderForecastChart(forecast) {
                     borderWidth: 1.5,
                     borderDash: [6, 4],
                     pointRadius: 0,
-                    backgroundColor: 'rgba(248, 113, 113, 0.08)',
-                    fill: '+1'  // fill between HH and H → upper corridor shading
+                    backgroundColor: 'transparent',
+                    fill: false
                 },
                 {
                     label: 'High (Target Atas)',
                     data: finalHighs,
                     borderColor: 'rgba(251, 191, 36, 0.9)',
                     borderWidth: 2,
-                    backgroundColor: 'rgba(14, 28, 54, 0.5)',
+                    backgroundColor: 'transparent',
                     pointRadius: 2,
                     pointBackgroundColor: 'rgba(251, 191, 36, 0.8)',
-                    fill: '+1'  // fill between H and L → inner band
+                    fill: false
                 },
                 {
                     label: 'Low (Target Bawah)',
                     data: finalLows,
                     borderColor: 'rgba(56, 189, 248, 0.9)',
                     borderWidth: 2,
-                    backgroundColor: 'rgba(74, 222, 128, 0.08)',
+                    backgroundColor: 'transparent',
                     pointRadius: 2,
                     pointBackgroundColor: 'rgba(56, 189, 248, 0.8)',
-                    fill: '+1'  // fill between L and LL → lower corridor shading
+                    fill: false
                 },
                 {
                     label: 'Low-Low (Target Ekstrem)',
@@ -665,9 +665,9 @@ function renderSymbolChart(symbol, fc) {
         data: {
             labels,
             datasets: [
-                { label: 'High-High (R2)', data: allHH, borderColor: 'rgba(248,113,113,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, backgroundColor: 'rgba(248,113,113,0.07)', fill: '+1' },
-                { label: 'High (R1)', data: allH, borderColor: accentHigh, borderWidth: 2, backgroundColor: accentHighBg, pointRadius: 1.5, fill: '+1' },
-                { label: 'Low (S1)', data: allL, borderColor: accentLow, borderWidth: 2, backgroundColor: accentLowBg, pointRadius: 1.5, fill: '+1' },
+                { label: 'High-High (R2)', data: allHH, borderColor: 'rgba(248,113,113,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, backgroundColor: 'transparent', fill: false },
+                { label: 'High (R1)', data: allH, borderColor: accentHigh, borderWidth: 2, backgroundColor: 'transparent', pointRadius: 1.5, fill: false },
+                { label: 'Low (S1)', data: allL, borderColor: accentLow, borderWidth: 2, backgroundColor: 'transparent', pointRadius: 1.5, fill: false },
                 { label: 'Low-Low (S2)', data: allLL, borderColor: 'rgba(74,222,128,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
                 { label: 'Median', data: allCt, borderColor: 'rgba(165,180,252,0.4)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false },
                 { label: 'Actual High', data: actH, borderColor: 'rgba(239,68,68,1)', borderWidth: 2.5, pointRadius: (c) => c.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (c) => c.dataIndex === past.length ? '#fff' : 'rgba(239,68,68,1)', fill: false, spanGaps: false },
