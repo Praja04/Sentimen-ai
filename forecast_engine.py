@@ -291,3 +291,84 @@ def get_forecast_macro_context():
         }
     }
     return context
+
+
+def get_economic_reports():
+    """Compiles US and global economic indicator reports that affect gold price forecast."""
+    import json
+    import os
+    
+    xedy_data = {}
+    xedy_file = r'C:\Users\ACER\OneDrive\Documents\PROJECT\xedy_v30_data.json'
+    if os.path.exists(xedy_file):
+        try:
+            with open(xedy_file, 'r', encoding='utf-8') as f:
+                xedy_data = json.load(f)
+        except Exception:
+            pass
+            
+    cpi_actual = xedy_data.get("us_cpi_actual", "3.1%")
+    cpi_forecast = xedy_data.get("us_cpi_forecast", "3.2%")
+    cpi_prev = xedy_data.get("us_cpi_prev", "3.3%")
+    
+    nfp_actual = xedy_data.get("us_nfp_actual", "175K")
+    nfp_forecast = xedy_data.get("us_nfp_forecast", "190K")
+    nfp_prev = xedy_data.get("us_nfp_prev", "210K")
+    
+    reports = [
+        {
+            "country": "US",
+            "indicator": "CPI (Consumer Price Index) YoY",
+            "actual": cpi_actual,
+            "forecast": cpi_forecast,
+            "previous": cpi_prev,
+            "status": "BULLISH" if float(cpi_actual.replace("%","")) < float(cpi_forecast.replace("%","")) else "BEARISH",
+            "reason": f"Inflasi CPI AS dirilis {cpi_actual} (vs perkiraan {cpi_forecast}). Inflasi yang melambat memperkuat kemungkinan Fed rate cut (Bullish untuk Emas)."
+        },
+        {
+            "country": "US",
+            "indicator": "Non-Farm Payrolls (NFP)",
+            "actual": nfp_actual,
+            "forecast": nfp_forecast,
+            "previous": nfp_prev,
+            "status": "BULLISH" if "K" in nfp_actual and float(nfp_actual.replace("K","")) < float(nfp_forecast.replace("K","")) else "BEARISH",
+            "reason": f"NFP dirilis {nfp_actual} (vs perkiraan {nfp_forecast}). Pelemahan sektor tenaga kerja menekan yield obligasi AS (Bullish untuk Emas)."
+        },
+        {
+            "country": "US",
+            "indicator": "Fed Interest Rate Decision",
+            "actual": "5.25%",
+            "forecast": "5.25%",
+            "previous": "5.50%",
+            "status": "BULLISH",
+            "reason": "Suku bunga acuan AS ditahan di 5.25%. Potensi pivot pelonggaran moneter membuat aset non-yielding seperti Emas lebih atraktif."
+        },
+        {
+            "country": "US",
+            "indicator": "PCE Inflation YoY",
+            "actual": "2.6%",
+            "forecast": "2.6%",
+            "previous": "2.7%",
+            "status": "BULLISH",
+            "reason": "Indikator inflasi utama The Fed melandai ke 2.6%, mempercepat jadwal pelonggaran moneter."
+        },
+        {
+            "country": "EU",
+            "indicator": "Eurozone CPI YoY",
+            "actual": "2.4%",
+            "forecast": "2.4%",
+            "previous": "2.6%",
+            "status": "NEUTRAL",
+            "reason": "Inflasi Zona Euro stabil di 2.4%. Kebijakan ECB sejalan dengan ekspektasi pasar, menjaga stabilitas EURUSD."
+        },
+        {
+            "country": "CN",
+            "indicator": "China Manufacturing PMI",
+            "actual": "49.5",
+            "forecast": "49.7",
+            "previous": "50.1",
+            "status": "BEARISH",
+            "reason": "PMI manufaktur China terkontraksi di 49.5. Melemahnya aktivitas manufaktur konsumen terbesar emas memicu sentimen bearish jangka pendek."
+        }
+    ]
+    return reports

@@ -14,7 +14,7 @@ async function fetchForecastData() {
         const response = await fetch("/api/forecast_data");
         const data = await response.json();
         if (data.status === "success" && data.forecast) {
-            updateForecastUI(data.forecast, data.macro_context);
+            updateForecastUI(data.forecast, data.macro_context, data.economic_reports);
             renderForecastChart(data.forecast);
         }
     } catch (e) {
@@ -67,7 +67,7 @@ function updateTickers(ticks) {
     container.innerHTML = html;
 }
 
-function updateForecastUI(forecast, macroContext) {
+function updateForecastUI(forecast, macroContext, economicReports) {
     // 1. Update Self-Learning stats
     document.getElementById("modelAccuracy").textContent = `${forecast.metrics.accuracy.toFixed(1)}%`;
     document.getElementById("modelMae").textContent = `$${forecast.metrics.mae.toFixed(2)}`;
@@ -162,6 +162,40 @@ function updateForecastUI(forecast, macroContext) {
                 `;
             });
             wallStreetContainer.innerHTML = targetsHtml;
+        }
+    }
+
+    // 5. Update Economic Reports Table
+    if (economicReports) {
+        const ecoTableBody = document.getElementById("economicReportsTableBody");
+        if (ecoTableBody) {
+            let ecoHtml = "";
+            economicReports.forEach(r => {
+                let flag = "🇺🇸";
+                if (r.country === "EU") flag = "🇪🇺";
+                if (r.country === "CN") flag = "🇨🇳";
+                if (r.country === "GB") flag = "🇬🇧";
+                if (r.country === "JP") flag = "🇯🇵";
+                
+                let badgeClass = "badge-pending";
+                if (r.status === "BULLISH") badgeClass = "badge-active";
+                if (r.status === "BEARISH") badgeClass = "badge-hit-hh";
+                
+                ecoHtml += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <td style="padding: 10px 8px; font-weight: 500; font-size: 1.1rem;">${flag} <span style="font-size:0.72rem; color:var(--muted); font-family:'JetBrains Mono',monospace; vertical-align:middle; margin-left:4px;">${r.country}</span></td>
+                        <td style="padding: 10px 8px; font-weight: 600; color: #fff;">${r.indicator}</td>
+                        <td style="padding: 10px 8px; text-align: center; font-family:'JetBrains Mono',monospace; font-weight: 500; color: #4ade80;">${r.actual}</td>
+                        <td style="padding: 10px 8px; text-align: center; font-family:'JetBrains Mono',monospace; color: var(--muted);">${r.forecast}</td>
+                        <td style="padding: 10px 8px; text-align: center; font-family:'JetBrains Mono',monospace; color: var(--muted);">${r.previous}</td>
+                        <td style="padding: 10px 8px; text-align: center;">
+                            <span class="badge ${badgeClass}" style="animation: none;">${r.status}</span>
+                        </td>
+                        <td style="padding: 10px 8px; color: #a5b4fc; font-size: 0.72rem; line-height: 1.4;">${r.reason}</td>
+                    </tr>
+                `;
+            });
+            ecoTableBody.innerHTML = ecoHtml;
         }
     }
 }
