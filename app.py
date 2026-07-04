@@ -2818,7 +2818,7 @@ def get_forecast_data():
                 break
                 
         bias_val = compute_xedy_fundamental_bias()
-        state = forecast_engine.get_forecast_state(current_price, bias_val)
+        state = forecast_engine.get_forecast_state("XAUUSD", current_price, bias_val)
         macro_ctx = forecast_engine.get_forecast_macro_context()
         eco_reports = forecast_engine.get_economic_reports()
         return jsonify({
