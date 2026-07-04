@@ -434,3 +434,276 @@ function renderForecastChart(forecast) {
         }
     });
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  MULTI-SYMBOL TABS: XAUUSD | USDJPY | OIL
+// ═══════════════════════════════════════════════════════════════════════════
+
+const symbolCharts = {};   // keyed by symbol name
+let currentSymbolTab = 'XAUUSD';
+
+const TAB_STYLES = {
+    'XAUUSD': { active: 'border:1.5px solid rgba(251,191,36,0.7);background:rgba(251,191,36,0.14);color:#fbbf24;', idle: 'border:1.5px solid rgba(251,191,36,0.2);background:transparent;color:rgba(251,191,36,0.5);' },
+    'USDJPY': { active: 'border:1.5px solid rgba(165,180,252,0.7);background:rgba(165,180,252,0.1);color:#a5b4fc;', idle: 'border:1.5px solid rgba(99,102,241,0.2);background:transparent;color:rgba(165,180,252,0.5);' },
+    'XTIUSD': { active: 'border:1.5px solid rgba(251,146,60,0.7);background:rgba(251,146,60,0.1);color:#fb923c;', idle: 'border:1.5px solid rgba(249,115,22,0.2);background:transparent;color:rgba(251,146,60,0.5);' }
+};
+const TAB_BTNS = { 'XAUUSD': 'tab-xauusd', 'USDJPY': 'tab-usdjpy', 'XTIUSD': 'tab-oil' };
+
+function switchSymbolTab(symbol) {
+    if (currentSymbolTab === symbol) return;
+    currentSymbolTab = symbol;
+
+    // Update tab button styles
+    ['XAUUSD','USDJPY','XTIUSD'].forEach(sym => {
+        const btn = document.getElementById(TAB_BTNS[sym]);
+        if (!btn) return;
+        const st = TAB_STYLES[sym] || {};
+        btn.style.cssText = btn.style.cssText + ';' + (sym === symbol ? st.active : st.idle);
+    });
+
+    // Show/hide panels
+    document.querySelectorAll('.symbol-panel').forEach(p => p.style.display = 'none');
+    const panel = document.getElementById('panel-' + symbol);
+    if (panel) {
+        panel.style.display = 'block';
+        panel.style.animation = 'fadeInUp 0.3s ease-out';
+    }
+
+    // Fetch data if not XAUUSD (which is always pre-rendered)
+    if (symbol !== 'XAUUSD') {
+        loadSymbolForecast(symbol);
+    } else {
+        // Render XAUUSD confidence bars and chart
+        renderConfidenceBars('XAUUSD', null);
+    }
+
+    // Update price tag
+    updateSymbolPriceTag(symbol);
+}
+
+function updateSymbolPriceTag(symbol) {
+    const tag = document.getElementById('symbolPriceTag');
+    const nameEl = document.getElementById('symbolPriceName');
+    const valEl = document.getElementById('symbolPriceValue');
+    if (!tag) return;
+
+    fetch(`/api/symbol_forecast?symbol=${symbol === 'XAUUSD' ? 'USDJPY' : symbol}`)
+        .then(r => r.json()).then(d => {
+        if (d.status === 'success') {
+            tag.style.display = 'flex';
+            nameEl.textContent = d.forecast.display_name + ' BID';
+            valEl.textContent = d.forecast.base_price.toFixed(symbol === 'USDJPY' ? 3 : 2);
+        }
+    }).catch(() => {});
+}
+
+async function loadSymbolForecast(symbol) {
+    const spinner = document.getElementById('symbolLoadingSpinner');
+    if (spinner) spinner.style.display = 'flex';
+
+    try {
+        const resp = await fetch(`/api/symbol_forecast?symbol=${symbol}`);
+        const data = await resp.json();
+        if (data.status !== 'success') throw new Error(data.message);
+
+        const fc = data.forecast;
+
+        // Update desc/bias labels
+        if (symbol === 'USDJPY') {
+            const desc = document.getElementById('usdJpyDesc');
+            const bias = document.getElementById('usdJpyBias');
+            if (desc) desc.textContent = `${fc.description} | Bid: ${fc.base_price} | Drift/week: ${fc.weekly_drift > 0 ? '+' : ''}${fc.weekly_drift}`;
+            if (bias) bias.innerHTML = `Trend Bias: <strong style="color:${fc.trend_bias >= 0 ? '#4ade80' : '#f87171'}">${fc.trend_bias >= 0 ? '▲' : '▼'} ${(fc.trend_bias * 100).toFixed(2)}%</strong>`;
+        } else if (symbol === 'XTIUSD') {
+            const desc = document.getElementById('oilDesc');
+            const bias = document.getElementById('oilBias');
+            if (desc) desc.textContent = `${fc.description} | Bid: $${fc.base_price} | Drift/week: $${fc.weekly_drift > 0 ? '+' : ''}${fc.weekly_drift}`;
+            if (bias) bias.innerHTML = `Trend Bias: <strong style="color:${fc.trend_bias >= 0 ? '#4ade80' : '#f87171'}">${fc.trend_bias >= 0 ? '▲' : '▼'} ${(fc.trend_bias * 100).toFixed(2)}%</strong>`;
+        }
+
+        // Update price tag
+        const tag = document.getElementById('symbolPriceTag');
+        const nameEl = document.getElementById('symbolPriceName');
+        const valEl = document.getElementById('symbolPriceValue');
+        if (tag) { tag.style.display = 'flex'; nameEl.textContent = fc.display_name + ' BID'; valEl.textContent = fc.base_price; }
+
+        // Render chart
+        renderSymbolChart(symbol, fc);
+
+        // Render confidence bars
+        renderConfidenceBars(symbol, fc.projections);
+
+        // Render table
+        renderSymbolTable(symbol, fc);
+
+    } catch (err) {
+        console.error('Error loading symbol forecast:', err);
+        const tableId = symbol === 'USDJPY' ? 'forecastTableUSDJPY' : 'forecastTableXTIUSD';
+        const tbody = document.getElementById(tableId);
+        if (tbody) tbody.innerHTML = `<tr><td colspan="8" style="padding:20px;text-align:center;color:#f87171;">❌ Error: ${err.message}</td></tr>`;
+    } finally {
+        if (spinner) spinner.style.display = 'none';
+    }
+}
+
+function renderSymbolChart(symbol, fc) {
+    const canvasId = 'forecastChart' + symbol;
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+
+    const past = fc.past_projections || [];
+    const future = fc.projections || [];
+    const decimals = symbol === 'USDJPY' ? 3 : 2;
+    const isOil = symbol === 'XTIUSD';
+    const accentHigh = symbol === 'USDJPY' ? 'rgba(165,180,252,' : 'rgba(251,146,60,';
+    const accentLow  = symbol === 'USDJPY' ? 'rgba(52,211,153,' : 'rgba(56,189,248,';
+
+    // Build labels
+    const pastLabels   = past.map(p => `W${p.week}`);
+    const futureLabels = future.map(p => `W+${p.week}`);
+    const labels = [...pastLabels, '⬤ NOW', ...futureLabels.slice(1)];
+
+    // Band data (past + future combined)
+    const allHH = [...past.map(p => p.high_high), ...future.map(p => p.high_high)];
+    const allH  = [...past.map(p => p.high),      ...future.map(p => p.high)];
+    const allL  = [...past.map(p => p.low),        ...future.map(p => p.low)];
+    const allLL = [...past.map(p => p.low_low),    ...future.map(p => p.low_low)];
+    const allCt = [...past.map(p => p.center || (p.high+p.low)/2), ...future.map(p => (p.high+p.low)/2)];
+
+    // Actual lines (past only + current dot + nulls)
+    const actH = [...past.map(p => p.actual_high), fc.base_price, ...new Array(future.length - 1).fill(null)];
+    const actL = [...past.map(p => p.actual_low),  fc.base_price, ...new Array(future.length - 1).fill(null)];
+
+    // Destroy old chart if exists
+    if (symbolCharts[symbol]) { symbolCharts[symbol].destroy(); }
+
+    symbolCharts[symbol] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'High-High (R2)', data: allHH, borderColor: `rgba(248,113,113,0.6)`, borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, backgroundColor: 'rgba(248,113,113,0.07)', fill: '+1' },
+                { label: 'High (R1)', data: allH, borderColor: `${accentHigh}0.9)`, borderWidth: 2, backgroundColor: 'rgba(14,28,54,0.45)', pointRadius: 1.5, fill: '+1' },
+                { label: 'Low (S1)', data: allL, borderColor: `${accentLow}0.9)`, borderWidth: 2, backgroundColor: `${accentLow}0.07)`, pointRadius: 1.5, fill: '+1' },
+                { label: 'Low-Low (S2)', data: allLL, borderColor: 'rgba(74,222,128,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
+                { label: 'Median', data: allCt, borderColor: 'rgba(165,180,252,0.4)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false },
+                { label: 'Actual High', data: actH, borderColor: 'rgba(239,68,68,1)', borderWidth: 2.5, pointRadius: (c) => c.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (c) => c.dataIndex === past.length ? '#fff' : 'rgba(239,68,68,1)', fill: false, spanGaps: false },
+                { label: 'Actual Low', data: actL, borderColor: 'rgba(34,197,94,1)', borderWidth: 2.5, pointRadius: (c) => c.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (c) => c.dataIndex === past.length ? '#fff' : 'rgba(34,197,94,1)', fill: false, spanGaps: false },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            animation: { duration: 600, easing: 'easeInOutCubic' },
+            plugins: {
+                legend: { position: 'top', labels: { color: '#8a9cb4', font: { family: 'Outfit', size: 10 } } },
+                tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(6,12,26,0.95)', titleColor: '#fff', bodyColor: '#e2ecf8', borderColor: 'rgba(0,210,255,0.2)', borderWidth: 1, bodyFont: { family: 'JetBrains Mono', size: 11 },
+                    callbacks: {
+                        label: (ctx) => {
+                            const v = ctx.raw;
+                            if (v === null || v === undefined) return null;
+                            const prefix = isOil ? '$' : (symbol === 'USDJPY' ? '¥' : '$');
+                            return ` ${ctx.dataset.label}: ${prefix}${parseFloat(v).toFixed(decimals)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.03)' },
+                    ticks: {
+                        color: (ctx) => {
+                            const lbl = ctx.chart.data.labels[ctx.index];
+                            if (lbl && lbl.includes('NOW')) return '#fbbf24';
+                            return lbl && lbl.startsWith('W-') ? '#8a9cb4' : (symbol === 'USDJPY' ? '#a5b4fc' : '#fb923c');
+                        },
+                        font: { family: 'Outfit', size: 9 }, maxRotation: 45
+                    }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.02)' },
+                    ticks: { color: '#8a9cb4', font: { family: 'JetBrains Mono', size: 10 } }
+                }
+            }
+        }
+    });
+}
+
+function renderConfidenceBars(symbol, projections) {
+    const containerId = 'confidenceBars' + symbol;
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Use XAUUSD data from existing state if projections is null
+    let bars = projections;
+    if (!bars) {
+        // Build synthetic bars for XAUUSD from known formula
+        bars = [];
+        for (let w = 1; w <= 25; w++) {
+            bars.push({ week: w, confidence: Math.max(50, Math.round((95.0 - (w - 1) * 1.8) * 10) / 10) });
+        }
+    }
+
+    container.innerHTML = '';
+    bars.forEach(p => {
+        const conf = p.confidence;
+        const pct = ((conf - 50) / 45) * 100;  // scale 50-95% → 0-100%
+        const hue = pct > 60 ? 141 : pct > 30 ? 48 : 0;  // green → yellow → red
+        const bar = document.createElement('div');
+        bar.style.cssText = `flex:1; height:${Math.max(8, pct * 0.6)}px; background:hsla(${hue},80%,55%,0.6); border-radius:2px 2px 0 0; transition:all 0.3s; cursor:default; min-width:4px;`;
+        bar.title = `W+${p.week}: ${conf}%`;
+        bar.addEventListener('mouseover', () => { bar.style.opacity = '1'; bar.style.transform = 'scaleY(1.08)'; });
+        bar.addEventListener('mouseout',  () => { bar.style.opacity = '0.75'; bar.style.transform = 'scaleY(1)'; });
+        bar.style.opacity = '0.75';
+        container.appendChild(bar);
+    });
+}
+
+function renderSymbolTable(symbol, fc) {
+    const tableId = symbol === 'USDJPY' ? 'forecastTableUSDJPY' : 'forecastTableXTIUSD';
+    const tbody = document.getElementById(tableId);
+    if (!tbody) return;
+
+    const isOil = symbol === 'XTIUSD';
+    const decimals = symbol === 'USDJPY' ? 3 : 2;
+    const prefix = isOil ? '$' : (symbol === 'USDJPY' ? '¥' : '$');
+    const allRows = [...(fc.past_projections || []), ...(fc.projections || [])];
+    let html = '';
+
+    allRows.forEach(p => {
+        const isPast = p.status === 'COMPLETED';
+        const conf = p.confidence;
+        const confColor = conf >= 80 ? '#4ade80' : conf >= 65 ? '#fbbf24' : '#f87171';
+        const weekLabel = isPast ? `W${p.week}` : `W+${p.week}`;
+        const rowBg = isPast ? 'rgba(255,255,255,0.012)' : 'transparent';
+
+        let statusHtml = isPast
+            ? `<span style="font-size:0.7rem;color:#4ade80;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:6px;padding:2px 8px;">✅ Terjadi</span>`
+            : p.status === 'ACTIVE'
+                ? `<span style="font-size:0.7rem;color:#fbbf24;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);border-radius:6px;padding:2px 8px;">🔴 AKTIF</span>`
+                : `<span style="font-size:0.7rem;color:var(--muted);background:rgba(255,255,255,0.04);border-radius:6px;padding:2px 8px;">Pending</span>`;
+
+        html += `
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.03);background:${rowBg};">
+                <td style="padding:9px 8px;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:${isPast ? '#8a9cb4' : '#e2ecf8'};">${weekLabel}</td>
+                <td style="padding:9px 8px;color:var(--muted);font-size:0.75rem;">${p.date_range}</td>
+                <td style="padding:9px 8px;color:rgba(74,222,128,0.7);font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${prefix}${parseFloat(p.low_low).toFixed(decimals)}</td>
+                <td style="padding:9px 8px;color:#38bdf8;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${prefix}${parseFloat(p.low).toFixed(decimals)}${isPast ? `<div style="color:#22c55e;font-size:0.65rem;">Act:${prefix}${parseFloat(p.actual_low).toFixed(decimals)}</div>` : ''}</td>
+                <td style="padding:9px 8px;color:#fbbf24;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${prefix}${parseFloat(p.high).toFixed(decimals)}${isPast ? `<div style="color:#ef4444;font-size:0.65rem;">Act:${prefix}${parseFloat(p.actual_high).toFixed(decimals)}</div>` : ''}</td>
+                <td style="padding:9px 8px;color:rgba(248,113,113,0.7);font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${prefix}${parseFloat(p.high_high).toFixed(decimals)}</td>
+                <td style="padding:9px 8px;text-align:center;font-weight:700;font-family:'JetBrains Mono',monospace;color:${confColor};font-size:0.8rem;">${conf}%</td>
+                <td style="padding:9px 8px;text-align:center;">${statusHtml}</td>
+            </tr>`;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// Initialize XAUUSD tab as active + render confidence bars on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        renderConfidenceBars('XAUUSD', null);
+        // Also bind XAUUSD tab button style
+        const btn = document.getElementById('tab-xauusd');
+        if (btn) btn.style.cssText += ';' + TAB_STYLES['XAUUSD'].active;
+    }, 800);
+});
