@@ -11,9 +11,9 @@
     "learning_rate": 0.05
   },
   "metrics": {
-    "mae": 1.98,
+    "mae": 1.24,
     "accuracy": 99.8,
-    "ticks_monitored": 173
+    "ticks_monitored": 268
   },
   "projections": [
     {

@@ -3,8 +3,8 @@
     "equity": 10543.1,
     "active_trades": [
         {
-            "ticket": 24046008,
-            "time": "2026-07-04 11:47:40",
+            "ticket": 24850400,
+            "time": "2026-07-04 14:01:44",
             "symbol": "XAUUSD",
             "type": "SELL",
             "lots": 0.07,
@@ -68,5 +68,5 @@
             "result": "PROFIT"
         }
     ],
-    "last_update": 1783148363.9722524
+    "last_update": 1783148561.9588926
 }

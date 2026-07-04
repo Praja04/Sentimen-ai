@@ -752,6 +752,22 @@ function renderConfidenceBars(symbol, projections) {
         bar.style.opacity = '0.75';
         container.appendChild(bar);
     });
+
+    // Populate labels row dynamically
+    const labelsContainerId = 'confidenceLabels' + symbol;
+    const labelsContainer = document.getElementById(labelsContainerId);
+    if (labelsContainer) {
+        const w1Conf = bars[0] ? parseFloat(bars[0].confidence).toFixed(1) : '95.0';
+        const w13Conf = bars[12] ? parseFloat(bars[12].confidence).toFixed(1) : '73.4';
+        const w25Conf = bars[24] ? parseFloat(bars[24].confidence).toFixed(1) : '51.8';
+        labelsContainer.innerHTML = `
+            <span>W+1 (${w1Conf}%)</span>
+            <span>W+7</span>
+            <span>W+13 (${w13Conf}%)</span>
+            <span>W+19</span>
+            <span>W+25 (${w25Conf}%)</span>
+        `;
+    }
 }
 
 function renderSymbolTable(symbol, fc) {
