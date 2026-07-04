@@ -214,22 +214,35 @@ function updateForecastUI(forecast, macroContext, economicReports) {
 
     // 4. Update Macro Context Panels
     if (macroContext) {
-        document.getElementById("macroCentralBank").textContent = macroContext.demand.central_bank;
-        document.getElementById("macroEtfFlows").textContent = macroContext.demand.etf_flows;
-        document.getElementById("macroJewelry").textContent = macroContext.demand.jewelry;
+        const demand = macroContext.demand || {};
+        const experts = macroContext.experts || {};
+        const geopolitics = macroContext.geopolitics || {};
+
+        const cbEl = document.getElementById("macroCentralBank");
+        if (cbEl) cbEl.textContent = demand.central_bank || "-";
+        const etfEl = document.getElementById("macroEtfFlows");
+        if (etfEl) etfEl.textContent = demand.etf_flows || "-";
+        const jwEl = document.getElementById("macroJewelry");
+        if (jwEl) jwEl.textContent = demand.jewelry || "-";
         
-        document.getElementById("macroFedStance").textContent = macroContext.experts.fed_stance;
-        document.getElementById("macroPresidentStance").textContent = macroContext.experts.president_stance;
+        const fedEl = document.getElementById("macroFedStance");
+        if (fedEl) fedEl.textContent = experts.fed_stance || "-";
+        const presEl = document.getElementById("macroPresidentStance");
+        if (presEl) presEl.textContent = experts.president_stance || "-";
         
-        document.getElementById("macroGeopoliticsIndex").textContent = macroContext.geopolitics.index;
-        document.getElementById("macroConflicts").textContent = macroContext.geopolitics.conflicts;
-        document.getElementById("macroTariffWars").textContent = macroContext.geopolitics.tariff_wars;
+        const geoEl = document.getElementById("macroGeopoliticsIndex");
+        if (geoEl) geoEl.textContent = geopolitics.index || "-";
+        const confEl = document.getElementById("macroConflicts");
+        if (confEl) confEl.textContent = geopolitics.conflicts || "-";
+        const twEl = document.getElementById("macroTariffWars");
+        if (twEl) twEl.textContent = geopolitics.tariff_wars || "-";
         
         // Wall Street Consensus
         const wallStreetContainer = document.getElementById("macroWallStreet");
-        if (wallStreetContainer && macroContext.experts.targets) {
+        if (wallStreetContainer) {
             let targetsHtml = `<span style="color: var(--muted); display: block; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 4px;">Target Bank Global:</span>`;
-            macroContext.experts.targets.forEach(t => {
+            const targets = experts.targets || [];
+            targets.forEach(t => {
                 targetsHtml += `
                     <div style="display: flex; justify-content: space-between; font-size: 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding: 3px 0;">
                         <span style="color: var(--muted); font-weight: 500;">${t.inst}:</span>
@@ -671,8 +684,8 @@ function renderSymbolChart(symbol, fc) {
                     { label: 'Low (S1)', data: allL, borderColor: accentLow, borderWidth: 2, backgroundColor: 'transparent', pointRadius: 1.5, fill: false },
                     { label: 'Low-Low (S2)', data: allLL, borderColor: 'rgba(74,222,128,0.6)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
                     { label: 'Median', data: allCt, borderColor: 'rgba(165,180,252,0.4)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false },
-                    { label: 'Actual High', data: actH, borderColor: 'rgba(239,68,68,1)', borderWidth: 2.5, pointRadius: (ctx) => ctx.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (ctx) => ctx.dataIndex === past.length ? '#fff' : 'rgba(239,68,68,1)', fill: false, spanGaps: false },
-                    { label: 'Actual Low', data: actL, borderColor: 'rgba(34,197,94,1)', borderWidth: 2.5, pointRadius: (ctx) => ctx.dataIndex === past.length ? 6 : 2.5, pointBackgroundColor: (ctx) => ctx.dataIndex === past.length ? '#fff' : 'rgba(34,197,94,1)', fill: false, spanGaps: false },
+                    { label: 'Actual High', data: actH, borderColor: 'rgba(239,68,68,1)', borderWidth: 2.5, pointRadius: (ctx) => ctx.dataIndex === (past ? past.length : 0) ? 6 : 2.5, pointBackgroundColor: (ctx) => ctx.dataIndex === (past ? past.length : 0) ? '#fff' : 'rgba(239,68,68,1)', fill: false, spanGaps: false },
+                    { label: 'Actual Low', data: actL, borderColor: 'rgba(34,197,94,1)', borderWidth: 2.5, pointRadius: (ctx) => ctx.dataIndex === (past ? past.length : 0) ? 6 : 2.5, pointBackgroundColor: (ctx) => ctx.dataIndex === (past ? past.length : 0) ? '#fff' : 'rgba(34,197,94,1)', fill: false, spanGaps: false },
                 ]
             },
             options: {

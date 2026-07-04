@@ -345,12 +345,12 @@ def get_symbol_forecast(symbol: str) -> dict:
         past_projections.append({
             "week": w_idx,
             "date_range": f"{w_start.strftime('%d %b')} - {w_end.strftime('%d %b')}",
-            "low_low": round(low_low, 3), "low": round(low, 3),
-            "high": round(high, 3), "high_high": round(high_high, 3),
-            "center": round(center, 3),
-            "actual_high": round(actual_high, 3), "actual_low": round(actual_low, 3),
-            "error_high": round(actual_high - high, 3),
-            "error_low":  round(actual_low  - low,  3),
+            "low_low": round(float(low_low), 3), "low": round(float(low), 3),
+            "high": round(float(high), 3), "high_high": round(float(high_high), 3),
+            "center": round(float(center), 3),
+            "actual_high": round(float(actual_high), 3), "actual_low": round(float(actual_low), 3),
+            "error_high": round(float(actual_high - high), 3),
+            "error_low":  round(float(actual_low  - low),  3),
             "confidence": 100.0, "status": "COMPLETED", "hits": {}
         })
 
@@ -374,27 +374,95 @@ def get_symbol_forecast(symbol: str) -> dict:
             "date_range": f"{week_start.strftime('%d %b')} - {week_end.strftime('%d %b')}",
             "start_date": week_start.strftime("%Y-%m-%d"),
             "end_date":   week_end.strftime("%Y-%m-%d"),
-            "low_low": round(low_low, 3), "low": round(low, 3),
-            "high": round(high, 3), "high_high": round(high_high, 3),
+            "low_low": round(float(low_low), 3), "low": round(float(low), 3),
+            "high": round(float(high), 3), "high_high": round(float(high_high), 3),
             "confidence": confidence, "status": "PENDING", "hits": {}
         })
+
+    # Generate custom macro_context and economic_reports
+    macro_ctx = None
+    eco_reps = None
+    if symbol == 'USDJPY':
+        macro_ctx = {
+            "demand": {
+                "central_bank": "Intervensi BoJ & JGB Buying (Net Accumulation)",
+                "etf_flows": "Yen Carry Trade Outflows & JPY Buying",
+                "jewelry": "Aktivitas Konsumsi Domestik Jepang (Moderat)",
+                "status": "NEUTRAL"
+            },
+            "experts": {
+                "fed_stance": "BoJ Hawkish vs Fed Dovish: Kontraksi diferensial suku bunga AS-Jepang.",
+                "powell_quote": "Gubernur Ueda mengisyaratkan normalisasi suku bunga lebih lanjut jika inflasi bertahan di atas 2%.",
+                "targets": [
+                    {"inst": "Goldman Sachs", "target": "155.00", "stance": "Apresiasi JPY jangka menengah"},
+                    {"inst": "JP Morgan", "target": "152.50", "stance": "Normalisasi BoJ menekan USDJPY"},
+                    {"inst": "Citi Research", "target": "154.00", "stance": "Volatilitas carry trade mendukung Yen"}
+                ],
+                "president_stance": "Penutupan posisi carry trade global seiring penurunan yield obligasi US Treasury."
+            },
+            "geopolitics": {
+                "index": "MODERAT (110 bps)",
+                "conflicts": "Ketegangan geopolitik cenderung memicu aliran dana safe-haven repatriasi ke Yen Jepang.",
+                "tariff_wars": "Tarif dagang AS mempengaruhi ekspor otomotif dan prospek perdagangan Jepang.",
+                "vix_status": "Kenaikan VIX memicu penutupan posisi carry trade dan memicu penguatan Yen JPY."
+            }
+        }
+        eco_reps = [
+            {"date": "10 Jul", "time": "06:30", "country": "JPY", "indicator": "CPI Inti Nasional Jepang (YoY)", "actual": "2.5%", "forecast": "2.4%", "prev": "2.5%", "status": "HIGH", "impact": "BULLISH JPY"},
+            {"date": "18 Jul", "time": "10:00", "country": "JPY", "indicator": "Keputusan Suku Bunga BoJ", "actual": "0.25%", "forecast": "0.25%", "prev": "0.10%", "status": "HIGH", "impact": "HAWKISH JPY"},
+            {"date": "24 Jul", "time": "07:50", "country": "JPY", "indicator": "Neraca Perdagangan Jepang", "actual": "-¥180B", "forecast": "-¥150B", "prev": "-¥220B", "status": "MED", "impact": "NEUTRAL"},
+            {"date": "30 Jul", "time": "06:50", "country": "JPY", "indicator": "PDB Kuartalan (YoY)", "actual": "1.2%", "forecast": "1.0%", "prev": "0.8%", "status": "HIGH", "impact": "BULLISH JPY"}
+        ]
+    elif symbol == 'XTIUSD':
+        macro_ctx = {
+            "demand": {
+                "central_bank": "Cadangan Minyak Strategis AS (SPR) Akumulasi",
+                "etf_flows": "Kontrak Berjangka WTI & Inflow ETF Komoditas Energi",
+                "jewelry": "Permintaan Sektor Kilang & Transportasi Global (Tinggi)",
+                "status": "BULLISH"
+            },
+            "experts": {
+                "fed_stance": "OPEC+ memangkas produksi sukarela hingga akhir tahun untuk menjaga stabilitas harga minyak.",
+                "powell_quote": "Permintaan minyak mentah dari kilang lokal China menunjukkan pemulihan pasca stimulus.",
+                "targets": [
+                    {"inst": "Goldman Sachs", "target": "$82.00", "stance": "Keketatan pasokan kuartal berjalan"},
+                    {"inst": "JP Morgan", "target": "$78.50", "stance": "Ekspektasi suplai stabil dari produsen non-OPEC"},
+                    {"inst": "Citi Research", "target": "$85.00", "stance": "Gangguan pasokan Timur Tengah memicu premi risiko"}
+                ],
+                "president_stance": "Kebijakan energi domestik AS memengaruhi proyeksi output shale oil dalam jangka panjang."
+            },
+            "geopolitics": {
+                "index": "HIGH RISK (180 bps)",
+                "conflicts": "Ketegangan di Timur Tengah dan Laut Merah meningkatkan biaya premi risiko pasokan minyak.",
+                "tariff_wars": "Tarif dagang global berpotensi memperlambat aktivitas manufaktur dan pertumbuhan permintaan minyak.",
+                "vix_status": "Volatilitas pasar minyak tetap tinggi didukung oleh ketidakpastian geopolitik geopolitik produsen OPEC."
+            }
+        }
+        eco_reps = [
+            {"date": "08 Jul", "time": "21:30", "country": "USA", "indicator": "Persediaan Minyak Mentah EIA", "actual": "-3.2M", "forecast": "-1.5M", "prev": "+1.2M", "status": "HIGH", "impact": "BULLISH OIL"},
+            {"date": "10 Jul", "time": "00:00", "country": "USA", "indicator": "Baker Hughes Oil Rig Count", "actual": "485", "forecast": "490", "prev": "488", "status": "MED", "impact": "BULLISH OIL"},
+            {"date": "15 Jul", "time": "09:00", "country": "CHN", "indicator": "PDB Kuartalan China (YoY)", "actual": "4.8%", "forecast": "4.6%", "prev": "4.7%", "status": "HIGH", "impact": "NEUTRAL"},
+            {"date": "22 Jul", "time": "15:00", "country": "ALL", "indicator": "Kuota Output Bulanan OPEC+", "actual": "35.8M bpd", "forecast": "36.0M bpd", "prev": "36.2M bpd", "status": "HIGH", "impact": "BULLISH OIL"}
+        ]
 
     return {
         "symbol": symbol,
         "display_name": cfg["display_name"],
         "description": cfg["description"],
-        "base_price": round(current_price, 3),
-        "trend_bias": round(trend_bias, 4),
-        "avg_high_offset": round(avg_high_offset, 3),
-        "avg_low_offset":  round(avg_low_offset, 3),
-        "weekly_drift": round(weekly_drift, 3),
+        "base_price": round(float(current_price), 3),
+        "trend_bias": round(float(trend_bias), 4),
+        "avg_high_offset": round(float(avg_high_offset), 3),
+        "avg_low_offset":  round(float(avg_low_offset), 3),
+        "weekly_drift": round(float(weekly_drift), 3),
         "generated_at": now.strftime("%Y-%m-%d %H:%M:%S"),
         "past_projections": past_projections,
         "projections": future_projections,
         "error_correction": 0.0,
         "model_weights": {"fundamental": 0.70, "technical": 0.30, "volatility_multiplier": 1.0},
         "metrics": {"mae": 0.0, "accuracy": 92.0, "ticks_monitored": 0},
-        "hit_events": [], "learning_logs": []
+        "hit_events": [], "learning_logs": [],
+        "macro_context": macro_ctx,
+        "economic_reports": eco_reps
     }
 
 def get_forecast_state(current_price=None, fundamental_bias=None):
