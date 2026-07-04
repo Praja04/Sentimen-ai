@@ -145,7 +145,9 @@ def get_live_ticks():
                     with open(config_file, 'r', encoding='utf-8') as f_cfg:
                         demo_state["active_config"] = json.load(f_cfg)
             try:
-                forecast_engine.update_forecast_tick(ticks["XAUUSD"]["bid"], bias)
+                forecast_engine.update_forecast_tick("XAUUSD", ticks["XAUUSD"]["bid"], bias)
+                forecast_engine.update_forecast_tick("USDJPY", ticks["USDJPY"]["bid"], bias)
+                forecast_engine.update_forecast_tick("XTIUSD", ticks["WTI OIL"]["bid"], bias)
             except Exception as fe_err:
                 print("Error in forecast tick update:", fe_err)
         except Exception as err:
@@ -2729,12 +2731,14 @@ def get_trade_status():
 
         # Fetch news feed from xedy_v30_data.json
         news_feed = []
+        ml_weights = {}
         xedy_file = 'xedy_v30_data.json'
         if os.path.exists(xedy_file):
             with open(xedy_file, 'r', encoding='utf-8') as f_xedy:
                 try:
                     xedy_data = json.load(f_xedy)
                     news_feed = xedy_data.get("news_feed", [])
+                    ml_weights = xedy_data.get("ml_weights", {})
                 except Exception:
                     pass
 
@@ -2788,7 +2792,8 @@ def get_trade_status():
             "calendar": live_cal,
             "ticks": ticks,
             "fundamental_bias": bias_val,
-            "ai_live_logs": live_logs
+            "ai_live_logs": live_logs,
+            "ml_weights": ml_weights
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -2858,7 +2863,7 @@ if __name__ == '__main__':
             
         src_dir = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\static'
         dst_dir = r'C:\Users\ACER\OneDrive\Documents\PROJECT\static'
-        for f in ['backtest.html', 'backtest.js', 'backtest.css', 'forecast.html', 'forecast.js', 'index.html', 'trade.html']:
+        for f in ['backtest.html', 'backtest.js', 'backtest.css', 'forecast.html', 'forecast.js', 'index.html', 'trade.html', 'trade.js']:
             src_f = os.path.join(src_dir, f)
             dst_f = os.path.join(dst_dir, f)
             if os.path.exists(src_f):
