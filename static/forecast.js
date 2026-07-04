@@ -77,6 +77,9 @@ function updateForecastUI(forecast, macroContext, economicReports) {
     document.getElementById("fundWeightVal").textContent = `${(forecast.model_weights.fundamental * 100).toFixed(0)}%`;
     document.getElementById("techWeightVal").textContent = `${(forecast.model_weights.technical * 100).toFixed(0)}%`;
     document.getElementById("volMultVal").textContent = forecast.model_weights.volatility_multiplier.toFixed(3);
+    const ecVal = forecast.error_correction || 0.0;
+    const sign = ecVal >= 0 ? "+" : "";
+    document.getElementById("errorCorrectionVal").textContent = `${sign}$${ecVal.toFixed(2)}`;
     
     // 2. Learning logs terminal
     const logBox = document.getElementById("learningLogs");
