@@ -95,7 +95,7 @@ def save_demo_state(state):
     except Exception as e:
         print("Error saving demo state:", e)
 
-def update_livetest_sim(current_gold_price, bias):
+def update_livetest_sim(current_gold_price, bias, news_halt_active=False):
     state = get_demo_state()
     if not state:
         return None
@@ -178,6 +178,11 @@ def update_livetest_sim(current_gold_price, bias):
             
     # 2. If no active trade, open a new one
     else:
+        if news_halt_active:
+            state["last_update"] = time.time()
+            save_demo_state(state)
+            return state
+            
         # Load active config from decoupled active_config.json
         config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
         config = {}

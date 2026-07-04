@@ -127,7 +127,8 @@ def get_live_ticks():
         try:
             import livetest_sim
             bias = compute_xedy_fundamental_bias()
-            demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"]["bid"], bias)
+            news_halt, _ = is_news_halt_active()
+            demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"]["bid"], bias, news_halt_active=news_halt)
             if demo_state:
                 config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
                 if os.path.exists(config_file):
@@ -2428,6 +2429,52 @@ def fetch_live_calendar_and_news():
     return _cached_calendar, _cached_news
 
 
+def is_news_halt_active():
+    """Checks if there is a high-impact news event within 30 minutes in the future,
+    or within 15 minutes in the past."""
+    global _cached_calendar
+    if not _cached_calendar:
+        return False, None
+        
+    from datetime import datetime, timedelta
+    now = datetime.now()
+    
+    # High impact keywords for Gold (XAUUSD)
+    high_impact_keywords = ["cpi", "nfp", "fomc", "interest rate", "employment change", "gdp", "pce", "unemployment rate"]
+    
+    for event in _cached_calendar:
+        event_name = event.get("event", "").lower()
+        is_high_impact = any(k in event_name for k in high_impact_keywords)
+        if not is_high_impact:
+            continue
+            
+        event_time_str = event.get("time", "")
+        if not event_time_str:
+            continue
+            
+        try:
+            event_hour, event_minute = map(int, event_time_str.split(":"))
+            event_time = now.replace(hour=event_hour, minute=event_minute, second=0, microsecond=0)
+            
+            # Handle cross-day shifts
+            time_diff = event_time - now
+            if time_diff.total_seconds() < -43200:
+                event_time += timedelta(days=1)
+            elif time_diff.total_seconds() > 43200:
+                event_time -= timedelta(days=1)
+                
+            # Halt window: 30 mins before, 15 mins after
+            start_halt = event_time - timedelta(minutes=30)
+            end_halt = event_time + timedelta(minutes=15)
+            
+            if start_halt <= now <= end_halt:
+                return True, event.get("event")
+        except Exception as e:
+            continue
+            
+    return False, None
+
+
 _trade_live_logs = []
 _last_log_time = 0
 
@@ -2506,11 +2553,19 @@ def get_live_trade_logs(active_config, positions, ticks, bias):
                     "type": "pos"
                 })
         else:
-            new_entries.append({
-                "t": t_str,
-                "msg": f"Standby: Sinyal entry belum terpenuhi untuk '{strategy_name}'. AI standby menunggu trigger...",
-                "type": "wait"
-            })
+            is_halt, event_name = is_news_halt_active()
+            if is_halt:
+                new_entries.append({
+                    "t": t_str,
+                    "msg": f"⚠️ [PAUSED] News Halt: Trading ditangguhkan karena rilis berita berdampak tinggi: {event_name}",
+                    "type": "warn"
+                })
+            else:
+                new_entries.append({
+                    "t": t_str,
+                    "msg": f"Standby: Sinyal entry belum terpenuhi untuk '{strategy_name}'. AI standby menunggu trigger...",
+                    "type": "wait"
+                })
     else:
         new_entries.append({
             "t": t_str,
