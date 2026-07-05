@@ -11,8 +11,8 @@
     
     <style>
         :root {
-            --bg-dark: #02050b;
-            --bg-panel: rgba(6, 12, 26, 0.75);
+            --bg-dark: #020612;
+            --bg-panel: rgba(5, 10, 24, 0.85);
             --border-glow: rgba(0, 210, 255, 0.25);
             --border-light: rgba(255, 255, 255, 0.05);
             
@@ -20,13 +20,13 @@
             --text-cyan: #00d2ff;
             --text-green: #4ade80;
             --text-red: #f87171;
-            --text-muted: #7f90a8;
+            --text-muted: #72849a;
             --text-white: #ffffff;
             
-            --glow-cyan: 0 0 10px rgba(0, 210, 255, 0.25);
-            --glow-gold: 0 0 10px rgba(251, 191, 36, 0.25);
-            --glow-green: 0 0 10px rgba(74, 222, 128, 0.25);
-            --glow-red: 0 0 10px rgba(248, 113, 113, 0.25);
+            --glow-cyan: 0 0 10px rgba(0, 210, 255, 0.3);
+            --glow-gold: 0 0 10px rgba(251, 191, 36, 0.3);
+            --glow-green: 0 0 10px rgba(74, 222, 128, 0.3);
+            --glow-red: 0 0 10px rgba(248, 113, 113, 0.3);
         }
 
         * {
@@ -38,9 +38,9 @@
         body {
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.06), transparent 35%),
-                radial-gradient(circle at 90% 80%, rgba(74, 222, 128, 0.04), transparent 30%),
-                linear-gradient(180deg, #02050b 0%, #040914 100%);
+                radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.05), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(74, 222, 128, 0.03), transparent 35%),
+                linear-gradient(180deg, #020409 0%, #050a18 100%);
             background-attachment: fixed;
             color: var(--text-white);
             font-family: 'Outfit', sans-serif;
@@ -49,7 +49,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 8px;
+            padding: 6px;
         }
 
         /* Ambient scanlines */
@@ -69,17 +69,17 @@
         .dashboard-container {
             width: 100%;
             height: 98vh;
-            max-width: 1600px;
+            max-width: 1700px;
             background: var(--bg-panel);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border-light);
             border-radius: 12px;
             box-shadow: 
-                0 20px 50px rgba(0, 0, 0, 0.8),
-                0 0 25px rgba(0, 210, 255, 0.03),
+                0 25px 60px rgba(0, 0, 0, 0.9),
+                0 0 30px rgba(0, 210, 255, 0.04),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            padding: 10px 14px;
+            padding: 8px 12px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -92,27 +92,38 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--border-glow);
-            padding-bottom: 6px;
-            margin-bottom: 8px;
+            padding-bottom: 4px;
             height: 32px;
             font-family: 'Share Tech Mono', monospace;
         }
 
         .header-left {
-            font-size: 1.05rem;
+            font-size: 0.95rem;
             color: var(--text-gold);
             text-shadow: var(--glow-gold);
             font-weight: 700;
             display: flex;
-            align-items: center;
-            gap: 6px;
+            flex-direction: column;
         }
+        .header-left span { font-size: 0.55rem; color: var(--text-muted); font-weight: normal; }
 
         .header-center {
-            font-size: 0.82rem;
-            color: var(--text-white);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header-center h1 {
+            font-size: 1.05rem;
+            color: var(--text-gold);
+            text-shadow: var(--glow-gold);
             letter-spacing: 1px;
-            font-weight: 500;
+            font-weight: bold;
+        }
+        .header-center span {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
@@ -140,208 +151,23 @@
             100% { transform: scale(0.9); opacity: 0.5; }
         }
 
-        /* Top KPI Bar */
-        .kpi-bar {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
-            margin-bottom: 8px;
-            height: 38px;
-        }
-
-        .kpi-item {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 10px;
-            font-family: 'Share Tech Mono', monospace;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-        }
-
-        .kpi-lbl {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .kpi-val {
-            font-size: 0.88rem;
-            font-weight: 700;
-        }
-
-        /* Main Grid Area */
-        .main-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            flex: 1;
-            min-height: 0; /* Prevents overflow */
-            margin-bottom: 8px;
-        }
-
-        .grid-column {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-height: 0;
-        }
-
-        /* Individual Glassmorphic Panel Card */
-        .card-panel {
-            background: linear-gradient(135deg, rgba(12, 22, 45, 0.45) 0%, rgba(6, 10, 20, 0.7) 100%);
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            padding: 8px 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 0; /* Prevents flex boxes from blowing out height */
-            flex: 1;
-        }
-
-        .card-panel:hover {
-            border-color: rgba(0, 210, 255, 0.18);
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.08);
-        }
-
-        .card-title {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.72rem;
-            color: var(--text-cyan);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            padding-bottom: 3px;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex: 1;
-            gap: 4px;
-        }
-
-        /* Dense Target Rows */
-        .row-data {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.72rem;
-            font-family: 'Roboto Mono', monospace;
-            line-height: 1.4;
-        }
-
-        .row-lbl {
-            color: var(--text-muted);
-        }
-
-        .row-val {
-            font-weight: 700;
-        }
-
-        /* Star Rating Style */
-        .stars-val {
-            color: var(--text-gold);
-            letter-spacing: 1px;
-            font-size: 0.8rem;
-        }
-
-        /* Progress Bars */
-        .bar-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(0,0,0,0.6);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 2px 0 4px;
-        }
-
-        .bar-fill {
-            height: 100%;
-            background-color: var(--text-cyan);
-            border-radius: 2px;
-            transition: width 0.6s cubic-bezier(0.1, 0.8, 0.25, 1);
-        }
-
-        /* Bottom Row Configuration */
-        .bottom-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            height: 165px;
-            margin-top: 2px;
-        }
-
-        /* Custom Badges */
-        .badge-status {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 1px 6px;
-            border-radius: 3px;
-            text-transform: uppercase;
-        }
-
-        .badge-status.green {
-            background: rgba(74, 222, 128, 0.12);
-            color: var(--text-green);
-            border: 1px solid rgba(74, 222, 128, 0.25);
-            box-shadow: var(--glow-green);
-        }
-        
-        .badge-status.gold {
-            background: rgba(251, 191, 36, 0.12);
-            color: var(--text-gold);
-            border: 1px solid rgba(251, 191, 36, 0.25);
-            box-shadow: var(--glow-gold);
-        }
-
-        .badge-status.red {
-            background: rgba(248, 113, 113, 0.12);
-            color: var(--text-red);
-            border: 1px solid rgba(248, 113, 113, 0.25);
-            box-shadow: var(--glow-red);
-        }
-
-        .check-item {
-            font-size: 0.68rem;
-            color: var(--text-white);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 2px;
-        }
-
-        .check-icon {
-            color: var(--text-green);
-            font-weight: bold;
-        }
-
+        /* Symbol Selection Tabs */
         .symbol-tabs {
             display: flex;
             gap: 8px;
-            margin-bottom: 8px;
+            margin: 4px 0;
             justify-content: center;
             align-items: center;
-            height: 28px;
+            height: 24px;
         }
 
         .symbol-tab {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
             color: var(--text-muted);
-            padding: 4px 12px;
+            padding: 3px 10px;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
@@ -361,6 +187,360 @@
             background: rgba(0, 210, 255, 0.1);
             box-shadow: var(--glow-cyan);
         }
+
+        /* Top KPI Bar */
+        .kpi-bar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .kpi-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .kpi-icon {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kpi-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kpi-label {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .kpi-value {
+            font-size: 0.85rem;
+            font-weight: 700;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Pillars Score Row */
+        .pillars-bar {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .pillar-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .pillar-lbl {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .pillar-score {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-cyan);
+        }
+
+        .pillar-state {
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        /* Macro Drivers Box */
+        .drivers-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 4px 10px;
+            margin-bottom: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            height: 28px;
+        }
+
+        .drivers-title {
+            font-size: 0.65rem;
+            color: var(--text-gold);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .driver-pill {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        /* Middle Grid Layout */
+        .middle-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr 1fr 1fr;
+            gap: 8px;
+            flex: 1;
+            min-height: 0;
+            margin-bottom: 6px;
+        }
+
+        .mid-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 0;
+        }
+
+        /* Panel Box Styling */
+        .panel-card {
+            background: linear-gradient(135deg, rgba(8, 16, 32, 0.5) 0%, rgba(4, 8, 16, 0.8) 100%);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 6px 8px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 1;
+        }
+
+        .panel-header-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-cyan);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding-bottom: 2px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-body-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+            gap: 3px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.68rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .data-lbl {
+            color: var(--text-muted);
+        }
+
+        .data-val {
+            font-weight: 700;
+        }
+
+        /* Radials and SVGs */
+        .radial-gauge-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .radial-svg {
+            width: 58px;
+            height: 58px;
+            transform: rotate(-90deg);
+        }
+
+        .radial-svg circle {
+            fill: none;
+            stroke-width: 3.5;
+        }
+
+        .radial-bg {
+            stroke: rgba(255, 255, 255, 0.04);
+        }
+
+        .radial-fill {
+            stroke-dasharray: 100;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease;
+        }
+
+        .radial-text-center {
+            position: absolute;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Event and Donut Layout */
+        .donut-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 48px;
+        }
+
+        .donut-svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        /* Pentagon Radar Chart */
+        .radar-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 64px;
+        }
+
+        .radar-svg {
+            width: 68px;
+            height: 68px;
+        }
+
+        /* LED Bars for Pressure */
+        .led-bar {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+        }
+
+        .led-block {
+            width: 6px;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 1px;
+        }
+
+        .led-block.active-cyan {
+            background: var(--text-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .led-block.active-green {
+            background: var(--text-green);
+            box-shadow: var(--glow-green);
+        }
+
+        /* Bottom Row Panels grid */
+        .bottom-panels-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.3fr 1fr 1.2fr;
+            gap: 8px;
+            height: 98px;
+            margin-bottom: 6px;
+        }
+
+        /* Footer Row: Decision Engine (IDE) */
+        .footer-ide-row {
+            background: linear-gradient(90deg, rgba(74, 222, 128, 0.08) 0%, rgba(10, 22, 45, 0.7) 100%);
+            border: 1px solid rgba(74, 222, 128, 0.35);
+            box-shadow: var(--glow-green);
+            border-radius: 8px;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .ide-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bull-icon-glowing {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.5));
+        }
+
+        .ide-decision-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ide-decision-title {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .ide-decision-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-green);
+            text-shadow: var(--glow-green);
+        }
+
+        .ide-parameters {
+            display: flex;
+            gap: 20px;
+        }
+
+        .ide-param-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ide-param-lbl {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .ide-param-val {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .qr-code-block {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qr-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 3px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
@@ -370,14 +550,18 @@
         <!-- Header -->
         <header class="dash-header">
             <div class="header-left">
-                <span>🟡</span> XEDY V31 ELITE
+                <strong>🟡 XEDY V31 ELITE</strong>
+                <span>VERSION 31.0.0 | INSTITUTIONAL AI ENGINE</span>
             </div>
-            <div class="header-center" id="headerTitle">
-                Institutional Gold Intelligence Center (IGIC)
+            <div class="header-center">
+                <h1 id="headerTitle">INSTITUTIONAL GOLD INTELLIGENCE CENTER</h1>
+                <span>REAL-TIME MACRO - FLOW - SENTIMENT - AI DECISION ENGINE</span>
             </div>
             <div class="header-right">
                 <span class="live-pulse"></span>
                 <span>LIVE ● UPDATE 10 SEC</span>
+                <span style="margin-left: 8px; color: var(--text-muted);" id="liveClock">--:--:--</span>
+                <span style="margin-left: 10px; cursor: pointer;">⚙️</span>
             </div>
         </header>
 
@@ -390,244 +574,341 @@
 
         <!-- Top KPI Bar -->
         <section class="kpi-bar">
-            <div class="kpi-item">
-                <span class="kpi-lbl">XICI</span>
-                <span class="kpi-val" id="kpiXICI" style="color: var(--text-green); text-shadow: var(--glow-green);">90.7</span>
+            <!-- Price -->
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--text-gold);">🪙</div>
+                <div class="kpi-info">
+                    <span class="kpi-label" id="symbolLabel">XAUUSD</span>
+                    <span class="kpi-value" id="kpiPrice">----.--</span>
+                </div>
             </div>
-            <div class="kpi-item">
-                <span class="kpi-lbl">ICI</span>
-                <span class="kpi-val" id="kpiICI" style="color: var(--text-cyan); text-shadow: var(--glow-cyan);">90.4</span>
+            <!-- AI Stance -->
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--text-green);">🐂</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">AI Stance</span>
+                    <span class="kpi-value" id="kpiStance" style="color: var(--text-green);">BULLISH</span>
+                </div>
             </div>
-            <div class="kpi-item">
-                <span class="kpi-lbl">AI</span>
-                <span class="kpi-val" id="kpiAI" style="color: #fff;">89</span>
+            <!-- Confidence -->
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--text-cyan);">🛡️</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Confidence</span>
+                    <span class="kpi-value" id="kpiConfidence">--%</span>
+                </div>
             </div>
-            <div class="kpi-item">
-                <span class="kpi-lbl">CB</span>
-                <span class="kpi-val" id="kpiCB" style="color: var(--text-green);">95</span>
+            <!-- XICI -->
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: #a29bfe;">📊</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">XICI Score</span>
+                    <span class="kpi-value" id="kpiXICI" style="color: #a29bfe;">--.-</span>
+                </div>
             </div>
-            <div class="kpi-item">
-                <span class="kpi-lbl">ETF</span>
-                <span class="kpi-val" id="kpiETF" style="color: var(--text-cyan);">92</span>
+            <!-- Risk -->
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--text-gold);">⚠️</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Risk Level</span>
+                    <span class="kpi-value" id="kpiRisk" style="color: var(--text-gold);">MEDIUM</span>
+                </div>
             </div>
-            <div class="kpi-item">
-                <span class="kpi-lbl">Stress</span>
-                <span class="kpi-val" id="kpiStress" style="color: var(--text-green);">32</span>
+            <!-- Regime -->
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--text-green);">📈</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Regime</span>
+                    <span class="kpi-value" id="kpiRegime" style="color: var(--text-green);">TRENDING</span>
+                </div>
             </div>
-            <div class="kpi-item">
-                <span class="kpi-lbl">Fair Val</span>
-                <span class="kpi-val" id="kpiFairVal" style="color: var(--text-gold);">+1.6%</span>
-            </div>
-            <div class="kpi-item">
-                <span class="kpi-lbl">Regime</span>
-                <span class="kpi-val" id="kpiRegime" style="color: var(--text-green);">Trend ↑</span>
+            <!-- Volatility -->
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--text-cyan);">⚙️</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Volatility</span>
+                    <span class="kpi-value" id="kpiVolatility" style="color: var(--text-cyan);">NORMAL</span>
+                </div>
             </div>
         </section>
 
-        <!-- Main Grid Area -->
-        <section class="main-grid">
+        <!-- Pillars Row -->
+        <section class="pillars-bar">
+            <div class="pillar-item">
+                <span class="pillar-lbl">WALL ST</span>
+                <span class="pillar-score" id="scoreWallSt">89</span>
+                <span class="pillar-state" id="stanceWallSt" style="color: var(--text-green);">Bullish</span>
+            </div>
+            <div class="pillar-item">
+                <span class="pillar-lbl">EXPERTS</span>
+                <span class="pillar-score" id="scoreExperts">91</span>
+                <span class="pillar-state" id="stanceExperts" style="color: var(--text-green);">Bullish</span>
+            </div>
+            <div class="pillar-item">
+                <span class="pillar-lbl">CENTRAL BANK</span>
+                <span class="pillar-score" id="scoreCB">95</span>
+                <span class="pillar-state" id="stanceCB" style="color: var(--text-green);">Strong Bull</span>
+            </div>
+            <div class="pillar-item">
+                <span class="pillar-lbl">ETF FLOW</span>
+                <span class="pillar-score" id="scoreETF">92</span>
+                <span class="pillar-state" id="stanceETF" style="color: var(--text-green);">Bullish</span>
+            </div>
+            <div class="pillar-item">
+                <span class="pillar-lbl">AI ENGINE</span>
+                <span class="pillar-score" id="scoreAI">83</span>
+                <span class="pillar-state" id="stanceAI" style="color: var(--text-cyan);">Mod. Bull</span>
+            </div>
+            <div class="pillar-item">
+                <span class="pillar-lbl">SMART MONEY</span>
+                <span class="pillar-score" id="scoreSmartMoney">91</span>
+                <span class="pillar-state" id="stanceSmartMoney" style="color: var(--text-green);">Bullish</span>
+            </div>
+        </section>
+
+        <!-- Macro Drivers Bar -->
+        <section class="drivers-bar">
+            <span class="drivers-title">MACRO DRIVERS</span>
+            <div class="driver-pill" id="pillFed"><span style="color: var(--text-green);">🕊️</span> <span id="fedText">FED DOVISH</span></div>
+            <div class="driver-pill" id="pillCpi"><span style="color: var(--text-gold);">📊</span> <span id="cpiText">CPI STICKY</span></div>
+            <div class="driver-pill" id="pillDxy"><span style="color: var(--text-green);">📉</span> <span id="dxyText">DXY WEAK</span></div>
+            <div class="driver-pill" id="pillYield"><span style="color: var(--text-green);">🌊</span> <span id="yieldText">REAL YIELD FALLING</span></div>
+            <div class="driver-pill" id="pillLiq"><span style="color: var(--text-green);">💧</span> <span id="liqText">LIQUIDITY EXPANDING</span></div>
+            <div class="driver-pill" id="pillGeo"><span style="color: var(--text-red);">🚨</span> <span id="geoText">GEO RISK HIGH</span></div>
+        </section>
+
+        <!-- Middle Grid Layout -->
+        <section class="middle-grid">
             
             <!-- Column 1 -->
-            <div class="grid-column">
-                <!-- ① ICI Card -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>① Institutional Conviction (ICI)</span>
-                        <span class="badge-status green" id="iciStatus">Very High</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Wall Street</span><span class="row-val" id="iciWallSt">89</span></div>
-                        <div class="row-data"><span class="row-lbl">Experts</span><span class="row-val" id="iciExperts">91</span></div>
-                        <div class="row-data"><span class="row-lbl">Central Banks</span><span class="row-val" id="iciCB">95</span></div>
-                        <div class="row-data"><span class="row-lbl">ETF Flow</span><span class="row-val" id="iciETF">92</span></div>
-                        <div class="row-data"><span class="row-lbl">CFTC</span><span class="row-val" id="iciCFTC">88</span></div>
-                        <div class="row-data"><span class="row-lbl">Options</span><span class="row-val" id="iciOptions">86</span></div>
-                        <div class="bar-container"><div class="bar-fill" id="iciBar" style="width: 90.4%; background-color: var(--text-cyan); box-shadow: var(--glow-cyan);"></div></div>
+            <div class="mid-col">
+                <!-- 03 Institutional Consensus -->
+                <div class="panel-card" style="flex: 1.3;">
+                    <h3 class="panel-header-title">03 Institutional Consensus</h3>
+                    <div class="panel-body-content">
+                        <div id="wallStreetList">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <div style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.05); text-align: center;">
+                            <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Consensus Target</div>
+                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-gold);" id="consensusTargetVal">$4,212 (+3.8% vs Current)</div>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+                            <div class="donut-container" style="flex: 1;">
+                                <svg class="donut-svg" viewBox="0 0 36 36">
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="4.5"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-green)" stroke-width="4.5" stroke-dasharray="82 18" stroke-dashoffset="0"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-gold)" stroke-width="4.5" stroke-dasharray="13 87" stroke-dashoffset="-82"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-red)" stroke-width="4.5" stroke-dasharray="5 95" stroke-dashoffset="-95"/>
+                                </svg>
+                            </div>
+                            <div style="flex: 1.2; display: flex; flex-direction: column; gap: 2px; font-size: 0.6rem;">
+                                <div><span style="color: var(--text-green);">●</span> Bulls: 82%</div>
+                                <div><span style="color: var(--text-gold);">●</span> Neutrals: 13%</div>
+                                <div><span style="color: var(--text-red);">●</span> Bears: 5%</div>
+                            </div>
+                        </div>
+                        <div class="data-row" style="margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 3px;">
+                            <span class="data-lbl">Dispersion</span>
+                            <span class="data-val" id="dispersionVal" style="color: var(--text-green);">4.6% HIGH AGREEMENT</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ② Market Regime Card -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>② Market Regime Engine</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Trend</span><span class="row-val" id="regTrend" style="color: var(--text-green);">🟢 Strong Trend</span></div>
-                        <div class="row-data"><span class="row-lbl">Momentum</span><span class="row-val" id="regMom" style="color: var(--text-green);">🟢 Positive</span></div>
-                        <div class="row-data"><span class="row-lbl">Volatility</span><span class="row-val" id="regVol" style="color: var(--text-gold);">🟡 Normal</span></div>
-                        <div class="row-data"><span class="row-lbl">Liquidity</span><span class="row-val" id="regLiq" style="color: var(--text-green);">🟢 High</span></div>
-                        <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">Regime Type</span><span class="row-val" id="regType" style="color: var(--text-cyan);">TREND FOLLOWING</span></div>
-                    </div>
-                </div>
+                <!-- 08 Smart Money Flow -->
+                <div class="panel-card">
+                    <h3 class="panel-header-title">08 Smart Money Flow</h3>
+                    <div class="panel-body-content" style="gap: 4px;">
+                        <div class="data-row">
+                            <span class="data-lbl">Central Bank Buying</span>
+                            <span class="data-val" id="smCB">95</span>
+                        </div>
+                        <div class="bar-container"><div class="bar-fill" id="smCBBar" style="width: 95%; background-color: var(--text-green);"></div></div>
+                        
+                        <div class="data-row">
+                            <span class="data-lbl">ETF Holdings</span>
+                            <span class="data-val" id="smETF">92</span>
+                        </div>
+                        <div class="bar-container"><div class="bar-fill" id="smETFBar" style="width: 92%; background-color: var(--text-green);"></div></div>
 
-                <!-- ③ Gold Fair Value Card -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span id="gfiTitleText">③ Gold Fair Value & Signal</span>
-                        <span class="badge-status green" id="gfiStatus">Undervalued</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Current Market</span><span class="row-val" id="gfiCurrent">4058</span></div>
-                        <div class="row-data"><span class="row-lbl">AI Fair Value</span><span class="row-val" id="gfiFair" style="color: var(--text-gold);">$4,125</span></div>
-                        <div class="row-data"><span class="row-lbl">Mispricing</span><span class="row-val" id="gfiMispricing" style="color: var(--text-green);">-1.6%</span></div>
-                        <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">AI Rating</span><span class="stars-val" id="aiRating">★★★★★</span></div>
-                        <div class="row-data"><span class="row-lbl">AI Grade</span><span class="row-val" id="aiGrade" style="color: var(--text-green); font-weight: 700;">A+</span></div>
+                        <div class="data-row">
+                            <span class="data-lbl">CFTC Positioning</span>
+                            <span class="data-val" id="smCFTC">88</span>
+                        </div>
+                        <div class="bar-container"><div class="bar-fill" id="smCFTCBar" style="width: 88%; background-color: var(--text-cyan);"></div></div>
+
+                        <div class="data-row">
+                            <span class="data-lbl">Options Flow</span>
+                            <span class="data-val" id="smOptions">86</span>
+                        </div>
+                        <div class="bar-container"><div class="bar-fill" id="smOptionsBar" style="width: 86%; background-color: var(--text-cyan);"></div></div>
                     </div>
                 </div>
             </div>
 
             <!-- Column 2 -->
-            <div class="grid-column">
-                <!-- ④ Market Stress Index -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>④ Market Stress Index</span>
-                        <span class="badge-status green" id="stressLevel">Bullish</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">VIX (Equities)</span><span class="row-val" id="stressVix">16</span></div>
-                        <div class="row-data"><span class="row-lbl">MOVE (Bonds)</span><span class="row-val" id="stressMove">102</span></div>
-                        <div class="row-data"><span class="row-lbl">Credit Spread</span><span class="row-val" id="stressSpread">Low</span></div>
-                        <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">Aggregate Stress</span><span class="row-val" id="stressAgg" style="color: var(--text-green);">32 / 100</span></div>
+            <div class="mid-col">
+                <!-- Global Expert Consensus -->
+                <div class="panel-card" style="flex: 1.2;">
+                    <h3 class="panel-header-title">Global Expert Consensus</h3>
+                    <div class="panel-body-content">
+                        <div class="data-row"><span class="data-lbl">Bullish Stance</span><span class="data-val" id="expBullishVal">82%</span></div>
+                        <div class="bar-container"><div class="bar-fill" id="expBullishBar" style="width: 82%; background-color: var(--text-green);"></div></div>
+                        <div class="data-row"><span class="data-lbl">Neutral Stance</span><span class="data-val" id="expNeutralVal">13%</span></div>
+                        <div class="bar-container"><div class="bar-fill" id="expNeutralBar" style="width: 13%; background-color: var(--text-gold);"></div></div>
+                        <div class="data-row"><span class="data-lbl">Bearish Stance</span><span class="data-val" id="expBearishVal">5%</span></div>
+                        <div class="bar-container"><div class="bar-fill" id="expBearishBar" style="width: 5%; background-color: var(--text-red);"></div></div>
+                        
+                        <div style="font-size: 0.58rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 4px;">
+                            <div><span style="color: var(--text-gold);">TOP EXPERTS:</span> Dalio • Alden • El-Erian</div>
+                            <div>Gundlach • Schiff • Rosenberg • Holmes</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ⑤ Central Bank Activity -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑤ Central Bank Activity</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl" id="cbMonthlyLabel">Monthly Purchase</span><span class="row-val" id="cbMonthly" style="color: var(--text-green);">+67 Ton</span></div>
-                        <div class="row-data"><span class="row-lbl">QoQ Growth</span><span class="row-val" id="cbQoQ">+8%</span></div>
-                        <div class="row-data"><span class="row-lbl">YoY Growth</span><span class="row-val" id="cbYoY">+14%</span></div>
-                        <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">CB Strength Score</span><span class="row-val" id="cbScore" style="color: var(--text-cyan);">95 / 100</span></div>
+                <!-- Central Bank Intelligence -->
+                <div class="panel-card" style="flex: 1.1;">
+                    <h3 class="panel-header-title">Central Bank Intelligence</h3>
+                    <div class="panel-body-content">
+                        <div class="radar-container">
+                            <svg class="radar-svg" viewBox="0 0 100 100">
+                                <!-- Base Grid pentagons -->
+                                <polygon points="50,15 85,40 72,82 28,82 15,40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                                <polygon points="50,30 75,48 65,72 35,72 25,48" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                                <polygon points="50,45 66,57 60,69 40,69 34,57" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                                <!-- Radar filled area -->
+                                <polygon points="50,22 80,43 68,78 32,77 20,44" fill="rgba(74, 222, 128, 0.15)" stroke="var(--text-green)" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="data-row" style="margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 3px;">
+                            <span class="data-lbl">CB Intelligence Score</span>
+                            <span class="data-val" style="color: var(--text-green);" id="cbIntelScore">95 / 100</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ⑥ ETF Momentum -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑥ ETF Momentum</span>
-                        <span class="badge-status green" id="etfStance">Bullish</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl" id="etfLabel1">SPDR holdings</span><span class="row-val" id="etfSpdr" style="color: var(--text-green);">▲ Inflow</span></div>
-                        <div class="row-data"><span class="row-lbl" id="etfLabel2">iShares holdings</span><span class="row-val" id="etfIshares" style="color: var(--text-green);">▲ Inflow</span></div>
-                        <div class="row-data"><span class="row-lbl">Net Capital Flow</span><span class="row-val" id="etfFlow" style="color: var(--text-green);">+$1.8B</span></div>
-                    </div>
-                </div>
-
-                <!-- ⑬ Market Quality -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑬ Market Quality Index</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Trend Quality</span><span class="row-val" id="mqTrend">91</span></div>
-                        <div class="row-data"><span class="row-lbl">Liquidity Depth</span><span class="row-val" id="mqLiq">89</span></div>
-                        <div class="row-data"><span class="row-lbl">Participation</span><span class="row-val" id="mqPart">84</span></div>
-                        <div class="row-data"><span class="row-lbl">Market Breadth</span><span class="row-val" id="mqBreadth">87</span></div>
+                <!-- 09 AI Forecast Engine -->
+                <div class="panel-card" style="flex: 1.2;">
+                    <h3 class="panel-header-title">09 AI Forecast Engine</h3>
+                    <div class="panel-body-content" style="flex-direction: row; gap: 8px;">
+                        <div class="radial-gauge-container" style="flex: 1;">
+                            <svg class="radial-svg" viewBox="0 0 36 36">
+                                <circle class="radial-bg" cx="18" cy="18" r="15.915"/>
+                                <circle class="radial-fill" cx="18" cy="18" r="15.915" stroke="var(--text-cyan)" stroke-dashoffset="17"/>
+                            </svg>
+                            <span class="radial-text-center" id="aiConfVal">83%</span>
+                        </div>
+                        <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                            <div class="data-row"><span class="data-lbl">AI Target</span><span class="data-val" id="aiTargetPrice">$4,012</span></div>
+                            <div class="data-row"><span class="data-lbl">Deviation</span><span class="data-val" id="aiDevVal" style="color: var(--text-red);">-4.70%</span></div>
+                            <div class="data-row"><span class="data-lbl">Bias</span><span class="data-val" id="aiBiasText" style="color: var(--text-green);">MOD BULL</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Column 3 -->
-            <div class="grid-column">
-                <!-- ⑦ Positioning Engine -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑦ Positioning Engine</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Commercials</span><span class="row-val" id="posComm" style="color: var(--text-green);">BUY</span></div>
-                        <div class="row-data"><span class="row-lbl">Leveraged Funds</span><span class="row-val" id="posFunds" style="color: var(--text-green);">BUY</span></div>
-                        <div class="row-data"><span class="row-lbl">Retail Traders</span><span class="row-val" id="posRetail" style="color: var(--text-red);">SELL</span></div>
-                        <div class="row-data"><span class="row-lbl">Institutions</span><span class="row-val" id="posInst" style="color: var(--text-green);">BUY</span></div>
-                        <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">Smart Money Bias</span><span class="row-val" id="posBias" style="color: var(--text-green);">92%</span></div>
+            <div class="mid-col">
+                <!-- 01 Institutional Conviction Index (ICI) -->
+                <div class="panel-card" style="flex: 1.5;">
+                    <h3 class="panel-header-title">01 Conviction Index (ICI)</h3>
+                    <div class="panel-body-content" style="flex-direction: row; gap: 8px;">
+                        <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 3px; font-size: 0.65rem;">
+                            <div class="data-row"><span class="data-lbl">Wall Street</span><span class="data-val">89</span></div>
+                            <div class="data-row"><span class="data-lbl">Experts</span><span class="data-val">91</span></div>
+                            <div class="data-row"><span class="data-lbl">Central Banks</span><span class="data-val">95</span></div>
+                            <div class="data-row"><span class="data-lbl">ETF Flow</span><span class="data-val">92</span></div>
+                            <div class="data-row"><span class="data-lbl">CFTC Pos.</span><span class="data-val">88</span></div>
+                            <div class="data-row"><span class="data-lbl">Options Flow</span><span class="data-val">86</span></div>
+                        </div>
+                        <div class="radial-gauge-container" style="flex: 1.1;">
+                            <svg class="radial-svg" viewBox="0 0 36 36" style="width:68px; height:68px;">
+                                <circle class="radial-bg" cx="18" cy="18" r="15.915"/>
+                                <circle class="radial-fill" cx="18" cy="18" r="15.915" stroke="var(--text-green)" stroke-dashoffset="9.6"/>
+                            </svg>
+                            <span class="radial-text-center" style="font-size: 0.95rem;" id="iciScoreVal">90.4</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ⑧ AI Confidence Breakdown -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑧ AI Confidence Breakdown</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Macro Factors</span><span class="row-val" id="confMacro">91%</span></div>
-                        <div class="row-data"><span class="row-lbl">Technical Factors</span><span class="row-val" id="confTech">83%</span></div>
-                        <div class="row-data"><span class="row-lbl">Flow Analysis</span><span class="row-val" id="confFlow">94%</span></div>
-                        <div class="row-data"><span class="row-lbl">Sentiment Matrix</span><span class="row-val" id="confSent">88%</span></div>
-                        <div class="row-data"><span class="row-lbl">ML Consensus</span><span class="row-val" id="confCons">90%</span></div>
-                        <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">Final Composite</span><span class="row-val" id="confFinal" style="color: var(--text-cyan); font-weight: 700;">89%</span></div>
+                <!-- 02 Market Regime Engine -->
+                <div class="panel-card" style="flex: 1.1;">
+                    <h3 class="panel-header-title">02 Market Regime Engine</h3>
+                    <div class="panel-body-content" style="gap: 3px;">
+                        <div class="data-row"><span class="data-lbl">Trend Strength</span><span class="data-val" style="color: var(--text-green);">🟢 Strong Trend</span></div>
+                        <div class="data-row"><span class="data-lbl">Momentum</span><span class="data-val" style="color: var(--text-green);">🟢 Positive</span></div>
+                        <div class="data-row"><span class="data-lbl">Volatility</span><span class="data-val" style="color: var(--text-gold);">🟡 Normal</span></div>
+                        <div class="data-row"><span class="data-lbl">Liquidity</span><span class="data-val" style="color: var(--text-green);">🟢 High</span></div>
+                        <div class="data-row" style="margin-top: 1px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2px;"><span class="data-lbl">Regime Type</span><span class="data-val" style="color: var(--text-cyan);">TREND FOLLOWING</span></div>
                     </div>
                 </div>
 
-                <!-- ⑨ Consensus Dispersion -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑨ Consensus Dispersion</span>
-                        <span class="badge-status green" id="dispStatus">High Agreement</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Wall Street Target</span><span class="row-val" id="dispWS">$4,212</span></div>
-                        <div class="row-data"><span class="row-lbl">Global Experts</span><span class="row-val" id="dispExp">$4,198</span></div>
-                        <div class="row-data"><span class="row-lbl">AI Engine</span><span class="row-val" id="dispAI">$4,012</span></div>
-                        <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">Target Dispersion</span><span class="row-val" id="dispVal" style="color: var(--text-green);">4.6%</span></div>
+                <!-- 04 Market Stress Index -->
+                <div class="panel-card" style="flex: 1.2;">
+                    <h3 class="panel-header-title">04 Market Stress Index</h3>
+                    <div class="panel-body-content" style="flex-direction: row; gap: 8px;">
+                        <div style="flex: 1.1; display: flex; flex-direction: column; justify-content: center; gap: 3px;">
+                            <div class="data-row"><span class="data-lbl">VIX (Eq)</span><span class="data-val" style="color: var(--text-green);">16 (Low)</span></div>
+                            <div class="data-row"><span class="data-lbl">MOVE (Bond)</span><span class="data-val" style="color: var(--text-gold);">102 (Med)</span></div>
+                            <div class="data-row"><span class="data-lbl">Credit Sp.</span><span class="data-val" style="color: var(--text-green);">Low</span></div>
+                        </div>
+                        <div class="radial-gauge-container" style="flex: 1;">
+                            <svg class="radial-svg" viewBox="0 0 36 36">
+                                <circle class="radial-bg" cx="18" cy="18" r="15.915"/>
+                                <circle class="radial-fill" cx="18" cy="18" r="15.915" stroke="var(--text-green)" stroke-dashoffset="68"/>
+                            </svg>
+                            <span class="radial-text-center" id="stressScoreVal">32</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Column 4 -->
-            <div class="grid-column">
-                <!-- ⑩ Event Risk -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑩ Event Risk Monitor</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">FOMC Interest Decision</span><span class="row-val" style="color: var(--text-red);">HIGH RISK</span></div>
-                        <div class="row-data"><span class="row-lbl">CPI Inflation Release</span><span class="row-val" style="color: var(--text-gold);">MEDIUM RISK</span></div>
-                        <div class="row-data"><span class="row-lbl">NFP Payrolls Report</span><span class="row-val" style="color: var(--text-gold);">MEDIUM RISK</span></div>
-                        <div class="row-data"><span class="row-lbl">US Tariff / Trade War</span><span class="row-val" style="color: var(--text-red);">HIGH RISK</span></div>
-                        <div class="row-data"><span class="row-lbl">Geopolitical Conflict</span><span class="row-val" style="color: var(--text-red);">HIGH RISK</span></div>
+            <div class="mid-col">
+                <!-- 05 Central Bank Activity -->
+                <div class="panel-card" style="flex: 1.2;">
+                    <h3 class="panel-header-title">05 Central Bank Activity</h3>
+                    <div class="panel-body-content">
+                        <div class="data-row"><span class="data-lbl" id="cbLabel1">Monthly Purchase</span><span class="data-val" style="color: var(--text-green);">+67 Ton</span></div>
+                        <div class="data-row"><span class="data-lbl">QoQ Growth</span><span class="data-val">+8%</span></div>
+                        <div class="data-row"><span class="data-lbl">YoY Growth</span><span class="data-val">+14%</span></div>
+                        <div class="data-row" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2px;">
+                            <span class="data-lbl">Activity Score</span>
+                            <span class="data-val" style="color: var(--text-cyan);">95 / 100</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ⑪ AI Risk Engine -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑪ AI Risk Engine Projections</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Flash Crash Probability</span><span class="row-val" id="riskFlash" style="color: var(--text-green);">5%</span></div>
-                        <div class="row-data"><span class="row-lbl">Correction Probability</span><span class="row-val" id="riskCorr">28%</span></div>
-                        <div class="row-data"><span class="row-lbl">Breakout Probability</span><span class="row-val" id="riskBreak" style="color: var(--text-green);">74%</span></div>
-                        <div class="row-data"><span class="row-lbl">Trend Failure Probability</span><span class="row-val" id="riskFail">14%</span></div>
+                <!-- 06 ETF Momentum -->
+                <div class="panel-card" style="flex: 1.1;">
+                    <h3 class="panel-header-title">06 ETF Momentum</h3>
+                    <div class="panel-body-content">
+                        <div class="data-row"><span class="data-lbl" id="etfLabel1">SPDR holdings</span><span class="data-val" style="color: var(--text-green);">▲ Inflow</span></div>
+                        <div class="data-row"><span class="data-lbl" id="etfLabel2">iShares holdings</span><span class="data-val" style="color: var(--text-green);">▲ Inflow</span></div>
+                        <div class="data-row"><span class="data-lbl">Net Capital Flow</span><span class="data-val" style="color: var(--text-green);">+$1.8B</span></div>
+                        <div class="data-row" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2px;">
+                            <span class="data-lbl">Momentum Stance</span>
+                            <span class="data-val" style="color: var(--text-green);">BULLISH</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ⑫ Buying Pressure -->
-                <div class="card-panel">
-                    <h3 class="card-title">
-                        <span>⑫ Buying Pressure Index</span>
-                    </h3>
-                    <div class="card-content">
-                        <div class="consensus-bar-row">
-                            <div class="consensus-bar-lbl"><span class="row-lbl" id="pressLabel1">ETF Inflow</span><span id="pressEtfVal">76%</span></div>
-                            <div class="consensus-bar-track"><div class="consensus-bar-fill" id="pressEtfBar" style="width: 76%; background-color: var(--text-cyan); box-shadow: var(--glow-cyan);"></div></div>
+                <!-- 07 Positioning Engine (CFTC) -->
+                <div class="panel-card" style="flex: 1.4;">
+                    <h3 class="panel-header-title">07 Positioning Engine</h3>
+                    <div class="panel-body-content" style="flex-direction: row; gap: 8px;">
+                        <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 3px;">
+                            <div class="data-row"><span class="data-lbl">Commercial</span><span class="data-val" style="color: var(--text-green);">BUY</span></div>
+                            <div class="data-row"><span class="data-lbl">Funds</span><span class="data-val" style="color: var(--text-green);">BUY</span></div>
+                            <div class="data-row"><span class="data-lbl">Retail</span><span class="data-val" style="color: var(--text-red);">SELL</span></div>
+                            <div class="data-row"><span class="data-lbl">Institutions</span><span class="data-val" style="color: var(--text-green);">BUY</span></div>
                         </div>
-                        <div class="consensus-bar-row">
-                            <div class="consensus-bar-lbl"><span class="row-lbl" id="pressLabel2">Central Bank Purchase</span><span id="pressCbVal">95%</span></div>
-                            <div class="consensus-bar-track"><div class="consensus-bar-fill" id="pressCbBar" style="width: 95%; background-color: var(--text-green); box-shadow: var(--glow-green);"></div></div>
-                        </div>
-                        <div class="consensus-bar-row">
-                            <div class="consensus-bar-lbl"><span class="row-lbl" id="pressLabel3">Futures Contract Spec</span><span id="pressFutVal">64%</span></div>
-                            <div class="consensus-bar-track"><div class="consensus-bar-fill" id="pressFutBar" style="width: 64%; background-color: var(--text-cyan); box-shadow: var(--glow-cyan);"></div></div>
-                        </div>
-                        <div class="consensus-bar-row">
-                            <div class="consensus-bar-lbl"><span class="row-lbl" id="pressLabel4">Physical Demand (Asia)</span><span id="pressPhysVal">84%</span></div>
-                            <div class="consensus-bar-track"><div class="consensus-bar-fill" id="pressPhysBar" style="width: 84%; background-color: var(--text-green); box-shadow: var(--glow-green);"></div></div>
+                        <div class="radial-gauge-container" style="flex: 1;">
+                            <svg class="radial-svg" viewBox="0 0 36 36">
+                                <circle class="radial-bg" cx="18" cy="18" r="15.915"/>
+                                <circle class="radial-fill" cx="18" cy="18" r="15.915" stroke="var(--text-green)" stroke-dashoffset="8"/>
+                            </svg>
+                            <span class="radial-text-center" id="posSmartMoneyBias">92%</span>
                         </div>
                     </div>
                 </div>
@@ -635,68 +916,144 @@
 
         </section>
 
-        <!-- Bottom Row Panel Area (IDE & Performance Panels) -->
-        <footer class="bottom-row">
-            <!-- ⑮ Decision Engine (IDE) -->
-            <div class="card-panel" style="flex: 1.1;">
-                <h3 class="card-title">
-                    <span>⑮ Institutional Decision (IDE)</span>
-                    <span class="badge-status green" id="ideDecision">BUY ON DIP</span>
-                </h3>
-                <div class="card-content">
-                    <div class="row-data"><span class="row-lbl">Conviction Score</span><span class="row-val" id="ideConv" style="color: var(--text-green);">91%</span></div>
-                    <div class="row-data"><span class="row-lbl">Entry Zone</span><span class="row-val" id="ideEntry" style="color: #fff;">4020-4040</span></div>
-                    <div class="row-data"><span class="row-lbl">Profit Target</span><span class="row-val" id="ideTarget" style="color: var(--text-cyan);">$4,250</span></div>
-                    <div class="row-data"><span class="row-lbl">Stop Loss Protection</span><span class="row-val" id="ideStop" style="color: var(--text-red);">$3,965</span></div>
-                    <div class="row-data"><span class="row-lbl">Kelly Criterion Size</span><span class="row-val" id="ideKelly">0.31</span></div>
+        <!-- Bottom Row Panels Grid -->
+        <section class="bottom-panels-row">
+            <!-- 10 Event Risk -->
+            <div class="panel-card">
+                <h3 class="panel-header-title">10 Event Risk</h3>
+                <div class="panel-body-content" style="gap: 2px;">
+                    <div class="data-row"><span class="data-lbl">FOMC</span><span class="data-val" style="color: var(--text-red);">HIGH</span></div>
+                    <div class="data-row"><span class="data-lbl">CPI</span><span class="data-val" style="color: var(--text-gold);">MEDIUM</span></div>
+                    <div class="data-row"><span class="data-lbl">NFP</span><span class="data-val" style="color: var(--text-gold);">MEDIUM</span></div>
+                    <div class="data-row"><span class="data-lbl">Tariff</span><span class="data-val" style="color: var(--text-red);">HIGH</span></div>
+                    <div class="data-row"><span class="data-lbl">Geopolitics</span><span class="data-val" style="color: var(--text-red);">HIGH</span></div>
                 </div>
             </div>
 
-            <!-- ⑯ Performance Engine -->
-            <div class="card-panel">
-                <h3 class="card-title">
-                    <span>⑯ Performance Engine</span>
-                </h3>
-                <div class="card-content">
-                    <div class="row-data"><span class="row-lbl">Expected Return</span><span class="row-val" id="perfRet" style="color: var(--text-green);">+4.8%</span></div>
-                    <div class="row-data"><span class="row-lbl">Expected Drawdown</span><span class="row-val" id="perfRisk" style="color: var(--text-red);">-1.4%</span></div>
-                    <div class="row-data"><span class="row-lbl">Sharpe Ratio</span><span class="row-val" id="perfSharpe" style="color: var(--text-cyan);">2.16</span></div>
-                    <div class="row-data"><span class="row-lbl">Sortino Ratio</span><span class="row-val" id="perfSortino" style="color: var(--text-cyan);">3.05</span></div>
-                    <div class="row-data"><span class="row-lbl">Profit Factor</span><span class="row-val" id="perfPF">2.42</span></div>
-                    <div class="row-data"><span class="row-lbl">Reward / Risk Ratio</span><span class="row-val" id="perfRR" style="color: var(--text-gold);">3.8</span></div>
+            <!-- 11 AI Risk Engine -->
+            <div class="panel-card">
+                <h3 class="panel-header-title">11 AI Risk Engine</h3>
+                <div class="panel-body-content" style="flex-direction: row; gap: 4px;">
+                    <div class="donut-container" style="flex: 1;">
+                        <svg class="donut-svg" viewBox="0 0 36 36" style="width:38px; height:38px;">
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="4.5"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-green)" stroke-width="4.5" stroke-dasharray="74 26" stroke-dashoffset="0"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-red)" stroke-width="4.5" stroke-dasharray="28 72" stroke-dashoffset="-74"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-gold)" stroke-width="4.5" stroke-dasharray="14 86" stroke-dashoffset="-102"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-cyan)" stroke-width="4.5" stroke-dasharray="5 95" stroke-dashoffset="-116"/>
+                        </svg>
+                    </div>
+                    <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 1px; font-size: 0.52rem;">
+                        <div><span style="color: var(--text-green);">●</span> Breakout: 74%</div>
+                        <div><span style="color: var(--text-red);">●</span> Correct: 28%</div>
+                        <div><span style="color: var(--text-gold);">●</span> Failure: 14%</div>
+                        <div><span style="color: var(--text-cyan);">●</span> Crash: 5%</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- ⑰ AI Explanation -->
-            <div class="card-panel" style="flex: 0.9;">
-                <h3 class="card-title">
-                    <span>⑰ AI Explanation (Why Bullish?)</span>
-                </h3>
-                <div class="card-content" id="explanationList" style="justify-content: flex-start; gap: 3px;">
-                    <div class="check-item"><span class="check-icon">✓</span> DXY weakening</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Real Yield falling</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Central Banks buying</div>
-                    <div class="check-item"><span class="check-icon">✓</span> ETF inflow registered</div>
-                    <div class="check-item"><span class="check-icon">✓</span> AI Trend positive</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Liquidity expanding</div>
+            <!-- 12 & 13 buying pressure and market quality -->
+            <div class="panel-card">
+                <h3 class="panel-header-title">12 Buy Pressure / 13 Quality</h3>
+                <div class="panel-body-content" style="gap: 3px;">
+                    <!-- 12 Buy Pressure -->
+                    <div class="data-row" style="font-size:0.6rem;">
+                        <span class="data-lbl">ETF / CB</span>
+                        <div style="display:flex; gap:6px;">
+                            <div class="led-bar"><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block"></div></div>
+                            <div class="led-bar"><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div></div>
+                        </div>
+                    </div>
+                    <!-- 13 Market Quality -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 3px; font-size: 0.58rem;">
+                        <div><span style="color: var(--text-muted);">Trend Q:</span> <strong style="color:var(--text-green);">91</strong></div>
+                        <div><span style="color: var(--text-muted);">Liq:</span> <strong style="color:var(--text-green);">89</strong></div>
+                        <div><span style="color: var(--text-muted);">Part:</span> <strong style="color:var(--text-cyan);">84</strong></div>
+                        <div><span style="color: var(--text-muted);">Breadth:</span> <strong style="color:var(--text-green);">87</strong></div>
+                    </div>
+                    <!-- 14 AI Signal -->
+                    <div class="data-row" style="border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 2px;">
+                        <span class="stars-val">★★★★★</span>
+                        <strong style="color: var(--text-green);" id="gradeVal">A+ Grade</strong>
+                    </div>
                 </div>
             </div>
 
-            <!-- ⑱ Final Score -->
-            <div class="card-panel">
-                <h3 class="card-title">
-                    <span>⑱ Final Score & Bias</span>
-                    <span class="badge-status green" id="finalStance">STRONG BUY</span>
-                </h3>
-                <div class="card-content">
-                    <div class="row-data"><span class="row-lbl">Macro Bias</span><span class="row-val" id="finalMacro">89</span></div>
-                    <div class="row-data"><span class="row-lbl">Flow Analysis</span><span class="row-val" id="finalFlow">92</span></div>
-                    <div class="row-data"><span class="row-lbl">Central Bank</span><span class="row-val" id="finalCB">95</span></div>
-                    <div class="row-data"><span class="row-lbl">Technical Flow</span><span class="row-val" id="finalTech">84</span></div>
-                    <div class="row-data"><span class="row-lbl">AI Engine</span><span class="row-val" id="finalAI">89</span></div>
-                    <div class="row-data"><span class="row-lbl">Risk Factors</span><span class="row-val" id="finalRisk">74</span></div>
-                    <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">Final Score</span><span class="row-val" id="finalVal" style="color: var(--text-green); font-size: 0.95rem; text-shadow: var(--glow-green);">91.2</span></div>
+            <!-- 15 Multi-Timeframe Forecast -->
+            <div class="panel-card">
+                <h3 class="panel-header-title">15 Multi-Timeframe Forecast</h3>
+                <div class="panel-body-content" style="gap: 3px; font-size: 0.6rem; font-family: 'Share Tech Mono', monospace;">
+                    <div class="data-row"><span>1W Target</span><span class="data-val" id="tf1W">$4,050</span></div>
+                    <div class="data-row"><span>1M Target</span><span class="data-val" id="tf1M">$4,120</span></div>
+                    <div class="data-row"><span>3M Target</span><span class="data-val" id="tf3M">$4,220</span></div>
+                    <div class="data-row"><span>6M Target</span><span class="data-val" id="tf6M">$4,330</span></div>
+                    <div class="data-row"><span>12M Target</span><span class="data-val" id="tf12M">$4,450</span></div>
                 </div>
+            </div>
+
+            <!-- 16, 17, 18 Score & Stats -->
+            <div class="panel-card">
+                <h3 class="panel-header-title">18 Final Institutional Score</h3>
+                <div class="panel-body-content" style="flex-direction: row; gap: 8px;">
+                    <div style="flex: 1.1; display: flex; flex-direction: column; justify-content: center; gap: 2px; font-size: 0.58rem;">
+                        <div class="data-row"><span class="data-lbl">Macro / Flow</span><span>89 / 92</span></div>
+                        <div class="data-row"><span class="data-lbl">CB / Tech</span><span>95 / 84</span></div>
+                        <div class="data-row"><span class="data-lbl">AI / Risk</span><span>89 / 74</span></div>
+                    </div>
+                    <div class="radial-gauge-container" style="flex: 1;">
+                        <svg class="radial-svg" viewBox="0 0 36 36">
+                            <circle class="radial-bg" cx="18" cy="18" r="15.915"/>
+                            <circle class="radial-fill" cx="18" cy="18" r="15.915" stroke="var(--text-green)" stroke-dashoffset="8.8"/>
+                        </svg>
+                        <span class="radial-text-center" style="font-size: 0.85rem;" id="finalScoreVal">91.2</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer Row: Decision Engine (IDE) -->
+        <footer class="footer-ide-row">
+            <div class="ide-left">
+                <img class="bull-icon-glowing" id="bullIcon" src="/static/green_bull.png" alt="XEDY Bull">
+                <div class="ide-decision-block">
+                    <span class="ide-decision-title">19 Decision Engine (IDE)</span>
+                    <span class="ide-decision-val" id="ideDecision">BUY ON DIP</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:2px; margin-left:12px;">
+                    <span class="stars-val" style="font-size:1rem;">★★★★★</span>
+                    <span style="font-size: 0.6rem; color: var(--text-green);">CONVICTION LEVEL: 91%</span>
+                </div>
+            </div>
+
+            <div class="ide-parameters">
+                <div class="ide-param-item">
+                    <span class="ide-param-lbl">Entry Zone</span>
+                    <span class="ide-param-val" id="ideEntry" style="color: #fff;">4,020 - 4,040</span>
+                </div>
+                <div class="ide-param-item">
+                    <span class="ide-param-lbl">Targets</span>
+                    <span class="ide-param-val" id="ideTarget" style="color: var(--text-cyan);">4,120 / 4,250 / 4,350</span>
+                </div>
+                <div class="ide-param-item">
+                    <span class="ide-param-lbl">Stop Loss</span>
+                    <span class="ide-param-val" id="ideStop" style="color: var(--text-red);">3,965</span>
+                </div>
+                <div class="ide-param-item">
+                    <span class="ide-param-lbl">Risk Reward</span>
+                    <span class="ide-param-val" id="ideRR" style="color: var(--text-gold);">1 : 3.8</span>
+                </div>
+                <div class="ide-param-item">
+                    <span class="ide-param-lbl">Win Prob</span>
+                    <span class="ide-param-val" id="ideWinProb" style="color: var(--text-green);">82%</span>
+                </div>
+            </div>
+
+            <div class="qr-code-block">
+                <div style="text-align: right; display: flex; flex-direction: column; font-size: 0.55rem; color: var(--text-muted);">
+                    <strong>SCAN FOR</strong>
+                    <span>DETAILED REPORT</span>
+                </div>
+                <img class="qr-img" src="/static/qr_code.png" alt="Report QR">
             </div>
         </footer>
 
@@ -705,6 +1062,14 @@
     <!-- Script Block for real-time calculation & updating -->
     <script>
         let activeSymbol = 'XAUUSD';
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById("liveClock").textContent = timeString + " WIB";
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
         function setSymbol(sym) {
             activeSymbol = sym;
@@ -724,70 +1089,67 @@
 
         function updateDisplayLabels(sym) {
             const headerTitle = document.getElementById("headerTitle");
-            const gfiTitleText = document.getElementById("gfiTitleText");
-            const cbMonthlyLabel = document.getElementById("cbMonthlyLabel");
+            const symbolLabel = document.getElementById("symbolLabel");
+            const cbLabel1 = document.getElementById("cbLabel1");
             const etfLabel1 = document.getElementById("etfLabel1");
             const etfLabel2 = document.getElementById("etfLabel2");
             const pressLabel1 = document.getElementById("pressLabel1");
             const pressLabel2 = document.getElementById("pressLabel2");
             const pressLabel3 = document.getElementById("pressLabel3");
             const pressLabel4 = document.getElementById("pressLabel4");
-            const explanationList = document.getElementById("explanationList");
 
             if (sym === "XAUUSD") {
-                headerTitle.textContent = "Institutional Gold Intelligence Center (IGIC)";
-                gfiTitleText.textContent = "③ Gold Fair Value & Signal";
-                cbMonthlyLabel.textContent = "Monthly Purchase";
+                headerTitle.textContent = "INSTITUTIONAL GOLD INTELLIGENCE CENTER";
+                symbolLabel.textContent = "XAUUSD";
+                cbLabel1.textContent = "Monthly Purchase";
                 etfLabel1.textContent = "SPDR holdings";
                 etfLabel2.textContent = "iShares holdings";
                 pressLabel1.textContent = "ETF Inflow";
                 pressLabel2.textContent = "Central Bank Purchase";
                 pressLabel3.textContent = "Futures Contract Spec";
                 pressLabel4.textContent = "Physical Demand (Asia)";
-                explanationList.innerHTML = `
-                    <div class="check-item"><span class="check-icon">✓</span> DXY weakening</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Real Yield falling</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Central Banks buying</div>
-                    <div class="check-item"><span class="check-icon">✓</span> ETF inflow registered</div>
-                    <div class="check-item"><span class="check-icon">✓</span> AI Trend positive</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Liquidity expanding</div>
-                `;
+                
+                // Drivers pills
+                document.getElementById("fedText").textContent = "FED DOVISH";
+                document.getElementById("cpiText").textContent = "CPI STICKY";
+                document.getElementById("dxyText").textContent = "DXY WEAK";
+                document.getElementById("yieldText").textContent = "REAL YIELD FALLING";
+                document.getElementById("liqText").textContent = "LIQUIDITY EXPANDING";
+                document.getElementById("geoText").textContent = "GEO RISK HIGH";
             } else if (sym === "USDJPY") {
-                headerTitle.textContent = "Institutional Yen Intelligence Center (IYIC)";
-                gfiTitleText.textContent = "③ Yen Fair Value & Signal";
-                cbMonthlyLabel.textContent = "BoJ JGB Net Buying";
+                headerTitle.textContent = "INSTITUTIONAL YEN INTELLIGENCE CENTER";
+                symbolLabel.textContent = "USDJPY";
+                cbLabel1.textContent = "BoJ JGB Net Buying";
                 etfLabel1.textContent = "Yen Futures Long";
                 etfLabel2.textContent = "JGB Capital Inflow";
                 pressLabel1.textContent = "Carry Trade";
                 pressLabel2.textContent = "BoJ JGB Buying";
                 pressLabel3.textContent = "Futures Spec";
                 pressLabel4.textContent = "Retail Flow";
-                explanationList.innerHTML = `
-                    <div class="check-item"><span class="check-icon">✓</span> BoJ Policy Hawkish</div>
-                    <div class="check-item"><span class="check-icon">✓</span> DXY weakening</div>
-                    <div class="check-item"><span class="check-icon">✓</span> US-JP Yield Narrowing</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Carry Trade unwinding</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Repatriation flow</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Safe Haven support</div>
-                `;
+
+                document.getElementById("fedText").textContent = "BOJ HAWKISH";
+                document.getElementById("cpiText").textContent = "CPI STEADY";
+                document.getElementById("dxyText").textContent = "DXY WEAK";
+                document.getElementById("yieldText").textContent = "YIELD NARROWING";
+                document.getElementById("liqText").textContent = "REPATRIATION HIGH";
+                document.getElementById("geoText").textContent = "SAFE HAVEN SUPPORT";
             } else if (sym === "XTIUSD") {
-                headerTitle.textContent = "Institutional Oil Intelligence Center (IOIC)";
-                gfiTitleText.textContent = "③ Oil Fair Value & Signal";
-                cbMonthlyLabel.textContent = "US SPR Purchase";
+                headerTitle.textContent = "INSTITUTIONAL OIL INTELLIGENCE CENTER";
+                symbolLabel.textContent = "XTIUSD";
+                cbLabel1.textContent = "US SPR Purchase";
                 etfLabel1.textContent = "USO ETF holdings";
                 etfLabel2.textContent = "BNO ETF holdings";
                 pressLabel1.textContent = "Strategic reserves";
                 pressLabel2.textContent = "OPEC Cuts";
                 pressLabel3.textContent = "Futures Spec";
                 pressLabel4.textContent = "Refinery Flow";
-                explanationList.innerHTML = `
-                    <div class="check-item"><span class="check-icon">✓</span> OPEC+ compliance</div>
-                    <div class="check-item"><span class="check-icon">✓</span> SPR inventory buying</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Refinery demand high</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Geopolitics elevated</div>
-                    <div class="check-item"><span class="check-icon">✓</span> Middle East premium</div>
-                    <div class="check-item"><span class="check-icon">✓</span> US Dollar weakening</div>
-                `;
+
+                document.getElementById("fedText").textContent = "OPEC+ COMPLIANT";
+                document.getElementById("cpiText").textContent = "DEMAND HIGH";
+                document.getElementById("dxyText").textContent = "DXY WEAK";
+                document.getElementById("yieldText").textContent = "INVENTORY DROP";
+                document.getElementById("liqText").textContent = "REFINERY CAP HIGH";
+                document.getElementById("geoText").textContent = "ME RISK ELEVATED";
             }
         }
 
@@ -836,153 +1198,152 @@
                         aiTarget = (w4.high + w4.low) / 2;
                     }
 
-                    // 1. TOP KPI Row Calculations
-                    const xiciVal = 90.7; // Hardcoded default / slightly offset
-                    const iciVal = 90.4;
-                    const aiVal = Math.round(acc);
-                    const cbVal = activeSymbol === 'USDJPY' ? 90 : (activeSymbol === 'XTIUSD' ? 88 : 95);
-                    const etfVal = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : 92);
-                    const stressVal = activeSymbol === 'USDJPY' ? 38 : (activeSymbol === 'XTIUSD' ? 42 : 32);
-                    
-                    const multiplier = activeSymbol === 'USDJPY' ? 1.012 : (activeSymbol === 'XTIUSD' ? 1.022 : 1.016);
-                    const fairValue = Math.round(currentPrice * multiplier);
-                    const mispricingVal = ((currentPrice - fairValue) / fairValue * 100).toFixed(1);
-                    
+                    // 1. Price text and colors
+                    const changeSign = priceChange >= 0 ? '+' : '';
+                    const changeColor = priceChange >= 0 ? 'var(--text-green)' : 'var(--text-red)';
+                    const priceEl = document.getElementById("kpiPrice");
+                    priceEl.innerHTML = `${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span style="font-size:0.6rem; color:${changeColor};">${changeSign}${priceChange.toFixed(2)}%</span>`;
+
+                    // 2. AI Stance
+                    const stanceEl = document.getElementById("kpiStance");
+                    if (bias >= 0) {
+                        stanceEl.textContent = "BULLISH";
+                        stanceEl.style.color = "var(--text-green)";
+                    } else {
+                        stanceEl.textContent = "BEARISH";
+                        stanceEl.style.color = "var(--text-red)";
+                    }
+
+                    // 3. Confidence
+                    document.getElementById("kpiConfidence").textContent = `${Math.round(acc)}%`;
+
+                    // 4. XICI
+                    const xiciVal = 90.7;
                     document.getElementById("kpiXICI").textContent = xiciVal;
-                    document.getElementById("kpiICI").textContent = iciVal;
-                    document.getElementById("kpiAI").textContent = aiVal;
-                    document.getElementById("kpiCB").textContent = cbVal;
-                    document.getElementById("kpiETF").textContent = etfVal;
-                    document.getElementById("kpiStress").textContent = stressVal;
-                    document.getElementById("kpiFairVal").textContent = `${mispricingVal}%`;
-                    
-                    const regimeText = bias >= 0 ? "Trend ↑" : "Trend ↓";
-                    const regimeColor = bias >= 0 ? "var(--text-green)" : "var(--text-red)";
-                    const regimeKpi = document.getElementById("kpiRegime");
-                    regimeKpi.textContent = regimeText;
-                    regimeKpi.style.color = regimeColor;
 
-                    // 2. ICI Card
-                    document.getElementById("iciWallSt").textContent = activeSymbol === 'USDJPY' ? 86 : (activeSymbol === 'XTIUSD' ? 84 : 89);
-                    document.getElementById("iciExperts").textContent = activeSymbol === 'USDJPY' ? 88 : (activeSymbol === 'XTIUSD' ? 87 : 91);
-                    document.getElementById("iciCB").textContent = cbVal;
-                    document.getElementById("iciETF").textContent = etfVal;
-                    document.getElementById("iciCFTC").textContent = activeSymbol === 'USDJPY' ? 82 : (activeSymbol === 'XTIUSD' ? 84 : 88);
-                    document.getElementById("iciOptions").textContent = activeSymbol === 'USDJPY' ? 80 : (activeSymbol === 'XTIUSD' ? 82 : 86);
-                    document.getElementById("kpiICI").textContent = iciVal;
+                    // 5. Risk
+                    const volMult = forecast.model_weights.volatility_multiplier || 1.0;
+                    const riskEl = document.getElementById("kpiRisk");
+                    if (volMult > 1.25) {
+                        riskEl.textContent = "HIGH";
+                        riskEl.style.color = "var(--text-red)";
+                    } else if (volMult < 0.8) {
+                        riskEl.textContent = "LOW";
+                        riskEl.style.color = "var(--text-green)";
+                    } else {
+                        riskEl.textContent = "MEDIUM";
+                        riskEl.style.color = "var(--text-gold)";
+                    }
 
-                    // 3. Market Regime
-                    const trendState = bias >= 0 ? "🟢 Strong Trend" : "🔴 Strong Downtrend";
-                    const momState = bias >= 0 ? "🟢 Positive" : "🔴 Negative";
-                    document.getElementById("regTrend").textContent = trendState;
-                    document.getElementById("regMom").textContent = momState;
-                    document.getElementById("regVol").textContent = "🟡 Normal";
-                    document.getElementById("regLiq").textContent = "🟢 High";
-                    document.getElementById("regType").textContent = "TREND FOLLOWING";
+                    // 6. Regime
+                    const regimeEl = document.getElementById("kpiRegime");
+                    if (Math.abs(bias) >= 0.15) {
+                        regimeEl.textContent = "TRENDING";
+                        regimeEl.style.color = "var(--text-green)";
+                    } else {
+                        regimeEl.textContent = "RANGEBOUND";
+                        regimeEl.style.color = "var(--text-gold)";
+                    }
 
-                    // 4. Gold Fair Value
-                    document.getElementById("gfiCurrent").textContent = activeSymbol === 'XAUUSD' ? Math.round(currentPrice) : currentPrice.toFixed(2);
-                    document.getElementById("gfiFair").textContent = activeSymbol === 'XAUUSD' ? `$${fairValue.toLocaleString()}` : `$${fairValue.toFixed(2)}`;
-                    document.getElementById("gfiMispricing").textContent = `${mispricingVal}%`;
-                    document.getElementById("gfiStatus").textContent = "Undervalued";
+                    // 7. Volatility
+                    document.getElementById("kpiVolatility").textContent = "NORMAL";
 
-                    // Stars rating dynamic selection
-                    const ratingStars = bias >= 0.2 ? "★★★★★" : (bias >= 0.0 ? "★★★★☆" : "★★★☆☆");
-                    document.getElementById("aiRating").textContent = ratingStars;
+                    // 8. Pillars Score Row
+                    const scoreWallSt = Math.round(80 + (wsAvg - currentPrice)/currentPrice * 200);
+                    const scoreExperts = Math.round(75 + bias * 30);
+                    const scoreCB = activeSymbol === 'USDJPY' ? 90 : (activeSymbol === 'XTIUSD' ? 88 : 95);
+                    const scoreETF = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : 92);
+                    const scoreAI = Math.round(acc);
+                    const scoreSmartMoney = Math.round((scoreCB + scoreETF + 88 + 86) / 4);
 
-                    // 5. Market Stress
-                    document.getElementById("stressVix").textContent = activeSymbol === 'USDJPY' ? 18 : (activeSymbol === 'XTIUSD' ? 19 : 16);
-                    document.getElementById("stressMove").textContent = activeSymbol === 'USDJPY' ? 112 : (activeSymbol === 'XTIUSD' ? 118 : 102);
-                    document.getElementById("stressSpread").textContent = "Low";
-                    document.getElementById("stressAgg").textContent = `${stressVal} / 100`;
+                    document.getElementById("scoreWallSt").textContent = scoreWallSt;
+                    document.getElementById("scoreExperts").textContent = scoreExperts;
+                    document.getElementById("scoreCB").textContent = scoreCB;
+                    document.getElementById("scoreETF").textContent = scoreETF;
+                    document.getElementById("scoreAI").textContent = scoreAI;
+                    document.getElementById("scoreSmartMoney").textContent = scoreSmartMoney;
 
-                    // 6. Central Bank
-                    document.getElementById("cbMonthly").textContent = activeSymbol === 'XAUUSD' ? "+67 Ton" : (activeSymbol === 'USDJPY' ? "+180B" : "+12.2M Bbl");
-                    document.getElementById("cbQoQ").textContent = "+8%";
-                    document.getElementById("cbYoY").textContent = "+14%";
-                    document.getElementById("cbScore").textContent = `${cbVal} / 100`;
+                    // 9. Institutional Consensus lists
+                    let wallStHtml = '';
+                    wsTargets.forEach(t => {
+                        wallStHtml += `
+                            <div class="data-row" style="margin-bottom: 2px;">
+                                <span class="data-lbl">${t.inst}</span>
+                                <span class="data-val">${t.target}</span>
+                            </div>
+                        `;
+                    });
+                    document.getElementById("wallStreetList").innerHTML = wallStHtml;
 
-                    // 7. ETF Momentum
-                    document.getElementById("etfSpdr").textContent = bias >= 0 ? "▲ Inflow" : "▼ Outflow";
-                    document.getElementById("etfIshares").textContent = bias >= 0 ? "▲ Inflow" : "▼ Outflow";
-                    document.getElementById("etfFlow").textContent = activeSymbol === 'XAUUSD' ? "+$1.8B" : (activeSymbol === 'USDJPY' ? "+$420M" : "+$620M");
+                    const consensusDiff = ((wsAvg - currentPrice)/currentPrice * 100).toFixed(1);
+                    document.getElementById("consensusTargetVal").textContent = `$${Math.round(wsAvg).toLocaleString()} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)`;
 
-                    // 8. Market Quality
-                    document.getElementById("mqTrend").textContent = activeSymbol === 'USDJPY' ? 88 : (activeSymbol === 'XTIUSD' ? 84 : 91);
-                    document.getElementById("mqLiq").textContent = activeSymbol === 'USDJPY' ? 91 : (activeSymbol === 'XTIUSD' ? 86 : 89);
-                    document.getElementById("mqPart").textContent = activeSymbol === 'USDJPY' ? 82 : (activeSymbol === 'XTIUSD' ? 80 : 84);
-                    document.getElementById("mqBreadth").textContent = activeSymbol === 'USDJPY' ? 85 : (activeSymbol === 'XTIUSD' ? 82 : 87);
+                    // 10. Smart Money Flow
+                    document.getElementById("smCB").textContent = scoreCB;
+                    document.getElementById("smCBBar").style.width = `${scoreCB}%`;
+                    document.getElementById("smETF").textContent = scoreETF;
+                    document.getElementById("smETFBar").style.width = `${scoreETF}%`;
+                    document.getElementById("smCFTC").textContent = 88;
+                    document.getElementById("smCFTCBar").style.width = "88%";
+                    document.getElementById("smOptions").textContent = 86;
+                    document.getElementById("smOptionsBar").style.width = "86%";
 
-                    // 9. Positioning
-                    document.getElementById("posComm").textContent = bias >= 0 ? "BUY" : "SELL";
-                    document.getElementById("posFunds").textContent = bias >= 0 ? "BUY" : "SELL";
-                    document.getElementById("posRetail").textContent = bias >= 0 ? "SELL" : "BUY";
-                    document.getElementById("posInst").textContent = bias >= 0 ? "BUY" : "SELL";
-                    document.getElementById("posBias").textContent = activeSymbol === 'USDJPY' ? "84%" : (activeSymbol === 'XTIUSD' ? "86%" : "92%");
+                    // 11. Global Expert Consensus
+                    document.getElementById("expBullishVal").textContent = `${scoreExperts}%`;
+                    document.getElementById("expBullishBar").style.width = `${scoreExperts}%`;
+                    const expNeutral = Math.round(15 - bias * 15);
+                    document.getElementById("expNeutralVal").textContent = `${expNeutral}%`;
+                    document.getElementById("expNeutralBar").style.width = `${expNeutral}%`;
+                    const expBearish = 100 - scoreExperts - expNeutral;
+                    document.getElementById("expBearishVal").textContent = `${expBearish}%`;
+                    document.getElementById("expBearishBar").style.width = `${expBearish}%`;
 
-                    // 10. AI Confidence
-                    document.getElementById("confMacro").textContent = "91%";
-                    document.getElementById("confTech").textContent = "83%";
-                    document.getElementById("confFlow").textContent = "94%";
-                    document.getElementById("confSent").textContent = "88%";
-                    document.getElementById("confCons").textContent = "90%";
-                    document.getElementById("confFinal").textContent = `${aiVal}%`;
+                    // 12. AI Forecast Engine
+                    document.getElementById("aiConfVal").textContent = `${scoreAI}%`;
+                    document.getElementById("aiTargetPrice").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(aiTarget).toLocaleString()}` : `$${aiTarget.toFixed(2)}`;
+                    const aiDev = ((aiTarget - currentPrice)/currentPrice * 100).toFixed(2);
+                    const devEl = document.getElementById("aiDevVal");
+                    devEl.textContent = `${aiDev >= 0 ? '+' : ''}${aiDev}%`;
+                    devEl.style.color = aiDev >= 0 ? "var(--text-green)" : "var(--text-red)";
 
-                    // 11. Consensus Dispersion
-                    document.getElementById("dispWS").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(wsAvg)}` : `$${wsAvg.toFixed(2)}`;
-                    document.getElementById("dispExp").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(currentPrice * 1.03)}` : `$${(currentPrice * 1.03).toFixed(2)}`;
-                    document.getElementById("dispAI").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(aiTarget)}` : `$${aiTarget.toFixed(2)}`;
-                    const dispVal = Math.abs(((wsAvg - aiTarget)/aiTarget * 100)).toFixed(1);
-                    document.getElementById("dispVal").textContent = `${dispVal}%`;
+                    // 13. ICI
+                    document.getElementById("iciScoreVal").textContent = "90.4";
 
-                    // 12. AI Risk Engine
-                    document.getElementById("riskFlash").textContent = "5%";
-                    document.getElementById("riskCorr").textContent = "28%";
-                    document.getElementById("riskBreak").textContent = "74%";
-                    document.getElementById("riskFail").textContent = "14%";
+                    // 14. Stress
+                    const stressVal = activeSymbol === 'USDJPY' ? 38 : (activeSymbol === 'XTIUSD' ? 42 : 32);
+                    document.getElementById("stressScoreVal").textContent = stressVal;
 
-                    // 13. Buying pressure
-                    const p1 = activeSymbol === 'USDJPY' ? 62 : (activeSymbol === 'XTIUSD' ? 70 : 76);
-                    const p2 = cbVal;
-                    const p3 = activeSymbol === 'USDJPY' ? 72 : (activeSymbol === 'XTIUSD' ? 68 : 64);
-                    const p4 = activeSymbol === 'USDJPY' ? 74 : (activeSymbol === 'XTIUSD' ? 78 : 84);
+                    // 15. Positioning
+                    document.getElementById("posSmartMoneyBias").textContent = activeSymbol === 'USDJPY' ? "84%" : (activeSymbol === 'XTIUSD' ? "86%" : "92%");
 
-                    document.getElementById("pressEtfVal").textContent = `${p1}%`;
-                    document.getElementById("pressEtfBar").style.width = `${p1}%`;
-                    document.getElementById("pressCbVal").textContent = `${p2}%`;
-                    document.getElementById("pressCbBar").style.width = `${p2}%`;
-                    document.getElementById("pressFutVal").textContent = `${p3}%`;
-                    document.getElementById("pressFutBar").style.width = `${p3}%`;
-                    document.getElementById("pressPhysVal").textContent = `${p4}%`;
-                    document.getElementById("pressPhysBar").style.width = `${p4}%`;
+                    // 16. Multi timeframe
+                    if (forecast.projections && forecast.projections.length > 0) {
+                        const w1 = forecast.projections[0];
+                        const w4 = forecast.projections[3] || w1;
+                        const w12 = forecast.projections[11] || w4;
+                        const w25 = forecast.projections[25] || w12;
+                        
+                        document.getElementById("tf1W").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round((w1.high + w1.low)/2).toLocaleString()}` : `$${((w1.high + w1.low)/2).toFixed(2)}`;
+                        document.getElementById("tf1M").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round((w4.high + w4.low)/2).toLocaleString()}` : `$${((w4.high + w4.low)/2).toFixed(2)}`;
+                        document.getElementById("tf3M").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round((w12.high + w12.low)/2).toLocaleString()}` : `$${((w12.high + w12.low)/2).toFixed(2)}`;
+                        document.getElementById("tf6M").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round((w25.high + w25.low)/2).toLocaleString()}` : `$${((w25.high + w25.low)/2).toFixed(2)}`;
+                        document.getElementById("tf12M").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(((w25.high + w25.low)/2)*1.025).toLocaleString()}` : `$${(((w25.high + w25.low)/2)*1.025).toFixed(2)}`;
+                    }
 
-                    // 14. Decision Engine (IDE)
+                    // 17. Decision Engine (IDE)
                     const lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 38) : (currentPrice * 0.992).toFixed(2);
                     const upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 18) : (currentPrice * 0.997).toFixed(2);
                     document.getElementById("ideEntry").textContent = `${lowerEntry} - ${upperEntry}`;
                     
-                    const tpPrice = currentPrice * 1.042;
-                    document.getElementById("ideTarget").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(tpPrice).toLocaleString()}` : `$${tpPrice.toFixed(2)}`;
+                    const tpPrice1 = currentPrice * 1.015;
+                    const tpPrice2 = currentPrice * 1.042;
+                    const tpPrice3 = currentPrice * 1.065;
+                    document.getElementById("ideTarget").textContent = activeSymbol === 'XAUUSD' ? 
+                        `${Math.round(tpPrice1).toLocaleString()} / ${Math.round(tpPrice2).toLocaleString()} / ${Math.round(tpPrice3).toLocaleString()}` : 
+                        `${tpPrice1.toFixed(2)} / ${tpPrice2.toFixed(2)} / ${tpPrice3.toFixed(2)}`;
                     
                     const slPrice = currentPrice * 0.978;
                     document.getElementById("ideStop").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(slPrice).toLocaleString()}` : `$${slPrice.toFixed(2)}`;
-
-                    // 15. Performance
-                    document.getElementById("perfRet").textContent = "+4.8%";
-                    document.getElementById("perfRisk").textContent = "-1.4%";
-                    document.getElementById("perfSharpe").textContent = "2.16";
-                    document.getElementById("perfSortino").textContent = "3.05";
-                    document.getElementById("perfPF").textContent = "2.42";
-                    document.getElementById("perfRR").textContent = "3.8";
-
-                    // 16. Final Score
-                    document.getElementById("finalMacro").textContent = "89";
-                    document.getElementById("finalFlow").textContent = "92";
-                    document.getElementById("finalCB").textContent = "95";
-                    document.getElementById("finalTech").textContent = "84";
-                    document.getElementById("finalAI").textContent = "89";
-                    document.getElementById("finalRisk").textContent = "74";
-                    document.getElementById("finalVal").textContent = "91.2";
                 }
             } catch (err) {
                 console.error("Error loading XEDY V31 parameters: ", err);
