@@ -69,10 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const el = document.getElementById(`live-price-${symbol.replace(/\s+/g, '-')}`);
                     const decimals = symbol.includes('JPY') ? 3 : (symbol.includes('EUR') || symbol.includes('GBP') ? 4 : 2);
                     if (el) {
-                        el.innerText = tickInfo.bid.toLocaleString('en-US', {
-                            minimumFractionDigits: decimals,
-                            maximumFractionDigits: decimals
-                        });
+                        const formattedPrice = symbol.includes('JPY') ? 
+                            tickInfo.bid.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) :
+                            `$${tickInfo.bid.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
+                        el.innerText = formattedPrice;
                     }
                     
                     // Update detailed stats inside asset cards on homepage
@@ -165,10 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const assetsContainer = document.getElementById('assets-container');
         let aHtml = '';
         
-        const forecastHTML = (f) => `
+        const forecastHTML = (f, isJpy) => `
             <div class="fc-row"><span class="fc-label">DIRECTION</span><span class="fc-val ${f.dirClass}">${f.dir}</span></div>
-            <div class="fc-row"><span class="fc-label">LOW</span><span class="fc-val">${f.low}</span></div>
-            <div class="fc-row"><span class="fc-label">HIGH</span><span class="fc-val">${f.high}</span></div>
+            <div class="fc-row"><span class="fc-label">LOW</span><span class="fc-val">${isJpy ? f.low : '$' + f.low}</span></div>
+            <div class="fc-row"><span class="fc-label">HIGH</span><span class="fc-val">${isJpy ? f.high : '$' + f.high}</span></div>
             <div class="fc-row"><span class="fc-label">BULL PROB.</span><span class="fc-val">${f.bp}</span></div>
             <div class="fc-row"><span class="fc-label">BEAR PROB.</span><span class="fc-val">${f.bearp}</span></div>
             <div class="fc-row"><span class="fc-label">CONFIDENCE</span><span class="fc-val">${f.conf}</span></div>
@@ -178,18 +178,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         data.assets.forEach(a => {
             let chgColor = a.cColor || 'text-green';
+            const isJpy = a.symbol.includes('JPY');
+            const displayPrice = isJpy ? a.price : '$' + a.price;
             aHtml += `
             <div class="asset-card">
-                <div class="asset-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                <div class="asset-header" style="flex-direction: column; align-items: flex-start; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px; margin-bottom: 3px;">
+                    <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
                         <div class="asset-icon">${a.icon}</div>
                         <div class="asset-info">
                             <span class="asset-name">${a.symbol}</span>
-                            <span class="asset-price ${chgColor}" id="live-price-${a.symbol.replace(/\s+/g, '-')}">${a.price}</span>
+                            <span class="asset-price ${chgColor}" id="live-price-${a.symbol.replace(/\s+/g, '-')}">${displayPrice}</span>
                         </div>
                     </div>
                     <!-- Detailed Tick Metrics -->
-                    <div class="tick-details" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 0.55rem; width: 100%; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px; font-family: var(--font-mono);">
+                    <div class="tick-details" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; font-size: 0.48rem; width: 100%; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 3px; font-family: var(--font-mono);">
                         <div><span style="color:var(--text-muted);">BID:</span> <strong id="live-bid-${a.symbol.replace(/\s+/g, '-')}" style="color:#fff;">...</strong></div>
                         <div><span style="color:var(--text-muted);">ASK:</span> <strong id="live-ask-${a.symbol.replace(/\s+/g, '-')}" style="color:#fff;">...</strong></div>
                         <div><span style="color:var(--text-muted);">CHG:</span> <strong id="live-chg-${a.symbol.replace(/\s+/g, '-')}" class="${chgColor}">${a.change}</strong></div>
@@ -199,11 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="forecast-split">
                     <div class="fc-col">
                         <div class="fc-title">1D FORECAST</div>
-                        ${forecastHTML(a.f4)}
+                        ${forecastHTML(a.f4, isJpy)}
                     </div>
                     <div class="fc-col">
                         <div class="fc-title">1W FORECAST</div>
-                        ${forecastHTML(a.f1)}
+                        ${forecastHTML(a.f1, isJpy)}
                     </div>
                 </div>
             </div>
