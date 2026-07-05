@@ -980,6 +980,23 @@ def run_claude_daily_macro():
                         matrix[k1][k2] = float(c_val)
                 db['correlation_matrix'] = matrix
                 print("Correlation Matrix updated dynamically!")
+
+                # Calculate dynamic fundamental driver correlations
+                try:
+                    fun_corrs = {
+                        "Gold vs Real Yields (XAUUSD vs US10Y)": float(np.corrcoef(gld[-min_len:], tnx[-min_len:])[0, 1]),
+                        "Yen vs Yield Spread (USDJPY vs US10Y)": float(np.corrcoef(usdjpy_hist[-min_len:], tnx[-min_len:])[0, 1]),
+                        "Oil vs Commodity Index (WTI OIL vs DBC)": float(np.corrcoef(uso[-min_len:], dbc[-min_len:])[0, 1]),
+                        "Equities vs Risk Volatility (DJI vs VIX)": float(np.corrcoef(dji[-min_len:], vix[-min_len:])[0, 1]),
+                        "Dollar vs Gold Safe Haven (DXY vs XAUUSD)": float(np.corrcoef(dxy[-min_len:], gld[-min_len:])[0, 1])
+                    }
+                    for k in fun_corrs:
+                        if np.isnan(fun_corrs[k]):
+                            fun_corrs[k] = 0.0
+                    db['fundamental_correlations'] = fun_corrs
+                    print("Fundamental correlations updated dynamically!")
+                except Exception as fun_e:
+                    print("Failed to calculate fundamental correlations:", fun_e)
         except Exception as corr_e:
             print("Failed to calculate dynamic correlation matrix:", corr_e)
 

@@ -31,7 +31,7 @@
     {
       "name": "LIQUIDITY (RRP)",
       "val": "EXPANDING",
-      "score": 53,
+      "score": 52,
       "dir": "up",
       "value": "EXPANDING"
     },
@@ -158,7 +158,7 @@
     {
       "time": "INVESTING",
       "title": "Tarif Trump, risalah rapat The Fed, pembelian Bitcoin oleh Rumble - hal-hal yang menggerakkan pasar",
-      "impact": "text-yellow"
+      "impact": "text-red"
     },
     {
       "time": "WSJ",
@@ -229,25 +229,25 @@
       "change": "+52.58 (+1.28%)",
       "cColor": "text-green",
       "f4": {
-        "dir": "BEARISH",
-        "dirClass": "text-red arrow-down",
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
         "low": "3919.93",
         "high": "4429.69",
-        "bp": "85%",
-        "bearp": "15%",
+        "bp": "75%",
+        "bearp": "25%",
         "conf": "99%",
         "accuracy": "58.0%",
-        "action": "SELL RALLY",
-        "btn": "btn-red"
+        "action": "BUY DIP",
+        "btn": "btn-green"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
         "low": "3650.37",
         "high": "4699.25",
-        "bp": "37%",
-        "bearp": "63%",
-        "conf": "63%",
+        "bp": "36%",
+        "bearp": "64%",
+        "conf": "64%",
         "accuracy": "82.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -276,9 +276,9 @@
         "dirClass": "text-green arrow-up",
         "low": "157.344",
         "high": "165.290",
-        "bp": "61%",
-        "bearp": "39%",
-        "conf": "61%",
+        "bp": "62%",
+        "bearp": "38%",
+        "conf": "62%",
         "accuracy": "78.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
@@ -307,9 +307,9 @@
         "dirClass": "text-red arrow-down",
         "low": "44.20",
         "high": "93.18",
-        "bp": "32%",
-        "bearp": "68%",
-        "conf": "68%",
+        "bp": "31%",
+        "bearp": "69%",
+        "conf": "69%",
         "accuracy": "82.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -326,9 +326,9 @@
         "dirClass": "text-red arrow-down",
         "low": "1.1271",
         "high": "1.1591",
-        "bp": "85%",
-        "bearp": "15%",
-        "conf": "99%",
+        "bp": "42%",
+        "bearp": "58%",
+        "conf": "58%",
         "accuracy": "62.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -338,9 +338,9 @@
         "dirClass": "text-red arrow-down",
         "low": "1.1107",
         "high": "1.1755",
-        "bp": "37%",
-        "bearp": "63%",
-        "conf": "63%",
+        "bp": "36%",
+        "bearp": "64%",
+        "conf": "64%",
         "accuracy": "66.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -353,16 +353,16 @@
       "change": "+0.0001 (+0.01%)",
       "cColor": "text-green",
       "f4": {
-        "dir": "BEARISH",
-        "dirClass": "text-red arrow-down",
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
         "low": "1.3161",
         "high": "1.3529",
-        "bp": "85%",
-        "bearp": "15%",
-        "conf": "99%",
+        "bp": "52%",
+        "bearp": "48%",
+        "conf": "52%",
         "accuracy": "62.0%",
-        "action": "SELL RALLY",
-        "btn": "btn-red"
+        "action": "BUY DIP",
+        "btn": "btn-green"
       },
       "f1": {
         "dir": "BEARISH",
@@ -388,12 +388,12 @@
     "sentiment_penalty": -2
   },
   "ml_weights": {
-    "macro": 0.09849017110922496,
-    "sentiment": 0.11876311248275365,
-    "flow": 0.4733655164617152,
-    "regime": 0.10544551441854065,
-    "tech": 0.09849017110922496,
-    "cal": 0.10544551441854065
+    "macro": 0.09841273747387445,
+    "sentiment": 0.1109732658550221,
+    "flow": 0.4953757842494801,
+    "regime": 0.09841273747387445,
+    "tech": 0.09841273747387445,
+    "cal": 0.09841273747387445
   },
   "correlation_matrix": {
     "XAUUSD": {
@@ -489,7 +489,7 @@
   },
   "economic_calendar": [
     {
-      "time": "17:48",
+      "time": "17:52",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -498,7 +498,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "18:48",
+      "time": "18:52",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -507,7 +507,7 @@
       "prev": "215K"
     },
     {
-      "time": "20:48",
+      "time": "20:52",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -516,7 +516,7 @@
       "prev": "49.1"
     },
     {
-      "time": "21:48",
+      "time": "21:52",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
