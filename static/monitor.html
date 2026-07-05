@@ -933,11 +933,11 @@
             <div class="panel-card">
                 <h3 class="panel-header-title">10 Event Risk</h3>
                 <div class="panel-body-content" style="gap: 2px;">
-                    <div class="data-row"><span class="data-lbl">FOMC</span><span class="data-val" style="color: var(--text-red);">HIGH</span></div>
-                    <div class="data-row"><span class="data-lbl">CPI</span><span class="data-val" style="color: var(--text-gold);">MEDIUM</span></div>
-                    <div class="data-row"><span class="data-lbl">NFP</span><span class="data-val" style="color: var(--text-gold);">MEDIUM</span></div>
-                    <div class="data-row"><span class="data-lbl">Tariff</span><span class="data-val" style="color: var(--text-red);">HIGH</span></div>
-                    <div class="data-row"><span class="data-lbl">Geopolitics</span><span class="data-val" style="color: var(--text-red);">HIGH</span></div>
+                    <div class="data-row"><span class="data-lbl" id="evtLabel1">FOMC</span><span class="data-val" id="evtVal1" style="color: var(--text-red);">HIGH</span></div>
+                    <div class="data-row"><span class="data-lbl" id="evtLabel2">CPI</span><span class="data-val" id="evtVal2" style="color: var(--text-gold);">MEDIUM</span></div>
+                    <div class="data-row"><span class="data-lbl" id="evtLabel3">NFP</span><span class="data-val" id="evtVal3" style="color: var(--text-gold);">MEDIUM</span></div>
+                    <div class="data-row"><span class="data-lbl" id="evtLabel4">Tariff</span><span class="data-val" id="evtVal4" style="color: var(--text-red);">HIGH</span></div>
+                    <div class="data-row"><span class="data-lbl" id="evtLabel5">Geopolitics</span><span class="data-val" id="evtVal5" style="color: var(--text-red);">HIGH</span></div>
                 </div>
             </div>
 
@@ -946,19 +946,19 @@
                 <h3 class="panel-header-title">11 AI Risk Engine</h3>
                 <div class="panel-body-content" style="flex-direction: row; gap: 4px;">
                     <div class="donut-container" style="flex: 1;">
-                        <svg class="donut-svg" viewBox="0 0 36 36" style="width:38px; height:38px;">
+                        <svg class="donut-svg" id="riskDonutSvg" viewBox="0 0 36 36" style="width:38px; height:38px;">
                             <circle cx="18" cy="18" r="15.915" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="4.5"/>
-                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-green)" stroke-width="4.5" stroke-dasharray="74 26" stroke-dashoffset="0"/>
-                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-red)" stroke-width="4.5" stroke-dasharray="28 72" stroke-dashoffset="-74"/>
-                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-gold)" stroke-width="4.5" stroke-dasharray="14 86" stroke-dashoffset="-102"/>
-                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--text-cyan)" stroke-width="4.5" stroke-dasharray="5 95" stroke-dashoffset="-116"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" class="donut-slice-1" stroke="var(--text-green)" stroke-width="4.5" stroke-dasharray="74 26" stroke-dashoffset="0"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" class="donut-slice-2" stroke="var(--text-red)" stroke-width="4.5" stroke-dasharray="28 72" stroke-dashoffset="-74"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" class="donut-slice-3" stroke="var(--text-gold)" stroke-width="4.5" stroke-dasharray="14 86" stroke-dashoffset="-102"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" class="donut-slice-4" stroke="var(--text-cyan)" stroke-width="4.5" stroke-dasharray="5 95" stroke-dashoffset="-116"/>
                         </svg>
                     </div>
                     <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 1px; font-size: 0.52rem;">
-                        <div><span style="color: var(--text-green);">●</span> Breakout: 74%</div>
-                        <div><span style="color: var(--text-red);">●</span> Correct: 28%</div>
-                        <div><span style="color: var(--text-gold);">●</span> Failure: 14%</div>
-                        <div><span style="color: var(--text-cyan);">●</span> Crash: 5%</div>
+                        <div><span style="color: var(--text-green);">●</span> Breakout: <span id="riskBreakoutVal">74%</span></div>
+                        <div><span style="color: var(--text-red);">●</span> Correct: <span id="riskCorrectionVal">28%</span></div>
+                        <div><span style="color: var(--text-gold);">●</span> Failure: <span id="riskFailureVal">14%</span></div>
+                        <div><span style="color: var(--text-cyan);">●</span> Crash: <span id="riskCrashVal">5%</span></div>
                     </div>
                 </div>
             </div>
@@ -969,22 +969,22 @@
                 <div class="panel-body-content" style="gap: 3px;">
                     <!-- 12 Buy Pressure -->
                     <div class="data-row" style="font-size:0.6rem;">
-                        <span class="data-lbl">ETF / CB</span>
-                        <div style="display:flex; gap:6px;">
-                            <div class="led-bar"><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block"></div></div>
-                            <div class="led-bar"><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div></div>
+                        <span class="data-lbl" id="pressLabel1">ETF / CB</span>
+                        <div style="display:flex; gap:6px;" id="ledBarsContainer">
+                            <div class="led-bar" id="ledBar1"><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block active-cyan"></div><div class="led-block"></div></div>
+                            <div class="led-bar" id="ledBar2"><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div><div class="led-block active-green"></div></div>
                         </div>
                     </div>
                     <!-- 13 Market Quality -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 3px; font-size: 0.58rem;">
-                        <div><span style="color: var(--text-muted);">Trend Q:</span> <strong style="color:var(--text-green);">91</strong></div>
-                        <div><span style="color: var(--text-muted);">Liq:</span> <strong style="color:var(--text-green);">89</strong></div>
-                        <div><span style="color: var(--text-muted);">Part:</span> <strong style="color:var(--text-cyan);">84</strong></div>
-                        <div><span style="color: var(--text-muted);">Breadth:</span> <strong style="color:var(--text-green);">87</strong></div>
+                        <div><span style="color: var(--text-muted);">Trend Q:</span> <strong style="color:var(--text-green);" id="mqTrend">91</strong></div>
+                        <div><span style="color: var(--text-muted);">Liq:</span> <strong style="color:var(--text-green);" id="mqLiq">89</strong></div>
+                        <div><span style="color: var(--text-muted);">Part:</span> <strong style="color:var(--text-cyan);" id="mqPart">84</strong></div>
+                        <div><span style="color: var(--text-muted);">Breadth:</span> <strong style="color:var(--text-green);" id="mqBreadth">87</strong></div>
                     </div>
                     <!-- 14 AI Signal -->
                     <div class="data-row" style="border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 2px;">
-                        <span class="stars-val">★★★★★</span>
+                        <span class="stars-val" id="starsVal">★★★★★</span>
                         <strong style="color: var(--text-green);" id="gradeVal">A+ Grade</strong>
                     </div>
                 </div>
@@ -1007,9 +1007,9 @@
                 <h3 class="panel-header-title">18 Final Institutional Score</h3>
                 <div class="panel-body-content" style="flex-direction: row; gap: 8px;">
                     <div style="flex: 1.1; display: flex; flex-direction: column; justify-content: center; gap: 2px; font-size: 0.58rem;">
-                        <div class="data-row"><span class="data-lbl">Macro / Flow</span><span>89 / 92</span></div>
-                        <div class="data-row"><span class="data-lbl">CB / Tech</span><span>95 / 84</span></div>
-                        <div class="data-row"><span class="data-lbl">AI / Risk</span><span>89 / 74</span></div>
+                        <div class="data-row"><span class="data-lbl">Macro / Flow</span><span id="finalMacroFlow">89 / 92</span></div>
+                        <div class="data-row"><span class="data-lbl">CB / Tech</span><span id="finalCBTech">95 / 84</span></div>
+                        <div class="data-row"><span class="data-lbl">AI / Risk</span><span id="finalAIRisk">89 / 74</span></div>
                     </div>
                     <div class="radial-gauge-container" style="flex: 1;">
                         <svg class="radial-svg" viewBox="0 0 36 36">
@@ -1499,6 +1499,14 @@
                         }
                     }
 
+                    // Update Final Score sub-indicators
+                    const finalMacroFlow = document.getElementById("finalMacroFlow");
+                    if (finalMacroFlow) finalMacroFlow.textContent = `${scoreWallSt} / ${scoreSmartMoney}`;
+                    const finalCBTech = document.getElementById("finalCBTech");
+                    if (finalCBTech) finalCBTech.textContent = `${scoreCB} / ${scoreWallSt}`;
+                    const finalAIRisk = document.getElementById("finalAIRisk");
+                    if (finalAIRisk) finalAIRisk.textContent = `${scoreAI} / ${Math.round(100 - stressVal)}`;
+
                     // 19. Decision Engine (IDE)
                     const lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 38) : (currentPrice * 0.992).toFixed(2);
                     const upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 18) : (currentPrice * 0.997).toFixed(2);
@@ -1535,6 +1543,152 @@
                             document.querySelector(".footer-ide-row").style.border = "1px solid rgba(74, 222, 128, 0.35)";
                             document.querySelector(".footer-ide-row").style.boxShadow = "var(--glow-green)";
                             document.querySelector(".footer-ide-row").style.background = "linear-gradient(90deg, rgba(74, 222, 128, 0.08) 0%, rgba(10, 22, 45, 0.7) 100%)";
+                        }
+                    }
+
+                    // 10. Event Risk otonomous updates
+                    const evtLabel1 = document.getElementById("evtLabel1");
+                    const evtLabel2 = document.getElementById("evtLabel2");
+                    const evtLabel3 = document.getElementById("evtLabel3");
+                    const evtLabel4 = document.getElementById("evtLabel4");
+                    const evtLabel5 = document.getElementById("evtLabel5");
+
+                    const evtVal1 = document.getElementById("evtVal1");
+                    const evtVal2 = document.getElementById("evtVal2");
+                    const evtVal3 = document.getElementById("evtVal3");
+                    const evtVal4 = document.getElementById("evtVal4");
+                    const evtVal5 = document.getElementById("evtVal5");
+
+                    if (activeSymbol === "XAUUSD") {
+                        if (evtLabel1) evtLabel1.textContent = "FOMC";
+                        if (evtVal1) { evtVal1.textContent = "HIGH"; evtVal1.style.color = "var(--text-red)"; }
+                        if (evtLabel2) evtLabel2.textContent = "CPI";
+                        if (evtVal2) { evtVal2.textContent = "MEDIUM"; evtVal2.style.color = "var(--text-gold)"; }
+                        if (evtLabel3) evtLabel3.textContent = "NFP";
+                        if (evtVal3) { evtVal3.textContent = "MEDIUM"; evtVal3.style.color = "var(--text-gold)"; }
+                        if (evtLabel4) evtLabel4.textContent = "Tariff";
+                        if (evtVal4) { evtVal4.textContent = "HIGH"; evtVal4.style.color = "var(--text-red)"; }
+                        if (evtLabel5) evtLabel5.textContent = "Geopolitics";
+                        if (evtVal5) { evtVal5.textContent = "HIGH"; evtVal5.style.color = "var(--text-red)"; }
+                    } else if (activeSymbol === "USDJPY") {
+                        if (evtLabel1) evtLabel1.textContent = "BOJ Meeting";
+                        if (evtVal1) { evtVal1.textContent = "HIGH"; evtVal1.style.color = "var(--text-red)"; }
+                        if (evtLabel2) evtLabel2.textContent = "US CPI";
+                        if (evtVal2) { evtVal2.textContent = "HIGH"; evtVal2.style.color = "var(--text-red)"; }
+                        if (evtLabel3) evtLabel3.textContent = "Yield Gap";
+                        if (evtVal3) { evtVal3.textContent = "HIGH"; evtVal3.style.color = "var(--text-red)"; }
+                        if (evtLabel4) evtLabel4.textContent = "Intervention";
+                        if (evtVal4) { evtVal4.textContent = "MEDIUM"; evtVal4.style.color = "var(--text-gold)"; }
+                        if (evtLabel5) evtLabel5.textContent = "Carry Trade";
+                        if (evtVal5) { evtVal5.textContent = "HIGH"; evtVal5.style.color = "var(--text-red)"; }
+                    } else if (activeSymbol === "XTIUSD") {
+                        if (evtLabel1) evtLabel1.textContent = "OPEC+ Meeting";
+                        if (evtVal1) { evtVal1.textContent = "HIGH"; evtVal1.style.color = "var(--text-red)"; }
+                        if (evtLabel2) evtLabel2.textContent = "SPR Purchase";
+                        if (evtVal2) { evtVal2.textContent = "MEDIUM"; evtVal2.style.color = "var(--text-gold)"; }
+                        if (evtLabel3) evtLabel3.textContent = "ME Conflict";
+                        if (evtVal3) { evtVal3.textContent = "HIGH"; evtVal3.style.color = "var(--text-red)"; }
+                        if (evtLabel4) evtLabel4.textContent = "US Inventory";
+                        if (evtVal4) { evtVal4.textContent = "MEDIUM"; evtVal4.style.color = "var(--text-gold)"; }
+                        if (evtLabel5) evtLabel5.textContent = "China Demand";
+                        if (evtVal5) { evtVal5.textContent = "MEDIUM"; evtVal5.style.color = "var(--text-gold)"; }
+                    }
+
+                    // 11. AI Risk Engine otonomous updates
+                    const riskBreakout = Math.round(70 + bias * 40 - (volMult > 1.1 ? 10 : 0));
+                    const riskCorrection = Math.round(25 - bias * 30);
+                    const riskFailure = Math.round(14 + (volMult - 1) * 15);
+                    const riskCrash = Math.round(5 + (volMult > 1.25 ? 12 : 0));
+
+                    const riskBreakoutVal = document.getElementById("riskBreakoutVal");
+                    if (riskBreakoutVal) riskBreakoutVal.textContent = `${riskBreakout}%`;
+                    const riskCorrectionVal = document.getElementById("riskCorrectionVal");
+                    if (riskCorrectionVal) riskCorrectionVal.textContent = `${riskCorrection}%`;
+                    const riskFailureVal = document.getElementById("riskFailureVal");
+                    if (riskFailureVal) riskFailureVal.textContent = `${riskFailure}%`;
+                    const riskCrashVal = document.getElementById("riskCrashVal");
+                    if (riskCrashVal) riskCrashVal.textContent = `${riskCrash}%`;
+
+                    // Update donut chart slices
+                    const donutSlices = document.querySelectorAll("#riskDonutSvg circle");
+                    if (donutSlices && donutSlices.length >= 5) {
+                        const total = riskBreakout + riskCorrection + riskFailure + riskCrash;
+                        const s1 = Math.round((riskBreakout / total) * 100);
+                        const s2 = Math.round((riskCorrection / total) * 100);
+                        const s3 = Math.round((riskFailure / total) * 100);
+                        const s4 = Math.round((riskCrash / total) * 100);
+                        
+                        donutSlices[1].setAttribute("stroke-dasharray", `${s1} ${100 - s1}`);
+                        donutSlices[2].setAttribute("stroke-dasharray", `${s2} ${100 - s2}`);
+                        donutSlices[2].setAttribute("stroke-dashoffset", -s1);
+                        donutSlices[3].setAttribute("stroke-dasharray", `${s3} ${100 - s3}`);
+                        donutSlices[3].setAttribute("stroke-dashoffset", -(s1 + s2));
+                        donutSlices[4].setAttribute("stroke-dasharray", `${s4} ${100 - s4}`);
+                        donutSlices[4].setAttribute("stroke-dashoffset", -(s1 + s2 + s3));
+                    }
+
+                    // 12. Buy Pressure LED block count updates
+                    const pressLabel1 = document.getElementById("pressLabel1");
+                    if (pressLabel1) {
+                        pressLabel1.textContent = activeSymbol === 'USDJPY' ? "Carry / Retail" : (activeSymbol === 'XTIUSD' ? "SPR / OPEC" : "ETF / CB");
+                    }
+                    const ledBlocks1 = document.querySelectorAll("#ledBar1 .led-block");
+                    const ledBlocks2 = document.querySelectorAll("#ledBar2 .led-block");
+                    
+                    const score1 = Math.round(scoreETF / 20);
+                    const score2 = Math.round(scoreCB / 10);
+
+                    ledBlocks1.forEach((blk, idx) => {
+                        if (idx < score1) {
+                            blk.className = "led-block active-cyan";
+                        } else {
+                            blk.className = "led-block";
+                        }
+                    });
+                    ledBlocks2.forEach((blk, idx) => {
+                        if (idx < score2) {
+                            blk.className = "led-block active-green";
+                        } else {
+                            blk.className = "led-block";
+                        }
+                    });
+
+                    // 13. Market Quality otonomous updates
+                    const mqTrendVal = Math.round(85 + bias * 10);
+                    const mqLiqVal = activeSymbol === 'USDJPY' ? 92 : (activeSymbol === 'XTIUSD' ? 82 : 89);
+                    const mqPartVal = Math.round(80 + bias * 8);
+                    const mqBreadthVal = Math.round(83 + bias * 6);
+
+                    const mqTrend = document.getElementById("mqTrend");
+                    if (mqTrend) mqTrend.textContent = mqTrendVal;
+                    const mqLiq = document.getElementById("mqLiq");
+                    if (mqLiq) mqLiq.textContent = mqLiqVal;
+                    const mqPart = document.getElementById("mqPart");
+                    if (mqPart) mqPart.textContent = mqPartVal;
+                    const mqBreadth = document.getElementById("mqBreadth");
+                    if (mqBreadth) mqBreadth.textContent = mqBreadthVal;
+
+                    // 14. AI Signal Stars & Grade otonomous updates
+                    const starsVal = document.getElementById("starsVal");
+                    const gradeVal = document.getElementById("gradeVal");
+                    if (gradeVal && starsVal) {
+                        const parsedICI = parseFloat(iciScoreVal);
+                        if (parsedICI >= 90) {
+                            starsVal.textContent = "★★★★★";
+                            gradeVal.textContent = "A+ Grade";
+                            gradeVal.style.color = "var(--text-green)";
+                        } else if (parsedICI >= 80) {
+                            starsVal.textContent = "★★★★☆";
+                            gradeVal.textContent = "A Grade";
+                            gradeVal.style.color = "var(--text-green)";
+                        } else if (parsedICI >= 70) {
+                            starsVal.textContent = "★★★☆☆";
+                            gradeVal.textContent = "B+ Grade";
+                            gradeVal.style.color = "var(--text-cyan)";
+                        } else {
+                            starsVal.textContent = "★★☆☆☆";
+                            gradeVal.textContent = "B Grade";
+                            gradeVal.style.color = "var(--text-gold)";
                         }
                     }
                 }
