@@ -261,6 +261,24 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Row 4: Fundamental Correlations -->
+            <div class="row-panels" style="margin-top: 15px;">
+                <div class="panel panel-border" style="flex: 1.0; min-width: 100%;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">FUNDAMENTAL INTERMARKET CORRELATION
+                        <div class="tooltip-container" style="margin-left: 8px;">
+                            <span class="info-icon">ⓘ</span>
+                            <div class="tooltip-text" style="bottom: 150%; top: auto; width: 300px; left: 0; transform: none; z-index: 1000;">
+                                <strong style="color:var(--text-yellow);">Fundamental Correlation</strong><br><br>
+                                Menunjukkan korelasi Pearson real-time antar indikator makro/fundamental. Korelasi negatif yang kuat menunjukkan hubungan "safe-haven vs risk", sedangkan korelasi positif menunjukkan transmisi kebijakan yield/inflasi yang sinkron.
+                            </div>
+                        </div>
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; padding: 10px; width: 100%;" id="fundamental-correlations-container">
+                        <!-- Dynamically populated by script.js -->
+                    </div>
+                </div>
+            </div>
         </main>
 
         <footer class="cyber-footer">

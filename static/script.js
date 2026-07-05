@@ -236,6 +236,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Render Fundamental Correlations dynamically
+        if (data.fundamental_correlations) {
+            const funContainer = document.getElementById('fundamental-correlations-container');
+            if (funContainer) {
+                let fHtml = '';
+                const explanations = {
+                    "Gold vs Real Yields (XAUUSD vs US10Y)": "Yields naik = biaya peluang emas meningkat (Emas Bearish).",
+                    "Yen vs Yield Spread (USDJPY vs US10Y)": "Yields AS naik = selisih yield melebar (USDJPY Bullish).",
+                    "Oil vs Commodity Index (WTI OIL vs DBC)": "Harga minyak naik = inflasi komoditas naik (Inflasi Bullish).",
+                    "Equities vs Risk Volatility (DJI vs VIX)": "VIX naik = kepanikan pasar meningkat (Saham Bearish).",
+                    "Dollar vs Gold Safe Haven (DXY vs XAUUSD)": "Dollar kuat = harga komoditas dalam dollar tertekan (Emas Bearish)."
+                };
+                
+                Object.entries(data.fundamental_correlations).forEach(([relation, val]) => {
+                    let valStr = val.toFixed(2);
+                    let badgeText = "NEUTRAL";
+                    let badgeClass = "text-yellow";
+                    if (val >= 0.3) {
+                        badgeText = "STRONG POSITIVE";
+                        badgeClass = "text-green";
+                    } else if (val <= -0.3) {
+                        badgeText = "STRONG NEGATIVE";
+                        badgeClass = "text-red";
+                    }
+                    
+                    const explanation = explanations[relation] || "Hubungan intermarket makro.";
+                    
+                    fHtml += `
+                    <div class="macro-item" style="border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 4px; background: rgba(10,22,45,0.3); display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                        <span style="font-size: 0.65rem; color: var(--text-yellow); font-family: var(--font-mono); font-weight: bold;">${relation}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px;">
+                            <span class="${badgeClass}" style="font-size: 0.6rem; font-weight: bold; letter-spacing: 0.5px;">${badgeText}</span>
+                            <span class="${badgeClass}" style="font-size: 0.95rem; font-family: var(--font-mono); font-weight: bold;">${valStr}</span>
+                        </div>
+                        <span style="font-size: 0.55rem; color: var(--text-muted); line-height: 1.2;">${explanation}</span>
+                    </div>
+                    `;
+                });
+                funContainer.innerHTML = fHtml;
+            }
+        }
+
         // Initialize Gauges if they don't exist yet
         if (!window.gaugesInitialized) {
             initGauges(data.gauges);
