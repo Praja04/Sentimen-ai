@@ -1175,13 +1175,14 @@
 
                 if (ticksRes.ticks && ticksRes.ticks[tickKey] && forecastRes.status === "success") {
                     const tick = ticksRes.ticks[tickKey];
-                    const forecast = forecastRes.forecast;
-                    const macro = forecastRes.macro_context;
+                    const forecast = forecastRes.forecast || {};
+                    const macro = forecastRes.macro_context || {};
                     
                     const currentPrice = tick.bid;
                     const priceChange = tick.change;
-                    const bias = forecast.fundamental_bias;
-                    const acc = forecast.metrics.accuracy || 89;
+                    const bias = forecast.fundamental_bias !== undefined ? forecast.fundamental_bias : (forecast.trend_bias !== undefined ? forecast.trend_bias : 0);
+                    const acc = (forecast.metrics && forecast.metrics.accuracy !== undefined) ? forecast.metrics.accuracy : 89;
+                    const volMult = (forecast.model_weights && forecast.model_weights.volatility_multiplier !== undefined) ? forecast.model_weights.volatility_multiplier : 1.0;
 
                     // Compute dynamic targets
                     let wsTargets = [];
@@ -1257,7 +1258,6 @@
                     }
 
                     // 5. Risk
-                    const volMult = forecast.model_weights.volatility_multiplier || 1.0;
                     const riskEl = document.getElementById("kpiRisk");
                     if (riskEl) {
                         if (volMult > 1.25) {
