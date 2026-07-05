@@ -138,37 +138,37 @@
     {
       "time": "BLOOMBERG",
       "title": "BOK Memperingatkan Risiko Dari ETF dengan Leverage Saham Tunggal: Yonhap",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "FOREXLIVE",
       "title": "Bailey dari Bank of England mengatakan inflasi akan mencapai target jika bukan karena perang",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "FOREXLIVE",
       "title": "Konsumen AS sedang \"stres\" namun pengeluaran untuk membeli kucing \"berkobar\" menurut General Mills",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "INVESTING",
       "title": "Deutsche Bank memperkirakan S&P 500 akan mencapai level 7000 pada akhir tahun 2025",
-      "impact": "text-green"
+      "impact": "text-yellow"
     },
     {
       "time": "INVESTING",
       "title": "Tarif Trump, risalah rapat The Fed, pembelian Bitcoin oleh Rumble - hal-hal yang menggerakkan pasar",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "WSJ",
       "title": "Saham-Saham Tenggelam Akibat Kehancuran AI yang Dipicu oleh DeepSeek Tiongkok",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "WSJ",
       "title": "Emas Comex, Perak Berakhir Lebih Rendah",
-      "impact": "text-green"
+      "impact": "text-yellow"
     },
     {
       "time": "KITCO",
@@ -178,22 +178,22 @@
     {
       "time": "KITCO",
       "title": "Bank sentral meningkatkan cadangan emas dengan pembelian bersih 41 ton di bulan Mei – Dewan Emas Dunia",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "OILPRICE",
       "title": "Penurunan Impor LNG AS ke UE Menimbulkan Masalah bagi Kesepakatan Perdagangan",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "OILPRICE",
       "title": "Proyek Pusat Data Terbesar yang Pernah Diusulkan Secara Resmi Mati",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "YAHOO",
       "title": "Warren Buffett baru saja mengirimkan peringatan 11 kata kepada investor tentang pasar saham. ",
-      "impact": "text-red"
+      "impact": "text-yellow"
     },
     {
       "time": "YAHOO",
@@ -229,25 +229,25 @@
       "change": "+52.58 (+1.28%)",
       "cColor": "text-green",
       "f4": {
-        "dir": "BULLISH",
-        "dirClass": "text-green arrow-up",
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
         "low": "3919.93",
         "high": "4429.69",
-        "bp": "75%",
-        "bearp": "25%",
-        "conf": "99%",
+        "bp": "46%",
+        "bearp": "54%",
+        "conf": "54%",
         "accuracy": "58.0%",
-        "action": "BUY DIP",
-        "btn": "btn-green"
+        "action": "SELL RALLY",
+        "btn": "btn-red"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
         "low": "3650.37",
         "high": "4699.25",
-        "bp": "36%",
-        "bearp": "64%",
-        "conf": "64%",
+        "bp": "35%",
+        "bearp": "65%",
+        "conf": "65%",
         "accuracy": "82.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -260,25 +260,25 @@
       "change": "+0.23 (+0.14%)",
       "cColor": "text-green",
       "f4": {
-        "dir": "BEARISH",
-        "dirClass": "text-red arrow-down",
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
         "low": "159.661",
         "high": "162.973",
-        "bp": "85%",
-        "bearp": "15%",
-        "conf": "99%",
+        "bp": "58%",
+        "bearp": "42%",
+        "conf": "58%",
         "accuracy": "66.0%",
-        "action": "SELL RALLY",
-        "btn": "btn-red"
+        "action": "BUY DIP",
+        "btn": "btn-green"
       },
       "f1": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
         "low": "157.344",
         "high": "165.290",
-        "bp": "62%",
-        "bearp": "38%",
-        "conf": "62%",
+        "bp": "64%",
+        "bearp": "36%",
+        "conf": "64%",
         "accuracy": "78.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
@@ -295,9 +295,9 @@
         "dirClass": "text-red arrow-down",
         "low": "62.80",
         "high": "74.58",
-        "bp": "85%",
-        "bearp": "15%",
-        "conf": "99%",
+        "bp": "35%",
+        "bearp": "65%",
+        "conf": "65%",
         "accuracy": "84.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -326,9 +326,9 @@
         "dirClass": "text-red arrow-down",
         "low": "1.1271",
         "high": "1.1591",
-        "bp": "42%",
-        "bearp": "58%",
-        "conf": "58%",
+        "bp": "41%",
+        "bearp": "59%",
+        "conf": "59%",
         "accuracy": "62.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -338,9 +338,9 @@
         "dirClass": "text-red arrow-down",
         "low": "1.1107",
         "high": "1.1755",
-        "bp": "36%",
-        "bearp": "64%",
-        "conf": "64%",
+        "bp": "34%",
+        "bearp": "66%",
+        "conf": "66%",
         "accuracy": "66.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -357,9 +357,9 @@
         "dirClass": "text-green arrow-up",
         "low": "1.3161",
         "high": "1.3529",
-        "bp": "52%",
-        "bearp": "48%",
-        "conf": "52%",
+        "bp": "51%",
+        "bearp": "49%",
+        "conf": "51%",
         "accuracy": "62.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
@@ -369,9 +369,9 @@
         "dirClass": "text-red arrow-down",
         "low": "1.2908",
         "high": "1.3782",
-        "bp": "44%",
-        "bearp": "56%",
-        "conf": "56%",
+        "bp": "43%",
+        "bearp": "57%",
+        "conf": "57%",
         "accuracy": "58.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -381,19 +381,19 @@
   "gauges": {
     "macro_alignment_score": 42,
     "market_regime_score": 55,
-    "market_sentiment_score": 47,
+    "market_sentiment_score": 37,
     "institutional_flow_score": 22
   },
   "ml_memory": {
     "sentiment_penalty": -2
   },
   "ml_weights": {
-    "macro": 0.09841273747387445,
-    "sentiment": 0.1109732658550221,
-    "flow": 0.4953757842494801,
-    "regime": 0.09841273747387445,
-    "tech": 0.09841273747387445,
-    "cal": 0.09841273747387445
+    "macro": 0.09705448846665857,
+    "sentiment": 0.10188126620233724,
+    "flow": 0.5099007799310286,
+    "regime": 0.09705448846665857,
+    "tech": 0.09705448846665857,
+    "cal": 0.09705448846665857
   },
   "correlation_matrix": {
     "XAUUSD": {
@@ -489,7 +489,7 @@
   },
   "economic_calendar": [
     {
-      "time": "17:52",
+      "time": "17:53",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -498,7 +498,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "18:52",
+      "time": "18:53",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -507,7 +507,7 @@
       "prev": "215K"
     },
     {
-      "time": "20:52",
+      "time": "20:53",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -516,7 +516,7 @@
       "prev": "49.1"
     },
     {
-      "time": "21:52",
+      "time": "21:53",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
@@ -538,5 +538,12 @@
     "WTI OIL": 68.0,
     "EURUSD": 1.145,
     "GBPUSD": 1.336
+  },
+  "fundamental_correlations": {
+    "Gold vs Real Yields (XAUUSD vs US10Y)": 0.559808518800247,
+    "Yen vs Yield Spread (USDJPY vs US10Y)": -0.5904176215023436,
+    "Oil vs Commodity Index (WTI OIL vs DBC)": 0.9910652985921801,
+    "Equities vs Risk Volatility (DJI vs VIX)": -0.791154049826836,
+    "Dollar vs Gold Safe Haven (DXY vs XAUUSD)": -0.8190667314458285
   }
 }
