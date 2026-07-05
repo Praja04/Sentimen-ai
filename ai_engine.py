@@ -1062,8 +1062,8 @@ def run_technical_and_calendar():
         import random
         # 1. Technical Signals (Real from MT5)
         tech_signals = {}
-        for symbol in ["XAUUSD", "USDJPY", "WTI", "EURUSD", "GBPUSD"]:
-            ui_sym = "WTI OIL" if symbol == "WTI" else symbol
+        for symbol in ["XAUUSD", "USDJPY", "XTIUSD", "EURUSD", "GBPUSD"]:
+            ui_sym = "WTI OIL" if symbol == "XTIUSD" else symbol
             rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H4, 0, 100)
             if rates is not None and len(rates) >= 50:
                 closes = [r['close'] for r in rates]

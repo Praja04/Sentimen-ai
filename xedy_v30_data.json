@@ -31,7 +31,7 @@
     {
       "name": "LIQUIDITY (RRP)",
       "val": "EXPANDING",
-      "score": 50,
+      "score": 52,
       "dir": "up",
       "value": "EXPANDING"
     },
@@ -158,7 +158,7 @@
     {
       "time": "INVESTING",
       "title": "Tarif Trump, risalah rapat The Fed, pembelian Bitcoin oleh Rumble - hal-hal yang menggerakkan pasar",
-      "impact": "text-yellow"
+      "impact": "text-red"
     },
     {
       "time": "WSJ",
@@ -168,7 +168,7 @@
     {
       "time": "WSJ",
       "title": "Emas Comex, Perak Berakhir Lebih Rendah",
-      "impact": "text-green"
+      "impact": "text-yellow"
     },
     {
       "time": "KITCO",
@@ -202,23 +202,23 @@
     },
     {
       "time": "CNBC",
-      "title": "Ant Group yang berafiliasi dengan Alibaba meluncurkan robot humanoid dengan selusin kesepakatan dalam 18 bulan",
+      "title": "Piala Dunia membuat volume pasar prediksi melonjak ke rekor tertinggi",
       "impact": "text-green"
     },
     {
       "time": "CNBC",
-      "title": "Analis teknologi produktif Dan Ives keluar dari Wedbush untuk usaha baru",
+      "title": "Jangan buang kesempatan Anda untuk berbicara dengan AI Alexander Hamilton di museum keuangan baru di Boston",
       "impact": "text-yellow"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Minyak Memperpanjang Penurunan karena Semakin Banyak Barel Mengalir Melalui Selat Hormuz",
+      "title": "OPEC+ Akan Meratifikasi Rencana Kenaikan Kuota Minyak Saat Aliran Teluk Berlanjut",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Morgan Stanley Di Antara Bank yang Menantang Optimisme Dolar yang Tumbuh",
-      "impact": "text-green"
+      "title": "BOK Memperingatkan Risiko Dari ETF dengan Leverage Saham Tunggal: Yonhap",
+      "impact": "text-red"
     }
   ],
   "assets": [
@@ -233,8 +233,8 @@
         "dirClass": "text-green arrow-up",
         "low": "3919.93",
         "high": "4429.69",
-        "bp": "85%",
-        "bearp": "15%",
+        "bp": "70%",
+        "bearp": "30%",
         "conf": "99%",
         "accuracy": "58.0%",
         "action": "BUY DIP",
@@ -245,9 +245,9 @@
         "dirClass": "text-red arrow-down",
         "low": "3650.37",
         "high": "4699.25",
-        "bp": "39%",
-        "bearp": "61%",
-        "conf": "61%",
+        "bp": "35%",
+        "bearp": "65%",
+        "conf": "65%",
         "accuracy": "82.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -276,10 +276,10 @@
         "dirClass": "text-green arrow-up",
         "low": "157.344",
         "high": "165.290",
-        "bp": "58%",
-        "bearp": "42%",
-        "conf": "58%",
-        "accuracy": "74.0%",
+        "bp": "63%",
+        "bearp": "37%",
+        "conf": "63%",
+        "accuracy": "78.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
       }
@@ -307,10 +307,10 @@
         "dirClass": "text-red arrow-down",
         "low": "44.20",
         "high": "93.18",
-        "bp": "36%",
-        "bearp": "64%",
-        "conf": "64%",
-        "accuracy": "74.0%",
+        "bp": "31%",
+        "bearp": "69%",
+        "conf": "69%",
+        "accuracy": "82.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       }
@@ -338,9 +338,9 @@
         "dirClass": "text-red arrow-down",
         "low": "1.1107",
         "high": "1.1755",
-        "bp": "40%",
-        "bearp": "60%",
-        "conf": "60%",
+        "bp": "35%",
+        "bearp": "65%",
+        "conf": "65%",
         "accuracy": "66.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -369,9 +369,9 @@
         "dirClass": "text-red arrow-down",
         "low": "1.2908",
         "high": "1.3782",
-        "bp": "47%",
-        "bearp": "53%",
-        "conf": "53%",
+        "bp": "43%",
+        "bearp": "57%",
+        "conf": "57%",
         "accuracy": "58.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
@@ -381,82 +381,82 @@
   "gauges": {
     "macro_alignment_score": 42,
     "market_regime_score": 55,
-    "market_sentiment_score": 85,
+    "market_sentiment_score": 27,
     "institutional_flow_score": 22
   },
   "ml_memory": {
     "sentiment_penalty": -2
   },
   "ml_weights": {
-    "macro": 0.09545986382928263,
-    "sentiment": 0.1347268562865015,
-    "flow": 0.4282513814437691,
-    "regime": 0.12097617173878816,
-    "tech": 0.09960955496287038,
-    "cal": 0.12097617173878816
+    "macro": 0.09833512911100208,
+    "sentiment": 0.12658372032986534,
+    "flow": 0.45062208759568095,
+    "regime": 0.11306196692622482,
+    "tech": 0.09833512911100208,
+    "cal": 0.11306196692622482
   },
   "correlation_matrix": {
     "XAUUSD": {
       "XAUUSD": 1.0,
-      "USDJPY": -0.87,
-      "WTI OIL": 0.79,
-      "DXY": -0.92,
-      "US10Y": -0.08,
-      "DJI": -0.72,
-      "VIX": -0.41
+      "USDJPY": -0.7374791683922225,
+      "WTI OIL": 0.6634117206918698,
+      "DXY": -0.8190667314458285,
+      "US10Y": 0.559808518800247,
+      "DJI": -0.41106087169209954,
+      "VIX": 0.03736338293704456
     },
     "USDJPY": {
-      "XAUUSD": -0.87,
+      "XAUUSD": -0.7374791683922225,
       "USDJPY": 1.0,
-      "WTI OIL": -0.74,
-      "DXY": 0.88,
-      "US10Y": 0.1,
-      "DJI": 0.74,
-      "VIX": 0.21
+      "WTI OIL": -0.8880404941479199,
+      "DXY": 0.8775173393280344,
+      "US10Y": -0.5904176215023436,
+      "DJI": 0.7486115646423587,
+      "VIX": -0.4739991050880012
     },
     "WTI OIL": {
-      "XAUUSD": 0.79,
-      "USDJPY": -0.74,
-      "WTI OIL": 1.0,
-      "DXY": -0.81,
-      "US10Y": 0.23,
-      "DJI": -0.9,
-      "VIX": -0.08
+      "XAUUSD": 0.6634117206918698,
+      "USDJPY": -0.88804049414792,
+      "WTI OIL": 0.9999999999999999,
+      "DXY": -0.7834614305275426,
+      "US10Y": 0.7257473601424153,
+      "DJI": -0.9066032525256951,
+      "VIX": 0.6305838172396003
     },
     "DXY": {
-      "XAUUSD": -0.92,
-      "USDJPY": 0.88,
-      "WTI OIL": -0.81,
-      "DXY": 1.0,
-      "US10Y": 0.16,
-      "DJI": 0.77,
-      "VIX": 0.32
+      "XAUUSD": -0.8190667314458285,
+      "USDJPY": 0.8775173393280344,
+      "WTI OIL": -0.7834614305275426,
+      "DXY": 0.9999999999999999,
+      "US10Y": -0.5158189548099065,
+      "DJI": 0.581579475225682,
+      "VIX": -0.19033000870964822
     },
     "US10Y": {
-      "XAUUSD": -0.08,
-      "USDJPY": 0.1,
-      "WTI OIL": 0.23,
-      "DXY": 0.16,
+      "XAUUSD": 0.559808518800247,
+      "USDJPY": -0.5904176215023436,
+      "WTI OIL": 0.7257473601424151,
+      "DXY": -0.5158189548099065,
       "US10Y": 1.0,
-      "DJI": 0.03,
-      "VIX": 0.16
+      "DJI": -0.6142382067255948,
+      "VIX": 0.4252268267429029
     },
     "DJI": {
-      "XAUUSD": -0.72,
-      "USDJPY": 0.74,
-      "WTI OIL": -0.9,
-      "DXY": 0.77,
-      "US10Y": 0.03,
-      "DJI": 1.0,
-      "VIX": -0.13
+      "XAUUSD": -0.41106087169209954,
+      "USDJPY": 0.7486115646423588,
+      "WTI OIL": -0.9066032525256951,
+      "DXY": 0.581579475225682,
+      "US10Y": -0.6142382067255948,
+      "DJI": 0.9999999999999999,
+      "VIX": -0.791154049826836
     },
     "VIX": {
-      "XAUUSD": -0.41,
-      "USDJPY": 0.21,
-      "WTI OIL": -0.08,
-      "DXY": 0.32,
-      "US10Y": 0.16,
-      "DJI": -0.13,
+      "XAUUSD": 0.03736338293704456,
+      "USDJPY": -0.4739991050880012,
+      "WTI OIL": 0.6305838172396003,
+      "DXY": -0.19033000870964825,
+      "US10Y": 0.4252268267429029,
+      "DJI": -0.791154049826836,
       "VIX": 1.0
     }
   },
@@ -484,7 +484,7 @@
   },
   "economic_calendar": [
     {
-      "time": "17:43",
+      "time": "17:46",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -493,7 +493,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "18:43",
+      "time": "18:46",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -502,7 +502,7 @@
       "prev": "215K"
     },
     {
-      "time": "20:43",
+      "time": "20:46",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -511,7 +511,7 @@
       "prev": "49.1"
     },
     {
-      "time": "21:43",
+      "time": "21:46",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
