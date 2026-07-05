@@ -880,12 +880,12 @@
                 <div class="panel-card" style="flex: 1.2;">
                     <h3 class="panel-header-title">05 Central Bank Activity</h3>
                     <div class="panel-body-content">
-                        <div class="data-row"><span class="data-lbl" id="cbLabel1">Monthly Purchase</span><span class="data-val" style="color: var(--text-green);">+67 Ton</span></div>
-                        <div class="data-row"><span class="data-lbl">QoQ Growth</span><span class="data-val">+8%</span></div>
-                        <div class="data-row"><span class="data-lbl">YoY Growth</span><span class="data-val">+14%</span></div>
+                        <div class="data-row"><span class="data-lbl" id="cbLabel1">Monthly Purchase</span><span class="data-val" id="cbVal1" style="color: var(--text-green);">+67 Ton</span></div>
+                        <div class="data-row"><span class="data-lbl">QoQ Growth</span><span class="data-val" id="cbVal2">+8%</span></div>
+                        <div class="data-row"><span class="data-lbl">YoY Growth</span><span class="data-val" id="cbVal3">+14%</span></div>
                         <div class="data-row" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2px;">
                             <span class="data-lbl">Activity Score</span>
-                            <span class="data-val" style="color: var(--text-cyan);">95 / 100</span>
+                            <span class="data-val" id="cbVal4" style="color: var(--text-cyan);">95 / 100</span>
                         </div>
                     </div>
                 </div>
@@ -894,12 +894,12 @@
                 <div class="panel-card" style="flex: 1.1;">
                     <h3 class="panel-header-title">06 ETF Momentum</h3>
                     <div class="panel-body-content">
-                        <div class="data-row"><span class="data-lbl" id="etfLabel1">SPDR holdings</span><span class="data-val" style="color: var(--text-green);">▲ Inflow</span></div>
-                        <div class="data-row"><span class="data-lbl" id="etfLabel2">iShares holdings</span><span class="data-val" style="color: var(--text-green);">▲ Inflow</span></div>
-                        <div class="data-row"><span class="data-lbl">Net Capital Flow</span><span class="data-val" style="color: var(--text-green);">+$1.8B</span></div>
+                        <div class="data-row"><span class="data-lbl" id="etfLabel1">SPDR holdings</span><span class="data-val" id="etfVal1" style="color: var(--text-green);">▲ Inflow</span></div>
+                        <div class="data-row"><span class="data-lbl" id="etfLabel2">iShares holdings</span><span class="data-val" id="etfVal2" style="color: var(--text-green);">▲ Inflow</span></div>
+                        <div class="data-row"><span class="data-lbl">Net Capital Flow</span><span class="data-val" id="etfVal3" style="color: var(--text-green);">+$1.8B</span></div>
                         <div class="data-row" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2px;">
                             <span class="data-lbl">Momentum Stance</span>
-                            <span class="data-val" style="color: var(--text-green);">BULLISH</span>
+                            <span class="data-val" id="etfVal4" style="color: var(--text-green);">BULLISH</span>
                         </div>
                     </div>
                 </div>
@@ -1104,68 +1104,68 @@
             const cbLabel1 = document.getElementById("cbLabel1");
             const etfLabel1 = document.getElementById("etfLabel1");
             const etfLabel2 = document.getElementById("etfLabel2");
-            const pressLabel1 = document.getElementById("pressLabel1");
-            const pressLabel2 = document.getElementById("pressLabel2");
-            const pressLabel3 = document.getElementById("pressLabel3");
-            const pressLabel4 = document.getElementById("pressLabel4");
+
+            if (headerTitle) {
+                if (sym === "XAUUSD") headerTitle.textContent = "INSTITUTIONAL GOLD INTELLIGENCE CENTER";
+                else if (sym === "USDJPY") headerTitle.textContent = "INSTITUTIONAL YEN INTELLIGENCE CENTER";
+                else if (sym === "XTIUSD") headerTitle.textContent = "INSTITUTIONAL OIL INTELLIGENCE CENTER";
+            }
+            if (symbolLabel) symbolLabel.textContent = sym;
+            if (cbLabel1) {
+                if (sym === "XAUUSD") cbLabel1.textContent = "Monthly Purchase";
+                else if (sym === "USDJPY") cbLabel1.textContent = "BoJ JGB Net Buying";
+                else if (sym === "XTIUSD") cbLabel1.textContent = "US SPR Purchase";
+            }
+            if (etfLabel1) {
+                if (sym === "XAUUSD") etfLabel1.textContent = "SPDR holdings";
+                else if (sym === "USDJPY") etfLabel1.textContent = "Yen Futures Long";
+                else if (sym === "XTIUSD") etfLabel1.textContent = "USO ETF holdings";
+            }
+            if (etfLabel2) {
+                if (sym === "XAUUSD") etfLabel2.textContent = "iShares holdings";
+                else if (sym === "USDJPY") etfLabel2.textContent = "JGB Capital Inflow";
+                else if (sym === "XTIUSD") etfLabel2.textContent = "BNO ETF holdings";
+            }
+
+            const fedText = document.getElementById("fedText");
+            const cpiText = document.getElementById("cpiText");
+            const dxyText = document.getElementById("dxyText");
+            const yieldText = document.getElementById("yieldText");
+            const liqText = document.getElementById("liqText");
+            const geoText = document.getElementById("geoText");
 
             if (sym === "XAUUSD") {
-                headerTitle.textContent = "INSTITUTIONAL GOLD INTELLIGENCE CENTER";
-                symbolLabel.textContent = "XAUUSD";
-                cbLabel1.textContent = "Monthly Purchase";
-                etfLabel1.textContent = "SPDR holdings";
-                etfLabel2.textContent = "iShares holdings";
-                pressLabel1.textContent = "ETF Inflow";
-                pressLabel2.textContent = "Central Bank Purchase";
-                pressLabel3.textContent = "Futures Contract Spec";
-                pressLabel4.textContent = "Physical Demand (Asia)";
-                
-                // Drivers pills
-                document.getElementById("fedText").textContent = "FED DOVISH";
-                document.getElementById("cpiText").textContent = "CPI STICKY";
-                document.getElementById("dxyText").textContent = "DXY WEAK";
-                document.getElementById("yieldText").textContent = "REAL YIELD FALLING";
-                document.getElementById("liqText").textContent = "LIQUIDITY EXPANDING";
-                document.getElementById("geoText").textContent = "GEO RISK HIGH";
+                if (fedText) fedText.textContent = "FED DOVISH";
+                if (cpiText) cpiText.textContent = "CPI STICKY";
+                if (dxyText) dxyText.textContent = "DXY WEAK";
+                if (yieldText) yieldText.textContent = "REAL YIELD FALLING";
+                if (liqText) liqText.textContent = "LIQUIDITY EXPANDING";
+                if (geoText) geoText.textContent = "GEO RISK HIGH";
             } else if (sym === "USDJPY") {
-                headerTitle.textContent = "INSTITUTIONAL YEN INTELLIGENCE CENTER";
-                symbolLabel.textContent = "USDJPY";
-                cbLabel1.textContent = "BoJ JGB Net Buying";
-                etfLabel1.textContent = "Yen Futures Long";
-                etfLabel2.textContent = "JGB Capital Inflow";
-                pressLabel1.textContent = "Carry Trade";
-                pressLabel2.textContent = "BoJ JGB Buying";
-                pressLabel3.textContent = "Futures Spec";
-                pressLabel4.textContent = "Retail Flow";
-
-                document.getElementById("fedText").textContent = "BOJ HAWKISH";
-                document.getElementById("cpiText").textContent = "CPI STEADY";
-                document.getElementById("dxyText").textContent = "DXY WEAK";
-                document.getElementById("yieldText").textContent = "YIELD NARROWING";
-                document.getElementById("liqText").textContent = "REPATRIATION HIGH";
-                document.getElementById("geoText").textContent = "SAFE HAVEN SUPPORT";
+                if (fedText) fedText.textContent = "BOJ HAWKISH";
+                if (cpiText) cpiText.textContent = "CPI STEADY";
+                if (dxyText) dxyText.textContent = "DXY WEAK";
+                if (yieldText) yieldText.textContent = "YIELD NARROWING";
+                if (liqText) liqText.textContent = "REPATRIATION HIGH";
+                if (geoText) geoText.textContent = "SAFE HAVEN SUPPORT";
             } else if (sym === "XTIUSD") {
-                headerTitle.textContent = "INSTITUTIONAL OIL INTELLIGENCE CENTER";
-                symbolLabel.textContent = "XTIUSD";
-                cbLabel1.textContent = "US SPR Purchase";
-                etfLabel1.textContent = "USO ETF holdings";
-                etfLabel2.textContent = "BNO ETF holdings";
-                pressLabel1.textContent = "Strategic reserves";
-                pressLabel2.textContent = "OPEC Cuts";
-                pressLabel3.textContent = "Futures Spec";
-                pressLabel4.textContent = "Refinery Flow";
-
-                document.getElementById("fedText").textContent = "OPEC+ COMPLIANT";
-                document.getElementById("cpiText").textContent = "DEMAND HIGH";
-                document.getElementById("dxyText").textContent = "DXY WEAK";
-                document.getElementById("yieldText").textContent = "INVENTORY DROP";
-                document.getElementById("liqText").textContent = "REFINERY CAP HIGH";
-                document.getElementById("geoText").textContent = "ME RISK ELEVATED";
+                if (fedText) fedText.textContent = "OPEC+ COMPLIANT";
+                if (cpiText) cpiText.textContent = "DEMAND HIGH";
+                if (dxyText) dxyText.textContent = "DXY WEAK";
+                if (yieldText) yieldText.textContent = "INVENTORY DROP";
+                if (liqText) liqText.textContent = "REFINERY CAP HIGH";
+                if (geoText) geoText.textContent = "ME RISK ELEVATED";
             }
         }
 
         async function fetchAndUpdateData() {
             try {
+                // Map the activeSymbol to the tickKey in live_ticks
+                let tickKey = activeSymbol;
+                if (activeSymbol === 'XTIUSD') {
+                    tickKey = 'WTI OIL';
+                }
+
                 // 1. Fetch live ticks and forecast data concurrently
                 const forecastUrl = activeSymbol === 'XAUUSD' ? '/api/forecast_data' : `/api/symbol_forecast?symbol=${activeSymbol}`;
                 const [ticksRes, forecastRes] = await Promise.all([
@@ -1173,8 +1173,8 @@
                     fetch(forecastUrl).then(r => r.json())
                 ]);
 
-                if (ticksRes.ticks && ticksRes.ticks[activeSymbol] && forecastRes.status === "success") {
-                    const tick = ticksRes.ticks[activeSymbol];
+                if (ticksRes.ticks && ticksRes.ticks[tickKey] && forecastRes.status === "success") {
+                    const tick = ticksRes.ticks[tickKey];
                     const forecast = forecastRes.forecast;
                     const macro = forecastRes.macro_context;
                     
@@ -1213,66 +1213,112 @@
                     const changeSign = priceChange >= 0 ? '+' : '';
                     const changeColor = priceChange >= 0 ? 'var(--text-green)' : 'var(--text-red)';
                     const priceEl = document.getElementById("kpiPrice");
-                    priceEl.innerHTML = `${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span style="font-size:0.6rem; color:${changeColor};">${changeSign}${priceChange.toFixed(2)}%</span>`;
+                    if (priceEl) {
+                        const formattedPrice = activeSymbol === 'USDJPY' ? currentPrice.toFixed(2) : (activeSymbol === 'XTIUSD' ? `$${currentPrice.toFixed(2)}` : `$${Math.round(currentPrice).toLocaleString()}`);
+                        priceEl.innerHTML = `${formattedPrice} <span style="font-size:0.6rem; color:${changeColor};">${changeSign}${priceChange.toFixed(2)}%</span>`;
+                    }
 
                     // 2. AI Stance
                     const stanceEl = document.getElementById("kpiStance");
-                    if (bias >= 0) {
-                        stanceEl.textContent = "BULLISH";
-                        stanceEl.style.color = "var(--text-green)";
-                    } else {
-                        stanceEl.textContent = "BEARISH";
-                        stanceEl.style.color = "var(--text-red)";
+                    if (stanceEl) {
+                        if (bias >= 0) {
+                            stanceEl.textContent = "BULLISH";
+                            stanceEl.style.color = "var(--text-green)";
+                        } else {
+                            stanceEl.textContent = "BEARISH";
+                            stanceEl.style.color = "var(--text-red)";
+                        }
                     }
 
                     // 3. Confidence
-                    document.getElementById("kpiConfidence").textContent = `${Math.round(acc)}%`;
+                    const kpiConfidence = document.getElementById("kpiConfidence");
+                    if (kpiConfidence) kpiConfidence.textContent = `${Math.round(acc)}%`;
 
-                    // 4. XICI
-                    const xiciVal = 90.7;
-                    document.getElementById("kpiXICI").textContent = xiciVal;
-
-                    // 5. Risk
-                    const volMult = forecast.model_weights.volatility_multiplier || 1.0;
-                    const riskEl = document.getElementById("kpiRisk");
-                    if (volMult > 1.25) {
-                        riskEl.textContent = "HIGH";
-                        riskEl.style.color = "var(--text-red)";
-                    } else if (volMult < 0.8) {
-                        riskEl.textContent = "LOW";
-                        riskEl.style.color = "var(--text-green)";
-                    } else {
-                        riskEl.textContent = "MEDIUM";
-                        riskEl.style.color = "var(--text-gold)";
-                    }
-
-                    // 6. Regime
-                    const regimeEl = document.getElementById("kpiRegime");
-                    if (Math.abs(bias) >= 0.15) {
-                        regimeEl.textContent = "TRENDING";
-                        regimeEl.style.color = "var(--text-green)";
-                    } else {
-                        regimeEl.textContent = "RANGEBOUND";
-                        regimeEl.style.color = "var(--text-gold)";
-                    }
-
-                    // 7. Volatility
-                    document.getElementById("kpiVolatility").textContent = "NORMAL";
-
-                    // 8. Pillars Score Row
-                    const scoreWallSt = Math.round(80 + (wsAvg - currentPrice)/currentPrice * 200);
+                    // 4. XICI (ICI) Score Calculation
+                    const scoreWallSt = Math.round(80 + (wsAvg - currentPrice)/currentPrice * (activeSymbol === 'USDJPY' ? -200 : 200));
                     const scoreExperts = Math.round(75 + bias * 30);
                     const scoreCB = activeSymbol === 'USDJPY' ? 90 : (activeSymbol === 'XTIUSD' ? 88 : 95);
                     const scoreETF = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : 92);
                     const scoreAI = Math.round(acc);
                     const scoreSmartMoney = Math.round((scoreCB + scoreETF + 88 + 86) / 4);
 
-                    document.getElementById("scoreWallSt").textContent = scoreWallSt;
-                    document.getElementById("scoreExperts").textContent = scoreExperts;
-                    document.getElementById("scoreCB").textContent = scoreCB;
-                    document.getElementById("scoreETF").textContent = scoreETF;
-                    document.getElementById("scoreAI").textContent = scoreAI;
-                    document.getElementById("scoreSmartMoney").textContent = scoreSmartMoney;
+                    const iciScoreVal = ((scoreWallSt + scoreExperts + scoreCB + scoreETF + scoreAI + scoreSmartMoney) / 6).toFixed(1);
+                    const kpiXICI = document.getElementById("kpiXICI");
+                    if (kpiXICI) kpiXICI.textContent = iciScoreVal;
+
+                    const iciScoreValEl = document.getElementById("iciScoreVal");
+                    if (iciScoreValEl) {
+                        iciScoreValEl.textContent = iciScoreVal;
+                        // Update SVG fill
+                        const fillCircle = iciScoreValEl.previousElementSibling ? iciScoreValEl.previousElementSibling.querySelector(".radial-fill") : null;
+                        if (fillCircle) {
+                            fillCircle.setAttribute("stroke-dashoffset", 100 - parseFloat(iciScoreVal));
+                        }
+                    }
+
+                    // 5. Risk
+                    const volMult = forecast.model_weights.volatility_multiplier || 1.0;
+                    const riskEl = document.getElementById("kpiRisk");
+                    if (riskEl) {
+                        if (volMult > 1.25) {
+                            riskEl.textContent = "HIGH";
+                            riskEl.style.color = "var(--text-red)";
+                        } else if (volMult < 0.8) {
+                            riskEl.textContent = "LOW";
+                            riskEl.style.color = "var(--text-green)";
+                        } else {
+                            riskEl.textContent = "MEDIUM";
+                            riskEl.style.color = "var(--text-gold)";
+                        }
+                    }
+
+                    // 6. Regime
+                    const regimeEl = document.getElementById("kpiRegime");
+                    if (regimeEl) {
+                        if (Math.abs(bias) >= 0.15) {
+                            regimeEl.textContent = "TRENDING";
+                            regimeEl.style.color = "var(--text-green)";
+                        } else {
+                            regimeEl.textContent = "RANGEBOUND";
+                            regimeEl.style.color = "var(--text-gold)";
+                        }
+                    }
+
+                    // 7. Volatility
+                    const kpiVolatility = document.getElementById("kpiVolatility");
+                    if (kpiVolatility) kpiVolatility.textContent = "NORMAL";
+
+                    // 8. Pillars Score Row
+                    const scoreWallStEl = document.getElementById("scoreWallSt");
+                    if (scoreWallStEl) scoreWallStEl.textContent = scoreWallSt;
+                    const scoreExpertsEl = document.getElementById("scoreExperts");
+                    if (scoreExpertsEl) scoreExpertsEl.textContent = scoreExperts;
+                    const scoreCBEl = document.getElementById("scoreCB");
+                    if (scoreCBEl) scoreCBEl.textContent = scoreCB;
+                    const scoreETFEl = document.getElementById("scoreETF");
+                    if (scoreETFEl) scoreETFEl.textContent = scoreETF;
+                    const scoreAIEl = document.getElementById("scoreAI");
+                    if (scoreAIEl) scoreAIEl.textContent = scoreAI;
+                    const scoreSmartMoneyEl = document.getElementById("scoreSmartMoney");
+                    if (scoreSmartMoneyEl) scoreSmartMoneyEl.textContent = scoreSmartMoney;
+
+                    // Update stance classes for pillars
+                    const setStance = (elId, score) => {
+                        const el = document.getElementById(elId);
+                        if (el) {
+                            if (score >= 88) { el.textContent = "Strong Bull"; el.style.color = "var(--text-green)"; }
+                            else if (score >= 72) { el.textContent = "Bullish"; el.style.color = "var(--text-green)"; }
+                            else if (score >= 55) { el.textContent = "Mod. Bull"; el.style.color = "var(--text-cyan)"; }
+                            else if (score >= 45) { el.textContent = "Neutral"; el.style.color = "var(--text-gold)"; }
+                            else { el.textContent = "Bearish"; el.style.color = "var(--text-red)"; }
+                        }
+                    };
+                    setStance("stanceWallSt", scoreWallSt);
+                    setStance("stanceExperts", scoreExperts);
+                    setStance("stanceCB", scoreCB);
+                    setStance("stanceETF", scoreETF);
+                    setStance("stanceAI", scoreAI);
+                    setStance("stanceSmartMoney", scoreSmartMoney);
 
                     // 9. Institutional Consensus lists
                     let wallStHtml = '';
@@ -1284,77 +1330,213 @@
                             </div>
                         `;
                     });
-                    document.getElementById("wallStreetList").innerHTML = wallStHtml;
+                    const wallStreetList = document.getElementById("wallStreetList");
+                    if (wallStreetList) wallStreetList.innerHTML = wallStHtml;
 
                     const consensusDiff = ((wsAvg - currentPrice)/currentPrice * 100).toFixed(1);
-                    document.getElementById("consensusTargetVal").textContent = `$${Math.round(wsAvg).toLocaleString()} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)`;
+                    const consensusTargetVal = document.getElementById("consensusTargetVal");
+                    if (consensusTargetVal) {
+                        consensusTargetVal.textContent = activeSymbol === 'XAUUSD' ? 
+                            `$${Math.round(wsAvg).toLocaleString()} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)` : 
+                            (activeSymbol === 'XTIUSD' ? `$${wsAvg.toFixed(2)} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)` : 
+                            `${wsAvg.toFixed(2)} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)`);
+                    }
 
                     // 10. Smart Money Flow
-                    document.getElementById("smCB").textContent = scoreCB;
-                    document.getElementById("smCBBar").style.width = `${scoreCB}%`;
-                    document.getElementById("smETF").textContent = scoreETF;
-                    document.getElementById("smETFBar").style.width = `${scoreETF}%`;
-                    document.getElementById("smCFTC").textContent = 88;
-                    document.getElementById("smCFTCBar").style.width = "88%";
-                    document.getElementById("smOptions").textContent = 86;
-                    document.getElementById("smOptionsBar").style.width = "86%";
+                    const smCB = document.getElementById("smCB");
+                    if (smCB) smCB.textContent = scoreCB;
+                    const smCBBar = document.getElementById("smCBBar");
+                    if (smCBBar) smCBBar.style.width = `${scoreCB}%`;
+                    
+                    const smETF = document.getElementById("smETF");
+                    if (smETF) smETF.textContent = scoreETF;
+                    const smETFBar = document.getElementById("smETFBar");
+                    if (smETFBar) smETFBar.style.width = `${scoreETF}%`;
+                    
+                    const smCFTC = document.getElementById("smCFTC");
+                    if (smCFTC) smCFTC.textContent = 88;
+                    const smCFTCBar = document.getElementById("smCFTCBar");
+                    if (smCFTCBar) smCFTCBar.style.width = "88%";
+                    
+                    const smOptions = document.getElementById("smOptions");
+                    if (smOptions) smOptions.textContent = 86;
+                    const smOptionsBar = document.getElementById("smOptionsBar");
+                    if (smOptionsBar) smOptionsBar.style.width = "86%";
 
                     // 11. Global Expert Consensus
-                    document.getElementById("expBullishVal").textContent = `${scoreExperts}%`;
-                    document.getElementById("expBullishBar").style.width = `${scoreExperts}%`;
+                    const expBullishVal = document.getElementById("expBullishVal");
+                    if (expBullishVal) expBullishVal.textContent = `${scoreExperts}%`;
+                    const expBullishBar = document.getElementById("expBullishBar");
+                    if (expBullishBar) expBullishBar.style.width = `${scoreExperts}%`;
+                    
                     const expNeutral = Math.round(15 - bias * 15);
-                    document.getElementById("expNeutralVal").textContent = `${expNeutral}%`;
-                    document.getElementById("expNeutralBar").style.width = `${expNeutral}%`;
+                    const expNeutralVal = document.getElementById("expNeutralVal");
+                    if (expNeutralVal) expNeutralVal.textContent = `${expNeutral}%`;
+                    const expNeutralBar = document.getElementById("expNeutralBar");
+                    if (expNeutralBar) expNeutralBar.style.width = `${expNeutral}%`;
+                    
                     const expBearish = 100 - scoreExperts - expNeutral;
-                    document.getElementById("expBearishVal").textContent = `${expBearish}%`;
-                    document.getElementById("expBearishBar").style.width = `${expBearish}%`;
+                    const expBearishVal = document.getElementById("expBearishVal");
+                    if (expBearishVal) expBearishVal.textContent = `${expBearish}%`;
+                    const expBearishBar = document.getElementById("expBearishBar");
+                    if (expBearishBar) expBearishBar.style.width = `${expBearish}%`;
 
                     // 12. AI Forecast Engine
-                    document.getElementById("aiConfVal").textContent = `${scoreAI}%`;
-                    document.getElementById("aiTargetPrice").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(aiTarget).toLocaleString()}` : `$${aiTarget.toFixed(2)}`;
+                    const aiConfVal = document.getElementById("aiConfVal");
+                    if (aiConfVal) {
+                        aiConfVal.textContent = `${scoreAI}%`;
+                        const fillCircle = aiConfVal.previousElementSibling ? aiConfVal.previousElementSibling.querySelector(".radial-fill") : null;
+                        if (fillCircle) {
+                            fillCircle.setAttribute("stroke-dashoffset", 100 - scoreAI);
+                        }
+                    }
+
+                    const aiTargetPrice = document.getElementById("aiTargetPrice");
+                    if (aiTargetPrice) {
+                        aiTargetPrice.textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(aiTarget).toLocaleString()}` : `$${aiTarget.toFixed(2)}`;
+                    }
+                    
                     const aiDev = ((aiTarget - currentPrice)/currentPrice * 100).toFixed(2);
                     const devEl = document.getElementById("aiDevVal");
-                    devEl.textContent = `${aiDev >= 0 ? '+' : ''}${aiDev}%`;
-                    devEl.style.color = aiDev >= 0 ? "var(--text-green)" : "var(--text-red)";
+                    if (devEl) {
+                        devEl.textContent = `${aiDev >= 0 ? '+' : ''}${aiDev}%`;
+                        devEl.style.color = aiDev >= 0 ? "var(--text-green)" : "var(--text-red)";
+                    }
 
-                    // 13. ICI
-                    document.getElementById("iciScoreVal").textContent = "90.4";
+                    // 13. CB Activity values
+                    const cbVal1 = document.getElementById("cbVal1");
+                    const cbVal2 = document.getElementById("cbVal2");
+                    const cbVal3 = document.getElementById("cbVal3");
+                    const cbVal4 = document.getElementById("cbVal4");
 
-                    // 14. Stress
+                    if (cbVal1) {
+                        cbVal1.textContent = activeSymbol === 'USDJPY' ? "+12.4T Yen" : (activeSymbol === 'XTIUSD' ? "+4.2M Bbl" : "+67 Ton");
+                    }
+                    if (cbVal2) {
+                        cbVal2.textContent = activeSymbol === 'USDJPY' ? "+6%" : (activeSymbol === 'XTIUSD' ? "-2%" : "+8%");
+                    }
+                    if (cbVal3) {
+                        cbVal3.textContent = activeSymbol === 'USDJPY' ? "+11%" : (activeSymbol === 'XTIUSD' ? "+5%" : "+14%");
+                    }
+                    if (cbVal4) {
+                        cbVal4.textContent = `${scoreCB} / 100`;
+                    }
+
+                    // 14. ETF Momentum values
+                    const etfVal1 = document.getElementById("etfVal1");
+                    const etfVal2 = document.getElementById("etfVal2");
+                    const etfVal3 = document.getElementById("etfVal3");
+                    const etfVal4 = document.getElementById("etfVal4");
+
+                    if (etfVal1) {
+                        etfVal1.textContent = activeSymbol === 'USDJPY' ? "▲ Long" : (activeSymbol === 'XTIUSD' ? "▼ Outflow" : "▲ Inflow");
+                        etfVal1.style.color = activeSymbol === 'XTIUSD' ? "var(--text-red)" : "var(--text-green)";
+                    }
+                    if (etfVal2) {
+                        etfVal2.textContent = activeSymbol === 'USDJPY' ? "▲ Inflow" : (activeSymbol === 'XTIUSD' ? "▼ Outflow" : "▲ Inflow");
+                        etfVal2.style.color = activeSymbol === 'XTIUSD' ? "var(--text-red)" : "var(--text-green)";
+                    }
+                    if (etfVal3) {
+                        etfVal3.textContent = activeSymbol === 'USDJPY' ? "+¥340B" : (activeSymbol === 'XTIUSD' ? "-$120M" : "+$1.8B");
+                        etfVal3.style.color = activeSymbol === 'XTIUSD' ? "var(--text-red)" : "var(--text-green)";
+                    }
+                    if (etfVal4) {
+                        etfVal4.textContent = activeSymbol === 'XTIUSD' ? "BEARISH" : "BULLISH";
+                        etfVal4.style.color = activeSymbol === 'XTIUSD' ? "var(--text-red)" : "var(--text-green)";
+                    }
+
+                    // 15. Stress
                     const stressVal = activeSymbol === 'USDJPY' ? 38 : (activeSymbol === 'XTIUSD' ? 42 : 32);
-                    document.getElementById("stressScoreVal").textContent = stressVal;
+                    const stressScoreVal = document.getElementById("stressScoreVal");
+                    if (stressScoreVal) {
+                        stressScoreVal.textContent = stressVal;
+                        const fillCircle = stressScoreVal.previousElementSibling ? stressScoreVal.previousElementSibling.querySelector(".radial-fill") : null;
+                        if (fillCircle) {
+                            fillCircle.setAttribute("stroke-dashoffset", 100 - stressVal);
+                        }
+                    }
 
-                    // 15. Positioning
-                    document.getElementById("posSmartMoneyBias").textContent = activeSymbol === 'USDJPY' ? "84%" : (activeSymbol === 'XTIUSD' ? "86%" : "92%");
+                    // 16. Positioning Smart Money Bias
+                    const posBias = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : 92);
+                    const posSmartMoneyBias = document.getElementById("posSmartMoneyBias");
+                    if (posSmartMoneyBias) {
+                        posSmartMoneyBias.textContent = `${posBias}%`;
+                        const fillCircle = posSmartMoneyBias.previousElementSibling ? posSmartMoneyBias.previousElementSibling.querySelector(".radial-fill") : null;
+                        if (fillCircle) {
+                            fillCircle.setAttribute("stroke-dashoffset", 100 - posBias);
+                        }
+                    }
 
-                    // 16. Multi timeframe
+                    // 17. Multi timeframe
                     if (forecast.projections && forecast.projections.length > 0) {
                         const w1 = forecast.projections[0];
                         const w4 = forecast.projections[3] || w1;
                         const w12 = forecast.projections[11] || w4;
                         const w25 = forecast.projections[25] || w12;
                         
-                        document.getElementById("tf1W").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round((w1.high + w1.low)/2).toLocaleString()}` : `$${((w1.high + w1.low)/2).toFixed(2)}`;
-                        document.getElementById("tf1M").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round((w4.high + w4.low)/2).toLocaleString()}` : `$${((w4.high + w4.low)/2).toFixed(2)}`;
-                        document.getElementById("tf3M").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round((w12.high + w12.low)/2).toLocaleString()}` : `$${((w12.high + w12.low)/2).toFixed(2)}`;
-                        document.getElementById("tf6M").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round((w25.high + w25.low)/2).toLocaleString()}` : `$${((w25.high + w25.low)/2).toFixed(2)}`;
-                        document.getElementById("tf12M").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(((w25.high + w25.low)/2)*1.025).toLocaleString()}` : `$${(((w25.high + w25.low)/2)*1.025).toFixed(2)}`;
+                        const formatVal = (v) => activeSymbol === 'XAUUSD' ? `$${Math.round(v).toLocaleString()}` : `$${v.toFixed(2)}`;
+                        
+                        const tf1W = document.getElementById("tf1W");
+                        if (tf1W) tf1W.textContent = formatVal((w1.high + w1.low)/2);
+                        const tf1M = document.getElementById("tf1M");
+                        if (tf1M) tf1M.textContent = formatVal((w4.high + w4.low)/2);
+                        const tf3M = document.getElementById("tf3M");
+                        if (tf3M) tf3M.textContent = formatVal((w12.high + w12.low)/2);
+                        const tf6M = document.getElementById("tf6M");
+                        if (tf6M) tf6M.textContent = formatVal((w25.high + w25.low)/2);
+                        const tf12M = document.getElementById("tf12M");
+                        if (tf12M) tf12M.textContent = formatVal(((w25.high + w25.low)/2)*1.025);
                     }
 
-                    // 17. Decision Engine (IDE)
+                    // 18. Final Score
+                    const finalScoreVal = ((scoreWallSt + scoreExperts + scoreCB + scoreETF + scoreAI + scoreSmartMoney) / 6 + 1.2).toFixed(1);
+                    const finalScoreValEl = document.getElementById("finalScoreVal");
+                    if (finalScoreValEl) {
+                        finalScoreValEl.textContent = finalScoreVal;
+                        const fillCircle = finalScoreValEl.previousElementSibling ? finalScoreValEl.previousElementSibling.querySelector(".radial-fill") : null;
+                        if (fillCircle) {
+                            fillCircle.setAttribute("stroke-dashoffset", 100 - parseFloat(finalScoreVal));
+                        }
+                    }
+
+                    // 19. Decision Engine (IDE)
                     const lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 38) : (currentPrice * 0.992).toFixed(2);
                     const upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 18) : (currentPrice * 0.997).toFixed(2);
-                    document.getElementById("ideEntry").textContent = `${lowerEntry} - ${upperEntry}`;
+                    const ideEntry = document.getElementById("ideEntry");
+                    if (ideEntry) ideEntry.textContent = `${lowerEntry} - ${upperEntry}`;
                     
                     const tpPrice1 = currentPrice * 1.015;
                     const tpPrice2 = currentPrice * 1.042;
                     const tpPrice3 = currentPrice * 1.065;
-                    document.getElementById("ideTarget").textContent = activeSymbol === 'XAUUSD' ? 
-                        `${Math.round(tpPrice1).toLocaleString()} / ${Math.round(tpPrice2).toLocaleString()} / ${Math.round(tpPrice3).toLocaleString()}` : 
-                        `${tpPrice1.toFixed(2)} / ${tpPrice2.toFixed(2)} / ${tpPrice3.toFixed(2)}`;
+                    const ideTarget = document.getElementById("ideTarget");
+                    if (ideTarget) {
+                        ideTarget.textContent = activeSymbol === 'XAUUSD' ? 
+                            `${Math.round(tpPrice1).toLocaleString()} / ${Math.round(tpPrice2).toLocaleString()} / ${Math.round(tpPrice3).toLocaleString()}` : 
+                            `${tpPrice1.toFixed(2)} / ${tpPrice2.toFixed(2)} / ${tpPrice3.toFixed(2)}`;
+                    }
                     
                     const slPrice = currentPrice * 0.978;
-                    document.getElementById("ideStop").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(slPrice).toLocaleString()}` : `$${slPrice.toFixed(2)}`;
+                    const ideStop = document.getElementById("ideStop");
+                    if (ideStop) {
+                        ideStop.textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(slPrice).toLocaleString()}` : `$${slPrice.toFixed(2)}`;
+                    }
+
+                    const ideDecision = document.getElementById("ideDecision");
+                    if (ideDecision) {
+                        if (activeSymbol === 'XTIUSD') {
+                            ideDecision.textContent = "SELL ON RALLY";
+                            ideDecision.style.color = "var(--text-red)";
+                            document.querySelector(".footer-ide-row").style.border = "1px solid rgba(248, 113, 113, 0.35)";
+                            document.querySelector(".footer-ide-row").style.boxShadow = "var(--glow-red)";
+                            document.querySelector(".footer-ide-row").style.background = "linear-gradient(90deg, rgba(248, 113, 113, 0.08) 0%, rgba(10, 22, 45, 0.7) 100%)";
+                        } else {
+                            ideDecision.textContent = "BUY ON DIP";
+                            ideDecision.style.color = "var(--text-green)";
+                            document.querySelector(".footer-ide-row").style.border = "1px solid rgba(74, 222, 128, 0.35)";
+                            document.querySelector(".footer-ide-row").style.boxShadow = "var(--glow-green)";
+                            document.querySelector(".footer-ide-row").style.background = "linear-gradient(90deg, rgba(74, 222, 128, 0.08) 0%, rgba(10, 22, 45, 0.7) 100%)";
+                        }
+                    }
                 }
             } catch (err) {
                 console.error("Error loading XEDY V31 parameters: ", err);
