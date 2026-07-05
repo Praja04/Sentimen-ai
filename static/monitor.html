@@ -1600,15 +1600,33 @@
                     if (finalAIRisk) finalAIRisk.textContent = `${scoreAI} / ${Math.round(100 - stressVal)}`;
 
                     // 19. Decision Engine (IDE)
+                    const shouldSell = bias < 0;
                     const entryDecimals = (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD') ? 4 : (activeSymbol === 'USDJPY' ? 3 : 2);
-                    const lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 38).toLocaleString('en-US') : (currentPrice * 0.992).toFixed(entryDecimals);
-                    const upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 18).toLocaleString('en-US') : (currentPrice * 0.997).toFixed(entryDecimals);
+                    
+                    let lowerEntry, upperEntry;
+                    if (shouldSell) {
+                        lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice + 18).toLocaleString('en-US') : (currentPrice * 1.003).toFixed(entryDecimals);
+                        upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice + 38).toLocaleString('en-US') : (currentPrice * 1.008).toFixed(entryDecimals);
+                    } else {
+                        lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 38).toLocaleString('en-US') : (currentPrice * 0.992).toFixed(entryDecimals);
+                        upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 18).toLocaleString('en-US') : (currentPrice * 0.997).toFixed(entryDecimals);
+                    }
                     const ideEntry = document.getElementById("ideEntry");
                     if (ideEntry) ideEntry.textContent = `${lowerEntry} - ${upperEntry}`;
                     
-                    const tpPrice1 = currentPrice * 1.015;
-                    const tpPrice2 = currentPrice * 1.042;
-                    const tpPrice3 = currentPrice * 1.065;
+                    let tpPrice1, tpPrice2, tpPrice3, slPrice;
+                    if (shouldSell) {
+                        tpPrice1 = currentPrice * 0.985;
+                        tpPrice2 = currentPrice * 0.958;
+                        tpPrice3 = currentPrice * 0.935;
+                        slPrice = currentPrice * 1.022;
+                    } else {
+                        tpPrice1 = currentPrice * 1.015;
+                        tpPrice2 = currentPrice * 1.042;
+                        tpPrice3 = currentPrice * 1.065;
+                        slPrice = currentPrice * 0.978;
+                    }
+
                     const ideTarget = document.getElementById("ideTarget");
                     if (ideTarget) {
                         if (activeSymbol === 'XAUUSD') {
@@ -1622,7 +1640,6 @@
                         }
                     }
                     
-                    const slPrice = currentPrice * 0.978;
                     const ideStop = document.getElementById("ideStop");
                     if (ideStop) {
                         if (activeSymbol === 'XAUUSD') {
@@ -1636,9 +1653,17 @@
                         }
                     }
 
+                    // Update Risk Reward and Win Prob dynamically
+                    const reward = Math.abs(currentPrice - tpPrice2);
+                    const risk = Math.abs(currentPrice - slPrice);
+                    const rrRatio = risk > 0 ? (reward / risk).toFixed(1) : "3.8";
+                    const ideRR = document.getElementById("ideRR");
+                    if (ideRR) ideRR.textContent = `1 : ${rrRatio}`;
+                    const ideWinProb = document.getElementById("ideWinProb");
+                    if (ideWinProb) ideWinProb.textContent = `${Math.round(acc)}%`;
+
                     const ideDecision = document.getElementById("ideDecision");
                     if (ideDecision) {
-                        const shouldSell = bias < 0;
                         if (shouldSell) {
                             ideDecision.textContent = "SELL ON RALLY";
                             ideDecision.style.color = "var(--text-red)";
