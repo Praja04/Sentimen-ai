@@ -3,77 +3,77 @@
     {
       "name": "FED POLICY",
       "val": "VERY DOVISH",
-      "score": 69,
+      "score": 54,
       "dir": "up",
       "value": "HAWKISH"
     },
     {
       "name": "REAL YIELD",
       "val": "NEGATIVE",
-      "score": 41,
+      "score": 50,
       "dir": "up",
       "value": "RISING"
     },
     {
       "name": "DXY INDEX",
       "val": "BULLISH",
-      "score": 59,
+      "score": 52,
       "dir": "up",
       "value": "BULLISH"
     },
     {
       "name": "TREASURY YIELD",
       "val": "FALLING",
-      "score": 47,
-      "dir": "down",
-      "value": "FALLING"
+      "score": 54,
+      "dir": "up",
+      "value": "RISING"
     },
     {
       "name": "LIQUIDITY (RRP)",
       "val": "EXPANDING",
-      "score": 1,
-      "dir": "down",
-      "value": "CONTRACTING"
+      "score": 50,
+      "dir": "up",
+      "value": "EXPANDING"
     },
     {
       "name": "INFLATION (PCE)",
       "val": "STICKY",
-      "score": 1,
+      "score": 2,
       "dir": "down",
       "value": "EASING"
     },
     {
       "name": "EMPLOYMENT",
       "val": "WEAKENING",
-      "score": 82,
+      "score": 66,
       "dir": "up",
       "value": "STRONG"
     },
     {
       "name": "GDP GROWTH",
       "val": "SLOWING",
-      "score": 45,
-      "dir": "down",
-      "value": "SLOWING"
+      "score": 53,
+      "dir": "up",
+      "value": "GROWING"
     },
     {
       "name": "CAPITAL FLOW",
       "val": "SAFE HAVEN",
-      "score": 49,
-      "dir": "down",
-      "value": "RISK-OFF"
+      "score": 51,
+      "dir": "up",
+      "value": "RISK-ON"
     },
     {
       "name": "CENTRAL BANK",
       "val": "HEAVY BUYING",
-      "score": 12,
+      "score": 3,
       "dir": "down",
       "value": "EASING"
     },
     {
       "name": "PHYSICAL GOLD",
       "val": "SUPPLY DEFICIT",
-      "score": 21,
+      "score": 34,
       "dir": "down",
       "value": "BEARISH"
     },
@@ -87,7 +87,7 @@
     {
       "name": "CORRELATION",
       "val": "RISK OFF",
-      "score": 87,
+      "score": 81,
       "dir": "down",
       "value": "STRONG NEG"
     }
@@ -122,32 +122,32 @@
   "news_feed": [
     {
       "time": "CNBC",
-      "title": "Ant Group yang berafiliasi dengan Alibaba meluncurkan robot humanoid dengan selusin kesepakatan dalam 18 bulan",
+      "title": "Piala Dunia membuat volume pasar prediksi melonjak ke rekor tertinggi",
       "impact": "text-green"
     },
     {
       "time": "CNBC",
-      "title": "Analis teknologi produktif Dan Ives keluar dari Wedbush untuk usaha baru",
+      "title": "Jangan buang kesempatan Anda untuk berbicara dengan AI Alexander Hamilton di museum keuangan baru di Boston",
       "impact": "text-yellow"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Minyak Memperpanjang Penurunan karena Semakin Banyak Barel Mengalir Melalui Selat Hormuz",
+      "title": "OPEC+ Akan Meratifikasi Rencana Kenaikan Kuota Minyak Saat Aliran Teluk Berlanjut",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Morgan Stanley Di Antara Bank yang Menantang Optimisme Dolar yang Tumbuh",
-      "impact": "text-green"
+      "title": "BOK Memperingatkan Risiko Dari ETF dengan Leverage Saham Tunggal: Yonhap",
+      "impact": "text-red"
     },
     {
       "time": "FOREXLIVE",
-      "title": "Bagaimana distribusi perkiraan NFP AS?",
-      "impact": "text-yellow"
+      "title": "Bailey dari Bank of England mengatakan inflasi akan mencapai target jika bukan karena perang",
+      "impact": "text-red"
     },
     {
       "time": "FOREXLIVE",
-      "title": "Pembekuan Aset di Thailand Menjadikan Risiko Penyelesaian Valuta Asing sebagai Fokus",
+      "title": "Konsumen AS sedang \"stres\" namun pengeluaran untuk membeli kucing \"berkobar\" menurut General Mills",
       "impact": "text-red"
     },
     {
@@ -172,32 +172,32 @@
     },
     {
       "time": "KITCO",
-      "title": "Emas dan perak naik karena risiko NFP membatasi dolar dan imbal hasil dalam penawaran beli - Laporan PM Kitco",
-      "impact": "text-red"
+      "title": "Emas dan perak mempertahankan kenaikan pasca NFP karena taruhan kenaikan dihilangkan - Laporan Kitco PM",
+      "impact": "text-green"
     },
     {
       "time": "KITCO",
-      "title": "Ini adalah faktor-faktor kunci yang dapat memulai kembali kenaikan harga emas tahun ini, atau mendorong harga lebih rendah lagi – World Gold Council H2 Outlook",
-      "impact": "text-green"
+      "title": "Bank sentral meningkatkan cadangan emas dengan pembelian bersih 41 ton di bulan Mei – Dewan Emas Dunia",
+      "impact": "text-red"
     },
     {
       "time": "OILPRICE",
-      "title": "AI Boom Mendorong Rekor Lonjakan Permintaan Baterai",
-      "impact": "text-green"
+      "title": "Penurunan Impor LNG AS ke UE Menimbulkan Masalah bagi Kesepakatan Perdagangan",
+      "impact": "text-red"
     },
     {
       "time": "OILPRICE",
-      "title": "Teko Cina Mengonsumsi Minyak Mentah Timur Tengah Seiring Penurunan Harga",
-      "impact": "text-green"
+      "title": "Proyek Pusat Data Terbesar yang Pernah Diusulkan Secara Resmi Mati",
+      "impact": "text-red"
     },
     {
       "time": "YAHOO",
-      "title": "Ulasan Bilt Cards 2.0: Apakah lebih baik dari versi aslinya — dan apakah Anda masih bisa mendapatkan poin dari sewa?",
-      "impact": "text-yellow"
+      "title": "Warren Buffett baru saja mengirimkan peringatan 11 kata kepada investor tentang pasar saham. ",
+      "impact": "text-red"
     },
     {
       "time": "YAHOO",
-      "title": "Kartu kredit pelajar terbaik bulan Juli 2026: Mulailah membangun kredit dengan imbalan atas pembelanjaan",
+      "title": "Pratinjau Pendapatan Kuartalan Nucor Corporation: Yang Perlu Anda Ketahui",
       "impact": "text-yellow"
     },
     {
@@ -212,43 +212,43 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Morgan Stanley Di Antara Bank yang Menantang Optimisme Dolar yang Tumbuh",
+      "title": "Minyak Memperpanjang Penurunan karena Semakin Banyak Barel Mengalir Melalui Selat Hormuz",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Prasad: Aliran Minyak Meningkat Tapi Ketidakpastian Pasar Masih Ada",
-      "impact": "text-yellow"
+      "title": "Morgan Stanley Di Antara Bank yang Menantang Optimisme Dolar yang Tumbuh",
+      "impact": "text-green"
     }
   ],
   "assets": [
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,064.81",
-      "change": "+35.16 (+0.87%)",
+      "price": "4,174.81",
+      "change": "+52.58 (+1.28%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
         "dirClass": "text-green arrow-up",
-        "low": "3829.47",
-        "high": "4312.77",
+        "low": "3919.93",
+        "high": "4429.69",
         "bp": "85%",
         "bearp": "15%",
         "conf": "99%",
-        "accuracy": "68.0%",
+        "accuracy": "58.0%",
         "action": "BUY DIP",
         "btn": "btn-green"
       },
       "f1": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "3570.83",
-        "high": "4571.41",
-        "bp": "32%",
-        "bearp": "68%",
-        "conf": "68%",
-        "accuracy": "86.0%",
+        "low": "3650.37",
+        "high": "4699.25",
+        "bp": "39%",
+        "bearp": "61%",
+        "conf": "61%",
+        "accuracy": "82.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
       }
@@ -256,14 +256,76 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "161.227",
-      "change": "-1.34 (-0.82%)",
-      "cColor": "text-red",
+      "price": "161.317",
+      "change": "+0.23 (+0.14%)",
+      "cColor": "text-green",
       "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "159.721",
-        "high": "162.811",
+        "low": "159.661",
+        "high": "162.973",
+        "bp": "85%",
+        "bearp": "15%",
+        "conf": "99%",
+        "accuracy": "66.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
+      },
+      "f1": {
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "157.344",
+        "high": "165.290",
+        "bp": "58%",
+        "bearp": "42%",
+        "conf": "58%",
+        "accuracy": "74.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
+      }
+    },
+    {
+      "symbol": "WTI OIL",
+      "icon": "🛢️",
+      "price": "68.69",
+      "change": "+0.53 (+0.78%)",
+      "cColor": "text-green",
+      "f4": {
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "62.80",
+        "high": "74.58",
+        "bp": "85%",
+        "bearp": "15%",
+        "conf": "99%",
+        "accuracy": "84.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
+      },
+      "f1": {
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "44.20",
+        "high": "93.18",
+        "bp": "36%",
+        "bearp": "64%",
+        "conf": "64%",
+        "accuracy": "74.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "icon": "🇪🇺",
+      "price": "1.1431",
+      "change": "+0.0000 (+0.00%)",
+      "cColor": "text-green",
+      "f4": {
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "1.1271",
+        "high": "1.1591",
         "bp": "85%",
         "bearp": "15%",
         "conf": "99%",
@@ -272,128 +334,66 @@
         "btn": "btn-red"
       },
       "f1": {
-        "dir": "BULLISH",
-        "dirClass": "text-green arrow-up",
-        "low": "157.354",
-        "high": "165.178",
-        "bp": "62%",
-        "bearp": "38%",
-        "conf": "62%",
-        "accuracy": "78.0%",
-        "action": "BUY DIP",
-        "btn": "btn-green"
-      }
-    },
-    {
-      "symbol": "WTI OIL",
-      "icon": "🛢️",
-      "price": "67.48",
-      "change": "-0.46 (-0.68%)",
-      "cColor": "text-red",
-      "f4": {
         "dir": "BEARISH",
         "dirClass": "text-red arrow-down",
-        "low": "61.67",
-        "high": "73.39",
-        "bp": "85%",
-        "bearp": "15%",
-        "conf": "99%",
-        "accuracy": "88.0%",
+        "low": "1.1107",
+        "high": "1.1755",
+        "bp": "40%",
+        "bearp": "60%",
+        "conf": "60%",
+        "accuracy": "66.0%",
         "action": "SELL RALLY",
         "btn": "btn-red"
-      },
-      "f1": {
-        "dir": "BEARISH",
-        "dirClass": "text-red arrow-down",
-        "low": "43.10",
-        "high": "91.96",
-        "bp": "32%",
-        "bearp": "68%",
-        "conf": "68%",
-        "accuracy": "82.0%",
-        "action": "SELL RALLY",
-        "btn": "btn-red"
-      }
-    },
-    {
-      "symbol": "EURUSD",
-      "icon": "🇪🇺",
-      "price": "1.0850",
-      "change": "+0.0020 (+0.18%)",
-      "cColor": "text-green",
-      "f4": {
-        "dir": "BULLISH",
-        "dirClass": "text-green arrow-up",
-        "low": "1.0750",
-        "high": "1.0950",
-        "bp": "75%",
-        "bearp": "25%",
-        "conf": "85%",
-        "accuracy": "82.0%",
-        "action": "BUY DIP",
-        "btn": "btn-green"
-      },
-      "f1": {
-        "dir": "BULLISH",
-        "dirClass": "text-green arrow-up",
-        "low": "1.0680",
-        "high": "1.1020",
-        "bp": "68%",
-        "bearp": "32%",
-        "conf": "78%",
-        "accuracy": "84.0%",
-        "action": "BUY DIP",
-        "btn": "btn-green"
       }
     },
     {
       "symbol": "GBPUSD",
       "icon": "🇬🇧",
-      "price": "1.2720",
-      "change": "+0.0035 (+0.28%)",
+      "price": "1.3345",
+      "change": "+0.0001 (+0.01%)",
       "cColor": "text-green",
       "f4": {
-        "dir": "BULLISH",
-        "dirClass": "text-green arrow-up",
-        "low": "1.2610",
-        "high": "1.2840",
-        "bp": "80%",
-        "bearp": "20%",
-        "conf": "88%",
-        "accuracy": "85.0%",
-        "action": "BUY DIP",
-        "btn": "btn-green"
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "1.3161",
+        "high": "1.3529",
+        "bp": "85%",
+        "bearp": "15%",
+        "conf": "99%",
+        "accuracy": "62.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
       },
       "f1": {
-        "dir": "BULLISH",
-        "dirClass": "text-green arrow-up",
-        "low": "1.2520",
-        "high": "1.2950",
-        "bp": "72%",
-        "bearp": "28%",
-        "conf": "80%",
-        "accuracy": "86.0%",
-        "action": "BUY DIP",
-        "btn": "btn-green"
+        "dir": "BEARISH",
+        "dirClass": "text-red arrow-down",
+        "low": "1.2908",
+        "high": "1.3782",
+        "bp": "47%",
+        "bearp": "53%",
+        "conf": "53%",
+        "accuracy": "58.0%",
+        "action": "SELL RALLY",
+        "btn": "btn-red"
       }
     }
   ],
   "gauges": {
-    "macro_alignment_score": 39,
+    "macro_alignment_score": 42,
     "market_regime_score": 55,
-    "market_sentiment_score": 40,
-    "institutional_flow_score": 20
+    "market_sentiment_score": 85,
+    "institutional_flow_score": 22
   },
   "ml_memory": {
-    "sentiment_penalty": 0
+    "sentiment_penalty": -2
   },
   "ml_weights": {
-    "macro": 0.09441165291435855,
-    "sentiment": 0.17588661274389192,
-    "flow": 0.4081658026100407,
-    "regime": 0.1135621394086752,
-    "tech": 0.09441165291435855,
-    "cal": 0.1135621394086752
+    "macro": 0.09545986382928263,
+    "sentiment": 0.1347268562865015,
+    "flow": 0.4282513814437691,
+    "regime": 0.12097617173878816,
+    "tech": 0.09960955496287038,
+    "cal": 0.12097617173878816
   },
   "correlation_matrix": {
     "XAUUSD": {
@@ -463,18 +463,28 @@
   "technical_signals": {
     "XAUUSD": {
       "trend": "BULLISH",
-      "rsi": 63,
+      "rsi": 83,
       "ma50": "UP"
     },
     "USDJPY": {
       "trend": "BEARISH",
-      "rsi": 33,
+      "rsi": 24,
       "ma50": "DOWN"
+    },
+    "EURUSD": {
+      "trend": "BULLISH",
+      "rsi": 69,
+      "ma50": "UP"
+    },
+    "GBPUSD": {
+      "trend": "BULLISH",
+      "rsi": 77,
+      "ma50": "UP"
     }
   },
   "economic_calendar": [
     {
-      "time": "17:34",
+      "time": "17:43",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -483,7 +493,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "18:34",
+      "time": "18:43",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -492,7 +502,7 @@
       "prev": "215K"
     },
     {
-      "time": "20:34",
+      "time": "20:43",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -501,7 +511,7 @@
       "prev": "49.1"
     },
     {
-      "time": "21:34",
+      "time": "21:43",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
@@ -512,14 +522,16 @@
   ],
   "top_drivers": [
     "DXY SURGE: BULLISH",
-    "FALLING YIELDS: FALLING",
+    "RISING YIELDS: RISING",
     "MARKET INDECISION",
     "LOW VOLATILITY REGIME",
     "GLOBAL LIQUIDITY SHIFT"
   ],
   "liquidity_zones": {
-    "XAUUSD": 4030.0,
-    "USDJPY": 162.5,
-    "WTI OIL": 68.0
+    "XAUUSD": 4118.0,
+    "USDJPY": 161.0,
+    "WTI OIL": 68.0,
+    "EURUSD": 1.145,
+    "GBPUSD": 1.336
   }
 }

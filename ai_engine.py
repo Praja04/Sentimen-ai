@@ -820,7 +820,7 @@ def run_claude_daily_macro():
     """Updates Macro Dashboard algorithmically using Yahoo Finance Proxies."""
     print(f"[{datetime.now()}] Running Daily Macro Update (Algorithmic)...")
     try:
-        tickers = "DX-Y.NYB ^TNX ^VIX ^DJI ^IRX TIP BTC-USD DBC ^RUT ^DJT HYG IEF GLD ^SKEW USO"
+        tickers = "DX-Y.NYB ^TNX ^VIX ^DJI ^IRX TIP BTC-USD DBC ^RUT ^DJT HYG IEF GLD ^SKEW USO USDJPY=X"
         data = yf.Tickers(tickers)
         
         def get_hist(sym):
@@ -845,6 +845,7 @@ def run_claude_daily_macro():
         gld = get_hist("GLD")
         skew = get_hist("^SKEW")
         uso = get_hist("USO")
+        usdjpy_hist = get_hist("USDJPY=X")
         
         def get_status(arr, bull_word, bear_word):
             if len(arr) < 2: return bear_word, 50, "down"
@@ -951,6 +952,37 @@ def run_claude_daily_macro():
         
         db['top_drivers'] = drivers[:5]
         
+        # Calculate dynamic correlation matrix for the 7 assets over the last 15 days
+        try:
+            import numpy as np
+            corr_assets = {
+                "XAUUSD": gld,
+                "USDJPY": usdjpy_hist if usdjpy_hist != [0,0] else [0,0],
+                "WTI OIL": uso,
+                "DXY": dxy,
+                "US10Y": tnx,
+                "DJI": dji,
+                "VIX": vix
+            }
+            valid_lengths = [len(lst) for lst in corr_assets.values() if len(lst) > 2]
+            if valid_lengths:
+                min_len = min(valid_lengths)
+                matrix = {}
+                keys = ["XAUUSD", "USDJPY", "WTI OIL", "DXY", "US10Y", "DJI", "VIX"]
+                for k1 in keys:
+                    matrix[k1] = {}
+                    for k2 in keys:
+                        arr1 = corr_assets[k1][-min_len:]
+                        arr2 = corr_assets[k2][-min_len:]
+                        c_val = np.corrcoef(arr1, arr2)[0, 1]
+                        if np.isnan(c_val):
+                            c_val = 0.0
+                        matrix[k1][k2] = float(c_val)
+                db['correlation_matrix'] = matrix
+                print("Correlation Matrix updated dynamically!")
+        except Exception as corr_e:
+            print("Failed to calculate dynamic correlation matrix:", corr_e)
+
         with open(JSON_PATH, 'w', encoding='utf-8') as f:
             json.dump(db, f, indent=2, ensure_ascii=False)
         print("Macro Dashboard Updated.")
