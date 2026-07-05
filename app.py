@@ -2806,6 +2806,12 @@ def get_trade_status():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route('/Monitor')
+@app.route('/monitor')
+def monitor_page():
+    return send_from_directory('static', 'monitor.html')
+
+
 @app.route('/Forecast')
 def forecast_page():
     return send_from_directory('static', 'forecast.html')

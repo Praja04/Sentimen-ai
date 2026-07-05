@@ -575,8 +575,11 @@ def get_forecast_macro_context():
     powell_stance = "FOMC memantau ketat data inflasi PCE, cenderung menahan suku bunga netral."
     wall_street_targets = [
         {"inst": "Goldman Sachs", "target": "$4,250", "stance": "Bullish (Permintaan Fisik & Safe Haven)"},
+        {"inst": "Citi Research", "target": "$4,350", "stance": "Strong Bullish (Akumulasi Bank Sentral)"},
         {"inst": "JP Morgan", "target": "$4,180", "stance": "Bullish Moderat (Suku Bunga Turun)"},
-        {"inst": "Citi Research", "target": "$4,350", "stance": "Strong Bullish (Akumulasi Bank Sentral)"}
+        {"inst": "Bank of America", "target": "$4,100", "stance": "Netral-Bullish (Stabilisasi Pasar)"},
+        {"inst": "UBS", "target": "$4,080", "stance": "Netral (Konsolidasi Harga)"},
+        {"inst": "Morgan Stanley", "target": "$4,050", "stance": "Netral-Bearish (Koreksi Sehat)"}
     ]
     
     geopolitics_index = "ELEVATED (165 bps)"

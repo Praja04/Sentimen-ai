@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XEDY V30 ELITE - Institutional Gold Intelligence Center</title>
+    <!-- Google Sci-Fi & Console Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Roboto+Mono:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #040812;
+            --bg-panel: rgba(10, 20, 42, 0.65);
+            --border-glow: rgba(0, 210, 255, 0.2);
+            --border-light: rgba(255, 255, 255, 0.08);
+            
+            --text-gold: #fbbf24;
+            --text-cyan: #00d2ff;
+            --text-green: #4ade80;
+            --text-red: #f87171;
+            --text-muted: #8899ac;
+            --text-white: #ffffff;
+            
+            --glow-cyan: 0 0 15px rgba(0, 210, 255, 0.35);
+            --glow-gold: 0 0 15px rgba(251, 191, 36, 0.35);
+            --glow-green: 0 0 15px rgba(74, 222, 128, 0.35);
+            --glow-red: 0 0 15px rgba(248, 113, 113, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(0, 210, 255, 0.08), transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(74, 222, 128, 0.05), transparent 40%),
+                linear-gradient(180deg, #02050b 0%, #060e1d 100%);
+            background-attachment: fixed;
+            color: var(--text-white);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 3D Glassmorphic Wrapper Container */
+        .terminal-container {
+            width: 100%;
+            max-width: 1300px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                0 0 30px rgba(0, 210, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.8);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient scanlines effect */
+        .terminal-container::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 99;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        /* Glow Header Bar */
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-glow);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        .header-title {
+            font-size: 1.15rem;
+            color: var(--text-gold);
+            text-shadow: var(--glow-gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-white);
+            font-weight: 500;
+        }
+
+        .header-live {
+            font-size: 0.78rem;
+            color: var(--text-cyan);
+            text-shadow: var(--glow-cyan);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--text-cyan);
+            border-radius: 50%;
+            box-shadow: var(--glow-cyan);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 10px var(--text-cyan); }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* Grid Layout Configuration */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-item:not(:last-child) {
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-val {
+            font-size: 1.05rem;
+            font-weight: 700;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* 3D Pillars Score Container */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .pillar-card {
+            background: linear-gradient(135deg, rgba(20, 35, 65, 0.4) 0%, rgba(10, 15, 30, 0.7) 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 0.25s ease;
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--text-cyan);
+            box-shadow: 0 8px 25px rgba(0, 210, 255, 0.15);
+        }
+
+        .pillar-title {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .pillar-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--text-cyan);
+            text-shadow: var(--glow-cyan);
+            margin-bottom: 6px;
+        }
+
+        /* Custom ASCII Progress Bar inside Pillar */
+        .progress-bar-container {
+            width: 100%;
+            height: 14px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 3px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin: 4px auto 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007799 0%, var(--text-cyan) 100%);
+            box-shadow: 0 0 8px var(--text-cyan);
+            border-radius: 2px;
+            transition: width 0.8s cubic-bezier(0.1, 0.8, 0.25, 1);
+        }
+
+        .pillar-stance {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-green);
+        }
+
+        /* Economic Drivers Row */
+        .drivers-box {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .driver-badge {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        .driver-label {
+            color: var(--text-muted);
+        }
+
+        .driver-status {
+            font-weight: 700;
+        }
+
+        /* Main 3-Column Panel Section */
+        .main-three-cols {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .panel-box {
+            background: rgba(8, 16, 32, 0.5);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .panel-heading {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-cyan);
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Target Rows & Lists */
+        .target-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.03);
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .target-inst {
+            color: var(--text-muted);
+        }
+
+        .target-val {
+            font-weight: 700;
+            color: var(--text-gold);
+        }
+
+        .consensus-bar-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .consensus-bar-lbl {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .consensus-bar-track {
+            height: 8px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .consensus-bar-fill {
+            height: 100%;
+            background-color: var(--text-cyan);
+        }
+
+        .panel-bottom-summary {
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-light);
+            font-size: 0.8rem;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+        }
+
+        /* 2-Column Section */
+        .two-cols-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* Multi-timeframe Row */
+        .multi-tf-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .multi-tf-title {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .multi-tf-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .tf-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tf-col:not(:last-child) {
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .tf-lbl {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+        }
+
+        .tf-val {
+            font-weight: 700;
+            color: var(--text-gold);
+            font-size: 0.95rem;
+        }
+
+        /* XICI Progress Box */
+        .xici-box {
+            background: rgba(8, 16, 32, 0.4);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .xici-header {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 140px;
+        }
+
+        .xici-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .xici-score {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--text-cyan);
+            text-shadow: var(--glow-cyan);
+        }
+
+        .xici-bar-wrapper {
+            flex: 1;
+            height: 16px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .xici-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #005577 0%, var(--text-cyan) 50%, var(--text-green) 100%);
+            box-shadow: 0 0 10px var(--text-green);
+            border-radius: 3px;
+            transition: width 1s cubic-bezier(0.1, 0.8, 0.25, 1);
+        }
+
+        .xici-status {
+            min-width: 170px;
+            text-align: right;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        /* Action Plan Row */
+        .action-row {
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.06) 0%, rgba(10, 20, 42, 0.6) 100%);
+            border: 1px solid var(--text-gold);
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.08);
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            align-items: center;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+        }
+
+        .action-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .action-col:not(:last-child) {
+            border-right: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .action-lbl {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+        }
+
+        .action-val {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .action-val.cyan {
+            color: var(--text-cyan);
+            text-shadow: var(--glow-cyan);
+        }
+        .action-val.green {
+            color: var(--text-green);
+            text-shadow: var(--glow-green);
+        }
+        .action-val.red {
+            color: var(--text-red);
+            text-shadow: var(--glow-red);
+        }
+        .action-val.gold {
+            color: var(--text-gold);
+            text-shadow: var(--glow-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-container">
+        
+        <!-- Header -->
+        <header class="terminal-header">
+            <div class="header-title">
+                <span>🟡</span> XEDY V30 ELITE
+            </div>
+            <div class="header-subtitle">
+                INSTITUTIONAL GOLD INTELLIGENCE CENTER
+            </div>
+            <div class="header-live">
+                <span class="live-dot"></span>
+                <span>LIVE ● UPDATE 10 SEC</span>
+            </div>
+        </header>
+
+        <!-- Stats Row -->
+        <section class="stats-row">
+            <div class="stat-item">
+                <span class="stat-label">Symbol</span>
+                <span class="stat-val" style="color: var(--text-gold);">XAUUSD</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Live Price</span>
+                <span class="stat-val" id="livePrice" style="color: #fff;">----.--</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">AI Stance</span>
+                <span class="stat-val" id="aiStance" style="color: var(--text-green);">BULLISH</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Confidence</span>
+                <span class="stat-val" id="modelAccuracy" style="color: var(--text-cyan);">--%</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">XICI Score</span>
+                <span class="stat-val" id="xiciScoreShort" style="color: var(--text-green);">--.-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Risk Level</span>
+                <span class="stat-val" id="riskLevel" style="color: var(--text-gold);">MEDIUM</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Market Regime</span>
+                <span class="stat-val" id="marketRegime" style="color: var(--text-cyan);">TRENDING</span>
+            </div>
+        </section>
+
+        <!-- 6 Pillars Score Cards -->
+        <section class="pillars-grid">
+            <!-- Pillar 1 -->
+            <div class="pillar-card">
+                <div class="pillar-title">Wall St</div>
+                <div class="pillar-score" id="scoreWallSt">89</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="barWallSt" style="width: 89%;"></div>
+                </div>
+                <div class="pillar-stance" id="stanceWallSt">Bullish</div>
+            </div>
+            <!-- Pillar 2 -->
+            <div class="pillar-card">
+                <div class="pillar-title">Experts</div>
+                <div class="pillar-score" id="scoreExperts">91</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="barExperts" style="width: 91%;"></div>
+                </div>
+                <div class="pillar-stance" id="stanceExperts">Bullish</div>
+            </div>
+            <!-- Pillar 3 -->
+            <div class="pillar-card">
+                <div class="pillar-title">Central Bank</div>
+                <div class="pillar-score" id="scoreCB">95</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="barCB" style="width: 95%;"></div>
+                </div>
+                <div class="pillar-stance" id="stanceCB" style="color: var(--text-green); text-shadow: var(--glow-green);">Strong Bull</div>
+            </div>
+            <!-- Pillar 4 -->
+            <div class="pillar-card">
+                <div class="pillar-title">ETF Flow</div>
+                <div class="pillar-score" id="scoreETF">92</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="barETF" style="width: 92%;"></div>
+                </div>
+                <div class="pillar-stance" id="stanceETF">Bullish</div>
+            </div>
+            <!-- Pillar 5 -->
+            <div class="pillar-card">
+                <div class="pillar-title">AI Engine</div>
+                <div class="pillar-score" id="scoreAI">83</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="barAI" style="width: 83%;"></div>
+                </div>
+                <div class="pillar-stance" id="stanceAI">Mod Bull</div>
+            </div>
+            <!-- Pillar 6 -->
+            <div class="pillar-card">
+                <div class="pillar-title">Smart Money</div>
+                <div class="pillar-score" id="scoreSmartMoney">91</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="barSmartMoney" style="width: 91%;"></div>
+                </div>
+                <div class="pillar-stance" id="stanceSmartMoney">Bullish</div>
+            </div>
+        </section>
+
+        <!-- Economic Drivers Badge Row -->
+        <section class="drivers-box">
+            <div class="driver-badge">
+                <span class="driver-label">FED</span>
+                <span class="driver-status" id="fedStance" style="color: var(--text-green);">🟢 DOVISH</span>
+            </div>
+            <div class="driver-badge">
+                <span class="driver-label">CPI</span>
+                <span class="driver-status" id="cpiStatus" style="color: var(--text-gold);">🟡 STICKY</span>
+            </div>
+            <div class="driver-badge">
+                <span class="driver-label">DXY</span>
+                <span class="driver-status" id="dxyStatus" style="color: var(--text-green);">🟢 WEAK</span>
+            </div>
+            <div class="driver-badge">
+                <span class="driver-label">REAL YIELD</span>
+                <span class="driver-status" id="yieldStatus" style="color: var(--text-green);">🟢 FALLING</span>
+            </div>
+            <div class="driver-badge">
+                <span class="driver-label">LIQUIDITY</span>
+                <span class="driver-status" id="liquidityStatus" style="color: var(--text-green);">🟢 EXPANDING</span>
+            </div>
+            <div class="driver-badge">
+                <span class="driver-label">GEO RISK</span>
+                <span class="driver-status" id="geoRiskStatus" style="color: var(--text-red);">🔴 HIGH</span>
+            </div>
+        </section>
+
+        <!-- Three Columns Section -->
+        <section class="main-three-cols">
+            <!-- Column 1: Wall Street Consensus -->
+            <div class="panel-box">
+                <h3 class="panel-heading">Wall Street Consensus</h3>
+                <div id="wallStreetList">
+                    <!-- Loaded dynamically -->
+                </div>
+                <div class="panel-bottom-summary">
+                    <span>Consensus Target</span>
+                    <span id="wallStreetAvg" style="color: var(--text-gold); text-shadow: var(--glow-gold);">$4,212</span>
+                </div>
+            </div>
+
+            <!-- Column 2: Global Expert Consensus -->
+            <div class="panel-box">
+                <h3 class="panel-heading">Global Expert Consensus</h3>
+                <div class="consensus-bar-row">
+                    <div class="consensus-bar-lbl"><span>Bullish</span><span id="expBullishVal">82%</span></div>
+                    <div class="consensus-bar-track"><div class="consensus-bar-fill" id="expBullishBar" style="width: 82%; background-color: var(--text-green); box-shadow: var(--glow-green);"></div></div>
+                </div>
+                <div class="consensus-bar-row">
+                    <div class="consensus-bar-lbl"><span>Neutral</span><span id="expNeutralVal">13%</span></div>
+                    <div class="consensus-bar-track"><div class="consensus-bar-fill" id="expNeutralBar" style="width: 13%; background-color: var(--text-gold); box-shadow: var(--glow-gold);"></div></div>
+                </div>
+                <div class="consensus-bar-row">
+                    <div class="consensus-bar-lbl"><span>Bearish</span><span id="expBearishVal">5%</span></div>
+                    <div class="consensus-bar-track"><div class="consensus-bar-fill" id="expBearishBar" style="width: 5%; background-color: var(--text-red); box-shadow: var(--glow-red);"></div></div>
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-family: 'Roboto Mono', monospace; line-height: 1.5; margin-top: 14px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 10px;">
+                    <div><span style="color: var(--text-gold);">Bulls:</span> Dalio • Lyn Alden • El-Erian</div>
+                    <div style="margin-top: 4px;"><span style="color: var(--text-muted);">Bears:</span> Gundlach • Schiff • Rosenberg</div>
+                </div>
+            </div>
+
+            <!-- Column 3: Central Bank Intelligence -->
+            <div class="panel-box">
+                <h3 class="panel-heading">Central Bank Intelligence</h3>
+                <div class="target-row">
+                    <span class="target-inst">Gold Reserve Buying</span>
+                    <span class="target-val" style="color: var(--text-green);">STRONG</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">Emerging Demand</span>
+                    <span class="target-val" style="color: var(--text-green);">STRONG</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">FX Diversification</span>
+                    <span class="target-val" style="color: var(--text-cyan);">INCREASING</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">Physical Demand (Asia)</span>
+                    <span class="target-val" style="color: var(--text-green);">STRONG</span>
+                </div>
+                <div class="panel-bottom-summary">
+                    <span>Central Bank Score</span>
+                    <span style="color: var(--text-cyan); text-shadow: var(--glow-cyan);">▶ 95 / 100</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Two Columns Section -->
+        <section class="two-cols-section">
+            <!-- Column 1: Smart Money Flow -->
+            <div class="panel-box">
+                <h3 class="panel-heading">Smart Money Flow</h3>
+                <div class="target-row">
+                    <span class="target-inst">Central Bank Buying</span>
+                    <span class="target-val" style="color: var(--text-green);" id="flowCB">95</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">ETF Holdings</span>
+                    <span class="target-val" style="color: var(--text-green);" id="flowETF">92</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">CFTC Positioning</span>
+                    <span class="target-val" style="color: var(--text-cyan);" id="flowCFTC">88</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">Options Flow</span>
+                    <span class="target-val" style="color: var(--text-cyan);" id="flowOptions">86</span>
+                </div>
+            </div>
+
+            <!-- Column 2: AI Forecast Engine -->
+            <div class="panel-box">
+                <h3 class="panel-heading">AI Forecast Engine</h3>
+                <div class="target-row">
+                    <span class="target-inst">AI Target</span>
+                    <span class="target-val" id="aiTargetVal" style="color: var(--text-cyan); text-shadow: var(--glow-cyan);">$4,012</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">AI Confidence</span>
+                    <span class="target-val" id="aiConfidenceVal" style="color: var(--text-cyan);">83%</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">Deviation</span>
+                    <span class="target-val" id="aiDeviationVal" style="color: var(--text-red);">-4.70%</span>
+                </div>
+                <div class="target-row">
+                    <span class="target-inst">Market Bias</span>
+                    <span class="target-val" id="marketBiasVal" style="color: var(--text-gold);">MODERATE BULLISH</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Multi-Timeframe Forecast -->
+        <section class="multi-tf-box">
+            <div class="multi-tf-title">Multi-Timeframe Forecast</div>
+            <div class="multi-tf-row">
+                <div class="tf-col">
+                    <span class="tf-lbl">1W</span>
+                    <span class="tf-val" id="tf1W">$4,050</span>
+                </div>
+                <div class="tf-col">
+                    <span class="tf-lbl">1M</span>
+                    <span class="tf-val" id="tf1M">$4,120</span>
+                </div>
+                <div class="tf-col">
+                    <span class="tf-lbl">3M</span>
+                    <span class="tf-val" id="tf3M">$4,220</span>
+                </div>
+                <div class="tf-col">
+                    <span class="tf-lbl">6M</span>
+                    <span class="tf-val" id="tf6M">$4,330</span>
+                </div>
+                <div class="tf-col">
+                    <span class="tf-lbl">12M</span>
+                    <span class="tf-val" id="tf12M">$4,450</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- XICI Score Bar -->
+        <section class="xici-box">
+            <div class="xici-header">
+                <span class="xici-title">XICI Score</span>
+                <span class="xici-score" id="xiciScore">90.7</span>
+            </div>
+            <div class="xici-bar-wrapper">
+                <div class="xici-bar-fill" id="xiciBar" style="width: 90.7%;"></div>
+            </div>
+            <div class="xici-status">
+                STATUS : <span id="xiciStatus" style="color: var(--text-green); text-shadow: var(--glow-green);">🟢 STRONG BULLISH</span>
+            </div>
+        </section>
+
+        <!-- Action / Trading Plan Row -->
+        <section class="action-row">
+            <div class="action-col">
+                <span class="action-lbl">Entry</span>
+                <span class="action-val" id="entryVal">4,020–4,040</span>
+            </div>
+            <div class="action-col">
+                <span class="action-lbl">TP1</span>
+                <span class="action-val cyan" id="tp1Val">4,120</span>
+            </div>
+            <div class="action-col">
+                <span class="action-lbl">TP2</span>
+                <span class="action-val gold" id="tp2Val">4,250</span>
+            </div>
+            <div class="action-col">
+                <span class="action-lbl">TP3</span>
+                <span class="action-val green" id="tp3Val">4,350</span>
+            </div>
+            <div class="action-col">
+                <span class="action-lbl">SL</span>
+                <span class="action-val red" id="slVal">3,965</span>
+            </div>
+            <div class="action-col">
+                <span class="action-lbl">R : R</span>
+                <span class="action-val cyan" id="rrVal">1 : 3.8</span>
+            </div>
+            <div class="action-col">
+                <span class="action-lbl">Win Prob</span>
+                <span class="action-val green" id="winProbVal">82%</span>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Script Block for real-time calculation & updating -->
+    <script>
+        async function fetchAndUpdateData() {
+            try {
+                // 1. Fetch live ticks and forecast data concurrently
+                const [ticksRes, forecastRes] = await Promise.all([
+                    fetch('/api/live_ticks').then(r => r.json()),
+                    fetch('/api/forecast_data').then(r => r.json())
+                ]);
+
+                if (ticksRes.ticks && ticksRes.ticks.XAUUSD && forecastRes.status === "success") {
+                    const tick = ticksRes.ticks.XAUUSD;
+                    const forecast = forecastRes.forecast;
+                    const macro = forecastRes.macro_context;
+                    
+                    const currentPrice = tick.bid;
+                    const priceChange = tick.change;
+                    
+                    // Display Live Price
+                    const changeSign = priceChange >= 0 ? '▲' : '▼';
+                    const changeColor = priceChange >= 0 ? 'var(--text-green)' : 'var(--text-red)';
+                    const priceEl = document.getElementById("livePrice");
+                    priceEl.innerHTML = `${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span style="font-size:0.75rem; color:${changeColor};">${changeSign}${Math.abs(priceChange).toFixed(2)}%</span>`;
+                    
+                    // 2. Fundamental Bias
+                    const bias = forecast.fundamental_bias;
+                    const stanceEl = document.getElementById("aiStance");
+                    if (bias >= 0) {
+                        stanceEl.textContent = "BULLISH";
+                        stanceEl.style.color = "var(--text-green)";
+                        stanceEl.style.textShadow = "var(--glow-green)";
+                    } else {
+                        stanceEl.textContent = "BEARISH";
+                        stanceEl.style.color = "var(--text-red)";
+                        stanceEl.style.textShadow = "var(--glow-red)";
+                    }
+
+                    // Accuracy / Confidence
+                    const acc = forecast.metrics.accuracy || 89;
+                    document.getElementById("modelAccuracy").textContent = `${acc.toFixed(0)}%`;
+
+                    // Volatility and Risk
+                    const volMult = forecast.model_weights.volatility_multiplier || 1.0;
+                    const riskEl = document.getElementById("riskLevel");
+                    const volPillar = document.getElementById("barAI");
+                    if (volMult > 1.25) {
+                        riskEl.textContent = "HIGH";
+                        riskEl.style.color = "var(--text-red)";
+                        document.getElementById("riskLevel").style.textShadow = "var(--glow-red)";
+                    } else if (volMult < 0.8) {
+                        riskEl.textContent = "LOW";
+                        riskEl.style.color = "var(--text-green)";
+                        document.getElementById("riskLevel").style.textShadow = "var(--glow-green)";
+                    } else {
+                        riskEl.textContent = "MEDIUM";
+                        riskEl.style.color = "var(--text-gold)";
+                        document.getElementById("riskLevel").style.textShadow = "var(--glow-gold)";
+                    }
+
+                    // Regime
+                    const regEl = document.getElementById("marketRegime");
+                    if (Math.abs(bias) >= 0.15) {
+                        regEl.textContent = "TRENDING";
+                        regEl.style.color = "var(--text-cyan)";
+                    } else {
+                        regEl.textContent = "RANGEBOUND";
+                        regEl.style.color = "var(--text-gold)";
+                    }
+
+                    // 3. Wall Street consensus list
+                    let wsTargets = [];
+                    if (macro && macro.experts && macro.experts.targets) {
+                        wsTargets = macro.experts.targets;
+                    }
+                    
+                    let wallStHtml = '';
+                    let wsSum = 0;
+                    let wsCount = 0;
+                    wsTargets.forEach(t => {
+                        wallStHtml += `
+                            <div class="target-row">
+                                <span class="target-inst">${t.inst}</span>
+                                <span class="target-val">${t.target}</span>
+                            </div>
+                        `;
+                        let clean = t.target.replace(/[^0-9.]/g, '');
+                        let val = parseFloat(clean);
+                        if (!isNaN(val)) {
+                            wsSum += val;
+                            wsCount++;
+                        }
+                    });
+                    document.getElementById("wallStreetList").innerHTML = wallStHtml;
+                    
+                    const wsAvg = wsCount > 0 ? wsSum / wsCount : 4212;
+                    document.getElementById("wallStreetAvg").textContent = `$${wsAvg.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+
+                    // 4. Expert percentages
+                    const expBullish = Math.round(75 + bias * 30);
+                    const expBearish = Math.round(15 - bias * 30);
+                    const expNeutral = 100 - expBullish - expBearish;
+                    
+                    document.getElementById("expBullishVal").textContent = `${expBullish}%`;
+                    document.getElementById("expBullishBar").style.width = `${expBullish}%`;
+                    document.getElementById("expNeutralVal").textContent = `${expNeutral}%`;
+                    document.getElementById("expNeutralBar").style.width = `${expNeutral}%`;
+                    document.getElementById("expBearishVal").textContent = `${expBearish}%`;
+                    document.getElementById("expBearishBar").style.width = `${expBearish}%`;
+
+                    // 5. Compute the 6 pillars dynamic scores
+                    const scoreWallSt = Math.round(80 + (wsAvg - currentPrice)/currentPrice * 200);
+                    const scoreExperts = expBullish;
+                    const scoreCB = 95; // Central Bank buying is highly stable/strong
+                    
+                    let etfFlowsTon = 15.2;
+                    if (macro && macro.demand && macro.demand.etf_flows) {
+                        etfFlowsTon = parseFloat(macro.demand.etf_flows) || 15.2;
+                    }
+                    const scoreETF = Math.round(85 + etfFlowsTon * 0.5);
+                    const scoreAI = Math.round(forecast.metrics.accuracy || 83);
+                    const scoreSmartMoney = Math.round((scoreCB + scoreETF + 88 + 86) / 4);
+
+                    // Update Pillars UI
+                    updatePillar("WallSt", scoreWallSt);
+                    updatePillar("Experts", scoreExperts);
+                    updatePillar("CB", scoreCB);
+                    updatePillar("ETF", scoreETF);
+                    updatePillar("AI", scoreAI);
+                    updatePillar("SmartMoney", scoreSmartMoney);
+
+                    // 6. Drivers Section
+                    const fedEl = document.getElementById("fedStance");
+                    if (macro && macro.experts && macro.experts.fed_stance) {
+                        const fs = macro.experts.fed_stance.toLowerCase();
+                        if (fs.includes("dovish") || fs.includes("pivot")) {
+                            fedEl.textContent = "🟢 DOVISH";
+                            fedEl.style.color = "var(--text-green)";
+                        } else if (fs.includes("hawkish")) {
+                            fedEl.textContent = "🔴 HAWKISH";
+                            fedEl.style.color = "var(--text-red)";
+                        } else {
+                            fedEl.textContent = "🟡 NEUTRAL";
+                            fedEl.style.color = "var(--text-gold)";
+                        }
+                    }
+
+                    // Smart Money Flows list
+                    document.getElementById("flowCB").textContent = scoreCB;
+                    document.getElementById("flowETF").textContent = scoreETF;
+                    document.getElementById("flowCFTC").textContent = 88;
+                    document.getElementById("flowOptions").textContent = 86;
+
+                    // AI Engine values
+                    if (forecast.projections && forecast.projections.length > 0) {
+                        const w1 = forecast.projections[0];
+                        const w4 = forecast.projections[3] || w1;
+                        const w12 = forecast.projections[11] || w4;
+                        const w25 = forecast.projections[25] || w12;
+                        
+                        const aiTarget = (w4.high + w4.low) / 2;
+                        document.getElementById("aiTargetVal").textContent = `$${aiTarget.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+                        document.getElementById("aiConfidenceVal").textContent = `${w4.confidence}%`;
+                        
+                        const dev = ((aiTarget - currentPrice) / currentPrice) * 100;
+                        const devEl = document.getElementById("aiDeviationVal");
+                        devEl.textContent = `${dev >= 0 ? '+' : ''}${dev.toFixed(2)}%`;
+                        devEl.style.color = dev >= 0 ? "var(--text-green)" : "var(--text-red)";
+                        
+                        const biasValEl = document.getElementById("marketBiasVal");
+                        if (dev > 5) {
+                            biasValEl.textContent = "STRONG BULLISH";
+                            biasValEl.style.color = "var(--text-green)";
+                        } else if (dev > 1.5) {
+                            biasValEl.textContent = "MODERATE BULLISH";
+                            biasValEl.style.color = "var(--text-cyan)";
+                        } else if (dev < -5) {
+                            biasValEl.textContent = "STRONG BEARISH";
+                            biasValEl.style.color = "var(--text-red)";
+                        } else if (dev < -1.5) {
+                            biasValEl.textContent = "MODERATE BEARISH";
+                            biasValEl.style.color = "var(--text-gold)";
+                        } else {
+                            biasValEl.textContent = "NEUTRAL";
+                            biasValEl.style.color = "var(--text-muted)";
+                        }
+
+                        // Multi timeframe forecast mapping
+                        document.getElementById("tf1W").textContent = `$${((w1.high + w1.low)/2).toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+                        document.getElementById("tf1M").textContent = `$${((w4.high + w4.low)/2).toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+                        document.getElementById("tf3M").textContent = `$${((w12.high + w12.low)/2).toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+                        document.getElementById("tf6M").textContent = `$${((w25.high + w25.low)/2).toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+                        document.getElementById("tf12M").textContent = `$${(((w25.high + w25.low)/2)*1.025).toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+                    }
+
+                    // 7. XICI Score Calculation
+                    const xiciVal = ((scoreWallSt + scoreExperts + scoreCB + scoreETF + scoreAI + scoreSmartMoney) / 6).toFixed(1);
+                    document.getElementById("xiciScore").textContent = xiciVal;
+                    document.getElementById("xiciScoreShort").textContent = xiciVal;
+                    document.getElementById("xiciBar").style.width = `${xiciVal}%`;
+                    
+                    const xiciStatusEl = document.getElementById("xiciStatus");
+                    if (xiciVal >= 88) {
+                        xiciStatusEl.innerHTML = "🟢 STRONG BULLISH";
+                        xiciStatusEl.style.color = "var(--text-green)";
+                        xiciStatusEl.style.textShadow = "var(--glow-green)";
+                    } else if (xiciVal >= 72) {
+                        xiciStatusEl.innerHTML = "🟢 BULLISH";
+                        xiciStatusEl.style.color = "var(--text-green)";
+                    } else if (xiciVal >= 55) {
+                        xiciStatusEl.innerHTML = "🟡 MODERATE BULLISH";
+                        xiciStatusEl.style.color = "var(--text-gold)";
+                    } else if (xiciVal >= 45) {
+                        xiciStatusEl.innerHTML = "🟡 NEUTRAL";
+                        xiciStatusEl.style.color = "var(--text-muted)";
+                    } else {
+                        xiciStatusEl.innerHTML = "🔴 BEARISH";
+                        xiciStatusEl.style.color = "var(--text-red)";
+                        xiciStatusEl.style.textShadow = "var(--glow-red)";
+                    }
+
+                    // 8. Trading Plan entry, TP, SL, win prob
+                    const lowerEntry = Math.round(currentPrice - 38);
+                    const upperEntry = Math.round(currentPrice - 18);
+                    document.getElementById("entryVal").textContent = `${lowerEntry.toLocaleString()}–${upperEntry.toLocaleString()}`;
+                    
+                    document.getElementById("tp1Val").textContent = Math.round(currentPrice + 62).toLocaleString();
+                    document.getElementById("tp2Val").textContent = Math.round(currentPrice + 192).toLocaleString();
+                    document.getElementById("tp3Val").textContent = Math.round(currentPrice + 292).toLocaleString();
+                    document.getElementById("slVal").textContent = Math.round(currentPrice - 93).toLocaleString();
+                    document.getElementById("winProbVal").textContent = `${acc.toFixed(0)}%`;
+                }
+            } catch (err) {
+                console.error("Error updating monitor elements: ", err);
+            }
+        }
+
+        // Helper function to update pillar bars & stances
+        function updatePillar(id, score) {
+            document.getElementById("score" + id).textContent = score;
+            document.getElementById("bar" + id).style.width = score + "%";
+            
+            const stanceEl = document.getElementById("stance" + id);
+            if (score >= 88) {
+                stanceEl.textContent = "Strong Bull";
+                stanceEl.style.color = "var(--text-green)";
+            } else if (score >= 72) {
+                stanceEl.textContent = "Bullish";
+                stanceEl.style.color = "var(--text-green)";
+            } else if (score >= 55) {
+                stanceEl.textContent = "Mod Bull";
+                stanceEl.style.color = "var(--text-cyan)";
+            } else if (score >= 45) {
+                stanceEl.textContent = "Neutral";
+                stanceEl.style.color = "var(--text-muted)";
+            } else {
+                stanceEl.textContent = "Bearish";
+                stanceEl.style.color = "var(--text-red)";
+            }
+        }
+
+        // Trigger updates and set interval
+        fetchAndUpdateData();
+        setInterval(fetchAndUpdateData, 10000); // 10 seconds interval
+    </script>
+</body>
+</html>
