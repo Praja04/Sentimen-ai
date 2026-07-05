@@ -314,6 +314,68 @@
         "action": "SELL RALLY",
         "btn": "btn-red"
       }
+    },
+    {
+      "symbol": "EURUSD",
+      "icon": "🇪🇺",
+      "price": "1.0850",
+      "change": "+0.0020 (+0.18%)",
+      "cColor": "text-green",
+      "f4": {
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "1.0750",
+        "high": "1.0950",
+        "bp": "75%",
+        "bearp": "25%",
+        "conf": "85%",
+        "accuracy": "82.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
+      },
+      "f1": {
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "1.0680",
+        "high": "1.1020",
+        "bp": "68%",
+        "bearp": "32%",
+        "conf": "78%",
+        "accuracy": "84.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
+      }
+    },
+    {
+      "symbol": "GBPUSD",
+      "icon": "🇬🇧",
+      "price": "1.2720",
+      "change": "+0.0035 (+0.28%)",
+      "cColor": "text-green",
+      "f4": {
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "1.2610",
+        "high": "1.2840",
+        "bp": "80%",
+        "bearp": "20%",
+        "conf": "88%",
+        "accuracy": "85.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
+      },
+      "f1": {
+        "dir": "BULLISH",
+        "dirClass": "text-green arrow-up",
+        "low": "1.2520",
+        "high": "1.2950",
+        "bp": "72%",
+        "bearp": "28%",
+        "conf": "80%",
+        "accuracy": "86.0%",
+        "action": "BUY DIP",
+        "btn": "btn-green"
+      }
     }
   ],
   "gauges": {

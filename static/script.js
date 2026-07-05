@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!data.error && data.ticks) {
                 for (const [symbol, tickInfo] of Object.entries(data.ticks)) {
                     const el = document.getElementById(`live-price-${symbol.replace(/\s+/g, '-')}`);
+                    const decimals = symbol.includes('JPY') ? 3 : (symbol.includes('EUR') || symbol.includes('GBP') ? 4 : 2);
                     if (el) {
-                        const decimals = symbol.includes('JPY') ? 3 : 2;
                         el.innerText = tickInfo.bid.toLocaleString('en-US', {
                             minimumFractionDigits: decimals,
                             maximumFractionDigits: decimals
@@ -81,11 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const chgEl = document.getElementById(`live-chg-${symbol.replace(/\s+/g, '-')}`);
                     const volEl = document.getElementById(`live-vol-${symbol.replace(/\s+/g, '-')}`);
                     
-                    const decimals = symbol.includes('JPY') ? 3 : 2;
                     if (bidEl) bidEl.innerText = tickInfo.bid.toFixed(decimals);
                     if (askEl) askEl.innerText = tickInfo.ask.toFixed(decimals);
                     if (chgEl) {
-                        const formattedChg = tickInfo.change >= 0 ? `+${tickInfo.change.toFixed(3)}%` : `${tickInfo.change.toFixed(3)}%`;
+                        const formattedChg = tickInfo.change >= 0 ? `+${tickInfo.change.toFixed(decimals)}%` : `${tickInfo.change.toFixed(decimals)}%`;
                         chgEl.innerText = formattedChg;
                         chgEl.className = tickInfo.change >= 0 ? 'text-green' : 'text-red';
                     }
@@ -319,10 +318,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const pocXau = document.getElementById('liquidity-poc-xau');
             const pocJpy = document.getElementById('liquidity-poc-jpy');
             const pocOil = document.getElementById('liquidity-poc-oil');
+            const pocEur = document.getElementById('liquidity-poc-eur');
+            const pocGbp = document.getElementById('liquidity-poc-gbp');
             
             if(pocXau && data.liquidity_zones['XAUUSD']) pocXau.innerText = data.liquidity_zones['XAUUSD'];
             if(pocJpy && data.liquidity_zones['USDJPY']) pocJpy.innerText = data.liquidity_zones['USDJPY'];
             if(pocOil && data.liquidity_zones['WTI OIL']) pocOil.innerText = data.liquidity_zones['WTI OIL'];
+            if(pocEur && data.liquidity_zones['EURUSD']) pocEur.innerText = data.liquidity_zones['EURUSD'];
+            if(pocGbp && data.liquidity_zones['GBPUSD']) pocGbp.innerText = data.liquidity_zones['GBPUSD'];
         }
 
         // Render Macro Conclusion Badge
@@ -415,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const techBodyEl = document.getElementById('tech-table-body');
             if (techBodyEl) {
                 let tHtml = '';
-                ["XAUUSD", "USDJPY", "WTI OIL"].forEach(sym => {
+                ["XAUUSD", "USDJPY", "WTI OIL", "EURUSD", "GBPUSD"].forEach(sym => {
                     const t = data.technical_signals[sym];
                     if (t) {
                         const trClass = t.trend === "BULLISH" ? "text-green" : "text-red";

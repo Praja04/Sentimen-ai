@@ -58,7 +58,7 @@ def fetch_live_prices_mt5():
         return None
     
     prices = {}
-    for symbol in ["XAUUSD", "USDJPY", "WTI", "XTIUSD", "USOIL"]: # Check common WTI symbols
+    for symbol in ["XAUUSD", "USDJPY", "WTI", "XTIUSD", "USOIL", "EURUSD", "GBPUSD"]: # Check common symbols
         tick = mt5.symbol_info_tick(symbol)
         info = mt5.symbol_info(symbol)
         if tick and info:
@@ -73,7 +73,14 @@ def fetch_live_prices_mt5():
                 if h1_rates is not None and len(h1_rates) > 0:
                     vol_profile = {}
                     for rate in h1_rates:
-                        bucket_size = 2.0 if "XAU" in symbol else 0.5
+                        if "XAU" in symbol:
+                            bucket_size = 2.0
+                        elif "JPY" in symbol:
+                            bucket_size = 0.1
+                        elif symbol in ["EURUSD", "GBPUSD"]:
+                            bucket_size = 0.0010
+                        else:
+                            bucket_size = 0.5
                         bucket = round(rate['close'] / bucket_size) * bucket_size
                         vol = rate['tick_volume']
                         vol_profile[bucket] = vol_profile.get(bucket, 0) + vol
@@ -90,7 +97,7 @@ def fetch_live_prices_mt5():
                 pct_change = (change / prev_close) * 100
                 
                 # Standardize oil symbol back to WTI OIL for the UI
-                ui_sym = symbol if symbol in ["XAUUSD", "USDJPY"] else "WTI OIL"
+                ui_sym = symbol if symbol in ["XAUUSD", "USDJPY", "EURUSD", "GBPUSD"] else "WTI OIL"
                 
                 prices[ui_sym] = {
                     "price": last_price,
@@ -122,9 +129,15 @@ def run_live_price_update():
     # Format the prices for JSON
     def format_price(sym, data):
         # Format based on asset type
-        p_format = "{:,.3f}" if sym == "USDJPY" else "{:,.2f}"
+        if sym == "USDJPY":
+            p_format = "{:,.3f}"
+        elif sym in ["EURUSD", "GBPUSD"]:
+            p_format = "{:,.4f}"
+        else:
+            p_format = "{:,.2f}"
         p = p_format.format(data['price'])
-        c = f"{data['change']:+.2f} ({data['pct_change']:+.2f}%)"
+        c = f"{data['change']:+.4f}" if sym in ["EURUSD", "GBPUSD"] else f"{data['change']:+.2f}"
+        c += f" ({data['pct_change']:+.2f}%)"
         cColor = "text-green" if data['change'] >= 0 else "text-red"
         return p, c, cColor
 
@@ -142,6 +155,14 @@ def run_live_price_update():
             p, c, col = format_price("WTI OIL", prices["WTI OIL"])
             db['assets'][2]['price'], db['assets'][2]['change'], db['assets'][2]['cColor'] = p, c, col
             db['liquidity_zones']['WTI OIL'] = prices["WTI OIL"].get("poc_price", 0)
+        if "EURUSD" in prices:
+            p, c, col = format_price("EURUSD", prices["EURUSD"])
+            db['assets'][3]['price'], db['assets'][3]['change'], db['assets'][3]['cColor'] = p, c, col
+            db['liquidity_zones']['EURUSD'] = prices["EURUSD"].get("poc_price", 0)
+        if "GBPUSD" in prices:
+            p, c, col = format_price("GBPUSD", prices["GBPUSD"])
+            db['assets'][4]['price'], db['assets'][4]['change'], db['assets'][4]['cColor'] = p, c, col
+            db['liquidity_zones']['GBPUSD'] = prices["GBPUSD"].get("poc_price", 0)
 
     # --- SENTIMENT ALGORITHM (Enhanced Multi-Asset) ---
     try:
@@ -687,7 +708,7 @@ def run_claude_4h_forecast():
             if high_impact_count > 2: cal_score = 70
             elif high_impact_count == 0: cal_score = 30
         
-        assets_map = {"XAUUSD": 0, "USDJPY": 1, "WTI OIL": 2}
+        assets_map = {"XAUUSD": 0, "USDJPY": 1, "WTI OIL": 2, "EURUSD": 3, "GBPUSD": 4}
         total_offsets = 0
         offset_count = 0
         best_pillars = []
@@ -1009,7 +1030,7 @@ def run_technical_and_calendar():
         import random
         # 1. Technical Signals (Real from MT5)
         tech_signals = {}
-        for symbol in ["XAUUSD", "USDJPY", "WTI"]:
+        for symbol in ["XAUUSD", "USDJPY", "WTI", "EURUSD", "GBPUSD"]:
             ui_sym = "WTI OIL" if symbol == "WTI" else symbol
             rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H4, 0, 100)
             if rates is not None and len(rates) >= 50:
