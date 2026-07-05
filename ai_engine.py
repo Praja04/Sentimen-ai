@@ -445,8 +445,8 @@ def generate_forecast(symbol, timeframe, macro_s, sent_s, flow_s, regime_s, tech
     return {
         "dir": dir_text,
         "dirClass": dir_class,
-        "low": f"{lower_band:.3f}" if symbol == "USDJPY" else f"{lower_band:.2f}",
-        "high": f"{upper_band:.3f}" if symbol == "USDJPY" else f"{upper_band:.2f}",
+        "low": f"{lower_band:.4f}" if symbol in ["EURUSD", "GBPUSD"] else (f"{lower_band:.3f}" if symbol == "USDJPY" else f"{lower_band:.2f}"),
+        "high": f"{upper_band:.4f}" if symbol in ["EURUSD", "GBPUSD"] else (f"{upper_band:.3f}" if symbol == "USDJPY" else f"{upper_band:.2f}"),
         "bp": f"{final_bp}%",
         "bearp": f"{bearp}%",
         "conf": f"{int(conf)}%",
