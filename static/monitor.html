@@ -550,6 +550,31 @@
             border-radius: 3px;
             border: 1px solid rgba(255,255,255,0.1);
         }
+
+        .nav-link-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            padding: 2px 8px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.62rem;
+            font-weight: bold;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-link-btn:hover {
+            color: #fff !important;
+            border-color: rgba(0, 210, 255, 0.4) !important;
+            background: rgba(0, 210, 255, 0.08) !important;
+            box-shadow: 0 0 8px rgba(0,210,255,0.2);
+        }
     </style>
 </head>
 <body>
@@ -574,11 +599,23 @@
             </div>
         </header>
 
-        <!-- Symbol Selection Tabs -->
-        <div class="symbol-tabs">
-            <button class="symbol-tab active" data-symbol="XAUUSD" onclick="setSymbol('XAUUSD')">⚜️ GOLD/USD (XAUUSD)</button>
-            <button class="symbol-tab" data-symbol="USDJPY" onclick="setSymbol('USDJPY')">💴 USD/JPY (USDJPY)</button>
-            <button class="symbol-tab" data-symbol="XTIUSD" onclick="setSymbol('XTIUSD')">🛢️ WTI OIL (XTIUSD)</button>
+        <!-- Navigation & Symbol Selector Bar -->
+        <div class="nav-bar-row" style="display: flex; justify-content: space-between; align-items: center; height: 26px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; margin-top: 2px; margin-bottom: 2px;">
+            <!-- Left: Page Navigation Shortcuts -->
+            <div style="display: flex; gap: 8px;">
+                <a href="/" class="nav-link-btn" style="color: var(--text-white); border-color: rgba(255,255,255,0.15);">🏠 HOME</a>
+                <a href="/backtest" class="nav-link-btn" style="color: var(--text-gold); border-color: rgba(251,191,36,0.3);">⚡ BACKTEST LAB</a>
+                <a href="/trade" class="nav-link-btn" style="color: var(--text-cyan); border-color: rgba(0,210,255,0.3);">📊 TRADE MONITOR</a>
+                <a href="/Forecast" class="nav-link-btn" style="color: #a29bfe; border-color: rgba(162,155,254,0.3);">🔮 AI FORECAST</a>
+                <a href="/Monitor" class="nav-link-btn" style="color: var(--text-green); border-color: rgba(74,222,128,0.5); background: rgba(74,222,128,0.15); box-shadow: 0 0 8px rgba(74,222,128,0.25);">🖥️ LIVE MONITOR</a>
+            </div>
+            
+            <!-- Right: Symbol Selection Tabs -->
+            <div class="symbol-tabs" style="margin: 0; padding: 0;">
+                <button class="symbol-tab active" data-symbol="XAUUSD" onclick="setSymbol('XAUUSD')">⚜️ GOLD/USD (XAUUSD)</button>
+                <button class="symbol-tab" data-symbol="USDJPY" onclick="setSymbol('USDJPY')">💴 USD/JPY (USDJPY)</button>
+                <button class="symbol-tab" data-symbol="XTIUSD" onclick="setSymbol('XTIUSD')">🛢️ WTI OIL (XTIUSD)</button>
+            </div>
         </div>
 
         <!-- Top KPI Bar -->
