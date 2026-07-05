@@ -8,7 +8,9 @@ import MetaTrader5 as mt5
 FALLBACK_PARAMS = {
     "XAUUSD": {"atr": 35.0, "high_offset": 95.0, "low_offset": 120.0, "drift_scale": 25.0, "decimals": 2},
     "USDJPY": {"atr": 1.0, "high_offset": 2.2, "low_offset": 2.5, "drift_scale": 1.5, "decimals": 3},
-    "XTIUSD": {"atr": 1.2, "high_offset": 2.8, "low_offset": 3.2, "drift_scale": 0.8, "decimals": 2}
+    "XTIUSD": {"atr": 1.2, "high_offset": 2.8, "low_offset": 3.2, "drift_scale": 0.8, "decimals": 2},
+    "EURUSD": {"atr": 0.0070, "high_offset": 0.0150, "low_offset": 0.0180, "drift_scale": 0.0080, "decimals": 4},
+    "GBPUSD": {"atr": 0.0085, "high_offset": 0.0180, "low_offset": 0.0220, "drift_scale": 0.0100, "decimals": 4}
 }
 
 def init_forecast_state(symbol, base_price, fundamental_bias):
@@ -434,6 +436,20 @@ SYMBOL_CONFIGS = {
         "bias_multiplier": 0.6,
         "drift_per_bias": 0.8,
         "description": "West Texas Intermediate Crude Oil"
+    },
+    "EURUSD": {
+        "display_name": "EUR/USD",
+        "pip_scale": 10000.0,
+        "bias_multiplier": 0.5,
+        "drift_per_bias": 0.005,
+        "description": "Euro / US Dollar"
+    },
+    "GBPUSD": {
+        "display_name": "GBP/USD",
+        "pip_scale": 10000.0,
+        "bias_multiplier": 0.5,
+        "drift_per_bias": 0.005,
+        "description": "Great Britain Pound / US Dollar"
     }
 }
 
@@ -534,6 +550,74 @@ def get_symbol_forecast(symbol: str) -> dict:
             {"date": "10 Jul", "time": "00:00", "country": "USA", "indicator": "Baker Hughes Oil Rig Count", "actual": "485", "forecast": "490", "prev": "488", "status": "MED", "impact": "BULLISH OIL"},
             {"date": "15 Jul", "time": "09:00", "country": "CHN", "indicator": "PDB Kuartalan China (YoY)", "actual": "4.8%", "forecast": "4.6%", "prev": "4.7%", "status": "HIGH", "impact": "NEUTRAL"},
             {"date": "22 Jul", "time": "15:00", "country": "ALL", "indicator": "Kuota Output Bulanan OPEC+", "actual": "35.8M bpd", "forecast": "36.0M bpd", "prev": "36.2M bpd", "status": "HIGH", "impact": "BULLISH OIL"}
+        ]
+    elif symbol == 'EURUSD':
+        macro_ctx = {
+            "demand": {
+                "central_bank": "ECB Rate Policy & Asset Purchase Programs",
+                "etf_flows": "Eurozone Capital Inflows & Bond Yield Differentials",
+                "jewelry": "Aktivitas Konsumsi Domestik Uni Eropa (Stabil)",
+                "status": "NEUTRAL"
+            },
+            "experts": {
+                "fed_stance": "ECB Dovish vs Fed Hawkish/Dovish: Kontraksi diferensial suku bunga.",
+                "powell_quote": "Presiden Lagarde mengisyaratkan pemangkasan suku bunga lanjutan jika inflasi mendekati target 2%.",
+                "targets": [
+                    {"inst": "Goldman Sachs", "target": "1.0950", "stance": "Konsolidasi jangka pendek"},
+                    {"inst": "Citi Research", "target": "1.1050", "stance": "Pelemahan USD mendukung Euro"},
+                    {"inst": "JP Morgan", "target": "1.0820", "stance": "Ketidakpastian politik tekan Euro"},
+                    {"inst": "Bank of America", "target": "1.1000", "stance": "Netral (Pemulihan moderat)"},
+                    {"inst": "UBS", "target": "1.0900", "stance": "Konsolidasi"},
+                    {"inst": "Morgan Stanley", "target": "1.0850", "stance": "Tekanan teknis jangka pendek"}
+                ],
+                "president_stance": "Arah kebijakan fiskal Uni Eropa dan dinamika pertumbuhan Jerman."
+            },
+            "geopolitics": {
+                "index": "MODERAT (95 bps)",
+                "conflicts": "Perkembangan konflik Ukraina mempengaruhi harga energi regional dan sentimen Euro.",
+                "tariff_wars": "Tarif impor AS pada otomotif Eropa dapat memicu ketegangan dagang baru.",
+                "vix_status": "Kenaikan VIX memicu aliran modal keluar dari mata uang berisiko ke USD."
+            }
+        }
+        eco_reps = [
+            {"date": "11 Jul", "time": "16:00", "country": "EUR", "indicator": "Indeks Sentimen Ekonomi ZEW Jerman", "actual": "41.5", "forecast": "40.0", "prev": "42.2", "status": "HIGH", "impact": "BULLISH EUR"},
+            {"date": "16 Jul", "time": "19:45", "country": "EUR", "indicator": "Keputusan Suku Bunga ECB", "actual": "3.75%", "forecast": "3.75%", "prev": "4.00%", "status": "HIGH", "impact": "NEUTRAL"},
+            {"date": "23 Jul", "time": "15:00", "country": "EUR", "indicator": "PMI Manufaktur Flash Zona Euro", "actual": "46.2", "forecast": "45.8", "prev": "46.0", "status": "HIGH", "impact": "BULLISH EUR"},
+            {"date": "31 Jul", "time": "16:00", "country": "EUR", "indicator": "PDB Awal Zona Euro (QoQ)", "actual": "0.3%", "forecast": "0.2%", "prev": "0.3%", "status": "HIGH", "impact": "BULLISH EUR"}
+        ]
+    elif symbol == 'GBPUSD':
+        macro_ctx = {
+            "demand": {
+                "central_bank": "BoE Quantitative Tightening & Bank Rate Decisions",
+                "etf_flows": "UK Capital Flows & Gilt Yield Dynamics",
+                "jewelry": "Aktivitas Manufaktur & Konsumsi Domestik Inggris (Stabil)",
+                "status": "NEUTRAL"
+            },
+            "experts": {
+                "fed_stance": "BoE Hawkish vs Fed Dovish: Kontraksi diferensial yield obligasi.",
+                "powell_quote": "Gubernur Bailey menyatakan inflasi jasa masih menjadi fokus utama kebijakan suku bunga.",
+                "targets": [
+                    {"inst": "Goldman Sachs", "target": "1.2850", "stance": "Apresiasi moderat GBP"},
+                    {"inst": "Citi Research", "target": "1.2950", "stance": "Pelemahan USD dongkrak Sterling"},
+                    {"inst": "JP Morgan", "target": "1.2650", "stance": "Ekspektasi pemotongan BoE tekan GBP"},
+                    {"inst": "Bank of America", "target": "1.2800", "stance": "Netral (Konsolidasi)"},
+                    {"inst": "UBS", "target": "1.2750", "stance": "Pergerakan range-bound"},
+                    {"inst": "Morgan Stanley", "target": "1.2700", "stance": "Netral"}
+                ],
+                "president_stance": "Kebijakan fiskal pemerintah baru Inggris dalam mendorong pertumbuhan ekonomi."
+            },
+            "geopolitics": {
+                "index": "MODERAT (90 bps)",
+                "conflicts": "Sentimen risiko global memengaruhi pergerakan mata uang beta tinggi seperti Sterling.",
+                "tariff_wars": "Ketidakpastian perang dagang global berdampak pada ekspor sektor jasa Inggris.",
+                "vix_status": "VIX naik memicu pelepasan aset risiko yang menekan Sterling terhadap USD."
+            }
+        }
+        eco_reps = [
+            {"date": "12 Jul", "time": "13:00", "country": "GBP", "indicator": "PDB Bulanan Inggris (MoM)", "actual": "0.2%", "forecast": "0.1%", "prev": "0.3%", "status": "HIGH", "impact": "BULLISH GBP"},
+            {"date": "17 Jul", "time": "13:00", "country": "GBP", "indicator": "Indeks Harga Konsumen (IHK) YoY", "actual": "2.1%", "forecast": "2.0%", "prev": "2.2%", "status": "HIGH", "impact": "HAWKISH GBP"},
+            {"date": "19 Jul", "time": "13:00", "country": "GBP", "indicator": "Tingkat Pengangguran LFS", "actual": "4.3%", "forecast": "4.4%", "prev": "4.3%", "status": "MED", "impact": "NEUTRAL"},
+            {"date": "31 Jul", "time": "18:00", "country": "GBP", "indicator": "Keputusan Suku Bunga BoE", "actual": "5.00%", "forecast": "5.00%", "prev": "5.25%", "status": "HIGH", "impact": "BULLISH GBP"}
         ]
 
     params = FALLBACK_PARAMS.get(symbol, FALLBACK_PARAMS["XAUUSD"])

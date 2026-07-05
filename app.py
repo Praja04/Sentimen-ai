@@ -2849,7 +2849,7 @@ def get_symbol_forecast_api():
     """Returns forecast data for a given symbol (USDJPY, XTIUSD, etc.)"""
     try:
         symbol = request.args.get('symbol', 'USDJPY').upper()
-        allowed = ['USDJPY', 'XTIUSD']
+        allowed = ['USDJPY', 'XTIUSD', 'EURUSD', 'GBPUSD']
         if symbol not in allowed:
             return jsonify({"status": "error", "message": f"Symbol {symbol} not supported. Use: {allowed}"}), 400
         data = forecast_engine.get_symbol_forecast(symbol)

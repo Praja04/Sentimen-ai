@@ -615,6 +615,8 @@
                 <button class="symbol-tab active" data-symbol="XAUUSD" onclick="setSymbol('XAUUSD')">⚜️ GOLD/USD (XAUUSD)</button>
                 <button class="symbol-tab" data-symbol="USDJPY" onclick="setSymbol('USDJPY')">💴 USD/JPY (USDJPY)</button>
                 <button class="symbol-tab" data-symbol="XTIUSD" onclick="setSymbol('XTIUSD')">🛢️ WTI OIL (XTIUSD)</button>
+                <button class="symbol-tab" data-symbol="EURUSD" onclick="setSymbol('EURUSD')">🇪🇺 EUR/USD (EURUSD)</button>
+                <button class="symbol-tab" data-symbol="GBPUSD" onclick="setSymbol('GBPUSD')">🇬🇧 GBP/USD (GBPUSD)</button>
             </div>
         </div>
 
@@ -1146,22 +1148,30 @@
                 if (sym === "XAUUSD") headerTitle.textContent = "INSTITUTIONAL GOLD INTELLIGENCE CENTER";
                 else if (sym === "USDJPY") headerTitle.textContent = "INSTITUTIONAL YEN INTELLIGENCE CENTER";
                 else if (sym === "XTIUSD") headerTitle.textContent = "INSTITUTIONAL OIL INTELLIGENCE CENTER";
+                else if (sym === "EURUSD") headerTitle.textContent = "INSTITUTIONAL EURO INTELLIGENCE CENTER";
+                else if (sym === "GBPUSD") headerTitle.textContent = "INSTITUTIONAL STERLING INTELLIGENCE CENTER";
             }
             if (symbolLabel) symbolLabel.textContent = sym;
             if (cbLabel1) {
                 if (sym === "XAUUSD") cbLabel1.textContent = "Monthly Purchase";
                 else if (sym === "USDJPY") cbLabel1.textContent = "BoJ JGB Net Buying";
                 else if (sym === "XTIUSD") cbLabel1.textContent = "US SPR Purchase";
+                else if (sym === "EURUSD") cbLabel1.textContent = "ECB Asset Buying";
+                else if (sym === "GBPUSD") cbLabel1.textContent = "BoE Gilt Buying";
             }
             if (etfLabel1) {
                 if (sym === "XAUUSD") etfLabel1.textContent = "SPDR holdings";
                 else if (sym === "USDJPY") etfLabel1.textContent = "Yen Futures Long";
                 else if (sym === "XTIUSD") etfLabel1.textContent = "USO ETF holdings";
+                else if (sym === "EURUSD") etfLabel1.textContent = "EUR Bond ETF";
+                else if (sym === "GBPUSD") etfLabel1.textContent = "GBP Bond ETF";
             }
             if (etfLabel2) {
                 if (sym === "XAUUSD") etfLabel2.textContent = "iShares holdings";
                 else if (sym === "USDJPY") etfLabel2.textContent = "JGB Capital Inflow";
                 else if (sym === "XTIUSD") etfLabel2.textContent = "BNO ETF holdings";
+                else if (sym === "EURUSD") etfLabel2.textContent = "EU Capital Inflow";
+                else if (sym === "GBPUSD") etfLabel2.textContent = "UK Capital Inflow";
             }
 
             const fedText = document.getElementById("fedText");
@@ -1192,6 +1202,20 @@
                 if (yieldText) yieldText.textContent = "INVENTORY DROP";
                 if (liqText) liqText.textContent = "REFINERY CAP HIGH";
                 if (geoText) geoText.textContent = "ME RISK ELEVATED";
+            } else if (sym === "EURUSD") {
+                if (fedText) fedText.textContent = "ECB DOVISH";
+                if (cpiText) cpiText.textContent = "CPI STEADY";
+                if (dxyText) dxyText.textContent = "DXY WEAK";
+                if (yieldText) yieldText.textContent = "YIELD SPREAD WIDE";
+                if (liqText) liqText.textContent = "EU LIQUIDITY HIGH";
+                if (geoText) geoText.textContent = "UKRAINE RISK-OFF";
+            } else if (sym === "GBPUSD") {
+                if (fedText) fedText.textContent = "BOE HAWKISH";
+                if (cpiText) cpiText.textContent = "CPI STICKY";
+                if (dxyText) dxyText.textContent = "DXY WEAK";
+                if (yieldText) yieldText.textContent = "GILT YIELD RISING";
+                if (liqText) liqText.textContent = "UK LIQUIDITY STABLE";
+                if (geoText) geoText.textContent = "BREXIT EFFECTS";
             }
         }
 
@@ -1237,7 +1261,7 @@
                             wsCount++;
                         }
                     });
-                    const wsAvg = wsCount > 0 ? wsSum / wsCount : (activeSymbol === 'USDJPY' ? 155.2 : (activeSymbol === 'XTIUSD' ? 81.5 : 4212));
+                    const wsAvg = wsCount > 0 ? wsSum / wsCount : (activeSymbol === 'USDJPY' ? 155.2 : (activeSymbol === 'XTIUSD' ? 81.5 : (activeSymbol === 'EURUSD' ? 1.0850 : (activeSymbol === 'GBPUSD' ? 1.2720 : 4212))));
 
                     // AI Engine values
                     let aiTarget = currentPrice;
@@ -1252,7 +1276,16 @@
                     const changeColor = priceChange >= 0 ? 'var(--text-green)' : 'var(--text-red)';
                     const priceEl = document.getElementById("kpiPrice");
                     if (priceEl) {
-                        const formattedPrice = activeSymbol === 'USDJPY' ? currentPrice.toFixed(2) : (activeSymbol === 'XTIUSD' ? `$${currentPrice.toFixed(2)}` : `$${Math.round(currentPrice).toLocaleString('en-US')}`);
+                        let formattedPrice = '';
+                        if (activeSymbol === 'USDJPY') {
+                            formattedPrice = currentPrice.toFixed(3);
+                        } else if (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD') {
+                            formattedPrice = currentPrice.toFixed(4);
+                        } else if (activeSymbol === 'XTIUSD') {
+                            formattedPrice = `$${currentPrice.toFixed(2)}`;
+                        } else {
+                            formattedPrice = `$${Math.round(currentPrice).toLocaleString('en-US')}`;
+                        }
                         priceEl.innerHTML = `${formattedPrice} <span style="font-size:0.6rem; color:${changeColor};">${changeSign}${priceChange.toFixed(2)}%</span>`;
                     }
 
@@ -1275,8 +1308,8 @@
                     // 4. XICI (ICI) Score Calculation
                     const scoreWallSt = Math.round(80 + (wsAvg - currentPrice)/currentPrice * (activeSymbol === 'USDJPY' ? -200 : 200));
                     const scoreExperts = Math.round(75 + bias * 30);
-                    const scoreCB = activeSymbol === 'USDJPY' ? 90 : (activeSymbol === 'XTIUSD' ? 88 : 95);
-                    const scoreETF = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : 92);
+                    const scoreCB = activeSymbol === 'USDJPY' ? 90 : (activeSymbol === 'XTIUSD' ? 88 : (activeSymbol === 'EURUSD' ? 92 : (activeSymbol === 'GBPUSD' ? 91 : 95)));
+                    const scoreETF = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : (activeSymbol === 'EURUSD' ? 90 : (activeSymbol === 'GBPUSD' ? 88 : 92)));
                     const scoreAI = Math.round(acc);
                     const scoreSmartMoney = Math.round((scoreCB + scoreETF + 88 + 86) / 4);
 
@@ -1373,10 +1406,17 @@
                     const consensusDiff = ((wsAvg - currentPrice)/currentPrice * 100).toFixed(1);
                     const consensusTargetVal = document.getElementById("consensusTargetVal");
                     if (consensusTargetVal) {
-                        consensusTargetVal.textContent = activeSymbol === 'XAUUSD' ? 
-                            `$${Math.round(wsAvg).toLocaleString('en-US')} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)` : 
-                            (activeSymbol === 'XTIUSD' ? `$${wsAvg.toFixed(2)} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)` : 
-                            `${wsAvg.toFixed(2)} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)`);
+                        let targetText = '';
+                        if (activeSymbol === 'XAUUSD') {
+                            targetText = `$${Math.round(wsAvg).toLocaleString('en-US')}`;
+                        } else if (activeSymbol === 'XTIUSD') {
+                            targetText = `$${wsAvg.toFixed(2)}`;
+                        } else if (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD') {
+                            targetText = `${wsAvg.toFixed(4)}`;
+                        } else {
+                            targetText = `${wsAvg.toFixed(3)}`;
+                        }
+                        consensusTargetVal.textContent = `${targetText} (${consensusDiff >= 0 ? '+' : ''}${consensusDiff}% vs Current)`;
                     }
 
                     // 10. Smart Money Flow
@@ -1430,7 +1470,17 @@
 
                     const aiTargetPrice = document.getElementById("aiTargetPrice");
                     if (aiTargetPrice) {
-                        aiTargetPrice.textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(aiTarget).toLocaleString('en-US')}` : `$${aiTarget.toFixed(2)}`;
+                        let targetText = '';
+                        if (activeSymbol === 'XAUUSD') {
+                            targetText = `$${Math.round(aiTarget).toLocaleString('en-US')}`;
+                        } else if (activeSymbol === 'XTIUSD') {
+                            targetText = `$${aiTarget.toFixed(2)}`;
+                        } else if (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD') {
+                            targetText = `${aiTarget.toFixed(4)}`;
+                        } else {
+                            targetText = `${aiTarget.toFixed(3)}`;
+                        }
+                        aiTargetPrice.textContent = targetText;
                     }
                     
                     const aiDev = ((aiTarget - currentPrice)/currentPrice * 100).toFixed(2);
@@ -1447,13 +1497,13 @@
                     const cbVal4 = document.getElementById("cbVal4");
 
                     if (cbVal1) {
-                        cbVal1.textContent = activeSymbol === 'USDJPY' ? "+12.4T Yen" : (activeSymbol === 'XTIUSD' ? "+4.2M Bbl" : "+67 Ton");
+                        cbVal1.textContent = activeSymbol === 'USDJPY' ? "+12.4T Yen" : (activeSymbol === 'XTIUSD' ? "+4.2M Bbl" : (activeSymbol === 'EURUSD' ? "+1.8B EUR" : (activeSymbol === 'GBPUSD' ? "+620M GBP" : "+67 Ton")));
                     }
                     if (cbVal2) {
-                        cbVal2.textContent = activeSymbol === 'USDJPY' ? "+6%" : (activeSymbol === 'XTIUSD' ? "-2%" : "+8%");
+                        cbVal2.textContent = activeSymbol === 'USDJPY' ? "+6%" : (activeSymbol === 'XTIUSD' ? "-2%" : (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD' ? "+3%" : "+8%"));
                     }
                     if (cbVal3) {
-                        cbVal3.textContent = activeSymbol === 'USDJPY' ? "+11%" : (activeSymbol === 'XTIUSD' ? "+5%" : "+14%");
+                        cbVal3.textContent = activeSymbol === 'USDJPY' ? "+11%" : (activeSymbol === 'XTIUSD' ? "+5%" : (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD' ? "+7%" : "+14%"));
                     }
                     if (cbVal4) {
                         cbVal4.textContent = `${scoreCB} / 100`;
@@ -1474,7 +1524,7 @@
                         etfVal2.style.color = activeSymbol === 'XTIUSD' ? "var(--text-red)" : "var(--text-green)";
                     }
                     if (etfVal3) {
-                        etfVal3.textContent = activeSymbol === 'USDJPY' ? "+¥340B" : (activeSymbol === 'XTIUSD' ? "-$120M" : "+$1.8B");
+                        etfVal3.textContent = activeSymbol === 'USDJPY' ? "+¥340B" : (activeSymbol === 'XTIUSD' ? "-$120M" : (activeSymbol === 'EURUSD' ? "+$350M" : (activeSymbol === 'GBPUSD' ? "+$180M" : "+$1.8B")));
                         etfVal3.style.color = activeSymbol === 'XTIUSD' ? "var(--text-red)" : "var(--text-green)";
                     }
                     if (etfVal4) {
@@ -1483,7 +1533,7 @@
                     }
 
                     // 15. Stress
-                    const stressVal = activeSymbol === 'USDJPY' ? 38 : (activeSymbol === 'XTIUSD' ? 42 : 32);
+                    const stressVal = activeSymbol === 'USDJPY' ? 38 : (activeSymbol === 'XTIUSD' ? 42 : (activeSymbol === 'EURUSD' ? 35 : (activeSymbol === 'GBPUSD' ? 34 : 32)));
                     const stressScoreVal = document.getElementById("stressScoreVal");
                     if (stressScoreVal) {
                         stressScoreVal.textContent = stressVal;
@@ -1494,7 +1544,7 @@
                     }
 
                     // 16. Positioning Smart Money Bias
-                    const posBias = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : 92);
+                    const posBias = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : (activeSymbol === 'EURUSD' ? 88 : (activeSymbol === 'GBPUSD' ? 89 : 92)));
                     const posSmartMoneyBias = document.getElementById("posSmartMoneyBias");
                     if (posSmartMoneyBias) {
                         posSmartMoneyBias.textContent = `${posBias}%`;
@@ -1514,7 +1564,8 @@
                         const formatVal = (v) => {
                             if (activeSymbol === 'XAUUSD') return `$${Math.round(v).toLocaleString('en-US')}`;
                             if (activeSymbol === 'XTIUSD') return `$${v.toFixed(2)}`;
-                            return v.toFixed(2);
+                            if (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD') return v.toFixed(4);
+                            return v.toFixed(3);
                         };
                         
                         const tf1W = document.getElementById("tf1W");
@@ -1549,8 +1600,9 @@
                     if (finalAIRisk) finalAIRisk.textContent = `${scoreAI} / ${Math.round(100 - stressVal)}`;
 
                     // 19. Decision Engine (IDE)
-                    const lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 38).toLocaleString('en-US') : (currentPrice * 0.992).toFixed(2);
-                    const upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 18).toLocaleString('en-US') : (currentPrice * 0.997).toFixed(2);
+                    const entryDecimals = (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD') ? 4 : (activeSymbol === 'USDJPY' ? 3 : 2);
+                    const lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 38).toLocaleString('en-US') : (currentPrice * 0.992).toFixed(entryDecimals);
+                    const upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 18).toLocaleString('en-US') : (currentPrice * 0.997).toFixed(entryDecimals);
                     const ideEntry = document.getElementById("ideEntry");
                     if (ideEntry) ideEntry.textContent = `${lowerEntry} - ${upperEntry}`;
                     
@@ -1559,20 +1611,35 @@
                     const tpPrice3 = currentPrice * 1.065;
                     const ideTarget = document.getElementById("ideTarget");
                     if (ideTarget) {
-                        ideTarget.textContent = activeSymbol === 'XAUUSD' ? 
-                            `${Math.round(tpPrice1).toLocaleString('en-US')} / ${Math.round(tpPrice2).toLocaleString('en-US')} / ${Math.round(tpPrice3).toLocaleString('en-US')}` : 
-                            (activeSymbol === 'XTIUSD' ? `$${tpPrice1.toFixed(2)} / $${tpPrice2.toFixed(2)} / $${tpPrice3.toFixed(2)}` : `${tpPrice1.toFixed(2)} / ${tpPrice2.toFixed(2)} / ${tpPrice3.toFixed(2)}`);
+                        if (activeSymbol === 'XAUUSD') {
+                            ideTarget.textContent = `${Math.round(tpPrice1).toLocaleString('en-US')} / ${Math.round(tpPrice2).toLocaleString('en-US')} / ${Math.round(tpPrice3).toLocaleString('en-US')}`;
+                        } else if (activeSymbol === 'XTIUSD') {
+                            ideTarget.textContent = `$${tpPrice1.toFixed(2)} / $${tpPrice2.toFixed(2)} / $${tpPrice3.toFixed(2)}`;
+                        } else if (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD') {
+                            ideTarget.textContent = `${tpPrice1.toFixed(4)} / ${tpPrice2.toFixed(4)} / ${tpPrice3.toFixed(4)}`;
+                        } else {
+                            ideTarget.textContent = `${tpPrice1.toFixed(3)} / ${tpPrice2.toFixed(3)} / ${tpPrice3.toFixed(3)}`;
+                        }
                     }
                     
                     const slPrice = currentPrice * 0.978;
                     const ideStop = document.getElementById("ideStop");
                     if (ideStop) {
-                        ideStop.textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(slPrice).toLocaleString('en-US')}` : (activeSymbol === 'XTIUSD' ? `$${slPrice.toFixed(2)}` : `${slPrice.toFixed(2)}`);
+                        if (activeSymbol === 'XAUUSD') {
+                            ideStop.textContent = `$${Math.round(slPrice).toLocaleString('en-US')}`;
+                        } else if (activeSymbol === 'XTIUSD') {
+                            ideStop.textContent = `$${slPrice.toFixed(2)}`;
+                        } else if (activeSymbol === 'EURUSD' || activeSymbol === 'GBPUSD') {
+                            ideStop.textContent = `${slPrice.toFixed(4)}`;
+                        } else {
+                            ideStop.textContent = `${slPrice.toFixed(3)}`;
+                        }
                     }
 
                     const ideDecision = document.getElementById("ideDecision");
                     if (ideDecision) {
-                        if (activeSymbol === 'XTIUSD') {
+                        const shouldSell = bias < 0;
+                        if (shouldSell) {
                             ideDecision.textContent = "SELL ON RALLY";
                             ideDecision.style.color = "var(--text-red)";
                             document.querySelector(".footer-ide-row").style.border = "1px solid rgba(248, 113, 113, 0.35)";
@@ -1632,6 +1699,28 @@
                         if (evtLabel4) evtLabel4.textContent = "US Inventory";
                         if (evtVal4) { evtVal4.textContent = "MEDIUM"; evtVal4.style.color = "var(--text-gold)"; }
                         if (evtLabel5) evtLabel5.textContent = "China Demand";
+                        if (evtVal5) { evtVal5.textContent = "MEDIUM"; evtVal5.style.color = "var(--text-gold)"; }
+                    } else if (activeSymbol === "EURUSD") {
+                        if (evtLabel1) evtLabel1.textContent = "ECB Meeting";
+                        if (evtVal1) { evtVal1.textContent = "HIGH"; evtVal1.style.color = "var(--text-red)"; }
+                        if (evtLabel2) evtLabel2.textContent = "US CPI";
+                        if (evtVal2) { evtVal2.textContent = "HIGH"; evtVal2.style.color = "var(--text-red)"; }
+                        if (evtLabel3) evtLabel3.textContent = "Eurozone GDP";
+                        if (evtVal3) { evtVal3.textContent = "MEDIUM"; evtVal3.style.color = "var(--text-gold)"; }
+                        if (evtLabel4) evtLabel4.textContent = "German CPI";
+                        if (evtVal4) { evtVal4.textContent = "MEDIUM"; evtVal4.style.color = "var(--text-gold)"; }
+                        if (evtLabel5) evtLabel5.textContent = "Ukraine Risk";
+                        if (evtVal5) { evtVal5.textContent = "MEDIUM"; evtVal5.style.color = "var(--text-gold)"; }
+                    } else if (activeSymbol === "GBPUSD") {
+                        if (evtLabel1) evtLabel1.textContent = "BoE Meeting";
+                        if (evtVal1) { evtVal1.textContent = "HIGH"; evtVal1.style.color = "var(--text-red)"; }
+                        if (evtLabel2) evtLabel2.textContent = "UK CPI";
+                        if (evtVal2) { evtVal2.textContent = "HIGH"; evtVal2.style.color = "var(--text-red)"; }
+                        if (evtLabel3) evtLabel3.textContent = "US NFP";
+                        if (evtVal3) { evtVal3.textContent = "HIGH"; evtVal3.style.color = "var(--text-red)"; }
+                        if (evtLabel4) evtLabel4.textContent = "UK GDP";
+                        if (evtVal4) { evtVal4.textContent = "MEDIUM"; evtVal4.style.color = "var(--text-gold)"; }
+                        if (evtLabel5) evtLabel5.textContent = "Trade Policy";
                         if (evtVal5) { evtVal5.textContent = "MEDIUM"; evtVal5.style.color = "var(--text-gold)"; }
                     }
 
@@ -1696,7 +1785,7 @@
 
                     // 13. Market Quality otonomous updates
                     const mqTrendVal = Math.round(85 + bias * 10);
-                    const mqLiqVal = activeSymbol === 'USDJPY' ? 92 : (activeSymbol === 'XTIUSD' ? 82 : 89);
+                    const mqLiqVal = activeSymbol === 'USDJPY' ? 92 : (activeSymbol === 'XTIUSD' ? 82 : (activeSymbol === 'EURUSD' ? 95 : (activeSymbol === 'GBPUSD' ? 93 : 89)));
                     const mqPartVal = Math.round(80 + bias * 8);
                     const mqBreadthVal = Math.round(83 + bias * 6);
 
