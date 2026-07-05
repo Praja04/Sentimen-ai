@@ -325,6 +325,42 @@
             color: var(--text-green);
             font-weight: bold;
         }
+
+        .symbol-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            justify-content: center;
+            align-items: center;
+            height: 28px;
+        }
+
+        .symbol-tab {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+            padding: 4px 12px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .symbol-tab:hover {
+            color: #fff;
+            border-color: rgba(0, 210, 255, 0.3);
+            background: rgba(0, 210, 255, 0.05);
+        }
+
+        .symbol-tab.active {
+            color: var(--text-cyan);
+            border-color: var(--text-cyan);
+            background: rgba(0, 210, 255, 0.1);
+            box-shadow: var(--glow-cyan);
+        }
     </style>
 </head>
 <body>
@@ -336,7 +372,7 @@
             <div class="header-left">
                 <span>🟡</span> XEDY V31 ELITE
             </div>
-            <div class="header-center">
+            <div class="header-center" id="headerTitle">
                 Institutional Gold Intelligence Center (IGIC)
             </div>
             <div class="header-right">
@@ -344,6 +380,13 @@
                 <span>LIVE ● UPDATE 10 SEC</span>
             </div>
         </header>
+
+        <!-- Symbol Selection Tabs -->
+        <div class="symbol-tabs">
+            <button class="symbol-tab active" data-symbol="XAUUSD" onclick="setSymbol('XAUUSD')">⚜️ GOLD/USD (XAUUSD)</button>
+            <button class="symbol-tab" data-symbol="USDJPY" onclick="setSymbol('USDJPY')">💴 USD/JPY (USDJPY)</button>
+            <button class="symbol-tab" data-symbol="XTIUSD" onclick="setSymbol('XTIUSD')">🛢️ WTI OIL (XTIUSD)</button>
+        </div>
 
         <!-- Top KPI Bar -->
         <section class="kpi-bar">
@@ -420,7 +463,7 @@
                 <!-- ③ Gold Fair Value Card -->
                 <div class="card-panel">
                     <h3 class="card-title">
-                        <span>③ Gold Fair Value & Signal</span>
+                        <span id="gfiTitleText">③ Gold Fair Value & Signal</span>
                         <span class="badge-status green" id="gfiStatus">Undervalued</span>
                     </h3>
                     <div class="card-content">
@@ -455,7 +498,7 @@
                         <span>⑤ Central Bank Activity</span>
                     </h3>
                     <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">Monthly Purchase</span><span class="row-val" id="cbMonthly" style="color: var(--text-green);">+67 Ton</span></div>
+                        <div class="row-data"><span class="row-lbl" id="cbMonthlyLabel">Monthly Purchase</span><span class="row-val" id="cbMonthly" style="color: var(--text-green);">+67 Ton</span></div>
                         <div class="row-data"><span class="row-lbl">QoQ Growth</span><span class="row-val" id="cbQoQ">+8%</span></div>
                         <div class="row-data"><span class="row-lbl">YoY Growth</span><span class="row-val" id="cbYoY">+14%</span></div>
                         <div class="row-data" style="margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 3px;"><span class="row-lbl">CB Strength Score</span><span class="row-val" id="cbScore" style="color: var(--text-cyan);">95 / 100</span></div>
@@ -469,8 +512,8 @@
                         <span class="badge-status green" id="etfStance">Bullish</span>
                     </h3>
                     <div class="card-content">
-                        <div class="row-data"><span class="row-lbl">SPDR holdings</span><span class="row-val" id="etfSpdr" style="color: var(--text-green);">▲ Inflow</span></div>
-                        <div class="row-data"><span class="row-lbl">iShares holdings</span><span class="row-val" id="etfIshares" style="color: var(--text-green);">▲ Inflow</span></div>
+                        <div class="row-data"><span class="row-lbl" id="etfLabel1">SPDR holdings</span><span class="row-val" id="etfSpdr" style="color: var(--text-green);">▲ Inflow</span></div>
+                        <div class="row-data"><span class="row-lbl" id="etfLabel2">iShares holdings</span><span class="row-val" id="etfIshares" style="color: var(--text-green);">▲ Inflow</span></div>
                         <div class="row-data"><span class="row-lbl">Net Capital Flow</span><span class="row-val" id="etfFlow" style="color: var(--text-green);">+$1.8B</span></div>
                     </div>
                 </div>
@@ -571,19 +614,19 @@
                     </h3>
                     <div class="card-content">
                         <div class="consensus-bar-row">
-                            <div class="consensus-bar-lbl"><span class="row-lbl">ETF Inflow</span><span id="pressEtfVal">76%</span></div>
+                            <div class="consensus-bar-lbl"><span class="row-lbl" id="pressLabel1">ETF Inflow</span><span id="pressEtfVal">76%</span></div>
                             <div class="consensus-bar-track"><div class="consensus-bar-fill" id="pressEtfBar" style="width: 76%; background-color: var(--text-cyan); box-shadow: var(--glow-cyan);"></div></div>
                         </div>
                         <div class="consensus-bar-row">
-                            <div class="consensus-bar-lbl"><span class="row-lbl">Central Bank Purchase</span><span id="pressCbVal">95%</span></div>
+                            <div class="consensus-bar-lbl"><span class="row-lbl" id="pressLabel2">Central Bank Purchase</span><span id="pressCbVal">95%</span></div>
                             <div class="consensus-bar-track"><div class="consensus-bar-fill" id="pressCbBar" style="width: 95%; background-color: var(--text-green); box-shadow: var(--glow-green);"></div></div>
                         </div>
                         <div class="consensus-bar-row">
-                            <div class="consensus-bar-lbl"><span class="row-lbl">Futures Contract Spec</span><span id="pressFutVal">64%</span></div>
+                            <div class="consensus-bar-lbl"><span class="row-lbl" id="pressLabel3">Futures Contract Spec</span><span id="pressFutVal">64%</span></div>
                             <div class="consensus-bar-track"><div class="consensus-bar-fill" id="pressFutBar" style="width: 64%; background-color: var(--text-cyan); box-shadow: var(--glow-cyan);"></div></div>
                         </div>
                         <div class="consensus-bar-row">
-                            <div class="consensus-bar-lbl"><span class="row-lbl">Physical Demand (Asia)</span><span id="pressPhysVal">84%</span></div>
+                            <div class="consensus-bar-lbl"><span class="row-lbl" id="pressLabel4">Physical Demand (Asia)</span><span id="pressPhysVal">84%</span></div>
                             <div class="consensus-bar-track"><div class="consensus-bar-fill" id="pressPhysBar" style="width: 84%; background-color: var(--text-green); box-shadow: var(--glow-green);"></div></div>
                         </div>
                     </div>
@@ -629,7 +672,7 @@
                 <h3 class="card-title">
                     <span>⑰ AI Explanation (Why Bullish?)</span>
                 </h3>
-                <div class="card-content" style="justify-content: flex-start; gap: 3px;">
+                <div class="card-content" id="explanationList" style="justify-content: flex-start; gap: 3px;">
                     <div class="check-item"><span class="check-icon">✓</span> DXY weakening</div>
                     <div class="check-item"><span class="check-icon">✓</span> Real Yield falling</div>
                     <div class="check-item"><span class="check-icon">✓</span> Central Banks buying</div>
@@ -661,16 +704,104 @@
 
     <!-- Script Block for real-time calculation & updating -->
     <script>
+        let activeSymbol = 'XAUUSD';
+
+        function setSymbol(sym) {
+            activeSymbol = sym;
+            // Update active class on tab buttons
+            document.querySelectorAll('.symbol-tab').forEach(btn => {
+                if (btn.getAttribute('data-symbol') === sym) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            // Update labels
+            updateDisplayLabels(sym);
+            // Fetch immediately
+            fetchAndUpdateData();
+        }
+
+        function updateDisplayLabels(sym) {
+            const headerTitle = document.getElementById("headerTitle");
+            const gfiTitleText = document.getElementById("gfiTitleText");
+            const cbMonthlyLabel = document.getElementById("cbMonthlyLabel");
+            const etfLabel1 = document.getElementById("etfLabel1");
+            const etfLabel2 = document.getElementById("etfLabel2");
+            const pressLabel1 = document.getElementById("pressLabel1");
+            const pressLabel2 = document.getElementById("pressLabel2");
+            const pressLabel3 = document.getElementById("pressLabel3");
+            const pressLabel4 = document.getElementById("pressLabel4");
+            const explanationList = document.getElementById("explanationList");
+
+            if (sym === "XAUUSD") {
+                headerTitle.textContent = "Institutional Gold Intelligence Center (IGIC)";
+                gfiTitleText.textContent = "③ Gold Fair Value & Signal";
+                cbMonthlyLabel.textContent = "Monthly Purchase";
+                etfLabel1.textContent = "SPDR holdings";
+                etfLabel2.textContent = "iShares holdings";
+                pressLabel1.textContent = "ETF Inflow";
+                pressLabel2.textContent = "Central Bank Purchase";
+                pressLabel3.textContent = "Futures Contract Spec";
+                pressLabel4.textContent = "Physical Demand (Asia)";
+                explanationList.innerHTML = `
+                    <div class="check-item"><span class="check-icon">✓</span> DXY weakening</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Real Yield falling</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Central Banks buying</div>
+                    <div class="check-item"><span class="check-icon">✓</span> ETF inflow registered</div>
+                    <div class="check-item"><span class="check-icon">✓</span> AI Trend positive</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Liquidity expanding</div>
+                `;
+            } else if (sym === "USDJPY") {
+                headerTitle.textContent = "Institutional Yen Intelligence Center (IYIC)";
+                gfiTitleText.textContent = "③ Yen Fair Value & Signal";
+                cbMonthlyLabel.textContent = "BoJ JGB Net Buying";
+                etfLabel1.textContent = "Yen Futures Long";
+                etfLabel2.textContent = "JGB Capital Inflow";
+                pressLabel1.textContent = "Carry Trade";
+                pressLabel2.textContent = "BoJ JGB Buying";
+                pressLabel3.textContent = "Futures Spec";
+                pressLabel4.textContent = "Retail Flow";
+                explanationList.innerHTML = `
+                    <div class="check-item"><span class="check-icon">✓</span> BoJ Policy Hawkish</div>
+                    <div class="check-item"><span class="check-icon">✓</span> DXY weakening</div>
+                    <div class="check-item"><span class="check-icon">✓</span> US-JP Yield Narrowing</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Carry Trade unwinding</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Repatriation flow</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Safe Haven support</div>
+                `;
+            } else if (sym === "XTIUSD") {
+                headerTitle.textContent = "Institutional Oil Intelligence Center (IOIC)";
+                gfiTitleText.textContent = "③ Oil Fair Value & Signal";
+                cbMonthlyLabel.textContent = "US SPR Purchase";
+                etfLabel1.textContent = "USO ETF holdings";
+                etfLabel2.textContent = "BNO ETF holdings";
+                pressLabel1.textContent = "Strategic reserves";
+                pressLabel2.textContent = "OPEC Cuts";
+                pressLabel3.textContent = "Futures Spec";
+                pressLabel4.textContent = "Refinery Flow";
+                explanationList.innerHTML = `
+                    <div class="check-item"><span class="check-icon">✓</span> OPEC+ compliance</div>
+                    <div class="check-item"><span class="check-icon">✓</span> SPR inventory buying</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Refinery demand high</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Geopolitics elevated</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Middle East premium</div>
+                    <div class="check-item"><span class="check-icon">✓</span> US Dollar weakening</div>
+                `;
+            }
+        }
+
         async function fetchAndUpdateData() {
             try {
                 // 1. Fetch live ticks and forecast data concurrently
+                const forecastUrl = activeSymbol === 'XAUUSD' ? '/api/forecast_data' : `/api/symbol_forecast?symbol=${activeSymbol}`;
                 const [ticksRes, forecastRes] = await Promise.all([
                     fetch('/api/live_ticks').then(r => r.json()),
-                    fetch('/api/forecast_data').then(r => r.json())
+                    fetch(forecastUrl).then(r => r.json())
                 ]);
 
-                if (ticksRes.ticks && ticksRes.ticks.XAUUSD && forecastRes.status === "success") {
-                    const tick = ticksRes.ticks.XAUUSD;
+                if (ticksRes.ticks && ticksRes.ticks[activeSymbol] && forecastRes.status === "success") {
+                    const tick = ticksRes.ticks[activeSymbol];
                     const forecast = forecastRes.forecast;
                     const macro = forecastRes.macro_context;
                     
@@ -695,7 +826,7 @@
                             wsCount++;
                         }
                     });
-                    const wsAvg = wsCount > 0 ? wsSum / wsCount : 4212;
+                    const wsAvg = wsCount > 0 ? wsSum / wsCount : (activeSymbol === 'USDJPY' ? 155.2 : (activeSymbol === 'XTIUSD' ? 81.5 : 4212));
 
                     // AI Engine values
                     let aiTarget = currentPrice;
@@ -709,10 +840,13 @@
                     const xiciVal = 90.7; // Hardcoded default / slightly offset
                     const iciVal = 90.4;
                     const aiVal = Math.round(acc);
-                    const cbVal = 95;
-                    const etfVal = 92;
-                    const stressVal = 32;
-                    const mispricingVal = ((currentPrice - (currentPrice + 67)) / (currentPrice + 67) * 100).toFixed(1);
+                    const cbVal = activeSymbol === 'USDJPY' ? 90 : (activeSymbol === 'XTIUSD' ? 88 : 95);
+                    const etfVal = activeSymbol === 'USDJPY' ? 84 : (activeSymbol === 'XTIUSD' ? 86 : 92);
+                    const stressVal = activeSymbol === 'USDJPY' ? 38 : (activeSymbol === 'XTIUSD' ? 42 : 32);
+                    
+                    const multiplier = activeSymbol === 'USDJPY' ? 1.012 : (activeSymbol === 'XTIUSD' ? 1.022 : 1.016);
+                    const fairValue = Math.round(currentPrice * multiplier);
+                    const mispricingVal = ((currentPrice - fairValue) / fairValue * 100).toFixed(1);
                     
                     document.getElementById("kpiXICI").textContent = xiciVal;
                     document.getElementById("kpiICI").textContent = iciVal;
@@ -729,12 +863,12 @@
                     regimeKpi.style.color = regimeColor;
 
                     // 2. ICI Card
-                    document.getElementById("iciWallSt").textContent = 89;
-                    document.getElementById("iciExperts").textContent = 91;
-                    document.getElementById("iciCB").textContent = 95;
-                    document.getElementById("iciETF").textContent = 92;
-                    document.getElementById("iciCFTC").textContent = 88;
-                    document.getElementById("iciOptions").textContent = 86;
+                    document.getElementById("iciWallSt").textContent = activeSymbol === 'USDJPY' ? 86 : (activeSymbol === 'XTIUSD' ? 84 : 89);
+                    document.getElementById("iciExperts").textContent = activeSymbol === 'USDJPY' ? 88 : (activeSymbol === 'XTIUSD' ? 87 : 91);
+                    document.getElementById("iciCB").textContent = cbVal;
+                    document.getElementById("iciETF").textContent = etfVal;
+                    document.getElementById("iciCFTC").textContent = activeSymbol === 'USDJPY' ? 82 : (activeSymbol === 'XTIUSD' ? 84 : 88);
+                    document.getElementById("iciOptions").textContent = activeSymbol === 'USDJPY' ? 80 : (activeSymbol === 'XTIUSD' ? 82 : 86);
                     document.getElementById("kpiICI").textContent = iciVal;
 
                     // 3. Market Regime
@@ -747,11 +881,9 @@
                     document.getElementById("regType").textContent = "TREND FOLLOWING";
 
                     // 4. Gold Fair Value
-                    const fairValue = Math.round(currentPrice * 1.016);
-                    const mispricing = ((currentPrice - fairValue) / fairValue * 100).toFixed(1);
-                    document.getElementById("gfiCurrent").textContent = Math.round(currentPrice);
-                    document.getElementById("gfiFair").textContent = `$${fairValue.toLocaleString()}`;
-                    document.getElementById("gfiMispricing").textContent = `${mispricing}%`;
+                    document.getElementById("gfiCurrent").textContent = activeSymbol === 'XAUUSD' ? Math.round(currentPrice) : currentPrice.toFixed(2);
+                    document.getElementById("gfiFair").textContent = activeSymbol === 'XAUUSD' ? `$${fairValue.toLocaleString()}` : `$${fairValue.toFixed(2)}`;
+                    document.getElementById("gfiMispricing").textContent = `${mispricingVal}%`;
                     document.getElementById("gfiStatus").textContent = "Undervalued";
 
                     // Stars rating dynamic selection
@@ -759,34 +891,34 @@
                     document.getElementById("aiRating").textContent = ratingStars;
 
                     // 5. Market Stress
-                    document.getElementById("stressVix").textContent = 16;
-                    document.getElementById("stressMove").textContent = 102;
+                    document.getElementById("stressVix").textContent = activeSymbol === 'USDJPY' ? 18 : (activeSymbol === 'XTIUSD' ? 19 : 16);
+                    document.getElementById("stressMove").textContent = activeSymbol === 'USDJPY' ? 112 : (activeSymbol === 'XTIUSD' ? 118 : 102);
                     document.getElementById("stressSpread").textContent = "Low";
-                    document.getElementById("stressAgg").textContent = "32 / 100";
+                    document.getElementById("stressAgg").textContent = `${stressVal} / 100`;
 
                     // 6. Central Bank
-                    document.getElementById("cbMonthly").textContent = "+67 Ton";
+                    document.getElementById("cbMonthly").textContent = activeSymbol === 'XAUUSD' ? "+67 Ton" : (activeSymbol === 'USDJPY' ? "+180B" : "+12.2M Bbl");
                     document.getElementById("cbQoQ").textContent = "+8%";
                     document.getElementById("cbYoY").textContent = "+14%";
-                    document.getElementById("cbScore").textContent = "95 / 100";
+                    document.getElementById("cbScore").textContent = `${cbVal} / 100`;
 
                     // 7. ETF Momentum
-                    document.getElementById("etfSpdr").textContent = "▲ Inflow";
-                    document.getElementById("etfIshares").textContent = "▲ Inflow";
-                    document.getElementById("etfFlow").textContent = "+$1.8B";
+                    document.getElementById("etfSpdr").textContent = bias >= 0 ? "▲ Inflow" : "▼ Outflow";
+                    document.getElementById("etfIshares").textContent = bias >= 0 ? "▲ Inflow" : "▼ Outflow";
+                    document.getElementById("etfFlow").textContent = activeSymbol === 'XAUUSD' ? "+$1.8B" : (activeSymbol === 'USDJPY' ? "+$420M" : "+$620M");
 
                     // 8. Market Quality
-                    document.getElementById("mqTrend").textContent = 91;
-                    document.getElementById("mqLiq").textContent = 89;
-                    document.getElementById("mqPart").textContent = 84;
-                    document.getElementById("mqBreadth").textContent = 87;
+                    document.getElementById("mqTrend").textContent = activeSymbol === 'USDJPY' ? 88 : (activeSymbol === 'XTIUSD' ? 84 : 91);
+                    document.getElementById("mqLiq").textContent = activeSymbol === 'USDJPY' ? 91 : (activeSymbol === 'XTIUSD' ? 86 : 89);
+                    document.getElementById("mqPart").textContent = activeSymbol === 'USDJPY' ? 82 : (activeSymbol === 'XTIUSD' ? 80 : 84);
+                    document.getElementById("mqBreadth").textContent = activeSymbol === 'USDJPY' ? 85 : (activeSymbol === 'XTIUSD' ? 82 : 87);
 
                     // 9. Positioning
-                    document.getElementById("posComm").textContent = "BUY";
-                    document.getElementById("posFunds").textContent = "BUY";
-                    document.getElementById("posRetail").textContent = "SELL";
-                    document.getElementById("posInst").textContent = "BUY";
-                    document.getElementById("posBias").textContent = "92%";
+                    document.getElementById("posComm").textContent = bias >= 0 ? "BUY" : "SELL";
+                    document.getElementById("posFunds").textContent = bias >= 0 ? "BUY" : "SELL";
+                    document.getElementById("posRetail").textContent = bias >= 0 ? "SELL" : "BUY";
+                    document.getElementById("posInst").textContent = bias >= 0 ? "BUY" : "SELL";
+                    document.getElementById("posBias").textContent = activeSymbol === 'USDJPY' ? "84%" : (activeSymbol === 'XTIUSD' ? "86%" : "92%");
 
                     // 10. AI Confidence
                     document.getElementById("confMacro").textContent = "91%";
@@ -794,12 +926,12 @@
                     document.getElementById("confFlow").textContent = "94%";
                     document.getElementById("confSent").textContent = "88%";
                     document.getElementById("confCons").textContent = "90%";
-                    document.getElementById("confFinal").textContent = "89%";
+                    document.getElementById("confFinal").textContent = `${aiVal}%`;
 
                     // 11. Consensus Dispersion
-                    document.getElementById("dispWS").textContent = `$${Math.round(wsAvg)}`;
-                    document.getElementById("dispExp").textContent = `$${Math.round(currentPrice * 1.03)}`;
-                    document.getElementById("dispAI").textContent = `$${Math.round(aiTarget)}`;
+                    document.getElementById("dispWS").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(wsAvg)}` : `$${wsAvg.toFixed(2)}`;
+                    document.getElementById("dispExp").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(currentPrice * 1.03)}` : `$${(currentPrice * 1.03).toFixed(2)}`;
+                    document.getElementById("dispAI").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(aiTarget)}` : `$${aiTarget.toFixed(2)}`;
                     const dispVal = Math.abs(((wsAvg - aiTarget)/aiTarget * 100)).toFixed(1);
                     document.getElementById("dispVal").textContent = `${dispVal}%`;
 
@@ -810,21 +942,30 @@
                     document.getElementById("riskFail").textContent = "14%";
 
                     // 13. Buying pressure
-                    document.getElementById("pressEtfVal").textContent = "76%";
-                    document.getElementById("pressEtfBar").style.width = "76%";
-                    document.getElementById("pressCbVal").textContent = "95%";
-                    document.getElementById("pressCbBar").style.width = "95%";
-                    document.getElementById("pressFutVal").textContent = "64%";
-                    document.getElementById("pressFutBar").style.width = "64%";
-                    document.getElementById("pressPhysVal").textContent = "84%";
-                    document.getElementById("pressPhysBar").style.width = "84%";
+                    const p1 = activeSymbol === 'USDJPY' ? 62 : (activeSymbol === 'XTIUSD' ? 70 : 76);
+                    const p2 = cbVal;
+                    const p3 = activeSymbol === 'USDJPY' ? 72 : (activeSymbol === 'XTIUSD' ? 68 : 64);
+                    const p4 = activeSymbol === 'USDJPY' ? 74 : (activeSymbol === 'XTIUSD' ? 78 : 84);
+
+                    document.getElementById("pressEtfVal").textContent = `${p1}%`;
+                    document.getElementById("pressEtfBar").style.width = `${p1}%`;
+                    document.getElementById("pressCbVal").textContent = `${p2}%`;
+                    document.getElementById("pressCbBar").style.width = `${p2}%`;
+                    document.getElementById("pressFutVal").textContent = `${p3}%`;
+                    document.getElementById("pressFutBar").style.width = `${p3}%`;
+                    document.getElementById("pressPhysVal").textContent = `${p4}%`;
+                    document.getElementById("pressPhysBar").style.width = `${p4}%`;
 
                     // 14. Decision Engine (IDE)
-                    const lowerEntry = Math.round(currentPrice - 38);
-                    const upperEntry = Math.round(currentPrice - 18);
-                    document.getElementById("ideEntry").textContent = `${lowerEntry.toLocaleString()} - ${upperEntry.toLocaleString()}`;
-                    document.getElementById("ideTarget").textContent = `$${Math.round(currentPrice + 192).toLocaleString()}`;
-                    document.getElementById("ideStop").textContent = `$${Math.round(currentPrice - 93).toLocaleString()}`;
+                    const lowerEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 38) : (currentPrice * 0.992).toFixed(2);
+                    const upperEntry = activeSymbol === 'XAUUSD' ? Math.round(currentPrice - 18) : (currentPrice * 0.997).toFixed(2);
+                    document.getElementById("ideEntry").textContent = `${lowerEntry} - ${upperEntry}`;
+                    
+                    const tpPrice = currentPrice * 1.042;
+                    document.getElementById("ideTarget").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(tpPrice).toLocaleString()}` : `$${tpPrice.toFixed(2)}`;
+                    
+                    const slPrice = currentPrice * 0.978;
+                    document.getElementById("ideStop").textContent = activeSymbol === 'XAUUSD' ? `$${Math.round(slPrice).toLocaleString()}` : `$${slPrice.toFixed(2)}`;
 
                     // 15. Performance
                     document.getElementById("perfRet").textContent = "+4.8%";

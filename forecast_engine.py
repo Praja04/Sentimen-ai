@@ -480,8 +480,11 @@ def get_symbol_forecast(symbol: str) -> dict:
                 "powell_quote": "Gubernur Ueda mengisyaratkan normalisasi suku bunga lebih lanjut jika inflasi bertahan di atas 2%.",
                 "targets": [
                     {"inst": "Goldman Sachs", "target": "155.00", "stance": "Apresiasi JPY jangka menengah"},
+                    {"inst": "Citi Research", "target": "154.00", "stance": "Volatilitas carry trade mendukung Yen"},
                     {"inst": "JP Morgan", "target": "152.50", "stance": "Normalisasi BoJ menekan USDJPY"},
-                    {"inst": "Citi Research", "target": "154.00", "stance": "Volatilitas carry trade mendukung Yen"}
+                    {"inst": "Bank of America", "target": "156.00", "stance": "Netral (Konsolidasi Range)"},
+                    {"inst": "UBS", "target": "158.00", "stance": "Netral-Hawkish"},
+                    {"inst": "Morgan Stanley", "target": "159.00", "stance": "Koreksi Teknis"}
                 ],
                 "president_stance": "Penutupan posisi carry trade global seiring penurunan yield obligasi US Treasury."
             },
@@ -511,8 +514,11 @@ def get_symbol_forecast(symbol: str) -> dict:
                 "powell_quote": "Permintaan minyak mentah dari kilang lokal China menunjukkan pemulihan pasca stimulus.",
                 "targets": [
                     {"inst": "Goldman Sachs", "target": "$82.00", "stance": "Keketatan pasokan kuartal berjalan"},
+                    {"inst": "Citi Research", "target": "$85.00", "stance": "Gangguan pasokan Timur Tengah memicu premi risiko"},
                     {"inst": "JP Morgan", "target": "$78.50", "stance": "Ekspektasi suplai stabil dari produsen non-OPEC"},
-                    {"inst": "Citi Research", "target": "$85.00", "stance": "Gangguan pasokan Timur Tengah memicu premi risiko"}
+                    {"inst": "Bank of America", "target": "$80.00", "stance": "Netral-Bullish"},
+                    {"inst": "UBS", "target": "$81.00", "stance": "Netral (Permintaan Manufaktur Melambat)"},
+                    {"inst": "Morgan Stanley", "target": "$83.00", "stance": "Koreksi Premium Risiko"}
                 ],
                 "president_stance": "Kebijakan energi domestik AS memengaruhi proyeksi output shale oil dalam jangka panjang."
             },
