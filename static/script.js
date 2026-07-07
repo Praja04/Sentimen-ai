@@ -187,6 +187,40 @@ document.addEventListener('DOMContentLoaded', () => {
                             recVal.innerHTML = `<span class="text-yellow">SIDEWAYS / AWAITING CONFLUENCE</span>`;
                         }
                     }
+                
+                // Update asset cards on homepage
+                for (const [symbol, info] of Object.entries(data.results)) {
+                    const cleanSymbol = symbol.replace(/\s+/g, '-');
+                    const fairEl = document.getElementById(`card-fair-value-${cleanSymbol}`);
+                    const gapEl = document.getElementById(`card-gap-${cleanSymbol}`);
+                    const aiEl = document.getElementById(`card-ai-dir-${cleanSymbol}`);
+                    const btnContainer = document.getElementById(`card-action-btn-container-${cleanSymbol}`);
+                    
+                    const isJpy = symbol.includes('JPY');
+                    const decimals = isJpy ? 3 : (symbol.includes('EUR') || symbol.includes('GBP') ? 4 : 2);
+                    
+                    if (fairEl) {
+                        fairEl.innerText = info.fair_value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: decimals});
+                    }
+                    if (gapEl) {
+                        const gapSign = info.gap >= 0 ? "+" : "";
+                        const statusClass = info.gap < 0 ? "text-green" : "text-red";
+                        gapEl.className = statusClass;
+                        gapEl.innerText = `${gapSign}${info.gap.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: decimals})} (${gapSign}${info.pct_gap}%)`;
+                    }
+                    if (aiEl) {
+                        aiEl.className = info.ai_direction === "BULLISH" ? "text-green" : (info.ai_direction === "BEARISH" ? "text-red" : "text-yellow");
+                        aiEl.innerText = info.ai_direction;
+                    }
+                    if (btnContainer) {
+                        if (info.action === "BUY") {
+                            btnContainer.innerHTML = `<button class="action-btn buy" style="width: 100%; border: 1.5px solid var(--text-green); box-shadow: 0 0 10px rgba(0,255,0,0.15); background: rgba(0,255,0,0.08); color: var(--text-green); font-weight: bold; cursor: pointer; padding: 4px; border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; text-shadow: 0 0 5px rgba(0,255,0,0.3);">BUY DIP</button>`;
+                        } else if (info.action === "SELL") {
+                            btnContainer.innerHTML = `<button class="action-btn sell" style="width: 100%; border: 1.5px solid var(--text-red); box-shadow: 0 0 10px rgba(255,0,0,0.15); background: rgba(255,0,0,0.08); color: var(--text-red); font-weight: bold; cursor: pointer; padding: 4px; border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; text-shadow: 0 0 5px rgba(255,0,0,0.3);">SELL RALLY</button>`;
+                        } else {
+                            btnContainer.innerHTML = `<button class="action-btn" style="width: 100%; border: 1px solid var(--text-yellow); background: rgba(255,183,0,0.05); color: var(--text-yellow); cursor: default; padding: 4px; border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;">HOLD / WAIT</button>`;
+                        }
+                    }
                 }
             }
         } catch (e) {
@@ -319,15 +353,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div><span style="color:var(--text-muted);">VOL:</span> <strong id="live-vol-${a.symbol.replace(/\s+/g, '-')}" style="color:#fff;">...</strong></div>
                     </div>
                 </div>
-                <div class="forecast-split">
-                    <div class="fc-col">
-                        <div class="fc-title">1D FORECAST</div>
-                        ${forecastHTML(a.f4, a.price, isJpy)}
+                <!-- Fair Value & FVG Detector -->
+                <div class="laggard-detail-box" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">FAIR VALUE (EST):</span>
+                        <strong id="card-fair-value-${a.symbol.replace(/\s+/g, '-')}" style="color: var(--text-yellow);">...</strong>
                     </div>
-                    <div class="fc-col">
-                        <div class="fc-title">1W FORECAST</div>
-                        ${forecastHTML(a.f1, a.price, isJpy)}
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">FVG / GAP:</span>
+                        <strong id="card-gap-${a.symbol.replace(/\s+/g, '-')}" style="color: #fff;">...</strong>
                     </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">AI FORECAST (D+1):</span>
+                        <span id="card-ai-dir-${a.symbol.replace(/\s+/g, '-')}" style="font-weight: bold;">...</span>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; text-align: center;" id="card-action-btn-container-${a.symbol.replace(/\s+/g, '-')}">
+                    <button class="action-btn" style="width: 100%; font-size: 0.7rem; border-radius: 4px; padding: 4px; cursor: default; border: 1px solid var(--border-glow); background: rgba(255,255,255,0.03); color: var(--text-muted);">AWAITING DATA</button>
                 </div>
             </div>
             `;
