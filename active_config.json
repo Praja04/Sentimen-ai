@@ -2,10 +2,10 @@
     "timeframe": "H1",
     "risk_percent": 1.0,
     "strategy_type": "xedy_mean_revert",
-    "strategy_name": "AI XEDY_V30 Mean Revert RSI30 (Expectancy-Opt)",
+    "strategy_name": "AI XEDY_V30 Mean Revert RSI30 (MAE-Opt)",
     "sl_dist": 25.0,
     "tp_dist": 25.0,
-    "win_rate": 63.41,
-    "max_drawdown": 3.12,
-    "net_profit": 17.56
+    "win_rate": 60.98,
+    "max_drawdown": 3.5,
+    "net_profit": 16.17
 }

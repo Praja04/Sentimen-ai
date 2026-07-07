@@ -3,7 +3,7 @@ import os
 import time
 from datetime import datetime
 
-DEMO_PATH = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+DEMO_PATH = r'C:\Antigravity\livetest_demo.json'
 
 def init_demo_file():
     needs_init = False
@@ -184,7 +184,7 @@ def update_livetest_sim(current_gold_price, bias, news_halt_active=False):
             return state
             
         # Load active config from decoupled active_config.json
-        config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+        config_file = r'C:\Antigravity\active_config.json'
         config = {}
         if os.path.exists(config_file):
             try:

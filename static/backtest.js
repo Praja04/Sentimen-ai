@@ -115,7 +115,10 @@ function renderResults(payload) {
         const isActive = activeConfig &&
                          activeConfig.timeframe === payload.timeframe &&
                          activeConfig.strategy_type === item.strategy_type &&
-                         activeConfig.strategy_name === item.strategy_name;
+                         activeConfig.strategy_name === item.strategy_name &&
+                         Math.abs((activeConfig.win_rate || 0) - (item.win_rate || 0)) < 0.01 &&
+                         Math.abs((activeConfig.max_drawdown || 0) - (item.max_drawdown_pct || 0)) < 0.01 &&
+                         Math.abs((activeConfig.net_profit || 0) - (item.net_profit_pct || 0)) < 0.01;
 
         return `
             <article class="result-card" style="${isActive ? 'border: 1.5px solid var(--text-yellow); box-shadow: 0 0 15px rgba(255,215,0,0.15);' : ''}">
@@ -623,7 +626,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
-
 function syncStrategyCheckboxes(activeConfig) {
     const checkboxes = document.querySelectorAll('.strategy-selector-chk');
     if (!checkboxes.length) return;
@@ -631,11 +633,17 @@ function syncStrategyCheckboxes(activeConfig) {
     checkboxes.forEach(chk => {
         const tf = chk.getAttribute('data-tf');
         const type = chk.getAttribute('data-type');
+        const win = parseFloat(chk.getAttribute('data-win') || '0');
+        const dd = parseFloat(chk.getAttribute('data-dd') || '0');
+        const profit = parseFloat(chk.getAttribute('data-profit') || '0');
         
         const matches = activeConfig && 
                         activeConfig.timeframe === tf && 
                         activeConfig.strategy_type === type &&
-                        activeConfig.strategy_name === chk.getAttribute('data-name');
+                        activeConfig.strategy_name === chk.getAttribute('data-name') &&
+                        Math.abs((activeConfig.win_rate || 0) - win) < 0.01 &&
+                        Math.abs((activeConfig.max_drawdown || 0) - dd) < 0.01 &&
+                        Math.abs((activeConfig.net_profit || 0) - profit) < 0.01;
                         
         if (matches) {
             if (!chk.checked) {
