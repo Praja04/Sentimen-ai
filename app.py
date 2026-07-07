@@ -1404,6 +1404,7 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
         "total_sell": total_sell,
         "win_rate": round(win_rate, 2),
         "max_drawdown_pct": round(max_drawdown, 2),
+        "days": round(test_days, 2),
         "avg_monthly_profit_pct": round(avg_monthly_profit_pct, 2),
         "net_profit_pct": round(net_profit_pct, 2),
         "ending_balance": round(equity, 2),
@@ -1457,12 +1458,14 @@ def evaluate_result_against_filters(result, filters):
     if not compare_metric(result["win_rate"], wr_operator, wr_value):
         return False
         
-    # Enforce minimum total trades filter
+    # Enforce minimum total trades filter (normalized per 30 days / 1 month)
     trade_filter = (filters or {}).get("total_trades", {})
     if trade_filter:
         trade_operator = trade_filter.get("operator", ">=")
-        trade_value = float(trade_filter.get("value", 10.0))
-        if not compare_metric(result["total_trades"], trade_operator, trade_value):
+        trades_per_month = float(trade_filter.get("value", 10.0))
+        test_days = float(result.get("days", 30.0))
+        scaled_threshold = trades_per_month * (test_days / 30.0)
+        if not compare_metric(result["total_trades"], trade_operator, scaled_threshold):
             return False
             
     return True
