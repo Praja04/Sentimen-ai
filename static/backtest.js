@@ -14,6 +14,8 @@ const elements = {
     wrValue: document.getElementById("wrValue"),
     mpOperator: document.getElementById("mpOperator"),
     mpValue: document.getElementById("mpValue"),
+    tradeOperator: document.getElementById("tradeOperator"),
+    tradeValue: document.getElementById("tradeValue"),
     priority1: document.getElementById("priority1"),
     priority2: document.getElementById("priority2"),
     priority3: document.getElementById("priority3"),
@@ -269,6 +271,10 @@ async function runBacktestSearch() {
             monthly_profit: {
                 operator: elements.mpOperator.value,
                 value: Number(elements.mpValue.value || 40),
+            },
+            total_trades: {
+                operator: elements.tradeOperator.value,
+                value: Number(elements.tradeValue.value || 10),
             },
         },
     };

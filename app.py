@@ -1457,6 +1457,14 @@ def evaluate_result_against_filters(result, filters):
     if not compare_metric(result["win_rate"], wr_operator, wr_value):
         return False
         
+    # Enforce minimum total trades filter
+    trade_filter = (filters or {}).get("total_trades", {})
+    if trade_filter:
+        trade_operator = trade_filter.get("operator", ">=")
+        trade_value = float(trade_filter.get("value", 10.0))
+        if not compare_metric(result["total_trades"], trade_operator, trade_value):
+            return False
+            
     return True
 
 
@@ -1858,6 +1866,10 @@ def api_backtest_search():
                     "monthly_profit": {
                         "operator": filters.get("monthly_profit", {}).get("operator", ">="),
                         "value": float(filters.get("monthly_profit", {}).get("value", 5.0)),
+                    },
+                    "total_trades": {
+                        "operator": filters.get("total_trades", {}).get("operator", ">="),
+                        "value": float(filters.get("total_trades", {}).get("value", 10.0)),
                     },
                 },
             )
