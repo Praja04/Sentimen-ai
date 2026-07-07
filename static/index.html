@@ -201,38 +201,6 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="panel panel-border" style="flex: 1.2;">
-                    <h3 class="panel-title" style="display:flex; align-items:center;">
-                        INTERMARKET FAIR VALUE & LAGGARD DETECTOR
-                        <div class="tooltip-container" style="margin-left: 8px;">
-                            <span class="info-icon">ⓘ</span>
-                            <div class="tooltip-text" style="bottom: auto; top: 150://; width: 280px; left: auto; right: -50px; transform: none; z-index: 1000;">
-                                <strong style="color:var(--text-yellow);">Laggard Rotation Strategy</strong><br><br>
-                                Menggunakan analisis regresi linier dinamis (last 30 days) lintas aset untuk menghitung <strong>Harga Seharusnya (Fair Value)</strong> berdasarkan pergerakan pasar intermarket.<br><br>
-                                Aset dengan <strong>Gap negatif terbesar (Undervalued)</strong> cenderung mengalami rotasi naik (BUY), sedangkan <strong>Gap positif terbesar (Overvalued)</strong> cenderung turun (SELL).
-                            </div>
-                        </div>
-                    </h3>
-                    <table class="tech-table" style="margin-top: 8px;">
-                        <thead>
-                            <tr>
-                                <th>ASSET</th>
-                                <th>ACTUAL</th>
-                                <th>FAIR VALUE</th>
-                                <th>GAP / FVG</th>
-                                <th>AI COMPARE</th>
-                                <th>CONFLUENCE</th>
-                            </tr>
-                        </thead>
-                        <tbody id="laggard-table-body">
-                            <!-- Dynamically populated -->
-                        </tbody>
-                    </table>
-                    <div style="margin-top: 10px; font-size: 0.7rem; font-family: 'Share Tech Mono', monospace; display: flex; justify-content: space-between; border-top: 1px solid var(--border-glow); padding-top: 8px;">
-                        <span style="color: var(--text-yellow);">LAGGARD ROTATION LEADER: <span id="laggard-leader-val" style="color: #fff; font-weight: bold;">...</span></span>
-                        <span id="laggard-recommendation-val" style="color: var(--text-green); font-weight: bold;">WAITING...</span>
-                    </div>
-                </div>
                 <div class="panel panel-border" style="flex: 0.8;">
                     <h3 class="panel-title">TECHNICAL SIGNALS (H4)</h3>
                     <table class="tech-table">

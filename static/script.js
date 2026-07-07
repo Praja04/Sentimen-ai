@@ -187,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             recVal.innerHTML = `<span class="text-yellow">SIDEWAYS / AWAITING CONFLUENCE</span>`;
                         }
                     }
+                }
                 
                 // Update asset cards on homepage
                 for (const [symbol, info] of Object.entries(data.results)) {
