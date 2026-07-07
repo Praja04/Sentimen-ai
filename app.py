@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-from flask import Flask, jsonify, send_from_directory, request
+from flask import Flask, jsonify, send_from_directory, request, render_template
 import MetaTrader5 as mt5
 from flask_cors import CORS
 import os
@@ -41,7 +41,7 @@ def _reset_progress():
 
 
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__, static_folder='static', template_folder='templates')
 app.debug = True
 CORS(app)
 
@@ -2876,6 +2876,11 @@ def modify_position_api():
 @app.route('/trade')
 def serve_trade():
     return send_from_directory(app.static_folder, 'trade.html')
+
+@app.route('/Intermarket')
+@app.route('/intermarket')
+def serve_intermarket():
+    return render_template('intermarket.html')
 
 _cached_calendar = []
 _cached_news = []
