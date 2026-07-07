@@ -42,6 +42,7 @@ def _reset_progress():
 
 
 app = Flask(__name__, static_folder='static')
+app.debug = True
 CORS(app)
 
 # The specific pairs requested
@@ -50,7 +51,13 @@ SYMBOLS = [
     "XTIUSD", "US30", "BOND JAPAN", "BOND US"
 ]
 
+_mt5_initialized = False
+
 def init_mt5():
+    global _mt5_initialized
+    if _mt5_initialized and mt5.terminal_info() is not None:
+        return True
+        
     # Initialize connection to the MetaTrader 5 terminal using credentials if present
     login_val = os.getenv("MT5_LOGIN")
     password_val = os.getenv("MT5_PASSWORD")
@@ -58,11 +65,14 @@ def init_mt5():
     
     if login_val and password_val and server_val:
         if mt5.initialize(login=int(login_val), password=password_val, server=server_val):
+            _mt5_initialized = True
             return True
             
     if not mt5.initialize():
         print("initialize() failed, error code =", mt5.last_error())
+        _mt5_initialized = False
         return False
+    _mt5_initialized = True
     return True
 
 @app.after_request

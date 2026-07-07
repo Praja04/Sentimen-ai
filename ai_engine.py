@@ -48,18 +48,27 @@ SYM_GOLD = "XAUUSD"
 SYM_JPY = "USDJPY"
 SYM_OIL = "WTI" # Fallback if WTI, often XTIUSD, we'll try WTI first
 
+_mt5_initialized = False
+
 def init_mt5():
+    global _mt5_initialized
+    if _mt5_initialized and mt5.terminal_info() is not None:
+        return True
+        
     login_val = os.getenv("MT5_LOGIN")
     password_val = os.getenv("MT5_PASSWORD")
     server_val = os.getenv("MT5_SERVER")
     
     if login_val and password_val and server_val:
         if mt5.initialize(login=int(login_val), password=password_val, server=server_val):
+            _mt5_initialized = True
             return True
             
     if not mt5.initialize():
         print("initialize() failed, error code =", mt5.last_error())
+        _mt5_initialized = False
         return False
+    _mt5_initialized = True
     return True
 
 # ==========================================
