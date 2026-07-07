@@ -223,6 +223,60 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 }
+
+                // === CURRENCY STRENGTH INDEX (CSI) BARS ===
+                const csiContainer = document.getElementById('csi-bars-container');
+                if (csiContainer && data.currency_indices) {
+                    const indices = data.currency_indices;
+
+                    // Define display order, colors and full names
+                    const CSI_META = {
+                        'DXY': { name: 'USD (DXY)', color: '#00d4ff' },
+                        'EXY': { name: 'EUR (EXY)', color: '#3b82f6' },
+                        'BXY': { name: 'GBP (BXY)', color: '#8b5cf6' },
+                        'JXY': { name: 'JPY (JXY)', color: '#f59e0b' },
+                        'SFX': { name: 'CHF (SFX)', color: '#10b981' },
+                        'CXY': { name: 'CAD (CXY)', color: '#ef4444' },
+                        'AXY': { name: 'AUD (AXY)', color: '#f97316' },
+                        'ZXY': { name: 'NZD (ZXY)', color: '#06b6d4' }
+                    };
+
+                    // Sort by score descending
+                    const sorted = Object.entries(indices).sort((a, b) => b[1].score - a[1].score);
+
+                    let html = '';
+                    for (const [key, val] of sorted) {
+                        const meta = CSI_META[key] || { name: key, color: '#94a3b8' };
+                        const score = val.score;
+                        const pct = val.percentage;
+                        const pctSign = pct >= 0 ? '+' : '';
+                        const pctStr = `${pctSign}${pct.toFixed(3)}%`;
+                        // bar width clamped 0..100 mapping score 0-100 → bar 0-100%
+                        const barWidth = Math.max(2, Math.min(100, score));
+                        // color intensity: strong = saturated, weak = faded
+                        const isStrong = score >= 50;
+                        const barColor = isStrong ? meta.color : '#334155';
+                        const textColor = isStrong ? meta.color : '#64748b';
+                        const arrowIcon = isStrong ? '▲' : '▼';
+                        const arrowColor = isStrong ? '#00ff41' : '#ff3333';
+
+                        html += `
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: ${textColor}; font-weight: bold; letter-spacing: 0.5px;">${meta.name}</span>
+                                <span style="display: flex; align-items: center; gap: 4px;">
+                                    <span style="color: ${arrowColor}; font-size: 0.6rem;">${arrowIcon}</span>
+                                    <span style="color: ${textColor}; font-size: 0.65rem;">${pctStr}</span>
+                                    <span style="color: #475569; font-size: 0.6rem;">${score.toFixed(1)}</span>
+                                </span>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 3px; height: 7px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="width: ${barWidth}%; height: 100%; background: linear-gradient(90deg, ${barColor}88, ${barColor}); border-radius: 3px; transition: width 0.6s ease; box-shadow: 0 0 6px ${barColor}55;"></div>
+                            </div>
+                        </div>`;
+                    }
+                    csiContainer.innerHTML = html;
+                }
             }
         } catch (e) {
             console.error("Failed to fetch laggard data", e);

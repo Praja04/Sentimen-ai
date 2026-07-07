@@ -328,11 +328,54 @@ def api_laggard_detection():
                 
         except Exception as e:
             print(f"Error calculating regression for {target}: {e}")
+    # Calculate Currency Strength Indices (DXY, EXY, JXY, etc.)
+    def get_change(sym_opts):
+        for opt in sym_opts:
+            mt5.symbol_select(opt, True)
+            t = mt5.symbol_info_tick(opt)
+            if t:
+                rates = mt5.copy_rates_from_pos(opt, mt5.TIMEFRAME_D1, 0, 1)
+                if rates is not None and len(rates) > 0:
+                    op = rates[0]['open']
+                    if op > 0:
+                        return ((t.bid - op) / op) * 100.0
+        return 0.0
+        
+    chg_eur = get_change(["EURUSD"])
+    chg_gbp = get_change(["GBPUSD"])
+    chg_jpy = -get_change(["USDJPY"])
+    chg_chf = -get_change(["USDCHF"])
+    chg_cad = -get_change(["USDCAD"])
+    chg_aud = get_change(["AUDUSD"])
+    chg_nzd = get_change(["NZDUSD"])
+    chg_usd = 0.0
+    
+    avg_chg = (chg_eur + chg_gbp + chg_jpy + chg_chf + chg_cad + chg_aud + chg_nzd) / 8.0
+    
+    strengths = {
+        "DXY": chg_usd - avg_chg,
+        "EXY": chg_eur - avg_chg,
+        "BXY": chg_gbp - avg_chg,
+        "JXY": chg_jpy - avg_chg,
+        "SFX": chg_chf - avg_chg,
+        "CXY": chg_cad - avg_chg,
+        "AXY": chg_aud - avg_chg,
+        "ZXY": chg_nzd - avg_chg
+    }
+    
+    scaled_indices = {}
+    for idx_name, pct in strengths.items():
+        score = 50.0 + (pct * 15.0)  # scale factor of 15.0 for UI visibility
+        scaled_indices[idx_name] = {
+            "percentage": round(pct, 3),
+            "score": round(min(100.0, max(0.0, score)), 1)
+        }
             
     return jsonify({
         "status": "success",
         "laggard_leader": laggard_leader,
-        "results": results
+        "results": results,
+        "currency_indices": scaled_indices
     })
 
 @app.route('/api/news_calendar')
