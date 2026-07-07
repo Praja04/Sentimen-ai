@@ -3,618 +3,452 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XEDY — Intermarket Intelligence Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>XEDY — Intermarket Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #020617;
-            --bg-panel: rgba(10, 20, 45, 0.85);
-            --border: #1e3a8a;
-            --accent: #3b82f6;
-            --cyan: #00d4ff;
-            --gold: #fbbf24;
-            --green: #00ff41;
-            --red: #ff3333;
-            --muted: #475569;
-            --text: #94a3b8;
-            --white: #e2e8f0;
-            --font-mono: 'Share Tech Mono', monospace;
-            --font-head: 'Orbitron', sans-serif;
-            --font-title: 'Rajdhani', sans-serif;
+            --bg:        #020617;
+            --bg-panel:  rgba(8,16,40,0.9);
+            --border:    #1e3a8a;
+            --accent:    #3b82f6;
+            --cyan:      #00d4ff;
+            --gold:      #fbbf24;
+            --green:     #00ff41;
+            --red:       #ff3333;
+            --purple:    #a78bfa;
+            --muted:     #475569;
+            --text:      #94a3b8;
+            --white:     #e2e8f0;
+            --mono:      'Share Tech Mono', monospace;
+            --title:     'Rajdhani', sans-serif;
+            --orbit:     'Orbitron', sans-serif;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
             background: var(--bg);
             color: var(--text);
-            font-family: var(--font-mono);
+            font-family: var(--mono);
             font-size: 11px;
-            min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* === ANIMATED BG === */
+        /* subtle animated bg */
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0; z-index: 0;
             background:
-                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59,130,246,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 40% at 80% 80%, rgba(0,212,255,0.05) 0%, transparent 50%);
+                radial-gradient(ellipse 70% 40% at 50% -5%, rgba(59,130,246,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 35% 35% at 85% 85%, rgba(167,139,250,0.05) 0%, transparent 50%);
             pointer-events: none;
-            z-index: 0;
         }
 
-        /* === HEADER === */
-        .im-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(2,6,23,0.95);
+        /* ═══ LAYOUT ═══════════════════════════════════════════ */
+        .page {
+            position: relative; z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            gap: 0;
+        }
+
+        /* ── HEADER ── */
+        .hdr {
+            flex: 0 0 auto;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            background: rgba(2,6,23,0.97);
             border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            padding: 8px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
+            backdrop-filter: blur(10px);
+            gap: 10px;
+            z-index: 10;
         }
-        .im-header-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
+        .hdr-brand {
+            display: flex; align-items: center; gap: 8px;
+            flex-shrink: 0;
         }
-        .im-logo-dot {
-            width: 10px; height: 10px;
-            background: var(--cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--cyan);
-            animation: pulse-dot 2s infinite;
+        .hdr-dot {
+            width: 8px; height: 8px;
+            background: var(--cyan); border-radius: 50%;
+            box-shadow: 0 0 8px var(--cyan);
+            animation: blink 1.8s infinite;
         }
-        @keyframes pulse-dot {
-            0%,100% { opacity:1; transform:scale(1); }
-            50% { opacity:0.4; transform:scale(0.7); }
-        }
-        .im-title {
-            font-family: var(--font-head);
-            font-size: 1.1rem;
-            color: var(--cyan);
-            letter-spacing: 2px;
-            text-shadow: 0 0 20px rgba(0,212,255,0.5);
-        }
-        .im-subtitle {
-            font-size: 0.65rem;
-            color: var(--muted);
-            letter-spacing: 3px;
-        }
-        .im-nav {
-            display: flex;
-            gap: 8px;
-        }
-        .im-nav a {
-            color: var(--muted);
-            text-decoration: none;
-            font-size: 0.7rem;
-            padding: 4px 12px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-        .im-nav a:hover, .im-nav a.active {
-            color: var(--cyan);
-            border-color: var(--cyan);
-            background: rgba(0,212,255,0.08);
-            box-shadow: 0 0 10px rgba(0,212,255,0.15);
-        }
-        .im-live-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.65rem;
-            color: var(--green);
-            border: 1px solid rgba(0,255,65,0.3);
-            padding: 3px 10px;
-            border-radius: 20px;
-            background: rgba(0,255,65,0.05);
-        }
-        .im-live-dot {
-            width: 6px; height: 6px;
-            background: var(--green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--green);
-            animation: pulse-dot 1s infinite;
-        }
-
-        /* === LAYOUT === */
-        .im-body {
-            position: relative;
-            z-index: 1;
-            padding: 16px 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: auto auto auto;
-            gap: 12px;
-        }
-
-        /* === PANEL === */
-        .im-panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow:
-                inset 0 0 20px rgba(26,54,93,0.4),
-                0 4px 20px rgba(0,0,0,0.4);
-            overflow: hidden;
-            backdrop-filter: blur(8px);
-        }
-        .im-panel.span2 { grid-column: span 2; }
-        .im-panel.span3 { grid-column: span 3; }
-
-        .im-panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 14px;
-            background: linear-gradient(90deg, rgba(26,54,93,0.7), transparent);
-            border-bottom: 1px solid rgba(59,130,246,0.2);
-        }
-        .im-panel-title {
-            font-family: var(--font-title);
+        @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+        .hdr-title {
+            font-family: var(--orbit);
             font-size: 0.85rem;
-            color: var(--white);
+            color: var(--cyan);
             letter-spacing: 2px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            text-shadow: 0 0 15px rgba(0,212,255,0.4);
         }
-        .im-panel-title .icon {
-            font-size: 0.9rem;
-        }
-        .im-panel-badge {
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
-        .badge-live { color: var(--green); background: rgba(0,255,65,0.1); border: 1px solid rgba(0,255,65,0.3); }
-        .badge-info { color: var(--cyan); background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); }
-        .badge-warn { color: var(--gold); background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); }
+        .hdr-sub { font-size: 0.52rem; color: var(--muted); letter-spacing: 2px; }
 
-        .im-panel-body { padding: 10px 14px; }
+        /* nav */
+        .hdr-nav {
+            display: flex; gap: 5px;
+            flex: 1;
+            justify-content: center;
+        }
+        .hdr-nav a {
+            color: var(--muted); text-decoration: none;
+            font-size: 0.62rem; padding: 3px 9px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 3px;
+            transition: all .2s;
+            letter-spacing: .8px;
+            white-space: nowrap;
+        }
+        .hdr-nav a:hover { color: var(--cyan); border-color: var(--cyan); background: rgba(0,212,255,0.07); }
+        .hdr-nav a.active { color: var(--purple); border-color: var(--purple); background: rgba(167,139,250,0.1); }
 
-        /* === MACRO SUMMARY STRIP === */
-        .macro-strip {
+        .hdr-right {
+            display: flex; align-items: center; gap: 8px;
+            flex-shrink: 0;
+        }
+        .live-badge {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.58rem; color: var(--green);
+            border: 1px solid rgba(0,255,65,0.25);
+            padding: 2px 8px; border-radius: 10px;
+            background: rgba(0,255,65,0.04);
+        }
+        .live-dot {
+            width: 5px; height: 5px;
+            background: var(--green); border-radius: 50%;
+            box-shadow: 0 0 6px var(--green);
+            animation: blink 1s infinite;
+        }
+        #hdr-ts { font-size: 0.58rem; color: var(--muted); }
+
+        /* ── ROW 1: macro strip ── */
+        .macro-row {
+            flex: 0 0 auto;
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
+            gap: 5px;
+            padding: 5px 8px;
+            background: rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
         }
-        .macro-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 6px;
-            padding: 8px 10px;
-            text-align: center;
-            transition: all 0.2s;
+        .mc {
+            background: var(--bg-panel);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 5px;
+            padding: 5px 8px;
+            display: flex; flex-direction: column; gap: 2px;
+            transition: border-color .2s;
         }
-        .macro-card:hover {
-            border-color: var(--accent);
-            background: rgba(59,130,246,0.06);
+        .mc:hover { border-color: var(--accent); }
+        .mc-name  { font-size: 0.58rem; color: var(--muted); letter-spacing: 1px; }
+        .mc-chg   { font-size: 0.88rem; font-family: var(--orbit); font-weight: 700; line-height: 1; }
+        .mc-price { font-size: 0.58rem; color: var(--muted); }
+        .mc-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 0.52rem; font-weight: bold; letter-spacing: .5px;
+            padding: 1px 5px; border-radius: 8px; width: fit-content;
         }
-        .macro-card .mc-name {
-            font-size: 0.6rem;
-            color: var(--muted);
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-        .macro-card .mc-val {
-            font-size: 1rem;
-            font-weight: bold;
-            font-family: var(--font-head);
-            letter-spacing: 1px;
-        }
-        .mc-chg {
-            font-size: 0.65rem;
-            margin-top: 2px;
-        }
-        .mc-impact {
-            font-size: 0.55rem;
-            letter-spacing: 1px;
-            margin-top: 3px;
-            padding: 1px 6px;
-            border-radius: 10px;
-            display: inline-block;
+        .bull { color: var(--green); background: rgba(0,255,65,0.08); border: 1px solid rgba(0,255,65,0.2); }
+        .bear { color: var(--red);   background: rgba(255,51,51,0.08);  border: 1px solid rgba(255,51,51,0.2);  }
+        .neut { color: var(--gold);  background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); }
+
+        /* ── ROW 2: 3-column panels ── */
+        .main-row {
+            flex: 1 1 0;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 26% 37% 37%;
+            gap: 5px;
+            padding: 5px 8px;
         }
 
-        /* === CSI BARS === */
-        .csi-grid {
+        /* shared panel */
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: inset 0 0 16px rgba(26,54,93,0.3);
+        }
+        .panel-hdr {
+            flex: 0 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 5px 10px;
+            background: linear-gradient(90deg, rgba(26,54,93,0.6) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(59,130,246,0.15);
+        }
+        .panel-title {
+            font-family: var(--title);
+            font-size: 0.75rem;
+            color: var(--white);
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .badge {
+            font-size: 0.52rem; padding: 1px 6px; border-radius: 8px;
+            font-weight: bold; letter-spacing: .5px;
+        }
+        .badge-live   { color: var(--green);  background: rgba(0,255,65,0.1);   border: 1px solid rgba(0,255,65,0.25);   }
+        .badge-info   { color: var(--cyan);   background: rgba(0,212,255,0.1);  border: 1px solid rgba(0,212,255,0.25);  }
+        .badge-warn   { color: var(--gold);   background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25); }
+
+        .panel-body {
+            flex: 1 1 0;
+            min-height: 0;
+            overflow: hidden;
+            padding: 6px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        /* ── CSI PANEL (left) ── */
+        .csi-row {
+            display: flex; align-items: center; gap: 5px;
+            flex: 1;
+        }
+        .csi-rank  { font-size: 0.58rem; font-weight: bold; min-width: 16px; flex-shrink:0; }
+        .csi-name  { font-size: 0.7rem; font-weight: bold; min-width: 28px; flex-shrink:0; }
+        .csi-tag   { font-size: 0.52rem; color: var(--muted); min-width: 24px; flex-shrink:0; }
+        .csi-track {
+            flex: 1; height: 12px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 3px; overflow: hidden;
+        }
+        .csi-fill  {
+            height: 100%; border-radius: 3px;
+            transition: width .8s cubic-bezier(.4,0,.2,1);
+        }
+        .csi-pct   { font-size: 0.62rem; min-width: 48px; text-align: right; flex-shrink:0; }
+        .csi-score { font-size: 0.58rem; color: var(--muted); min-width: 26px; text-align: right; flex-shrink:0; }
+
+        /* ── LAGGARD + TABLE (center) ── */
+        .lag-box {
+            flex: 0 0 auto;
+            background: rgba(0,212,255,0.04);
+            border: 1px solid rgba(0,212,255,0.15);
+            border-radius: 5px;
+            padding: 5px 8px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .lag-label { font-size: 0.55rem; color: var(--muted); letter-spacing:1px; }
+        .lag-name  { font-family: var(--title); font-size: 1rem; font-weight:700; color: var(--cyan); }
+        .lag-action{ font-size: 0.62rem; margin-left: auto; }
+
+        .im-tbl {
+            flex: 1 1 0; min-height: 0;
+            width: 100%; border-collapse: collapse;
+            font-size: 0.65rem;
+            display: block; overflow: hidden;
+        }
+        .im-tbl thead { display: block; width: 100%; }
+        .im-tbl tbody { display: block; width: 100%; overflow: hidden; }
+        .im-tbl tr    { display: flex; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .im-tbl tr:hover { background: rgba(255,255,255,0.02); }
+        .im-tbl th, .im-tbl td {
+            flex: 1; padding: 4px 5px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .im-tbl th {
+            font-size: 0.55rem; color: var(--muted);
+            letter-spacing: 1px; font-weight: normal;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 4px;
+        }
+        .im-tbl .col-name { flex: 1.2; font-weight: bold; color: var(--white); }
+        .im-tbl .col-chg  { flex: 0.9; font-weight: bold; }
+        .im-tbl .col-imp  { flex: 1.3; }
+        .im-tbl .col-rule { flex: 2; font-size: 0.55rem; color: var(--muted); }
+        .im-tbl .col-stars{ flex: 0.8; color: var(--gold); font-size: 0.58rem; letter-spacing:-1px; }
+
+        .imp-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 1px 6px; border-radius: 8px;
+            font-size: 0.58rem; font-weight: bold; letter-spacing: .5px;
+        }
+
+        /* ── PAIR SIGNALS (right) ── */
+        .pair-grid {
+            flex: 1 1 0; min-height: 0;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            grid-auto-rows: 1fr;
+            gap: 5px;
         }
-        .csi-row {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-        .csi-row-top {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .csi-rank {
-            font-size: 0.65rem;
-            font-weight: bold;
-            min-width: 18px;
-        }
-        .csi-name {
-            flex: 1;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-        .csi-index-tag {
-            font-size: 0.55rem;
-            color: var(--muted);
-        }
-        .csi-arrow { font-size: 0.65rem; }
-        .csi-pct { font-size: 0.7rem; min-width: 55px; text-align: right; }
-        .csi-score { font-size: 0.6rem; color: var(--muted); min-width: 32px; text-align: right; }
-        .csi-bar-track {
-            height: 6px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 3px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.04);
-        }
-        .csi-bar-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-        }
-
-        /* === INTERMARKET TABLE === */
-        .im-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.72rem;
-        }
-        .im-table thead th {
-            padding: 6px 10px;
-            text-align: left;
-            font-size: 0.6rem;
-            color: var(--muted);
-            letter-spacing: 1.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            font-weight: normal;
-        }
-        .im-table tbody tr {
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            transition: background 0.15s;
-        }
-        .im-table tbody tr:hover { background: rgba(255,255,255,0.03); }
-        .im-table tbody td { padding: 7px 10px; vertical-align: middle; }
-        .im-table .td-name { font-weight: bold; color: var(--white); }
-        .im-table .td-desc { font-size: 0.6rem; color: var(--muted); }
-        .im-table .td-stars { color: var(--gold); font-size: 0.65rem; letter-spacing: -1px; }
-        .impact-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        .impact-bullish { color: var(--green); background: rgba(0,255,65,0.08); border: 1px solid rgba(0,255,65,0.25); }
-        .impact-bearish { color: var(--red); background: rgba(255,51,51,0.08); border: 1px solid rgba(255,51,51,0.25); }
-        .impact-neutral { color: var(--gold); background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); }
-
-        /* === PAIR RECOMMENDATIONS === */
-        .pair-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-        }
-        .pair-card {
-            background: rgba(255,255,255,0.03);
+        .pc {
             border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 7px;
-            padding: 10px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            transition: all 0.2s;
+            border-radius: 5px;
+            padding: 7px 9px;
+            display: flex; flex-direction: column; gap: 4px;
+            transition: all .2s;
             cursor: default;
         }
-        .pair-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-        .pair-card.buy-card { border-color: rgba(0,255,65,0.2); }
-        .pair-card.buy-card:hover { border-color: rgba(0,255,65,0.4); background: rgba(0,255,65,0.04); }
-        .pair-card.sell-card { border-color: rgba(255,51,51,0.2); }
-        .pair-card.sell-card:hover { border-color: rgba(255,51,51,0.4); background: rgba(255,51,51,0.04); }
-        .pc-header { display: flex; align-items: center; justify-content: space-between; }
-        .pc-pair { font-size: 0.9rem; font-weight: bold; color: var(--white); font-family: var(--font-title); letter-spacing: 1px; }
-        .pc-action {
-            font-size: 0.65rem;
-            font-weight: bold;
-            padding: 2px 10px;
-            border-radius: 10px;
-            letter-spacing: 1px;
-        }
-        .pc-action.buy { color: var(--green); background: rgba(0,255,65,0.1); border: 1px solid rgba(0,255,65,0.3); }
-        .pc-action.sell { color: var(--red); background: rgba(255,51,51,0.1); border: 1px solid rgba(255,51,51,0.3); }
-        .pc-currencies { font-size: 0.62rem; color: var(--muted); }
-        .pc-meta { display: flex; align-items: center; justify-content: space-between; }
-        .pc-quality { color: var(--gold); font-size: 0.6rem; letter-spacing: -1px; }
-        .pc-gap { font-size: 0.62rem; color: var(--muted); }
-        .pc-conf-bar { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
-        .pc-conf-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
-        .pc-conf-num { font-size: 0.65rem; font-weight: bold; }
+        .pc:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+        .pc.buy  { border-color: rgba(0,255,65,0.2); }
+        .pc.buy:hover  { border-color: rgba(0,255,65,0.4); background: rgba(0,255,65,0.03); }
+        .pc.sell { border-color: rgba(255,51,51,0.2); }
+        .pc.sell:hover { border-color: rgba(255,51,51,0.4); background: rgba(255,51,51,0.03); }
 
-        /* === LAGGARD TABLE === */
-        .laggard-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.7rem;
+        .pc-top { display: flex; align-items: center; justify-content: space-between; }
+        .pc-pair {
+            font-family: var(--title); font-size: 0.82rem;
+            font-weight: 700; color: var(--white); letter-spacing: .5px;
         }
-        .laggard-table thead th {
-            padding: 5px 8px;
-            text-align: left;
-            font-size: 0.58rem;
-            color: var(--muted);
+        .pc-act {
+            font-size: 0.58rem; font-weight: bold; padding: 2px 7px;
+            border-radius: 8px; letter-spacing: .5px;
+        }
+        .pc-act.buy  { color: var(--green); background: rgba(0,255,65,0.1);  border: 1px solid rgba(0,255,65,0.3);  }
+        .pc-act.sell { color: var(--red);   background: rgba(255,51,51,0.1); border: 1px solid rgba(255,51,51,0.3); }
+        .pc-ccy { font-size: 0.58rem; color: var(--muted); }
+        .pc-mid { display: flex; align-items: center; justify-content: space-between; }
+        .pc-qual { color: var(--gold); font-size: 0.58rem; letter-spacing: -1px; }
+        .pc-conf { font-size: 0.62rem; font-weight: bold; }
+        .pc-bar  { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+        .pc-fill { height: 100%; border-radius: 2px; transition: width .8s ease; }
+
+        /* ── FOOTER ── */
+        .ftr {
+            flex: 0 0 auto;
+            height: 24px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.52rem; color: var(--muted);
             letter-spacing: 1.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            font-weight: normal;
-        }
-        .laggard-table tbody tr {
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            transition: background 0.15s;
-        }
-        .laggard-table tbody tr:hover { background: rgba(255,255,255,0.03); }
-        .laggard-table tbody td { padding: 5px 8px; vertical-align: middle; }
-
-        /* === FOOTER === */
-        .im-footer {
-            text-align: center;
-            padding: 12px 20px;
-            font-size: 0.6rem;
-            color: var(--muted);
             border-top: 1px solid var(--border);
-            letter-spacing: 2px;
-            position: relative;
-            z-index: 1;
+            background: rgba(0,0,0,.2);
+            gap: 8px;
         }
-
-        /* === LOADING SKELETON === */
-        .skeleton {
-            background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 4px;
-            height: 12px;
-        }
-        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
-        /* === CHART BARS (horizontal) for CSI visual === */
-        .csi-chart-col {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 4px;
-        }
-        .csi-chart-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .csi-chart-label {
-            min-width: 28px;
-            font-size: 0.65rem;
-            font-weight: bold;
-        }
-        .csi-chart-track {
-            flex: 1;
-            height: 18px;
-            background: rgba(255,255,255,0.04);
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-        .csi-chart-fill {
-            height: 100%;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            padding: 0 6px;
-            font-size: 0.6rem;
-            font-weight: bold;
-            white-space: nowrap;
-            transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-        }
-        .csi-chart-val {
-            min-width: 44px;
-            text-align: right;
-            font-size: 0.65rem;
-        }
-
-        /* scrollbar */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .ftr span { color: var(--cyan); }
     </style>
 </head>
 <body>
+<div class="page">
 
-<!-- HEADER -->
-<header class="im-header">
-    <div class="im-header-left">
-        <div class="im-logo-dot"></div>
-        <div>
-            <div class="im-title">XEDY INTERMARKET</div>
-            <div class="im-subtitle">INTELLIGENCE CENTER</div>
-        </div>
-    </div>
-    <nav class="im-nav">
-        <a href="/">⬅ DASHBOARD</a>
-        <a href="/backtest">BACKTEST</a>
-        <a href="/trade">TRADE</a>
-        <a href="/Forecast">AI FORECAST</a>
-        <a href="/Monitor">LIVE MONITOR</a>
-        <a href="/Intermarket" class="active">INTERMARKET</a>
-    </nav>
-    <div style="display:flex; align-items:center; gap:12px;">
-        <div id="last-update" style="font-size:0.6rem; color:var(--muted);">UPDATE: --:--:--</div>
-        <div class="im-live-badge">
-            <div class="im-live-dot"></div>
-            LIVE — 5s
-        </div>
-    </div>
-</header>
-
-<!-- MAIN BODY -->
-<div class="im-body">
-
-    <!-- ROW 1: MACRO STRIP (full width) -->
-    <div class="im-panel span3">
-        <div class="im-panel-header">
-            <div class="im-panel-title"><span class="icon">🌐</span> INTERMARKET INDEX — GOLD IMPACT</div>
-            <div class="im-panel-badge badge-live">REAL-TIME</div>
-        </div>
-        <div class="im-panel-body">
-            <div class="macro-strip" id="macro-strip">
-                <!-- Injected by JS -->
-                <div class="skeleton" style="height:70px;"></div>
-                <div class="skeleton" style="height:70px;"></div>
-                <div class="skeleton" style="height:70px;"></div>
-                <div class="skeleton" style="height:70px;"></div>
-                <div class="skeleton" style="height:70px;"></div>
-                <div class="skeleton" style="height:70px;"></div>
+    <!-- ══ HEADER ══════════════════════════════════════════════ -->
+    <header class="hdr">
+        <div class="hdr-brand">
+            <div class="hdr-dot"></div>
+            <div>
+                <div class="hdr-title">XEDY INTERMARKET</div>
+                <div class="hdr-sub">INTELLIGENCE CENTER</div>
             </div>
         </div>
+
+        <nav class="hdr-nav">
+            <a href="/">🏠 HOME</a>
+            <a href="/backtest">⚡ BACKTEST</a>
+            <a href="/trade">📊 TRADE</a>
+            <a href="/Forecast">🔮 FORECAST</a>
+            <a href="/Monitor">🖥️ MONITOR</a>
+            <a href="/Intermarket" class="active">🌐 INTERMARKET</a>
+        </nav>
+
+        <div class="hdr-right">
+            <div id="hdr-ts">--:--:--</div>
+            <div class="live-badge"><div class="live-dot"></div>LIVE 5s</div>
+        </div>
+    </header>
+
+    <!-- ══ ROW 1: MACRO STRIP ══════════════════════════════════ -->
+    <div class="macro-row" id="macro-row">
+        <!-- Injected by JS -->
+        <div class="mc"><div class="mc-name">DXY</div><div class="mc-chg">--</div><div class="mc-badge neut">─ NEUTRAL</div></div>
+        <div class="mc"><div class="mc-name">US10Y</div><div class="mc-chg">--</div><div class="mc-badge neut">─ NEUTRAL</div></div>
+        <div class="mc"><div class="mc-name">VIX</div><div class="mc-chg">--</div><div class="mc-badge neut">─ NEUTRAL</div></div>
+        <div class="mc"><div class="mc-name">SILVER</div><div class="mc-chg">--</div><div class="mc-badge neut">─ NEUTRAL</div></div>
+        <div class="mc"><div class="mc-name">WTI OIL</div><div class="mc-chg">--</div><div class="mc-badge neut">─ NEUTRAL</div></div>
+        <div class="mc"><div class="mc-name">S&P 500</div><div class="mc-chg">--</div><div class="mc-badge neut">─ NEUTRAL</div></div>
     </div>
 
-    <!-- ROW 2 LEFT: CSI CHART (2 cols) -->
-    <div class="im-panel span2">
-        <div class="im-panel-header">
-            <div class="im-panel-title"><span class="icon">📊</span> CURRENCY STRENGTH INDEX (CSI)</div>
-            <div style="display:flex; gap:6px; align-items:center;">
-                <div class="im-panel-badge badge-info">RANKED</div>
-                <div id="csi-ts" style="font-size:0.58rem; color:var(--muted);">--:--:--</div>
+    <!-- ══ ROW 2: 3 PANELS ════════════════════════════════════ -->
+    <div class="main-row">
+
+        <!-- LEFT: CSI ──────────────────────────────────────── -->
+        <div class="panel">
+            <div class="panel-hdr">
+                <div class="panel-title">📊 CURRENCY STRENGTH</div>
+                <div style="display:flex;gap:5px;align-items:center;">
+                    <div class="badge badge-info">RANKED</div>
+                    <div id="csi-ts" style="font-size:0.52rem;color:var(--muted);">--:--</div>
+                </div>
+            </div>
+            <div class="panel-body" id="csi-body" style="gap:0;">
+                <!-- 8 CSI rows injected here -->
             </div>
         </div>
-        <div class="im-panel-body">
-            <div id="csi-chart" class="csi-chart-col">
-                <!-- Injected by JS -->
-                <div class="skeleton" style="height:18px;"></div>
-                <div class="skeleton" style="height:18px;"></div>
-                <div class="skeleton" style="height:18px;"></div>
-                <div class="skeleton" style="height:18px;"></div>
-                <div class="skeleton" style="height:18px;"></div>
-                <div class="skeleton" style="height:18px;"></div>
-                <div class="skeleton" style="height:18px;"></div>
-                <div class="skeleton" style="height:18px;"></div>
+
+        <!-- CENTER: INTERMARKET TABLE ──────────────────────── -->
+        <div class="panel">
+            <div class="panel-hdr">
+                <div class="panel-title">🔗 INTERMARKET vs GOLD</div>
+                <div class="badge badge-warn">⭐ XAUUSD FOCUS</div>
+            </div>
+            <div class="panel-body" style="gap:4px;">
+                <!-- Laggard summary -->
+                <div class="lag-box">
+                    <div>
+                        <div class="lag-label">TOP LAGGARD</div>
+                        <div class="lag-name" id="lag-name">---</div>
+                    </div>
+                    <div class="lag-action" id="lag-action">---</div>
+                </div>
+                <!-- Table -->
+                <table class="im-tbl">
+                    <thead>
+                        <tr>
+                            <th class="col-name">INDEX</th>
+                            <th class="col-chg">TODAY %</th>
+                            <th class="col-imp">GOLD IMPACT</th>
+                            <th class="col-stars">PRIORITY</th>
+                            <th class="col-rule">RULE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="im-tbody"></tbody>
+                </table>
             </div>
         </div>
+
+        <!-- RIGHT: PAIR SIGNALS ────────────────────────────── -->
+        <div class="panel">
+            <div class="panel-hdr">
+                <div class="panel-title">🎯 TOP PAIR SIGNALS</div>
+                <div class="badge badge-live">CSI AUTO-RANK</div>
+            </div>
+            <div class="panel-body">
+                <div class="pair-grid" id="pair-grid">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- ROW 2 RIGHT: LAGGARD PANEL (1 col) -->
-    <div class="im-panel">
-        <div class="im-panel-header">
-            <div class="im-panel-title"><span class="icon">⚡</span> LAGGARD DETECTION</div>
-            <div class="im-panel-badge badge-warn">OPPORTUNITY</div>
-        </div>
-        <div class="im-panel-body">
-            <div id="laggard-summary" style="margin-bottom:8px; padding:8px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);">
-                <div style="font-size:0.6rem; color:var(--muted); letter-spacing:1px;">TOP LAGGARD</div>
-                <div id="laggard-name" style="font-size:1rem; font-weight:bold; color:var(--cyan); font-family:var(--font-title); margin-top:4px;">---</div>
-                <div id="laggard-action" style="margin-top:4px; font-size:0.65rem;">---</div>
-            </div>
-            <table class="laggard-table">
-                <thead>
-                    <tr>
-                        <th>PAIR</th>
-                        <th>PRICE</th>
-                        <th>FAIR VAL</th>
-                        <th>GAP%</th>
-                        <th>AI DIR</th>
-                    </tr>
-                </thead>
-                <tbody id="laggard-tbody">
-                    <tr><td colspan="5" style="text-align:center; color:var(--muted); padding:16px;">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ROW 3: PAIR RECOMMENDATIONS (full width) -->
-    <div class="im-panel span3">
-        <div class="im-panel-header">
-            <div class="im-panel-title"><span class="icon">🎯</span> TOP PAIR SIGNALS — CSI LEADER vs LAGGARD</div>
-            <div class="im-panel-badge badge-live">AUTO-RANK</div>
-        </div>
-        <div class="im-panel-body">
-            <div class="pair-grid" id="pair-grid">
-                <!-- Injected by JS -->
-                <div class="skeleton" style="height:90px;"></div>
-                <div class="skeleton" style="height:90px;"></div>
-                <div class="skeleton" style="height:90px;"></div>
-                <div class="skeleton" style="height:90px;"></div>
-                <div class="skeleton" style="height:90px;"></div>
-                <div class="skeleton" style="height:90px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ROW 4: FULL INTERMARKET TABLE (full width) -->
-    <div class="im-panel span3">
-        <div class="im-panel-header">
-            <div class="im-panel-title"><span class="icon">🔗</span> FULL INTERMARKET CORRELATION TABLE</div>
-            <div class="im-panel-badge badge-info">⭐ XAUUSD FOCUS</div>
-        </div>
-        <div class="im-panel-body">
-            <table class="im-table">
-                <thead>
-                    <tr>
-                        <th>INDEX</th>
-                        <th>DESCRIPTION</th>
-                        <th>PRIORITY</th>
-                        <th>PRICE</th>
-                        <th>TODAY %</th>
-                        <th>GOLD IMPACT</th>
-                        <th>RULE</th>
-                    </tr>
-                </thead>
-                <tbody id="im-full-tbody">
-                    <tr><td colspan="7" style="text-align:center; color:var(--muted); padding:20px;">Loading intermarket data...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <!-- ══ FOOTER ═════════════════════════════════════════════ -->
+    <footer class="ftr">
+        XEDY INTERMARKET INTELLIGENCE &nbsp;·&nbsp;
+        <span>MT5 REAL-TIME DATA</span> &nbsp;·&nbsp;
+        FED · CFTC · CME · BLOOMBERG · WGC · EIA
+    </footer>
 
 </div>
 
-<!-- FOOTER -->
-<footer class="im-footer">
-    XEDY INTERMARKET INTELLIGENCE • REAL-TIME DATA FROM MT5 • LEAD-LAG ANALYSIS ENGINE V1.0
-    &nbsp;|&nbsp; DATA: FEDERAL RESERVE · CFTC · CME · BLOOMBERG · REUTERS · WGC · EIA
-</footer>
-
 <script>
-    // ─── METADATA for intermarket index ───────────────────────────────────────
-    const IM_META = [
-        { name:'DXY',     desc:'US Dollar Index',          stars:5, rule:'DXY↑ → Gold↓ | DXY↓ → Gold↑', inv:true  },
-        { name:'US10Y',   desc:'Treasury Yield 10Y',       stars:5, rule:'Yield↑ → Gold↓ | Yield↓ → Gold↑', inv:true },
-        { name:'VIX',     desc:'Fear / Volatility Index',  stars:5, rule:'VIX↑ → Gold↑ (Safe Haven)',     inv:false },
-        { name:'SILVER',  desc:'Silver (Precious Metal)',  stars:4, rule:'Silver↑ → Gold↑ (Leader)',       inv:false },
-        { name:'WTI OIL', desc:'WTI Crude Oil',            stars:3, rule:'Oil↑ → Inflation → Complex',    inv:false },
-        { name:'S&P 500', desc:'US Equity Index',          stars:4, rule:'S&P↓ → Risk-Off → Gold↑',       inv:true  },
-    ];
+    const IM_RULES = {
+        'DXY':     'DXY↑ → Gold↓ | DXY↓ → Gold↑',
+        'US10Y':   'Yield↑ → Gold↓ | Yield↓ → Gold↑',
+        'VIX':     'VIX↑ → Gold↑ (Safe Haven)',
+        'SILVER':  'Silver↑ → Gold↑ (Leader)',
+        'WTI OIL': 'Oil↑ → Inflation → Complex',
+        'S&P 500': 'S&P↓ → Risk-Off → Gold↑',
+    };
 
     const CSI_META = {
         'DXY': { name:'USD', color:'#00d4ff', index:'DXY' },
@@ -626,198 +460,156 @@
         'AXY': { name:'AUD', color:'#f97316', index:'AXY' },
         'ZXY': { name:'NZD', color:'#06b6d4', index:'ZXY' },
     };
+    const RANK_COLORS = ['#ffd700','#c0c0c0','#cd7f32','#64748b','#475569','#334155','#1e293b','#0f172a'];
 
-    function starsHtml(n) {
-        return '⭐'.repeat(n);
-    }
-
-    // ─── RENDER MACRO STRIP ───────────────────────────────────────────────────
-    function renderMacroStrip(intermarket) {
-        const strip = document.getElementById('macro-strip');
-        if (!strip || !intermarket) return;
-        let html = '';
-        for (const im of intermarket) {
-            const chgSign  = im.change_pct >= 0 ? '+' : '';
-            const chgColor = im.change_pct > 0.05 ? '#00ff41' : (im.change_pct < -0.05 ? '#ff3333' : '#94a3b8');
-            const impColor = im.gold_impact === 'BULLISH' ? '#00ff41' : (im.gold_impact === 'BEARISH' ? '#ff3333' : '#fbbf24');
-            const impIcon  = im.gold_impact === 'BULLISH' ? '▲' : (im.gold_impact === 'BEARISH' ? '▼' : '─');
-            const impBg    = im.gold_impact === 'BULLISH' ? 'rgba(0,255,65,0.08)' : (im.gold_impact === 'BEARISH' ? 'rgba(255,51,51,0.08)' : 'rgba(251,191,36,0.08)');
-            const impBorder= im.gold_impact === 'BULLISH' ? 'rgba(0,255,65,0.3)' : (im.gold_impact === 'BEARISH' ? 'rgba(255,51,51,0.3)' : 'rgba(251,191,36,0.3)');
-            const priceStr = im.price !== null ? Number(im.price).toLocaleString('en-US', {maximumFractionDigits:3}) : 'N/A';
-            html += `
-            <div class="macro-card">
+    // ── MACRO STRIP ────────────────────────────────────────────
+    function renderMacro(arr) {
+        if (!arr) return;
+        const el = document.getElementById('macro-row');
+        el.innerHTML = arr.map(im => {
+            const sign  = im.change_pct >= 0 ? '+' : '';
+            const chgC  = im.change_pct > 0.05 ? '#00ff41' : im.change_pct < -0.05 ? '#ff3333' : '#94a3b8';
+            const isBull= im.gold_impact === 'BULLISH';
+            const isBear= im.gold_impact === 'BEARISH';
+            const cls   = isBull ? 'bull' : isBear ? 'bear' : 'neut';
+            const icon  = isBull ? '▲' : isBear ? '▼' : '─';
+            const price = im.price != null ? Number(im.price).toLocaleString('en-US',{maximumFractionDigits:3}) : 'N/A';
+            return `<div class="mc">
                 <div class="mc-name">${im.name}</div>
-                <div class="mc-val" style="color:${chgColor};">${chgSign}${im.change_pct.toFixed(2)}%</div>
-                <div class="mc-chg" style="color:var(--muted);">${priceStr}</div>
-                <span class="mc-impact" style="color:${impColor}; background:${impBg}; border:1px solid ${impBorder};">
-                    ${impIcon} ${im.gold_impact}
-                </span>
+                <div class="mc-chg" style="color:${chgC}">${sign}${im.change_pct.toFixed(2)}%</div>
+                <div class="mc-price">${price}</div>
+                <span class="mc-badge ${cls}">${icon} ${im.gold_impact}</span>
             </div>`;
-        }
-        strip.innerHTML = html;
+        }).join('');
     }
 
-    // ─── RENDER CSI CHART ─────────────────────────────────────────────────────
+    // ── CSI BARS ───────────────────────────────────────────────
     function renderCSI(indices) {
-        const chart = document.getElementById('csi-chart');
-        if (!chart || !indices) return;
-        const sorted = Object.entries(indices).sort((a, b) => b[1].score - a[1].score);
-        let html = '';
-        sorted.forEach(([key, val], rank) => {
-            const meta = CSI_META[key] || { name: key, color: '#94a3b8', index: key };
+        if (!indices) return;
+        const body = document.getElementById('csi-body');
+        const sorted = Object.entries(indices).sort((a,b) => b[1].score - a[1].score);
+        const rowH = Math.floor(100 / sorted.length);
+        body.innerHTML = sorted.map(([key, val], rank) => {
+            const meta  = CSI_META[key] || { name:key, color:'#94a3b8', index:key };
             const score = val.score;
             const pct   = val.percentage;
-            const pctSign = pct >= 0 ? '+' : '';
-            const barW  = Math.max(2, Math.min(100, score));
-            const isStrong = score >= 50;
-            const barColor = isStrong ? meta.color : '#334155';
-            const textColor = isStrong ? meta.color : '#64748b';
-            const rankColors = ['#ffd700','#c0c0c0','#cd7f32','#64748b','#475569','#334155','#1e293b','#0f172a'];
-            const rColor = rankColors[rank] || '#1e293b';
-            html += `
-            <div class="csi-chart-row">
-                <span style="color:${rColor}; font-size:0.6rem; min-width:18px; font-weight:bold;">#${rank+1}</span>
-                <span class="csi-chart-label" style="color:${textColor};">${meta.name}</span>
-                <div class="csi-chart-track">
-                    <div class="csi-chart-fill" style="width:${barW}%; background:linear-gradient(90deg, ${barColor}66, ${barColor}); box-shadow:0 0 8px ${barColor}44;">
-                        <span style="color:${isStrong ? '#000' : 'transparent'}; font-size:0.55rem;">${meta.index}</span>
-                    </div>
+            const sign  = pct >= 0 ? '+' : '';
+            const w     = Math.max(2, Math.min(100, score));
+            const strong= score >= 50;
+            const barC  = strong ? meta.color : '#334155';
+            const textC = strong ? meta.color : '#64748b';
+            const rC    = RANK_COLORS[rank] || '#1e293b';
+            const arrow = strong ? '▲' : '▼';
+            const arrowC= strong ? '#00ff41' : '#ff3333';
+            return `<div class="csi-row" style="height:${rowH}%;">
+                <span class="csi-rank" style="color:${rC}">#${rank+1}</span>
+                <span class="csi-name" style="color:${textC}">${meta.name}</span>
+                <span class="csi-tag">${meta.index}</span>
+                <div class="csi-track">
+                    <div class="csi-fill" style="width:${w}%;background:linear-gradient(90deg,${barC}55,${barC});box-shadow:0 0 6px ${barC}44;"></div>
                 </div>
-                <span class="csi-chart-val" style="color:${textColor};">${pctSign}${pct.toFixed(3)}%</span>
-                <span style="min-width:30px; text-align:right; color:var(--muted); font-size:0.6rem;">${score.toFixed(1)}</span>
+                <span class="csi-pct" style="color:${textC}">${sign}${pct.toFixed(3)}%</span>
+                <span class="csi-score">${score.toFixed(1)}</span>
+                <span style="color:${arrowC};font-size:0.58rem;min-width:10px;">${arrow}</span>
             </div>`;
-        });
-        chart.innerHTML = html;
+        }).join('');
         const ts = document.getElementById('csi-ts');
-        if (ts) ts.innerText = new Date().toLocaleTimeString('en-GB');
+        if (ts) ts.innerText = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     }
 
-    // ─── RENDER LAGGARD TABLE ─────────────────────────────────────────────────
-    function renderLaggard(results, laggardLeader) {
-        const tbody = document.getElementById('laggard-tbody');
-        const nameEl = document.getElementById('laggard-name');
-        const actionEl = document.getElementById('laggard-action');
-        if (!tbody) return;
-
-        if (nameEl) nameEl.innerText = laggardLeader || '---';
-
-        tbody.innerHTML = '';
-        if (!results) return;
-        for (const [sym, info] of Object.entries(results)) {
-            const isLeader = sym === laggardLeader;
-            const gapSign = info.gap >= 0 ? '+' : '';
-            const gapColor = info.gap < 0 ? '#00ff41' : '#ff3333';
-            const aiColor  = info.ai_direction === 'BULLISH' ? '#00ff41' : (info.ai_direction === 'BEARISH' ? '#ff3333' : '#fbbf24');
-            const isJpy = sym.includes('JPY');
-            const dec  = isJpy ? 3 : (sym.includes('EUR') || sym.includes('GBP') ? 4 : 2);
-            const rowStyle = isLeader ? 'background:rgba(0,212,255,0.04); border-left:2px solid #00d4ff;' : '';
-            tbody.innerHTML += `<tr style="${rowStyle}">
-                <td class="td-name">${isLeader ? '⚡ ':''}${sym}</td>
-                <td>${info.actual.toLocaleString('en-US', {maximumFractionDigits:dec})}</td>
-                <td>${info.fair_value.toLocaleString('en-US', {maximumFractionDigits:dec})}</td>
-                <td style="color:${gapColor};">${gapSign}${info.pct_gap}%</td>
-                <td style="color:${aiColor};">${info.ai_direction}</td>
+    // ── INTERMARKET TABLE ──────────────────────────────────────
+    function renderIMTable(arr) {
+        if (!arr) return;
+        const tbody = document.getElementById('im-tbody');
+        tbody.innerHTML = arr.map(im => {
+            const sign  = im.change_pct >= 0 ? '+' : '';
+            const chgC  = im.change_pct > 0.05 ? '#00ff41' : im.change_pct < -0.05 ? '#ff3333' : '#94a3b8';
+            const isBull= im.gold_impact === 'BULLISH';
+            const isBear= im.gold_impact === 'BEARISH';
+            const impCls= isBull ? 'bull' : isBear ? 'bear' : 'neut';
+            const icon  = isBull ? '▲' : isBear ? '▼' : '─';
+            const stars = '⭐'.repeat(im.stars || 3);
+            const rule  = IM_RULES[im.name] || '—';
+            return `<tr>
+                <td class="col-name">${im.name}</td>
+                <td class="col-chg" style="color:${chgC}">${sign}${im.change_pct.toFixed(2)}%</td>
+                <td class="col-imp"><span class="imp-badge ${impCls}">${icon} ${im.gold_impact}</span></td>
+                <td class="col-stars">${stars}</td>
+                <td class="col-rule">${rule}</td>
             </tr>`;
-        }
+        }).join('');
+    }
 
-        // Laggard action
-        if (actionEl && results[laggardLeader]) {
-            const li = results[laggardLeader];
-            if (li.action === 'BUY') {
-                actionEl.innerHTML = `<span style="color:#00ff41; font-weight:bold; text-shadow:0 0 8px rgba(0,255,65,0.4);">⚡ BUY ${laggardLeader} — LAGGARD OPPORTUNITY</span>`;
-            } else if (li.action === 'SELL') {
-                actionEl.innerHTML = `<span style="color:#ff3333; font-weight:bold; text-shadow:0 0 8px rgba(255,51,51,0.4);">⚡ SELL ${laggardLeader} — LAGGARD OPPORTUNITY</span>`;
-            } else {
-                actionEl.innerHTML = `<span style="color:#fbbf24;">HOLD / AWAITING CONFLUENCE</span>`;
-            }
+    // ── LAGGARD ────────────────────────────────────────────────
+    function renderLaggard(results, leader) {
+        const nameEl   = document.getElementById('lag-name');
+        const actionEl = document.getElementById('lag-action');
+        if (nameEl) nameEl.innerText = leader || '---';
+        if (actionEl && results && results[leader]) {
+            const li = results[leader];
+            if (li.action === 'BUY')
+                actionEl.innerHTML = `<span style="color:var(--green);font-weight:bold;">⚡ BUY — LAGGARD</span>`;
+            else if (li.action === 'SELL')
+                actionEl.innerHTML = `<span style="color:var(--red);font-weight:bold;">⚡ SELL — LAGGARD</span>`;
+            else
+                actionEl.innerHTML = `<span style="color:var(--gold);">HOLD / WAIT</span>`;
         }
     }
 
-    // ─── RENDER PAIR GRID ─────────────────────────────────────────────────────
+    // ── PAIR SIGNALS ───────────────────────────────────────────
     function renderPairs(recs) {
         const grid = document.getElementById('pair-grid');
         if (!grid) return;
         if (!recs || recs.length === 0) {
-            grid.innerHTML = '<div style="grid-column:span 3; text-align:center; color:var(--muted); padding:20px;">CSI gap terlalu kecil — pasar sideways, tidak ada sinyal</div>';
+            grid.innerHTML = `<div style="grid-column:span 2;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.7rem;">
+                Pasar sideways — CSI gap terlalu kecil</div>`;
             return;
         }
-        let html = '';
-        for (const rec of recs) {
-            const isBuy = rec.action === 'BUY';
-            const actColor = isBuy ? '#00ff41' : '#ff3333';
-            const confPct  = Math.round(rec.confidence);
-            const confColor= confPct >= 85 ? '#00ff41' : (confPct >= 70 ? '#fbbf24' : '#ff3333');
-            html += `
-            <div class="pair-card ${isBuy ? 'buy-card' : 'sell-card'}">
-                <div class="pc-header">
+        grid.innerHTML = recs.slice(0, 6).map(rec => {
+            const isBuy  = rec.action === 'BUY';
+            const actC   = isBuy ? '#00ff41' : '#ff3333';
+            const cls    = isBuy ? 'buy' : 'sell';
+            const confPct= Math.round(rec.confidence);
+            const confC  = confPct >= 85 ? '#00ff41' : confPct >= 70 ? '#fbbf24' : '#ff3333';
+            return `<div class="pc ${cls}">
+                <div class="pc-top">
                     <span class="pc-pair">${rec.pair}</span>
-                    <span class="pc-action ${isBuy ? 'buy' : 'sell'}">${rec.action}</span>
+                    <span class="pc-act ${cls}">${rec.action}</span>
                 </div>
-                <div class="pc-currencies" style="color:var(--muted);">
-                    <span style="color:${actColor};">${rec.strong}</span> vs <span style="color:#64748b;">${rec.weak}</span>
-                    &nbsp;·&nbsp; Gap: ${rec.gap.toFixed(3)}
+                <div class="pc-ccy">
+                    <span style="color:${actC}">${rec.strong || ''}</span>
+                    ${rec.weak ? ` vs <span style="color:var(--muted)">${rec.weak}</span>` : ''}
                 </div>
-                <div class="pc-meta">
-                    <span class="pc-quality">${rec.quality}</span>
-                    <span class="pc-conf-num" style="color:${confColor};">${confPct}%</span>
+                <div class="pc-mid">
+                    <span class="pc-qual">${rec.quality || '---'}</span>
+                    <span class="pc-conf" style="color:${confC}">${confPct}%</span>
                 </div>
-                <div class="pc-conf-bar">
-                    <div class="pc-conf-fill" style="width:${confPct}%; background:linear-gradient(90deg, ${actColor}66, ${actColor});"></div>
+                <div class="pc-bar">
+                    <div class="pc-fill" style="width:${confPct}%;background:linear-gradient(90deg,${actC}55,${actC})"></div>
                 </div>
             </div>`;
-        }
-        grid.innerHTML = html;
+        }).join('');
     }
 
-    // ─── RENDER FULL IM TABLE ─────────────────────────────────────────────────
-    function renderIMTable(intermarket) {
-        const tbody = document.getElementById('im-full-tbody');
-        if (!tbody || !intermarket) return;
-        let html = '';
-        for (const im of intermarket) {
-            const meta = IM_META.find(m => m.name === im.name) || { stars:3, rule:'—', inv:false };
-            const chgSign  = im.change_pct >= 0 ? '+' : '';
-            const chgColor = im.change_pct > 0.05 ? '#00ff41' : (im.change_pct < -0.05 ? '#ff3333' : '#94a3b8');
-            const impClass = im.gold_impact === 'BULLISH' ? 'impact-bullish' : (im.gold_impact === 'BEARISH' ? 'impact-bearish' : 'impact-neutral');
-            const impIcon  = im.gold_impact === 'BULLISH' ? '▲' : (im.gold_impact === 'BEARISH' ? '▼' : '─');
-            const priceStr = im.price !== null ? Number(im.price).toLocaleString('en-US', {maximumFractionDigits:3}) : '<span style="color:var(--muted)">N/A</span>';
-            html += `<tr>
-                <td class="td-name">${im.name}</td>
-                <td class="td-desc">${im.desc || meta.desc || '—'}</td>
-                <td class="td-stars">${'⭐'.repeat(im.stars || meta.stars)}</td>
-                <td>${priceStr}</td>
-                <td style="color:${chgColor}; font-weight:bold;">${chgSign}${im.change_pct.toFixed(3)}%</td>
-                <td><span class="impact-badge ${impClass}">${impIcon} ${im.gold_impact}</span></td>
-                <td style="color:var(--muted); font-size:0.6rem;">${meta.rule}</td>
-            </tr>`;
-        }
-        tbody.innerHTML = html;
-    }
-
-    // ─── MAIN FETCH & RENDER ──────────────────────────────────────────────────
+    // ── MAIN FETCH ─────────────────────────────────────────────
     async function fetchAll() {
         try {
             const res  = await fetch(`/api/laggard_detection?t=${Date.now()}`, {
-                cache: 'no-store',
-                headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+                cache: 'no-store', headers: {'Cache-Control':'no-cache','Pragma':'no-cache'}
             });
             const data = await res.json();
             if (data.status === 'success') {
-                renderMacroStrip(data.intermarket);
+                renderMacro(data.intermarket);
                 renderCSI(data.currency_indices);
+                renderIMTable(data.intermarket);
                 renderLaggard(data.results, data.laggard_leader);
                 renderPairs(data.pair_recommendations);
-                renderIMTable(data.intermarket);
-
-                const el = document.getElementById('last-update');
-                if (el) el.innerText = 'UPDATE: ' + new Date().toLocaleTimeString('en-GB');
+                const ts = document.getElementById('hdr-ts');
+                if (ts) ts.innerText = new Date().toLocaleTimeString('en-GB');
             }
-        } catch(e) {
-            console.error('Intermarket fetch error:', e);
-        }
+        } catch(e) { console.error('Fetch error:', e); }
     }
 
-    // Initial + 5s interval
     fetchAll();
     setInterval(fetchAll, 5000);
 </script>
