@@ -457,17 +457,32 @@ def dedupe_rr_values(values):
     return sorted({round(max(0.6, min(4.0, value)), 2) for value in values})
 
 
-def make_strategy_library(rr_values=None):
+def make_strategy_library(rr_values=None, max_risk=1.0):
     rr_values = dedupe_rr_values(rr_values or [1.2, 1.8, 2.4, 3.0])
+    
+    max_risk = float(max_risk)
+    if max_risk <= 1.5:
+        risk_values = [1.0]
+    elif max_risk <= 5.5:
+        risk_values = [float(r) for r in range(1, int(max_risk) + 1)]
+    else:
+        risk_values = [1.0]
+        for r in range(2, int(max_risk) + 1, 2):
+            risk_values.append(float(r))
+        if float(max_risk) not in risk_values:
+            risk_values.append(float(max_risk))
+    risk_values = sorted(list(set(risk_values)))
+    
     library = []
 
-    # AI XEDY_V30 Core (96 combinations)
-    for threshold, confirmation, stop_atr, max_hold_bars, rr in product(
+    # AI XEDY_V30 Core (96 combinations * len(risk_values))
+    for threshold, confirmation, stop_atr, max_hold_bars, rr, risk in product(
         [0.22, 0.32, 0.42],
         [0.08, 0.12],
         [1.0, 1.8],
         [30, 60],
         rr_values,
+        risk_values
     ):
         library.append(
             {
@@ -479,17 +494,19 @@ def make_strategy_library(rr_values=None):
                     "stop_atr": stop_atr,
                     "rr": rr,
                     "max_hold_bars": max_hold_bars,
+                    "risk_pct": risk,
                 },
             }
         )
 
-    # AI XEDY_V30 Pullback (8 combinations)
-    for pullback_limit, confirmation, stop_atr, max_hold_bars, rr in product(
+    # AI XEDY_V30 Pullback (8 combinations * len(risk_values))
+    for pullback_limit, confirmation, stop_atr, max_hold_bars, rr, risk in product(
         [0.08],
         [0.08, 0.12],
         [1.4],
         [45],
         rr_values,
+        risk_values
     ):
         library.append(
             {
@@ -501,17 +518,19 @@ def make_strategy_library(rr_values=None):
                     "stop_atr": stop_atr,
                     "rr": rr,
                     "max_hold_bars": max_hold_bars,
+                    "risk_pct": risk,
                 },
             }
         )
 
-    # AI XEDY_V30 Mean Revert (8 combinations)
-    for extreme_rsi, threshold, stop_atr, max_hold_bars, rr in product(
+    # AI XEDY_V30 Mean Revert (8 combinations * len(risk_values))
+    for extreme_rsi, threshold, stop_atr, max_hold_bars, rr, risk in product(
         [30],
         [0.22, 0.32],
         [1.4],
         [45],
         rr_values,
+        risk_values
     ):
         library.append(
             {
@@ -523,17 +542,19 @@ def make_strategy_library(rr_values=None):
                     "stop_atr": stop_atr,
                     "rr": rr,
                     "max_hold_bars": max_hold_bars,
+                    "risk_pct": risk,
                 },
             }
         )
 
-    # AI XEDY_V30 Breakout (8 combinations)
-    for breakout_buffer, threshold, stop_atr, max_hold_bars, rr in product(
+    # AI XEDY_V30 Breakout (8 combinations * len(risk_values))
+    for breakout_buffer, threshold, stop_atr, max_hold_bars, rr, risk in product(
         [0.15],
         [0.22, 0.32],
         [1.4],
         [45],
         rr_values,
+        risk_values
     ):
         library.append(
             {
@@ -545,16 +566,18 @@ def make_strategy_library(rr_values=None):
                     "stop_atr": stop_atr,
                     "rr": rr,
                     "max_hold_bars": max_hold_bars,
+                    "risk_pct": risk,
                 },
             }
         )
 
-    # AI XEDY_V30 MACD Momentum (8 combinations)
-    for threshold, stop_atr, max_hold_bars, rr in product(
+    # AI XEDY_V30 MACD Momentum (8 combinations * len(risk_values))
+    for threshold, stop_atr, max_hold_bars, rr, risk in product(
         [0.05, 0.15],
         [1.4],
         [45],
         rr_values,
+        risk_values
     ):
         library.append(
             {
@@ -565,16 +588,18 @@ def make_strategy_library(rr_values=None):
                     "stop_atr": stop_atr,
                     "rr": rr,
                     "max_hold_bars": max_hold_bars,
+                    "risk_pct": risk,
                 },
             }
         )
 
-    # AI XEDY_V31 Scalper (16 combinations)
-    for threshold, stop_atr, max_hold_bars, rr in product(
+    # AI XEDY_V31 Scalper (16 combinations * len(risk_values))
+    for threshold, stop_atr, max_hold_bars, rr, risk in product(
         [0.22, 0.32],
         [0.6, 1.0],
         [15],
         rr_values,
+        risk_values
     ):
         library.append(
             {
@@ -585,6 +610,7 @@ def make_strategy_library(rr_values=None):
                     "stop_atr": stop_atr,
                     "rr": rr,
                     "max_hold_bars": max_hold_bars,
+                    "risk_pct": risk,
                 },
             }
         )
@@ -998,6 +1024,9 @@ def build_monthly_report(trades, initial_capital):
 
 
 def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, risk_context=None):
+    # Resolve strategy-specific risk percent
+    risk_pct = float(strategy["params"].get("risk_pct", risk_pct))
+    
     warmup = 60
     equity = float(initial_capital)
     peak_equity = equity
@@ -1571,10 +1600,10 @@ def search_backtest_methods(
     learning_iterations = []
     rr_values = dedupe_rr_values([1.0, 1.4, 1.8, 2.2, 2.6])
     if custom_strategies:
-        initial_library = custom_strategies + make_strategy_library(rr_values)
+        initial_library = custom_strategies + make_strategy_library(rr_values, max_risk=risk_pct)
         _push_log(f"🤖 AI custom strategies injected: {len(custom_strategies)} strategi", "ai")
     else:
-        initial_library = make_strategy_library(rr_values)
+        initial_library = make_strategy_library(rr_values, max_risk=risk_pct)
     iteration_sources = [("grid", initial_library)]
     _push_log(f"📋 Library awal: {len(initial_library)} kombinasi strategi", "info")
 
@@ -1640,14 +1669,14 @@ def search_backtest_methods(
             }
         )
         passing_strategies = [item for item in current_results if item["passes_filters"]]
-        if passing_strategies and iteration_index >= 1:
+        if passing_strategies and iteration_index >= 3:
             best_passing = max(passing_strategies, key=lambda x: x.get("net_profit_pct", 0))
             _push_log(f" Target %DD, %Winrate, %Profit tercapai pada iterasi {iteration_index+1}! (Best - Profit: {best_passing['net_profit_pct']:.1f}%, DD: {best_passing['max_drawdown_pct']:.1f}%, WR: {best_passing['win_rate']:.1f}%)", "success")
             break
         seed_results = current_results[:6]
         rr_values = generate_refined_rr_values(seed_results)
         next_phase = "self_learning" if iteration_index == 0 else f"self_learning_{iteration_index}"
-        next_strategies = build_self_learning_strategies(seed_results) + make_strategy_library(rr_values)
+        next_strategies = build_self_learning_strategies(seed_results) + make_strategy_library(rr_values, max_risk=risk_pct)
         _push_log(f"🧬 Self-learning: mengembangkan {len(next_strategies)} strategi baru", "ai")
         iteration_sources.append((next_phase, next_strategies))
 

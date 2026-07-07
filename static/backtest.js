@@ -136,7 +136,7 @@ function renderResults(payload) {
                     <div class="strategy-select-container" style="background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.2); padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 8px;">
                         <input type="checkbox" class="strategy-selector-chk" 
                                data-tf="${payload.timeframe}"
-                               data-risk="${payload.risk_pct || payload.risk_percent || document.getElementById('riskPct')?.value || 1.0}"
+                               data-risk="${item.parameters.risk_pct || payload.risk_pct || payload.risk_percent || document.getElementById('riskPct')?.value || 1.0}"
                                data-type="${item.strategy_type}"
                                data-name="${item.strategy_name.replace(/'/g, "\'")}"
                                data-win="${item.win_rate}"
