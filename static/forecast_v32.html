@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XEDY V32 Ultimate Institutional Forecast AI</title>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/backtest.css?v=18">
+    <style>
+        :root {
+            --neon-blue: #00d2ff;
+            --neon-yellow: #ffd200;
+            --neon-red: #ff7675;
+            --neon-green: #2ecc71;
+            --bg-darker: #02060e;
+            --panel-bg: rgba(12, 24, 48, 0.45);
+            --border-glow: rgba(0, 210, 255, 0.25);
+        }
+        .page-shell {
+            width: 98% !important;
+            max-width: 2500px !important;
+            margin: 0 auto;
+        }
+        .v32-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        @media (max-width: 1200px) {
+            .v32-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .glow-card {
+            border: 1px solid rgba(0, 210, 255, 0.15);
+            background: linear-gradient(145deg, rgba(8, 20, 42, 0.6) 0%, rgba(4, 10, 24, 0.75) 100%);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .glow-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 8px 32px rgba(0, 210, 255, 0.15);
+        }
+        .horizon-toggle {
+            display: flex;
+            background: rgba(5, 12, 28, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+            padding: 4px;
+            gap: 4px;
+        }
+        .horizon-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 8px 24px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .horizon-btn.active {
+            background: var(--neon-blue);
+            color: #02060e;
+            box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
+        }
+        .price-display {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -1px;
+            text-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+        .ohlc-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .metric-circle {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            border: 3.5px solid rgba(0, 210, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            position: relative;
+            background: rgba(5,12,28,0.5);
+            box-shadow: inset 0 0 12px rgba(0,210,255,0.1);
+        }
+        .metric-circle.yellow {
+            border-color: rgba(255, 210, 0, 0.1);
+            box-shadow: inset 0 0 12px rgba(255,210,0,0.1);
+        }
+        .gate-card {
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            background: rgba(46, 204, 113, 0.04);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .gate-card.hold {
+            border-color: rgba(255, 118, 117, 0.2);
+            background: rgba(255, 118, 117, 0.04);
+        }
+        .gate-indicator {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
+        }
+        .gate-indicator.hold {
+            background: rgba(255, 118, 117, 0.15);
+            color: var(--neon-red);
+            box-shadow: 0 0 10px rgba(255, 118, 117, 0.2);
+        }
+    </style>
+</head>
+<body style="background: var(--bg-darker); color: #fff; font-family: 'Outfit', sans-serif;">
+    <main class="page-shell">
+        <!-- Navigation Header -->
+        <header class="hero-card" style="margin-bottom: 16px; border-bottom: 1px solid rgba(0, 210, 255, 0.15); display: flex; justify-content: space-between; align-items: center; background: rgba(5,12,28,0.4);">
+            <div>
+                <h1 style="text-shadow: 0 0 10px rgba(0, 210, 255, 0.4); display: flex; align-items: center; gap: 10px; margin: 0 0 6px 0;">
+                    <span>🏛️ XEDY V32 ULTIMATE FORECAST AI</span>
+                    <span style="font-size: 0.6rem; padding: 3px 8px; border-radius: 4px; background: var(--neon-blue); color: #000; font-weight: 800;">ULTIMATE GRADE</span>
+                </h1>
+                <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">High-Fidelity OHLC Forecast Engine D+1 & W+1 with Multi-Agent Consensus & Calibrated Decision Gates</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="/" style="text-decoration: none;">
+                    <button style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 4px 8px; font-size: 0.72rem; cursor: pointer; border-radius: 3px; font-weight: bold; letter-spacing: 0.5px;">🏠 HOME</button>
+                </a>
+                <a href="/backtest" style="text-decoration: none;">
+                    <button style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 4px 8px; font-size: 0.72rem; cursor: pointer; border-radius: 3px; font-weight: bold; letter-spacing: 0.5px;">⚡ BACKTEST</button>
+                </a>
+                <a href="/trade" style="text-decoration: none;">
+                    <button style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 4px 8px; font-size: 0.72rem; cursor: pointer; border-radius: 3px; font-weight: bold; letter-spacing: 0.5px;">📊 TERMINAL</button>
+                </a>
+                <a href="/ForecastV32" style="text-decoration: none;">
+                    <button style="background: linear-gradient(180deg, var(--accent) 0%, #0c72e0 100%); color: #02060e; padding: 4px 8px; font-size: 0.72rem; cursor: pointer; font-weight: bold; border-radius: 3px; border: none; box-shadow: 0 0 12px rgba(0, 210, 255, 0.3);">🔮 FORECAST</button>
+                </a>
+                <a href="/Monitor" style="text-decoration: none;">
+                    <button style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 4px 8px; font-size: 0.72rem; cursor: pointer; border-radius: 3px; font-weight: bold; letter-spacing: 0.5px;">🖥️ MONITOR</button>
+                </a>
+            </div>
+        </header>
+
+        <!-- Top Asset Symbols & Horizon Selectors -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(5,12,28,0.5); border: 1px solid rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px; margin-bottom: 15px;">
+            <div style="display: flex; gap: 8px;" id="v32-symbol-pills">
+                <!-- Injected dynamically by JS -->
+            </div>
+            
+            <div class="horizon-toggle">
+                <button id="hor-D" class="horizon-btn active" onclick="switchHorizon('D+1')">D+1 DAILY</button>
+                <button id="hor-W" class="horizon-btn" onclick="switchHorizon('W+1')">W+1 WEEKLY</button>
+            </div>
+        </div>
+
+        <div class="v32-grid">
+            <!-- Left Side: Forecast Metrics & Decision Gate -->
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Main price box -->
+                <div class="glow-card" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-family:'Share Tech Mono', monospace; font-size:0.75rem; color:var(--neon-blue); letter-spacing:1px;">EXPECTED PRICE TARGET & ERROR RANGE</span>
+                        <div id="regime-badge" class="badge badge-active" style="background: rgba(0,210,255,0.1); color: var(--neon-blue); border-color: rgba(0,210,255,0.25);">Loading...</div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span id="v32-base-price" class="price-display">-</span>
+                        <span id="v32-error-band" style="font-family:'JetBrains Mono', monospace; color:var(--neon-red); font-weight:700; font-size:1.15rem;">-</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 5px;">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <span style="font-size:0.6rem; color:var(--text-muted); text-transform:uppercase;">Expected ATR Range:</span>
+                            <strong id="v32-atr" style="font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:#fff;">-</strong>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <span style="font-size:0.6rem; color:var(--text-muted); text-transform:uppercase;">Calculated At:</span>
+                            <strong id="v32-calc-time" style="font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:#fff;">-</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OHLC Projection Cards -->
+                <div class="glow-card">
+                    <h3 style="margin-top:0; font-family:'Share Tech Mono', monospace; font-size:0.85rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px; color:var(--text-cyan);">PROBABILITY-WEIGHTED OHLC FORECAST</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div class="ohlc-badge">
+                            <span style="color:var(--text-muted); font-size:0.7rem;">OPEN (TODAY):</span>
+                            <strong id="v32-open" style="color:#fff;">-</strong>
+                        </div>
+                        <div class="ohlc-badge">
+                            <span style="color:var(--neon-yellow); font-size:0.7rem;">FORECAST HIGH:</span>
+                            <strong id="v32-high" style="color:var(--neon-yellow);">-</strong>
+                        </div>
+                        <div class="ohlc-badge">
+                            <span style="color:var(--neon-red); font-size:0.7rem;">FORECAST LOW:</span>
+                            <strong id="v32-low" style="color:var(--neon-red);">-</strong>
+                        </div>
+                        <div class="ohlc-badge">
+                            <span style="color:var(--neon-green); font-size:0.7rem;">FORECAST CLOSE:</span>
+                            <strong id="v32-close" style="color:var(--neon-green);">-</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top:12px;">
+                        <div style="display:flex; flex-direction:column; gap:4px; font-family:'Roboto Mono', monospace; font-size:0.68rem;">
+                            <span style="color:var(--text-muted); font-size:0.58rem; text-transform:uppercase;">80% Confidence Interval:</span>
+                            <strong id="v32-ci80" style="color:#fff;">-</strong>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px; font-family:'Roboto Mono', monospace; font-size:0.68rem;">
+                            <span style="color:var(--text-muted); font-size:0.58rem; text-transform:uppercase;">95% Confidence Interval:</span>
+                            <strong id="v32-ci95" style="color:#fff;">-</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decision Gate & ICI/FQI Gauges -->
+                <div class="glow-card" style="display:flex; flex-direction:column; gap:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="margin:0; font-family:'Share Tech Mono', monospace; font-size:0.85rem; color:#fff;">CONFIDENCE INDEX & DECISION GATE</h3>
+                        <span style="font-size:0.6rem; color:var(--text-muted);">THRESHOLD: 65% ICI</span>
+                    </div>
+
+                    <div style="display:flex; gap:25px; align-items:center;">
+                        <div class="metric-circle">
+                            <span id="v32-ici" style="font-size:1.4rem; font-weight:700; color:var(--neon-blue);">-</span>
+                            <span style="font-size:0.5rem; color:var(--text-muted); margin-top:2px;">ICI SCORE</span>
+                        </div>
+                        
+                        <div class="metric-circle yellow">
+                            <span id="v32-fqi" style="font-size:1.4rem; font-weight:700; color:var(--neon-yellow);">-</span>
+                            <span style="font-size:0.5rem; color:var(--text-muted); margin-top:2px;">FQI INDEX</span>
+                        </div>
+                        
+                        <div style="flex:1; display:flex; flex-direction:column; gap:4px; font-size:0.68rem; font-family:'Roboto Mono', monospace;">
+                            <div style="display:flex; justify-content:space-between;"><span>Macro Alignment:</span> <strong id="v32-score-macro">-</strong></div>
+                            <div style="display:flex; justify-content:space-between;"><span>Liquidity Pool:</span> <strong id="v32-score-liq">-</strong></div>
+                            <div style="display:flex; justify-content:space-between;"><span>Intermarket Correlation:</span> <strong id="v32-score-inter">-</strong></div>
+                            <div style="display:flex; justify-content:space-between;"><span>Fundamental Base:</span> <strong id="v32-score-fund">-</strong></div>
+                        </div>
+                    </div>
+
+                    <div id="decision-gate-card" class="gate-card">
+                        <div id="decision-gate-icon" class="gate-indicator">✓</div>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <span style="font-size:0.75rem; font-weight:700; color:#fff;">DECISION GATE STATUS: <span id="v32-gate-status" style="color:var(--neon-green);">APPROVED</span></span>
+                            <span id="v32-gate-reason" style="font-size:0.62rem; color:var(--text-muted);">Data quality check passed. Forecast is validated.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Scenario Analysis & Historical Top-10 matches -->
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Scenario Matrix -->
+                <div class="glow-card">
+                    <h3 style="margin-top:0; font-family:'Share Tech Mono', monospace; font-size:0.85rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px; color:var(--text-yellow);">FORECAST SCENARIO MATRIX</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-family: 'Share Tech Mono', monospace;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(46,204,113,0.05); border:1px solid rgba(46,204,113,0.15); padding:8px 12px; border-radius:6px;">
+                            <span style="color:var(--neon-green); font-weight:bold;">🟢 BULLISH SCENARIO</span>
+                            <span id="v32-scenario-bull-target" style="font-size:1.05rem; font-weight:bold; color:#fff;">-</span>
+                            <span id="v32-scenario-bull-prob" style="font-size:0.85rem; color:var(--neon-green);">PROB: -</span>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,210,255,0.05); border:1px solid rgba(0,210,255,0.15); padding:8px 12px; border-radius:6px;">
+                            <span style="color:var(--neon-blue); font-weight:bold;">🔵 NEUTRAL SCENARIO</span>
+                            <span id="v32-scenario-neu-target" style="font-size:1.05rem; font-weight:bold; color:#fff;">-</span>
+                            <span id="v32-scenario-neu-prob" style="font-size:0.85rem; color:var(--neon-blue);">PROB: -</span>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,118,117,0.05); border:1px solid rgba(255,118,117,0.15); padding:8px 12px; border-radius:6px;">
+                            <span style="color:var(--neon-red); font-weight:bold;">🔴 BEARISH SCENARIO</span>
+                            <span id="v32-scenario-bear-target" style="font-size:1.05rem; font-weight:bold; color:#fff;">-</span>
+                            <span id="v32-scenario-bear-prob" style="font-size:0.85rem; color:var(--neon-red);">PROB: -</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; border-top:1px solid rgba(255,255,255,0.05); padding-top:12px; font-family:'Roboto Mono', monospace; font-size:0.68rem;">
+                        <div style="display:flex; justify-content:space-between; width:100%;">
+                            <span style="color:var(--text-muted);">Max Expected Drawdown:</span>
+                            <strong id="v32-max-dd" style="color:var(--neon-red);">-</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; width:100%;">
+                            <span style="color:var(--text-muted);">Max Expected Rally:</span>
+                            <strong id="v32-max-rally" style="color:var(--neon-green);">-</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historical Top-10 Vector Matches -->
+                <div class="glow-card">
+                    <h3 style="margin-top:0; font-family:'Share Tech Mono', monospace; font-size:0.85rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px; color:var(--neon-blue); display:flex; justify-content:space-between; align-items:center;">
+                        <span>📜 HISTORICAL TOP-10 VECTOR MATCHES</span>
+                        <span id="v32-match-overall-score" style="font-size:0.65rem; color:var(--neon-blue); font-weight:bold; letter-spacing:0.5px;">OVERALL: -</span>
+                    </h3>
+                    
+                    <div style="overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.68rem; font-family:'Roboto Mono',monospace;">
+                            <thead>
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.08); color:var(--text-muted); font-size:0.58rem; text-transform:uppercase;">
+                                    <th style="padding:6px 4px;">Rank</th>
+                                    <th style="padding:6px 4px;">Historical Date</th>
+                                    <th style="padding:6px 4px; text-align:center;">Sim Score</th>
+                                    <th style="padding:6px 4px; text-align:center;">Outcome</th>
+                                    <th style="padding:6px 4px; text-align:right;">Close Delta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="v32-top10-body">
+                                <!-- Injected dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Multi-Agent AI Vote Output -->
+                <div class="glow-card">
+                    <h3 style="margin-top:0; font-family:'Share Tech Mono', monospace; font-size:0.85rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px; color:var(--text-cyan);">MULTI-AGENT CONSENSUS VOTES</h3>
+                    <div id="v32-xai-factors" style="display:flex; flex-direction:column; gap:6px; font-size:0.68rem; font-family:'Roboto Mono', monospace;">
+                        <!-- Injected dynamically by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/forecast_v32.js?v=20"></script>
+</body>
+</html>

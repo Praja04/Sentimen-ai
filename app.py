@@ -1,12 +1,3 @@
-try:
-    import shutil, os
-    src = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\forecast_engine.py'
-    dst = r'C:\Users\ACER\OneDrive\Documents\PROJECT\forecast_engine.py'
-    if os.path.exists(src):
-        shutil.copy2(src, dst)
-except Exception:
-    pass
-
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, jsonify, send_from_directory, request
@@ -16,10 +7,13 @@ import os
 import json
 import forecast_engine
 import time
+import math
 from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import product
 from pathlib import Path
+
+XEDY_DATABASE_PATH = r"C:\Antigravity\xedy_v30_data.json"
 
 stop_backtest_requested = False
 
@@ -147,7 +141,7 @@ def get_live_ticks():
             news_halt, _ = is_news_halt_active()
             demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"]["bid"], bias, news_halt_active=news_halt)
             if demo_state:
-                config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+                config_file = r'C:\Antigravity\active_config.json'
                 if os.path.exists(config_file):
                     with open(config_file, 'r', encoding='utf-8') as f_cfg:
                         demo_state["active_config"] = json.load(f_cfg)
@@ -173,6 +167,7 @@ def get_prices():
     prices = []
     
     for symbol in SYMBOLS:
+        mt5.symbol_select(symbol, True)
         tick = mt5.symbol_info_tick(symbol)
         info = mt5.symbol_info(symbol)
         if tick is not None and info is not None:
@@ -217,7 +212,7 @@ def api_macro():
 def api_xedy():
     import json
     try:
-        with open('xedy_v30_data.json', 'r', encoding='utf-8') as f:
+        with open(XEDY_DATABASE_PATH, 'r', encoding='utf-8') as f:
             data = json.load(f)
         return jsonify(data)
     except Exception as e:
@@ -274,7 +269,7 @@ def ensure_mt5():
         raise RuntimeError(f"MetaTrader5 initialize failed: {mt5.last_error()}")
 
 def load_dashboard_data():
-    with open('xedy_v30_data.json', 'r', encoding='utf-8') as f:
+    with open(XEDY_DATABASE_PATH, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
@@ -452,15 +447,15 @@ def dedupe_rr_values(values):
 
 
 def make_strategy_library(rr_values=None):
-    rr_values = dedupe_rr_values(rr_values or [1.0, 1.4, 1.8, 2.2, 2.6])
+    rr_values = dedupe_rr_values(rr_values or [1.2, 1.8, 2.4, 3.0])
     library = []
 
-    # AI XEDY_V30 Core
+    # AI XEDY_V30 Core (96 combinations)
     for threshold, confirmation, stop_atr, max_hold_bars, rr in product(
-        [0.18, 0.28],
-        [0.08],
-        [1.2, 1.8],
-        [30, 90],
+        [0.22, 0.32, 0.42],
+        [0.08, 0.12],
+        [1.0, 1.8],
+        [30, 60],
         rr_values,
     ):
         library.append(
@@ -477,11 +472,11 @@ def make_strategy_library(rr_values=None):
             }
         )
 
-    # AI XEDY_V30 Pullback
+    # AI XEDY_V30 Pullback (8 combinations)
     for pullback_limit, confirmation, stop_atr, max_hold_bars, rr in product(
         [0.08],
-        [0.08],
-        [1.2],
+        [0.08, 0.12],
+        [1.4],
         [45],
         rr_values,
     ):
@@ -499,11 +494,11 @@ def make_strategy_library(rr_values=None):
             }
         )
 
-    # AI XEDY_V30 Mean Revert
+    # AI XEDY_V30 Mean Revert (8 combinations)
     for extreme_rsi, threshold, stop_atr, max_hold_bars, rr in product(
         [30],
-        [0.18],
-        [1.2],
+        [0.22, 0.32],
+        [1.4],
         [45],
         rr_values,
     ):
@@ -521,11 +516,11 @@ def make_strategy_library(rr_values=None):
             }
         )
 
-    # AI XEDY_V30 Breakout
+    # AI XEDY_V30 Breakout (8 combinations)
     for breakout_buffer, threshold, stop_atr, max_hold_bars, rr in product(
         [0.15],
-        [0.18],
-        [1.2],
+        [0.22, 0.32],
+        [1.4],
         [45],
         rr_values,
     ):
@@ -543,10 +538,10 @@ def make_strategy_library(rr_values=None):
             }
         )
 
-    # AI XEDY_V30 MACD Momentum
+    # AI XEDY_V30 MACD Momentum (8 combinations)
     for threshold, stop_atr, max_hold_bars, rr in product(
         [0.05, 0.15],
-        [1.2],
+        [1.4],
         [45],
         rr_values,
     ):
@@ -554,6 +549,26 @@ def make_strategy_library(rr_values=None):
             {
                 "name": f"AI XEDY_V30 MACD Momentum T{threshold:.2f}",
                 "type": "xedy_macd_momentum",
+                "params": {
+                    "threshold": threshold,
+                    "stop_atr": stop_atr,
+                    "rr": rr,
+                    "max_hold_bars": max_hold_bars,
+                },
+            }
+        )
+
+    # AI XEDY_V31 Scalper (16 combinations)
+    for threshold, stop_atr, max_hold_bars, rr in product(
+        [0.22, 0.32],
+        [0.6, 1.0],
+        [15],
+        rr_values,
+    ):
+        library.append(
+            {
+                "name": f"AI XEDY_V31 Scalper T{threshold:.2f} S{stop_atr:.1f}",
+                "type": "xedy_scalper",
                 "params": {
                     "threshold": threshold,
                     "stop_atr": stop_atr,
@@ -813,6 +828,21 @@ def entry_signal(strategy, cache, index):
             elif macd_hist < -params["threshold"]:
                 signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
 
+    elif strategy["type"] == "xedy_scalper":
+        combined_score, trend_score = compute_combined_score(cache, index)
+        rsi_value = cache["rsi_14"][index]
+        if not (None in (combined_score, trend_score, rsi_value)):
+            stop_distance = atr_value * params["stop_atr"]
+            if combined_score >= params["threshold"] and rsi_value > 50:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            elif combined_score <= -params["threshold"] and rsi_value < 50:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": combined_score}
+            # Counter-trend entry based on technicals
+            elif rsi_value > 65:
+                signal = {"side": 1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
+            elif rsi_value < 35:
+                signal = {"side": -1, "stop_distance": stop_distance, "take_distance": stop_distance * params["rr"], "signal_strength": trend_score}
+
     if signal:
         # Check if signal side is counter-trend to fundamental bias
         is_against = (signal["side"] == 1 and bias < 0.0) or (signal["side"] == -1 and bias > 0.0)
@@ -823,7 +853,7 @@ def entry_signal(strategy, cache, index):
 
 def exit_signal(strategy, cache, index, position):
     params = strategy["params"]
-    if strategy["type"] in {"xedy_v30_ai", "xedy_trend_pullback", "xedy_mean_revert", "xedy_breakout_confirm"}:
+    if strategy["type"] in {"xedy_v30_ai", "xedy_trend_pullback", "xedy_mean_revert", "xedy_breakout_confirm", "xedy_scalper"}:
         ema_mid = cache["ema_21"][index]
         ema_slow = cache["ema_50"][index]
         rsi_value = cache["rsi_14"][index]
@@ -963,18 +993,45 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
     max_drawdown = 0.0
     trades = []
     active_positions = []
+    
+    # Kelly Risk Parameters
+    winrate_proxy = 0.55
+    rr_proxy = strategy["params"].get("rr", 1.5)
+    kelly_fraction = winrate_proxy - (1.0 - winrate_proxy) / rr_proxy
+    kelly_fraction = max(0.02, min(0.15, kelly_fraction))
 
     for index in range(warmup, len(rates)):
+        # Early loss pruning: if drawdown exceeds 20.0%, stop simulation early
+        current_dd = ((peak_equity - equity) / peak_equity * 100.0) if peak_equity > 0 else 0.0
+        if current_dd > 20.0:
+            max_drawdown = current_dd
+            break
+
         bar = rates[index]
+
+        # L2 Market Regime Detection
+        adx_val = cache.get("adx_14", [None]*len(rates))[index]
+        atr_val = cache["atr_14"][index]
+        bb_high = cache.get("bb_high_20", [None]*len(rates))[index]
+        bb_low = cache.get("bb_low_20", [None]*len(rates))[index]
+        ma20_val = cache.get("ma_20", [None]*len(rates))[index]
+        
+        regime = "sideway"
+        if adx_val is not None and adx_val > 25:
+            regime = "trending"
+        elif bb_high is not None and bb_low is not None and ma20_val is not None and ma20_val > 0:
+            bb_width = (bb_high - bb_low) / ma20_val
+            if bb_width < 0.015:
+                regime = "compression"
+            elif bb_width > 0.04:
+                regime = "expansion"
 
         closed_positions = []
         for pos in active_positions:
             update_position_excursions(pos, bar)
             
             # --- AVERAGING / GRID LOGIC ---
-            atr_val = cache["atr_14"][index]
             if atr_val is not None and atr_val > 0 and len(pos["entries"]) < 3:
-                # Optimized grid spacing dynamically scaled based on stop distance to lower drawdown
                 grid_spacing = pos["stop_distance"] * 1.25
                 last_entry_price = pos["entries"][-1]
                 
@@ -1001,10 +1058,65 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
                         pos["stop"] = avg_entry + pos["stop_distance"]
                         pos["take"] = avg_entry - pos["take_distance"]
 
+            # Trend Pyramiding / Scale-In (Profit Booster Engine)
+            if atr_val is not None and atr_val > 0 and len(pos.get("pyramid_entries", [])) < 1:
+                is_profitable = False
+                if pos["side"] == 1 and bar["close"] >= pos["entries"][0] + (atr_val * 1.2):
+                    is_profitable = True
+                elif pos["side"] == -1 and bar["close"] <= pos["entries"][0] - (atr_val * 1.2):
+                    is_profitable = True
+                
+                trend_score = cache.get("trend_score", [0]*len(rates))[index] or 0.0
+                if is_profitable and abs(trend_score) >= 0.08:
+                    scale_lot = pos["initial_lot"] * 0.5
+                    step = (risk_context or {}).get("volume_step", 0.01) or 0.01
+                    scale_lot = max(step, round(scale_lot / step) * step)
+                    
+                    pos["entries"].append(bar["close"])
+                    pos["lots"].append(scale_lot)
+                    
+                    total_lot = sum(pos["lots"])
+                    avg_entry = sum(e * l for e, l in zip(pos["entries"], pos["lots"])) / total_lot
+                    pos["entry"] = avg_entry
+                    pos["lot"] = total_lot
+                    
+                    # Move Stop Loss to break-even (risk-free scale-in)
+                    pos["stop"] = avg_entry
+                    
+                    if "pyramid_entries" not in pos:
+                        pos["pyramid_entries"] = []
+                    pos["pyramid_entries"].append(bar["close"])
+
+            # L11 Trailing Stop Profit-Lock Optimization
+            if atr_val is not None:
+                # Delay trailing stop until price moves 1.5x ATR in profit, then trail closely
+                if pos["side"] == 1:
+                    profit_distance = bar["close"] - pos["entries"][0]
+                    if profit_distance >= (atr_val * 1.5):
+                        ts = bar["close"] - (atr_val * 1.0)
+                        if ts > pos["stop"]: pos["stop"] = ts
+                else:
+                    profit_distance = pos["entries"][0] - bar["close"]
+                    if profit_distance >= (atr_val * 1.5):
+                        ts = bar["close"] + (atr_val * 1.0)
+                        if ts < pos["stop"]: pos["stop"] = ts
+
+            # Time exit decay & dynamic momentum extension
+            hold_bars = index - pos["entry_index"]
+            max_hold = strategy["params"].get("max_hold_bars", 45)
+            
+            trend_score = cache.get("trend_score", [0]*len(rates))[index] or 0.0
+            is_momentum_strong = (pos["side"] == 1 and trend_score > 0.12) or (pos["side"] == -1 and trend_score < -0.12)
+            if is_momentum_strong:
+                max_hold = int(max_hold * 1.5)
+            
             exit_price = None
             exit_reason = None
 
-            if pos["side"] == 1:
+            if hold_bars >= max_hold:
+                exit_price = bar["close"]
+                exit_reason = "time_decay"
+            elif pos["side"] == 1:
                 if bar["low"] <= pos["stop"]:
                     exit_price = pos["stop"]
                     exit_reason = "stop"
@@ -1057,10 +1169,63 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
                     is_hedge = True
 
             if can_open:
+                # L8 Entry Score Engine
+                trend_score = cache.get("trend_score", [0]*len(rates))[index] or 0.0
+                rsi_val = cache.get("rsi_14", [50]*len(rates))[index] or 50.0
+                rsi_mom = abs(rsi_val - 50.0) / 50.0
+                bias = cache.get("xedy_fundamental_bias", 0.0)
+                
+                # Session time check
+                try:
+                    from datetime import datetime
+                    if isinstance(bar["time"], str):
+                        bar_dt = datetime.strptime(bar["time"], "%Y-%m-%d %H:%M:%S")
+                    else:
+                        bar_dt = datetime.utcfromtimestamp(bar["time"])
+                    session_score = 1.0 if 7 <= bar_dt.hour <= 19 else 0.5
+                except:
+                    session_score = 0.8
+                    
+                vol_score = min(1.5, bar.get("tick_volume", 100) / 1000.0)
+                
+                # Combine weights
+                entry_score = (
+                    (abs(trend_score) * 0.3) + 
+                    (rsi_mom * 0.2) + 
+                    (abs(bias) * 0.15) + 
+                    (session_score * 0.1) + 
+                    (vol_score * 0.1) + 
+                    (0.5 * 0.15)
+                )
+                
+                # Entry Score Engine Filter
+                if entry_score < 0.25:
+                    can_open = False
+
+            if can_open:
+                # L9 Risk Sizing & L25 Drawdown Recovery
+                peak_equity = max(peak_equity, equity)
+                current_dd = (peak_equity - equity) / peak_equity if peak_equity > 0 else 0.0
+                
+                # Regime-Adaptive Risk Sizing (Profit Booster Engine)
+                current_kelly = kelly_fraction
+                if regime == "trending":
+                    current_kelly *= 1.5
+                elif regime in ("sideway", "compression"):
+                    current_kelly *= 0.6
+                current_kelly = max(0.02, min(0.25, current_kelly))
+                
+                if current_dd > 0.05:
+                    # Drawdown recovery
+                    current_kelly *= max(0.2, 1.0 - (current_dd * 5.0))
+
                 entry = bar["close"]
                 stop_distance = signal["stop_distance"]
                 take_distance = signal["take_distance"]
-                lot = estimate_lot_size(stop_distance, equity, risk_pct, risk_context or {})
+                
+                # Sizing using optimized risk fraction
+                risk_amount = equity * current_kelly * (risk_pct / 100.0)
+                lot = estimate_lot_size(stop_distance, equity, current_kelly * 100.0, risk_context or {})
                 
                 # Apply 50% counter-trend lot reduction
                 if signal.get("against_fundamental", False):
@@ -1144,6 +1309,48 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
     expectancy_score = avg_mfe_r - avg_mae_r
     score = (avg_monthly_profit_pct * 1.2) + (win_rate * 0.35) - (max_drawdown * 0.5) + (len(trades) * 0.03) + (expectancy_score * 3)
 
+    # Calculate advanced portfolio metrics
+    import numpy as np
+    
+    sharpe = 0.0
+    sortino = 0.0
+    if len(monthly_returns) > 1:
+        avg_ret = np.mean(monthly_returns)
+        std_ret = np.std(monthly_returns)
+        if std_ret > 0:
+            sharpe = (avg_ret / std_ret) * math.sqrt(12) # Annualized
+            
+        negative_returns = [r for r in monthly_returns if r < 0]
+        downside_std = np.std(negative_returns) if negative_returns else 0.0
+        if downside_std > 0:
+            sortino = (avg_ret / downside_std) * math.sqrt(12) # Annualized
+        elif avg_ret > 0:
+            sortino = 9.99
+    elif len(monthly_returns) == 1:
+        sharpe = monthly_returns[0] / 10.0
+        sortino = monthly_returns[0] / 5.0 if monthly_returns[0] > 0 else monthly_returns[0] / 10.0
+
+    test_days = max(1.0, (rates[-1]["time"] - rates[0]["time"]) / 86400.0)
+    recovery_factor = 0.0
+    calmar = 0.0
+    if max_drawdown > 0:
+        recovery_factor = net_profit_pct / max_drawdown
+        calmar = (net_profit_pct / (test_days / 365.25)) / max_drawdown
+        
+    ulcer_index = 0.0
+    if trades:
+        drawdowns = []
+        peak_eq = initial_capital
+        curr_eq = initial_capital
+        for t in trades:
+            change = initial_capital * (t["profit_pct"] / 100.0)
+            curr_eq += change
+            if curr_eq > peak_eq:
+                peak_eq = curr_eq
+            dd = ((peak_eq - curr_eq) / peak_eq) * 100.0 if peak_eq > 0 else 0.0
+            drawdowns.append(dd)
+        ulcer_index = math.sqrt(np.mean([d**2 for d in drawdowns]))
+
     total_buy = sum(1 for t in trades if t["side"] == "LONG")
     total_sell = sum(1 for t in trades if t["side"] == "SHORT")
 
@@ -1163,6 +1370,11 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
         "avg_mae_r": round(avg_mae_r, 3),
         "avg_mfe_r": round(avg_mfe_r, 3),
         "score": round(score, 2),
+        "sharpe_ratio": round(sharpe, 2),
+        "sortino_ratio": round(sortino, 2),
+        "calmar_ratio": round(calmar, 2),
+        "recovery_factor": round(recovery_factor, 2),
+        "ulcer_index": round(ulcer_index, 2),
         "sample_trades": trades[:5],
         "monthly_report": monthly_report,
     }
@@ -1181,8 +1393,10 @@ def compare_metric(value, operator, threshold):
 
 
 def evaluate_result_against_filters(result, filters):
-    # Enforce drawdown < 10%
-    if result.get("max_drawdown_pct", 100.0) >= 10.0:
+    # Enforce drawdown limit dynamically (default to 20% if not defined)
+    dd_filter = (filters or {}).get("drawdown", {})
+    dd_val = float(dd_filter.get("value", 20.0)) if dd_filter else 20.0
+    if result.get("max_drawdown_pct", 100.0) >= dd_val:
         return False
         
     # Enforce net profit is positive
@@ -1354,18 +1568,18 @@ def search_backtest_methods(
     _push_log(f"📋 Library awal: {len(initial_library)} kombinasi strategi", "info")
 
     global stop_backtest_requested
-    for iteration_index in range(6):
+    import concurrent.futures
+
+    for iteration_index in range(10):
         phase_name, strategies = iteration_sources[-1]
         cache = build_indicator_cache(rates, strategies, fundamental_bias=fundamental_bias)
         current_results = []
-        _push_log(f"🔄 Iterasi {iteration_index+1} — Phase: {phase_name} | {len(strategies)} strategi", "phase")
+        _push_log(f" Iterasi {iteration_index+1} — Phase: {phase_name} | {len(strategies)} strategi", "phase")
         _progress_stats.update({"iteration": iteration_index + 1, "phase": phase_name, "total": len(strategies), "tested": 0, "found": len(all_results)})
-        for idx, strategy in enumerate(strategies):
-            if stop_backtest_requested:
-                stop_backtest_requested = False
-                _push_log("⛔ Backtest dihentikan oleh user.", "warn")
-                raise RuntimeError("Backtest dihentikan oleh user.")
-            result = run_backtest(
+        
+        # Parallel backtest runner function
+        def worker(strategy):
+            res = run_backtest(
                 rates,
                 strategy,
                 cache,
@@ -1373,21 +1587,39 @@ def search_backtest_methods(
                 initial_capital=initial_capital,
                 risk_context=risk_context,
             )
-            if result["total_trades"] < 8:
-                continue
-            result["passes_filters"] = evaluate_result_against_filters(result, filters)
-            current_results.append(result)
-            # Update stats every 25 strategies
-            if (idx + 1) % 25 == 0 or idx == len(strategies) - 1:
-                _progress_stats.update({"tested": idx + 1, "found": len(all_results) + len(current_results)})
-                best = max(current_results, key=lambda x: x.get("net_profit_pct", 0), default=None)
-                if best:
-                    _push_log(f"  ⚡ {idx+1}/{len(strategies)} diuji | Ditemukan: {len(current_results)} | Best - Profit: {best['net_profit_pct']:.1f}%, DD: {best['max_drawdown_pct']:.1f}%, WR: {best['win_rate']:.1f}%", "progress")
+            res["passes_filters"] = evaluate_result_against_filters(res, filters)
+            return res
+
+        # Execute using ThreadPoolExecutor for 100% thread safety and no startup overhead
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+            futures = {executor.submit(worker, strat): strat for strat in strategies}
+            
+            for idx, future in enumerate(concurrent.futures.as_completed(futures)):
+                if stop_backtest_requested:
+                    stop_backtest_requested = False
+                    _push_log(" Backtest dihentikan oleh user.", "warn")
+                    executor.shutdown(wait=False, cancel_futures=True)
+                    raise RuntimeError("Backtest dihentikan oleh user.")
+                
+                try:
+                    result = future.result()
+                    if result["total_trades"] >= 8:
+                        current_results.append(result)
+                except Exception as exc:
+                    print(f"Error testing strategy: {exc}")
+                
+                # Update stats every 25 completed strategies
+                if (idx + 1) % 25 == 0 or idx == len(strategies) - 1:
+                    _progress_stats.update({"tested": idx + 1, "found": len(all_results) + len(current_results)})
+                    best = max(current_results, key=lambda x: x.get("net_profit_pct", 0), default=None)
+                    if best:
+                        _push_log(f"   {idx+1}/{len(strategies)} diuji | Ditemukan: {len(current_results)} | Best - Profit: {best['net_profit_pct']:.1f}%, DD: {best['max_drawdown_pct']:.1f}%, WR: {best['win_rate']:.1f}%", "progress")
+
         rank_results(current_results, sort_priority=sort_priority)
         all_results.extend(current_results)
         passes = sum(1 for item in current_results if item["passes_filters"])
         positive_passing = sum(1 for item in current_results if item["passes_filters"] and item["net_profit_pct"] > 0.0)
-        _push_log(f"✅ Phase '{phase_name}' selesai: {len(current_results)} hasil valid | {passes} lolos filter | {positive_passing} profit positif", "success")
+        _push_log(f" Phase '{phase_name}' selesai: {len(current_results)} hasil valid | {passes} lolos filter | {positive_passing} profit positif", "success")
         learning_iterations.append(
             {
                 "phase": phase_name,
@@ -1399,7 +1631,7 @@ def search_backtest_methods(
         passing_strategies = [item for item in current_results if item["passes_filters"]]
         if passing_strategies and iteration_index >= 1:
             best_passing = max(passing_strategies, key=lambda x: x.get("net_profit_pct", 0))
-            _push_log(f"🎯 Target %DD, %Winrate, %Profit tercapai pada iterasi {iteration_index+1}! (Best - Profit: {best_passing['net_profit_pct']:.1f}%, DD: {best_passing['max_drawdown_pct']:.1f}%, WR: {best_passing['win_rate']:.1f}%)", "success")
+            _push_log(f" Target %DD, %Winrate, %Profit tercapai pada iterasi {iteration_index+1}! (Best - Profit: {best_passing['net_profit_pct']:.1f}%, DD: {best_passing['max_drawdown_pct']:.1f}%, WR: {best_passing['win_rate']:.1f}%)", "success")
             break
         seed_results = current_results[:6]
         rr_values = generate_refined_rr_values(seed_results)
@@ -1422,6 +1654,94 @@ def search_backtest_methods(
     top_results = results[:10]
     passing_count = sum(1 for item in results if item["passes_filters"])
 
+    # For top results, perform Walk-Forward and Monte Carlo validations
+    train_len = int(len(rates) * 0.7)
+    train_rates = rates[:train_len]
+    test_rates = rates[train_len:]
+    
+    # Pre-build cache for train/test to run quick validation
+    train_cache = build_indicator_cache(train_rates, [item["parameters"] for item in top_results], fundamental_bias=fundamental_bias)
+    test_cache = build_indicator_cache(test_rates, [item["parameters"] for item in top_results], fundamental_bias=fundamental_bias)
+    
+    for item in top_results:
+        # 1. Walk-Forward Check
+        strat = {
+            "name": item["strategy_name"],
+            "type": item["strategy_type"],
+            "params": item["parameters"]
+        }
+        train_res = run_backtest(train_rates, strat, train_cache, risk_pct=risk_pct, initial_capital=initial_capital, risk_context=risk_context)
+        test_res = run_backtest(test_rates, strat, test_cache, risk_pct=risk_pct, initial_capital=initial_capital, risk_context=risk_context)
+        
+        train_profit = train_res.get("net_profit_pct", 0.0)
+        test_profit = test_res.get("net_profit_pct", 0.0)
+        
+        if train_profit > 0:
+            stability = (test_profit / train_profit) * 100.0
+        else:
+            stability = 0.0
+        item["wf_stability"] = round(max(0.0, min(100.0, stability)), 2)
+        item["wf_train_profit"] = round(train_profit, 2)
+        item["wf_test_profit"] = round(test_profit, 2)
+        
+        # 2. Monte Carlo Simulation
+        import random
+        mc_pass_count = 0
+        mc_simulations = 100
+        trades_list = item.get("trades", [])
+        
+        if trades_list:
+            for _ in range(mc_simulations):
+                # Shuffle trade list
+                shuffled = list(trades_list)
+                random.shuffle(shuffled)
+                
+                # Simulate equity curve with random spread/slippage variance (up to +/- 0.15 relative profit shift)
+                sim_equity = initial_capital
+                sim_peak = sim_equity
+                sim_max_dd = 0.0
+                
+                for t in shuffled:
+                    slippage = random.uniform(-0.15, 0.1)
+                    profit_pct = t["profit_pct"] * (1.0 + slippage)
+                    sim_equity += sim_equity * (profit_pct / 100.0)
+                    sim_peak = max(sim_peak, sim_equity)
+                    if sim_peak > 0:
+                        sim_max_dd = max(sim_max_dd, ((sim_peak - sim_equity) / sim_peak) * 100.0)
+                        
+                if sim_equity > initial_capital and sim_max_dd < 10.0:
+                    mc_pass_count += 1
+                    
+            item["mc_pass_rate"] = round((mc_pass_count / mc_simulations) * 100.0, 2)
+        else:
+            item["mc_pass_rate"] = 0.0
+            
+        # 3. Concept Drift Engine (PSI Indicator shift score)
+        import numpy as np
+        train_rsi = train_cache.get("rsi_14", [50]*len(train_rates))
+        test_rsi = test_cache.get("rsi_14", [50]*len(test_rates))
+        train_rsi = [v for v in train_rsi if v is not None]
+        test_rsi = [v for v in test_rsi if v is not None]
+        
+        if train_rsi and test_rsi:
+            train_mean = np.mean(train_rsi)
+            test_mean = np.mean(test_rsi)
+            drift_score = min(1.0, abs(train_mean - test_mean) / 25.0)
+        else:
+            drift_score = 0.15
+        item["concept_drift_score"] = round(drift_score, 3)
+        
+        # 4. Composite Score Ranking
+        composite = (
+            (item.get("net_profit_pct", 0.0) * 1.0) +
+            (item.get("win_rate", 0.0) * 0.25) -
+            (item.get("max_drawdown_pct", 0.0) * 0.6) +
+            (item.get("sharpe_ratio", 0.0) * 5.0) +
+            (item.get("wf_stability", 0.0) * 0.1) +
+            (item.get("mc_pass_rate", 0.0) * 0.1)
+        )
+        item["composite_score"] = round(composite, 2)
+
     return {
         "symbol": symbol,
         "timeframe": timeframe,
@@ -1431,7 +1751,7 @@ def search_backtest_methods(
             "start_month": start_month,
             "end_month": end_month,
         },
-        "method": "AI XEDY_V30",
+        "method": "AI XEDY_V31 Ultimate",
         "weighting": {"fundamental": 80, "technical": 20},
         "fundamental_bias": round(compute_xedy_fundamental_bias(), 3),
         "initial_capital": round(float(initial_capital), 2),
@@ -1983,7 +2303,7 @@ def apply_livetest_parameters():
             tp_dist = 30.0
             
         # Write active config to decoupled config file to prevent write race conditions
-        config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+        config_file = r'C:\Antigravity\active_config.json'
         config_data = {
             "timeframe": tf,
             "risk_percent": risk,
@@ -1999,7 +2319,7 @@ def apply_livetest_parameters():
             json.dump(config_data, f_cfg, indent=4)
             
         # Force close active trade by clearing state file
-        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        demo_file = r'C:\Antigravity\livetest_demo.json'
         state = {}
         if os.path.exists(demo_file):
             with open(demo_file, 'r', encoding='utf-8') as f_demo:
@@ -2027,11 +2347,11 @@ def apply_livetest_parameters():
 @app.route('/api/livetest/clear_parameters', methods=['POST'])
 def clear_livetest_parameters():
     try:
-        config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+        config_file = r'C:\Antigravity\active_config.json'
         if os.path.exists(config_file):
             os.remove(config_file)
             
-        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        demo_file = r'C:\Antigravity\livetest_demo.json'
         state = {}
         if os.path.exists(demo_file):
             with open(demo_file, 'r', encoding='utf-8') as f_demo:
@@ -2060,7 +2380,7 @@ def clear_livetest_parameters():
 @app.route('/api/livetest/reset_simulation', methods=['POST'])
 def reset_livetest_simulation():
     try:
-        demo_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_demo.json'
+        demo_file = r'C:\Antigravity\livetest_demo.json'
         initial_data = {
             "balance": 10000.00,
             "equity": 10000.00,
@@ -2610,7 +2930,7 @@ def get_trade_status():
     import datetime as dt
     try:
         # Load active config from decoupled active_config.json
-        config_file = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\active_config.json'
+        config_file = r'C:\Antigravity\active_config.json'
         active_config = {}
         if os.path.exists(config_file):
             with open(config_file, 'r', encoding='utf-8') as f_cfg:
@@ -2739,7 +3059,7 @@ def get_trade_status():
         # Fetch news feed from xedy_v30_data.json
         news_feed = []
         ml_weights = {}
-        xedy_file = 'xedy_v30_data.json'
+        xedy_file = XEDY_DATABASE_PATH
         if os.path.exists(xedy_file):
             with open(xedy_file, 'r', encoding='utf-8') as f_xedy:
                 try:
@@ -2817,6 +3137,30 @@ def forecast_page():
     return send_from_directory('static', 'forecast.html')
 
 
+@app.route('/ForecastV32')
+@app.route('/forecastv32')
+def forecast_v32_page():
+    return send_from_directory('static', 'forecast_v32.html')
+
+
+@app.route('/api/xedy_v32_forecast')
+def get_xedy_v32_forecast():
+    try:
+        xedy_file = XEDY_DATABASE_PATH
+        if os.path.exists(xedy_file):
+            with open(xedy_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                v32_data = data.get("forecast_v32", {})
+                if v32_data:
+                    return jsonify({
+                        "status": "success",
+                        "forecast": v32_data
+                    })
+        return jsonify({"status": "error", "message": "No V32 forecast data found"}), 404
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 @app.route('/api/forecast_data')
 def get_forecast_data():
     try:
@@ -2866,25 +3210,35 @@ def get_symbol_forecast_api():
 
 
 if __name__ == '__main__':
-    try:
-        src = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\livetest_sim.py'
-        dst = r'C:\Users\ACER\OneDrive\Documents\PROJECT\livetest_sim.py'
-        if os.path.exists(src):
-            import shutil
-            shutil.copy2(src, dst)
-            print("Programmatic sync of livetest_sim.py successful!")
+    pass
+
+    # Start background scheduler thread to auto-update all pages continuously
+    import threading
+    def run_scheduler_thread():
+        import ai_engine
+        import schedule
+        print("[Scheduler Thread] Starting background scheduler...")
+        
+        # Schedulers matching ai_engine.py
+        schedule.every(1).minutes.do(ai_engine.run_live_price_update)
+        schedule.every(15).minutes.do(ai_engine.run_news_update)
+        schedule.every(2).hours.do(ai_engine.run_claude_4h_forecast)
+        schedule.every(1).hours.do(ai_engine.run_claude_daily_macro)
+        schedule.every(4).hours.do(ai_engine.run_claude_weekly_flow)
+        schedule.every(1).minutes.do(ai_engine.run_v31_institutional_intelligence)
+        schedule.every(1).minutes.do(ai_engine.run_v32_ultimate_forecast)
+        schedule.every(1).minutes.do(ai_engine.run_technical_and_calendar)
+        
+        while True:
+            try:
+                schedule.run_pending()
+            except Exception as e:
+                print("[Scheduler Thread] Error running scheduled jobs:", e)
+            time.sleep(1)
             
-        src_dir = r'C:\Users\ACER\.gemini\antigravity\scratch\mt5-dashboard\static'
-        dst_dir = r'C:\Users\ACER\OneDrive\Documents\PROJECT\static'
-        for f in ['backtest.html', 'backtest.js', 'backtest.css', 'forecast.html', 'forecast.js', 'index.html', 'trade.html', 'trade.js']:
-            src_f = os.path.join(src_dir, f)
-            dst_f = os.path.join(dst_dir, f)
-            if os.path.exists(src_f):
-                import shutil
-                shutil.copy2(src_f, dst_f)
-                print(f"Programmatic sync of {f} successful!")
-    except Exception as e:
-        print("Programmatic sync failed:", e)
+    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug:
+        t = threading.Thread(target=run_scheduler_thread, daemon=True)
+        t.start()
 
     # Start the Flask app
     app.run(debug=True, host='0.0.0.0', port=5000)

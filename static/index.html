@@ -29,7 +29,6 @@
                     <h1>XEDY V30</h1>
                     <h2>INSTITUTIONAL FORECAST DASHBOARD</h2>
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 5px;">
-                    <a href="/" class="backtest-link-btn" style="display: inline-block; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); padding: 3px 10px; border-radius: 3px; background: rgba(255, 255, 255, 0.15); transition: all 0.3s; box-shadow: 0 0 8px rgba(255,255,255,0.25); font-weight: bold; letter-spacing: 1px;">🏠 HOME</a>
                     <a href="/backtest" class="backtest-link-btn" style="display: inline-block; color: var(--text-yellow); font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-decoration: none; border: 1px solid var(--text-yellow); padding: 3px 10px; border-radius: 3px; background: rgba(255, 183, 0, 0.08); transition: all 0.3s; box-shadow: 0 0 8px rgba(255,183,0,0.15); font-weight: bold; letter-spacing: 1px;">⚡ BACKTEST LAB</a>
                     <a href="/trade" class="backtest-link-btn" style="display: inline-block; color: var(--text-gold); font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-decoration: none; border: 1px solid var(--text-gold); padding: 3px 10px; border-radius: 3px; background: rgba(255, 215, 0, 0.08); transition: all 0.3s; box-shadow: 0 0 8px rgba(255,215,0,0.15); font-weight: bold; letter-spacing: 1px;">📊 TRADE MONITOR</a>
                     <a href="/Forecast" class="backtest-link-btn" style="display: inline-block; color: #00d2ff; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-decoration: none; border: 1px solid #00d2ff; padding: 3px 10px; border-radius: 3px; background: rgba(0, 210, 255, 0.08); transition: all 0.3s; box-shadow: 0 0 8px rgba(0,210,255,0.15); font-weight: bold; letter-spacing: 1px;">🔮 AI FORECAST</a>
@@ -258,24 +257,6 @@
                             <span class="result text-green" id="bias-result">LOADING...</span>
                             <span class="sub text-red" id="bias-sub"></span>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Row 4: Fundamental Correlations -->
-            <div class="row-panels" style="margin-top: 15px;">
-                <div class="panel panel-border" style="flex: 1.0; min-width: 100%;">
-                    <h3 class="panel-title" style="display:flex; align-items:center;">FUNDAMENTAL INTERMARKET CORRELATION
-                        <div class="tooltip-container" style="margin-left: 8px;">
-                            <span class="info-icon">ⓘ</span>
-                            <div class="tooltip-text" style="bottom: 150%; top: auto; width: 300px; left: 0; transform: none; z-index: 1000;">
-                                <strong style="color:var(--text-yellow);">Fundamental Correlation</strong><br><br>
-                                Menunjukkan korelasi Pearson real-time antar indikator makro/fundamental. Korelasi negatif yang kuat menunjukkan hubungan "safe-haven vs risk", sedangkan korelasi positif menunjukkan transmisi kebijakan yield/inflasi yang sinkron.
-                            </div>
-                        </div>
-                    </h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; padding: 10px; width: 100%;" id="fundamental-correlations-container">
-                        <!-- Dynamically populated by script.js -->
                     </div>
                 </div>
             </div>

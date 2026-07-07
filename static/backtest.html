@@ -24,11 +24,10 @@
                 <p class="hero-copy">Metode yang dipakai sekarang tetap: <strong>Fundamental 80%</strong> dari dataset XEDY V30 dan <strong>Teknikal 20%</strong> dari data <strong>M1 XAUUSD</strong> langsung dari MetaTrader 5. Hasil ditampilkan sebagai <strong>10 profit terbesar</strong>.</p>
             </div>
             <div class="header-links" style="display: flex; gap: 10px;">
-                <a class="ghost-link" href="/" style="border-color: rgba(255,255,255,0.3); color: #fff;">🏠 HOME</a>
-                <a class="ghost-link" href="/backtest" style="border-color: var(--text-yellow); color: var(--text-yellow); background: rgba(255, 183, 0, 0.05); box-shadow: 0 0 6px rgba(255,183,0,0.15); font-weight: bold;">⚡ BACKTEST LAB</a>
-                <a class="ghost-link" href="/trade" style="border-color: var(--text-gold); color: var(--text-gold);">📊 TRADE MONITOR</a>
-                <a class="ghost-link" href="/Forecast" style="border-color: #00d2ff; color: #00d2ff;">🔮 AI FORECAST</a>
-                <a class="ghost-link" href="/Monitor" style="border-color: #fbbf24; color: #fbbf24;">🖥️ LIVE MONITOR</a>
+                <a class="ghost-link" href="/">KEMBALI KE DASHBOARD</a>
+                <a class="ghost-link" href="/trade" style="border-color: var(--text-yellow); color: var(--text-yellow);">BUKA TRADE MONITOR</a>
+                <a class="ghost-link" href="/Forecast" style="border-color: #00d2ff; color: #00d2ff;">AI FORECAST</a>
+                <a class="ghost-link" href="/Monitor" style="border-color: #fbbf24; color: #fbbf24; background: rgba(255, 191, 36, 0.05); box-shadow: 0 0 6px rgba(255,191,36,0.15);">LIVE MONITOR</a>
             </div>
         </section>
 
@@ -138,13 +137,7 @@
                 <div class="form-grid">
                     <label>
                         <span>Symbol</span>
-                        <select id="symbol" style="width: 100%; height: 38px; background: rgba(10, 22, 45, 0.7); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 4px; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; padding: 0 10px; cursor: pointer; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--text-cyan)'" onblur="this.style.borderColor='rgba(0, 210, 255, 0.2)'">
-                            <option value="XAUUSD" selected>XAUUSD (Gold)</option>
-                            <option value="USDJPY">USDJPY (Yen)</option>
-                            <option value="XTIUSD">XTIUSD (Oil)</option>
-                            <option value="EURUSD">EURUSD (Euro)</option>
-                            <option value="GBPUSD">GBPUSD (Pound)</option>
-                        </select>
+                        <input id="symbol" value="XAUUSD" readonly />
                     </label>
                     <label>
                         <span>Modal awal ($)</span>
@@ -269,7 +262,7 @@
 
             <div class="panel">
                 <h2>Prioritas Ranking</h2>
-                <div class="form-grid">
+                <div class="priority-grid">
                     <label>
                         <span>Prioritas 1 (Utama)</span>
                         <select id="priority1">
@@ -302,94 +295,7 @@
             </div>
         </section>
 
-        <!-- AI Strategy Prompt Builder -->
-        <section class="panel prompt-panel" style="margin-top: 16px;">
-            <h2>🧠 AI Strategy Prompt Builder</h2>
-            <p class="hint" style="margin-bottom: 10px;">Tuliskan metode, logika, atau cara mencari strategi yang Anda inginkan. AI Gemini akan membuat parameter strategi berdasarkan prompt Anda, lalu menjalankan backtest secara otomatis.</p>
-            <textarea id="strategyPrompt" rows="6" style="
-                width: 100%;
-                box-sizing: border-box;
-                background: rgba(0,0,0,0.35);
-                border: 1px solid rgba(255,215,0,0.25);
-                border-radius: 8px;
-                color: #e0e0e0;
-                font-family: 'Roboto Mono', monospace;
-                font-size: 0.85rem;
-                padding: 14px 16px;
-                resize: vertical;
-                outline: none;
-                transition: border-color 0.3s ease;
-                line-height: 1.6;
-            " placeholder="Contoh:
-• Cari strategi breakout yang entry saat harga tembus high hari sebelumnya dengan konfirmasi volume tinggi
-• Gunakan RSI oversold di bawah 25 sebagai sinyal buy, dengan SL ketat 1x ATR dan TP 3x ATR
-• Strategi mean reversion: entry saat Bollinger Band menyentuh lower band, exit di middle band
-• Fokus strategi momentum MACD cross dengan filter trend EMA 200"></textarea>
-            <div style="display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="aiModelSelect" style="font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.5); font-family: 'Rajdhani', sans-serif; white-space: nowrap;">🤖 AI Model:</label>
-                    <select id="aiModelSelect" style="
-                        background: #ffffff;
-                        border: 1px solid rgba(108,92,231,0.35);
-                        border-radius: 6px;
-                        color: #111111;
-                        font-family: 'Roboto Mono', monospace;
-                        font-size: 0.75rem;
-                        padding: 6px 12px;
-                        cursor: pointer;
-                        outline: none;
-                        min-width: 220px;
-                    ">
-                        <optgroup label="Gemini 2.5 (Latest)">
-                            <option value="gemini-2.5-flash" selected>⚡ Gemini 2.5 Flash (Cepat)</option>
-                            <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Akurat)</option>
-                        </optgroup>
-                        <optgroup label="Gemini 2.0">
-                            <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash</option>
-                            <option value="gemini-2.0-flash-lite">💨 Gemini 2.0 Flash Lite</option>
-                        </optgroup>
-                        <optgroup label="Gemini 1.5 (Legacy)">
-                            <option value="gemini-1.5-pro">🧠 Gemini 1.5 Pro</option>
-                            <option value="gemini-1.5-flash">⚡ Gemini 1.5 Flash</option>
-                            <option value="gemini-1.5-flash-8b">💨 Gemini 1.5 Flash 8B</option>
-                        </optgroup>
-                        <optgroup label="Claude (Anthropic)">
-                            <option value="claude-sonnet-4-20250514">🧠 Claude Sonnet 4</option>
-                            <option value="claude-3-5-sonnet-20241022">⚡ Claude 3.5 Sonnet</option>
-                            <option value="claude-3-5-haiku-20241022">💨 Claude 3.5 Haiku (Cepat)</option>
-                            <option value="claude-3-opus-20240229">🏆 Claude 3 Opus</option>
-                        </optgroup>
-                        <optgroup label="DeepSeek">
-                            <option value="deepseek-chat">🧠 DeepSeek V3 (Chat)</option>
-                            <option value="deepseek-reasoner">🔬 DeepSeek R1 (Reasoner)</option>
-                        </optgroup>
-                        <optgroup label="OpenAI / ChatGPT">
-                            <option value="gpt-4o">🧠 GPT-4o (Terbaik)</option>
-                            <option value="gpt-4o-mini">⚡ GPT-4o Mini (Cepat)</option>
-                            <option value="gpt-4-turbo">🚀 GPT-4 Turbo</option>
-                            <option value="o3-mini">🔬 o3-mini (Reasoning)</option>
-                        </optgroup>
-                    </select>
-                </div>
-                <button id="generateFromPrompt" style="
-                    background: linear-gradient(135deg, #6c5ce7, #a55eea);
-                    color: white;
-                    border: none;
-                    padding: 10px 24px;
-                    border-radius: 8px;
-                    font-family: 'Rajdhani', sans-serif;
-                    font-size: 0.9rem;
-                    font-weight: 700;
-                    cursor: pointer;
-                    letter-spacing: 0.5px;
-                    transition: all 0.3s ease;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                ">✨ Generate Strategi dari Prompt</button>
-                <span id="promptStatus" style="color: rgba(255,255,255,0.5); font-size: 0.75rem; font-family: 'Rajdhani', sans-serif;"></span>
-            </div>
-        </section>
+
 
         <!-- API Keys Settings Panel -->
         <section class="panel" style="margin-top: 16px; border: 1px solid rgba(108,92,231,0.25);">

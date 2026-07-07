@@ -777,6 +777,68 @@ button:active {
 .text-red { color: var(--bad) !important; }
 .text-yellow { color: var(--warn) !important; }
 
+/* Filter Validasi & Prioritas Ranking styling */
+.target-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.target-row {
+    display: grid;
+    grid-template-columns: 145px 65px 1fr;
+    align-items: center;
+    gap: 10px;
+}
+
+.target-row span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.target-row select,
+.target-row input {
+    height: 38px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+    border-radius: 6px;
+    background: rgba(4, 8, 16, 0.4);
+}
+
+.priority-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.priority-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.priority-grid label span {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+}
+
+.priority-grid select {
+    height: 38px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    background: rgba(4, 8, 16, 0.4);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 /* Responsive adjustments */
 @media (max-width: 920px) {
     .control-grid {

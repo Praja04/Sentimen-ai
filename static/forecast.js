@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchForecastData() {
     try {
-        const response = await fetch("/api/forecast_data");
+        const response = await fetch("/api/forecast_data?t=" + Date.now());
         const data = await response.json();
         if (data.status === "success" && data.forecast) {
             // Only update the main macro/UI panels if the user is currently on XAUUSD
@@ -170,7 +170,7 @@ function updateForecastUI(forecast, macroContext, economicReports) {
             forecast.past_projections.forEach(p => {
                 tableHtml += `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.012);">
-                        <td style="padding: 10px 8px; font-weight: 700; color: #8a9cb4; font-family:'JetBrains Mono',monospace;">W${p.week}</td>
+                        <td style="padding: 10px 8px; font-weight: 700; color: #8a9cb4; font-family:'JetBrains Mono',monospace;">H${p.week}</td>
                         <td style="padding: 10px 8px; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size:0.78rem;">${p.date_range}</td>
                         <td style="padding: 10px 8px; color: rgba(74, 222, 128, 0.6); font-family: 'JetBrains Mono', monospace; font-size:0.82rem;">$${p.low_low.toFixed(0)}</td>
                         <td style="padding: 10px 8px; font-family: 'JetBrains Mono', monospace; font-size:0.82rem;">
@@ -405,7 +405,7 @@ function renderForecastChart(forecast) {
     
     if (forecast.past_projections) {
         forecast.past_projections.forEach(p => {
-            pastLabels.push(`W${p.week}`);
+            pastLabels.push(`H${p.week}`);
             pastHighHighs.push(p.high_high);
             pastHighs.push(p.high);
             pastLows.push(p.low);
@@ -416,8 +416,8 @@ function renderForecastChart(forecast) {
         });
     }
     
-    // 2. Compile future W+1 to W+25
-    const futureLabels = forecast.projections.map(p => `W+${p.week}`);
+    // 2. Compile future H+1 to H+25
+    const futureLabels = forecast.projections.map(p => `H+${p.week}`);
     const futureHighHighs = forecast.projections.map(p => p.high_high);
     const futureHighs = forecast.projections.map(p => p.high);
     const futureLows = forecast.projections.map(p => p.low);
@@ -623,9 +623,9 @@ function switchSymbolTab(symbol) {
     const biasTagEl = document.getElementById('weeklyTableBiasTag');
 
     if (symbol === 'XAUUSD') {
-        if (titleEl) titleEl.textContent = '📅 Rencana Proyeksi Mingguan XAUUSD';
+        if (titleEl) titleEl.textContent = ' Rencana Proyeksi H1 XAUUSD';
         if (badgeEl) {
-            badgeEl.textContent = 'GOLD/USD · W-12 → W+25';
+            badgeEl.textContent = 'GOLD/USD  H-20  H+20';
             badgeEl.className = 'badge badge-active';
             badgeEl.style.cssText = '';
         }
@@ -691,9 +691,9 @@ async function loadSymbolForecast(symbol) {
         const badgeEl = document.getElementById('weeklyTableBadge');
         const biasTagEl = document.getElementById('weeklyTableBiasTag');
 
-        if (titleEl) titleEl.textContent = `📅 Rencana Proyeksi Mingguan ${fc.display_name}`;
+        if (titleEl) titleEl.textContent = ` Rencana Proyeksi H1 ${fc.display_name}`;
         if (badgeEl) {
-            badgeEl.textContent = `${fc.symbol} · W-12 → W+25`;
+            badgeEl.textContent = `${fc.symbol}  H-20  H+20`;
             if (symbol === 'USDJPY') {
                 badgeEl.style.cssText = 'background:rgba(165,180,252,0.1); color:#a5b4fc; border:1px solid rgba(165,180,252,0.3);';
             } else {
@@ -855,14 +855,14 @@ function renderConfidenceBars(symbol, projections) {
     const labelsContainer = document.getElementById(labelsContainerId);
     if (labelsContainer) {
         const w1Conf = bars[0] ? parseFloat(bars[0].confidence).toFixed(1) : '95.0';
-        const w13Conf = bars[12] ? parseFloat(bars[12].confidence).toFixed(1) : '73.4';
-        const w25Conf = bars[24] ? parseFloat(bars[24].confidence).toFixed(1) : '51.8';
+        const w10Conf = bars[9] ? parseFloat(bars[9].confidence).toFixed(1) : '78.0';
+        const w20Conf = bars[19] ? parseFloat(bars[19].confidence).toFixed(1) : '60.0';
         labelsContainer.innerHTML = `
-            <span>W+1 (${w1Conf}%)</span>
-            <span>W+7</span>
-            <span>W+13 (${w13Conf}%)</span>
-            <span>W+19</span>
-            <span>W+25 (${w25Conf}%)</span>
+            <span>H+1 (${w1Conf}%)</span>
+            <span>H+5</span>
+            <span>H+10 (${w10Conf}%)</span>
+            <span>H+15</span>
+            <span>H+20 (${w20Conf}%)</span>
         `;
     }
 }
@@ -881,7 +881,7 @@ function renderSymbolTable(symbol, fc) {
         const isPast = p.status === 'COMPLETED';
         const conf = p.confidence;
         const confColor = conf >= 80 ? '#4ade80' : conf >= 65 ? '#fbbf24' : '#f87171';
-        const weekLabel = isPast ? `W${p.week}` : `W+${p.week}`;
+        const weekLabel = isPast ? `H${p.week}` : `H+${p.week}`;
         const rowBg = isPast ? 'rgba(255,255,255,0.012)' : 'transparent';
 
         let statusHtml = isPast

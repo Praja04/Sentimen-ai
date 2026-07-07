@@ -13,7 +13,3 @@ __pycache__/
 # OS generated files
 .DS_Store
 Thumbs.db
-
-# State and dynamic data
-xedy_v30_forecast*.json
-livetest_demo.json

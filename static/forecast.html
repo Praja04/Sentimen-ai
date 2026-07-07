@@ -170,9 +170,6 @@
                 <p>Proyeksi Harga Emas (6 Bulan) & Agen Self-Learning Pemantau Deviasi Real-time</p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <a href="/" style="text-decoration: none;">
-                    <button style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 8px 16px; font-size: 0.8rem; cursor: pointer;">🏠 HOME</button>
-                </a>
                 <a href="/backtest" style="text-decoration: none;">
                     <button style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 8px 16px; font-size: 0.8rem; cursor: pointer;">⚡ BACKTEST LAB</button>
                 </a>
@@ -229,10 +226,10 @@
                     </div>
                     <!-- Confidence bars for XAUUSD -->
                     <div style="margin-top:14px;">
-                        <div style="font-size:0.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📊 Weekly Confidence (W+1 → W+25)</div>
+                        <div style="font-size:0.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📊 H1 Confidence (H+1 → H+20)</div>
                         <div id="confidenceBarsXAUUSD" style="display:flex;gap:3px;align-items:flex-end;height:48px;"></div>
                         <div id="confidenceLabelsXAUUSD" style="display:flex;justify-content:space-between;margin-top:4px;font-size:0.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
-                            <span>W+1 (95%)</span><span>W+7</span><span>W+13 (73.4%)</span><span>W+19</span><span>W+25 (51.8%)</span>
+                            <span>H+1 (95%)</span><span>H+5</span><span>H+10 (78%)</span><span>H+15</span><span>H+20 (60%)</span>
                         </div>
                     </div>
                 </div>
@@ -243,7 +240,7 @@
                         <canvas id="forecastChartUSDJPY"></canvas>
                     </div>
                     <div style="margin-top:14px;">
-                        <div style="font-size:0.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📊 Weekly Confidence (W+1 → W+25)</div>
+                        <div style="font-size:0.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📊 H1 Confidence (H+1 → H+20)</div>
                         <div id="confidenceBarsUSDJPY" style="display:flex;gap:3px;align-items:flex-end;height:48px;"></div>
                         <div id="confidenceLabelsUSDJPY" style="display:flex;justify-content:space-between;margin-top:4px;font-size:0.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
                             <!-- Injected dynamically by JS -->
@@ -257,7 +254,7 @@
                         <canvas id="forecastChartXTIUSD"></canvas>
                     </div>
                     <div style="margin-top:14px;">
-                        <div style="font-size:0.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📊 Weekly Confidence (W+1 → W+25)</div>
+                        <div style="font-size:0.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📊 H1 Confidence (H+1 → H+20)</div>
                         <div id="confidenceBarsXTIUSD" style="display:flex;gap:3px;align-items:flex-end;height:48px;"></div>
                         <div id="confidenceLabelsXTIUSD" style="display:flex;justify-content:space-between;margin-top:4px;font-size:0.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
                             <!-- Injected dynamically by JS -->
@@ -430,9 +427,9 @@
             <!-- Unified Weekly Projections Table — JS populates based on active tab -->
             <div class="panel full-width-panel">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-                    <h2 id="weeklyTableTitle" style="margin:0;">📅 Rencana Proyeksi Mingguan XAUUSD</h2>
+                    <h2 id="weeklyTableTitle" style="margin:0;">📅 Rencana Proyeksi H1 XAUUSD</h2>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <span id="weeklyTableBadge" class="badge badge-active" style="font-size:0.7rem;">GOLD/USD · W-12 → W+25</span>
+                        <span id="weeklyTableBadge" class="badge badge-active" style="font-size:0.7rem;">GOLD/USD · H-20 → H+20</span>
                         <span id="weeklyTableBiasTag" style="font-size:0.72rem; color:var(--muted);"></span>
                     </div>
                 </div>
@@ -440,8 +437,8 @@
                     <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.78rem; font-family:'Outfit',sans-serif;">
                         <thead>
                             <tr style="border-bottom:1px solid var(--line); color:var(--muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em;">
-                                <th style="padding:10px 8px;">Minggu</th>
-                                <th style="padding:10px 8px;">Rentang Tanggal</th>
+                                <th style="padding:10px 8px;">Jam (Hour)</th>
+                                <th style="padding:10px 8px;">Waktu (Time)</th>
                                 <th style="padding:10px 8px; color:#4ade80;">Low-Low (S2)</th>
                                 <th style="padding:10px 8px; color:#38bdf8;">Low (S1)</th>
                                 <th style="padding:10px 8px; color:#fbbf24;">High (R1)</th>

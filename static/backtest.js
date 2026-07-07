@@ -156,8 +156,20 @@ function renderResults(payload) {
                 <div class="metrics-grid">
                     ${metricCard("Total trades", `${item.total_trades} (Buy: ${item.total_buy || 0}, Sell: ${item.total_sell || 0})`)}
                     ${metricCard("Ending balance", `$${item.ending_balance}`)}
-                    ${metricCard("Avg MAE (R)", item.avg_mae_r)}
-                    ${metricCard("Avg MFE (R)", item.avg_mfe_r)}
+                    ${metricCard("Sharpe Ratio", item.sharpe_ratio !== undefined ? item.sharpe_ratio : "-")}
+                    ${metricCard("Sortino Ratio", item.sortino_ratio !== undefined ? item.sortino_ratio : "-")}
+                </div>
+                <div class="metrics-grid">
+                    ${metricCard("Calmar Ratio", item.calmar_ratio !== undefined ? item.calmar_ratio : "-")}
+                    ${metricCard("Recovery Factor", item.recovery_factor !== undefined ? item.recovery_factor : "-")}
+                    ${metricCard("Ulcer Index", item.ulcer_index !== undefined ? `${item.ulcer_index}%` : "-")}
+                    ${metricCard("Avg MAE / MFE (R)", `${item.avg_mae_r} / ${item.avg_mfe_r}`)}
+                </div>
+                <div class="metrics-grid" style="border: 1px solid rgba(108,92,231,0.25); border-radius: 8px; padding: 6px; background: rgba(108,92,231,0.06); margin-top: 6px; margin-bottom: 6px;">
+                    ${metricCard("WF Stability", item.wf_stability !== undefined ? `${item.wf_stability}%` : "-")}
+                    ${metricCard("Monte Carlo Pass", item.mc_pass_rate !== undefined ? `${item.mc_pass_rate}%` : "-")}
+                    ${metricCard("Concept Drift", item.concept_drift_score !== undefined ? item.concept_drift_score : "-")}
+                    ${metricCard("Composite Score", item.composite_score !== undefined ? item.composite_score : "-")}
                 </div>
                 <div class="metrics-grid">
                     ${metricCard("Fundamental", `${payload.weighting.fundamental}%`)}
@@ -175,6 +187,7 @@ function renderResults(payload) {
                                 item.strategy_type === 'xedy_trend_pullback' ? 'Trend alignment + EMA 21 pullback filter' :
                                 item.strategy_type === 'xedy_mean_revert' ? 'Mean Reversion RSI Extreme boundary' :
                                 item.strategy_type === 'xedy_breakout_confirm' ? 'Support/Resistance channel breakout' :
+                                item.strategy_type === 'xedy_scalper' ? 'High-frequency Scalping RSI momentum' :
                                 'MACD Momentum Crossover confirmation'
                             }<br>
                             <strong>Aturan Grid Averaging:</strong> Multi-Level Entry (maks. 3 tingkat, step 1.5 * ATR), Arah order utama mengikuti Trend Fundamental (${payload.fundamental_bias > 0 ? 'LONG' : 'SHORT'}), counter-trend diperbolehkan (teknikal saja) dengan lot dikurangi 50%.

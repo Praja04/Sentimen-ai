@@ -69,10 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const el = document.getElementById(`live-price-${symbol.replace(/\s+/g, '-')}`);
                     const decimals = symbol.includes('JPY') ? 3 : (symbol.includes('EUR') || symbol.includes('GBP') ? 4 : 2);
                     if (el) {
-                        const formattedPrice = symbol.includes('JPY') ? 
-                            tickInfo.bid.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) :
-                            `$${tickInfo.bid.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
-                        el.innerText = formattedPrice;
+                        el.innerText = tickInfo.bid.toLocaleString('en-US', {
+                            minimumFractionDigits: decimals,
+                            maximumFractionDigits: decimals
+                        });
                     }
                     
                     // Update detailed stats inside asset cards on homepage
@@ -165,33 +165,53 @@ document.addEventListener('DOMContentLoaded', () => {
         const assetsContainer = document.getElementById('assets-container');
         let aHtml = '';
         
-        const forecastHTML = (f, isJpy) => `
-            <div class="fc-row"><span class="fc-label">DIRECTION</span><span class="fc-val ${f.dirClass}">${f.dir}</span></div>
-            <div class="fc-row"><span class="fc-label">LOW</span><span class="fc-val">${isJpy ? f.low : '$' + f.low}</span></div>
-            <div class="fc-row"><span class="fc-label">HIGH</span><span class="fc-val">${isJpy ? f.high : '$' + f.high}</span></div>
-            <div class="fc-row"><span class="fc-label">BULL PROB.</span><span class="fc-val">${f.bp}</span></div>
-            <div class="fc-row"><span class="fc-label">BEAR PROB.</span><span class="fc-val">${f.bearp}</span></div>
-            <div class="fc-row"><span class="fc-label">CONFIDENCE</span><span class="fc-val">${f.conf}</span></div>
-            <div class="fc-row"><span class="fc-label">ACCURACY</span><span class="fc-val text-green" style="font-weight:bold;">${f.accuracy}</span></div>
-            <button class="action-btn ${f.btn}">${f.action}</button>
-        `;
+        const forecastHTML = (f, currentPrice, isJpy) => {
+            const openVal = f.open || currentPrice;
+            let closeVal = f.close;
+            if (!closeVal) {
+                const p = parseFloat(currentPrice.toString().replace(/[^0-9.]/g, ''));
+                const high = parseFloat(f.high.toString().replace(/[^0-9.]/g, ''));
+                const low = parseFloat(f.low.toString().replace(/[^0-9.]/g, ''));
+                if (!isNaN(p) && !isNaN(high) && !isNaN(low)) {
+                    const isBull = f.dir && f.dir.includes('BULL');
+                    const diff = isBull ? (high - p) : (p - low);
+                    const change = diff * 0.4;
+                    const close = isBull ? (p + change) : (p - change);
+                    const decimals = isJpy ? 3 : (f.high.toString().includes('.') ? f.high.toString().split('.')[1].length : 2);
+                    closeVal = close.toFixed(decimals);
+                } else {
+                    closeVal = currentPrice;
+                }
+            }
+            return `
+                <div class="fc-row"><span class="fc-label">DIRECTION</span><span class="fc-val ${f.dirClass}">${f.dir}</span></div>
+                <div class="fc-row"><span class="fc-label">OPEN</span><span class="fc-val">${openVal}</span></div>
+                <div class="fc-row"><span class="fc-label">LOW</span><span class="fc-val">${f.low}</span></div>
+                <div class="fc-row"><span class="fc-label">HIGH</span><span class="fc-val">${f.high}</span></div>
+                <div class="fc-row"><span class="fc-label">CLOSE</span><span class="fc-val">${closeVal}</span></div>
+                <div class="fc-row"><span class="fc-label">BULL PROB.</span><span class="fc-val">${f.bp}</span></div>
+                <div class="fc-row"><span class="fc-label">BEAR PROB.</span><span class="fc-val">${f.bearp}</span></div>
+                <div class="fc-row"><span class="fc-label">CONFIDENCE</span><span class="fc-val">${f.conf}</span></div>
+                <div class="fc-row"><span class="fc-label">ACCURACY</span><span class="fc-val text-green" style="font-weight:bold;">${f.accuracy}</span></div>
+                <button class="action-btn ${f.btn}">${f.action}</button>
+            `;
+        };
 
         data.assets.forEach(a => {
             let chgColor = a.cColor || 'text-green';
             const isJpy = a.symbol.includes('JPY');
-            const displayPrice = isJpy ? a.price : '$' + a.price;
             aHtml += `
             <div class="asset-card">
-                <div class="asset-header" style="flex-direction: column; align-items: flex-start; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px; margin-bottom: 3px;">
-                    <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+                <div class="asset-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
                         <div class="asset-icon">${a.icon}</div>
                         <div class="asset-info">
                             <span class="asset-name">${a.symbol}</span>
-                            <span class="asset-price ${chgColor}" id="live-price-${a.symbol.replace(/\s+/g, '-')}">${displayPrice}</span>
+                            <span class="asset-price ${chgColor}" id="live-price-${a.symbol.replace(/\s+/g, '-')}">${a.price}</span>
                         </div>
                     </div>
                     <!-- Detailed Tick Metrics -->
-                    <div class="tick-details" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; font-size: 0.48rem; width: 100%; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 3px; font-family: var(--font-mono);">
+                    <div class="tick-details" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 0.55rem; width: 100%; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px; font-family: var(--font-mono);">
                         <div><span style="color:var(--text-muted);">BID:</span> <strong id="live-bid-${a.symbol.replace(/\s+/g, '-')}" style="color:#fff;">...</strong></div>
                         <div><span style="color:var(--text-muted);">ASK:</span> <strong id="live-ask-${a.symbol.replace(/\s+/g, '-')}" style="color:#fff;">...</strong></div>
                         <div><span style="color:var(--text-muted);">CHG:</span> <strong id="live-chg-${a.symbol.replace(/\s+/g, '-')}" class="${chgColor}">${a.change}</strong></div>
@@ -201,11 +221,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="forecast-split">
                     <div class="fc-col">
                         <div class="fc-title">1D FORECAST</div>
-                        ${forecastHTML(a.f4, isJpy)}
+                        ${forecastHTML(a.f4, a.price, isJpy)}
                     </div>
                     <div class="fc-col">
                         <div class="fc-title">1W FORECAST</div>
-                        ${forecastHTML(a.f1, isJpy)}
+                        ${forecastHTML(a.f1, a.price, isJpy)}
                     </div>
                 </div>
             </div>
@@ -233,48 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     cHtml += `</tr>`;
                 });
                 tableBody.innerHTML = cHtml;
-            }
-        }
-
-        // Render Fundamental Correlations dynamically
-        if (data.fundamental_correlations) {
-            const funContainer = document.getElementById('fundamental-correlations-container');
-            if (funContainer) {
-                let fHtml = '';
-                const explanations = {
-                    "Gold vs Real Yields (XAUUSD vs US10Y)": "Yields naik = biaya peluang emas meningkat (Emas Bearish).",
-                    "Yen vs Yield Spread (USDJPY vs US10Y)": "Yields AS naik = selisih yield melebar (USDJPY Bullish).",
-                    "Oil vs Commodity Index (WTI OIL vs DBC)": "Harga minyak naik = inflasi komoditas naik (Inflasi Bullish).",
-                    "Equities vs Risk Volatility (DJI vs VIX)": "VIX naik = kepanikan pasar meningkat (Saham Bearish).",
-                    "Dollar vs Gold Safe Haven (DXY vs XAUUSD)": "Dollar kuat = harga komoditas dalam dollar tertekan (Emas Bearish)."
-                };
-                
-                Object.entries(data.fundamental_correlations).forEach(([relation, val]) => {
-                    let valStr = val.toFixed(2);
-                    let badgeText = "NEUTRAL";
-                    let badgeClass = "text-yellow";
-                    if (val >= 0.3) {
-                        badgeText = "STRONG POSITIVE";
-                        badgeClass = "text-green";
-                    } else if (val <= -0.3) {
-                        badgeText = "STRONG NEGATIVE";
-                        badgeClass = "text-red";
-                    }
-                    
-                    const explanation = explanations[relation] || "Hubungan intermarket makro.";
-                    
-                    fHtml += `
-                    <div class="macro-item" style="border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 4px; background: rgba(10,22,45,0.3); display: flex; flex-direction: column; gap: 6px; text-align: left;">
-                        <span style="font-size: 0.65rem; color: var(--text-yellow); font-family: var(--font-mono); font-weight: bold;">${relation}</span>
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px;">
-                            <span class="${badgeClass}" style="font-size: 0.6rem; font-weight: bold; letter-spacing: 0.5px;">${badgeText}</span>
-                            <span class="${badgeClass}" style="font-size: 0.95rem; font-family: var(--font-mono); font-weight: bold;">${valStr}</span>
-                        </div>
-                        <span style="font-size: 0.55rem; color: var(--text-muted); line-height: 1.2;">${explanation}</span>
-                    </div>
-                    `;
-                });
-                funContainer.innerHTML = fHtml;
             }
         }
 
@@ -365,11 +343,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const pocEur = document.getElementById('liquidity-poc-eur');
             const pocGbp = document.getElementById('liquidity-poc-gbp');
             
-            if(pocXau && data.liquidity_zones['XAUUSD']) pocXau.innerText = data.liquidity_zones['XAUUSD'];
-            if(pocJpy && data.liquidity_zones['USDJPY']) pocJpy.innerText = data.liquidity_zones['USDJPY'];
-            if(pocOil && data.liquidity_zones['WTI OIL']) pocOil.innerText = data.liquidity_zones['WTI OIL'];
-            if(pocEur && data.liquidity_zones['EURUSD']) pocEur.innerText = data.liquidity_zones['EURUSD'];
-            if(pocGbp && data.liquidity_zones['GBPUSD']) pocGbp.innerText = data.liquidity_zones['GBPUSD'];
+            if(pocXau && data.liquidity_zones['XAUUSD'] !== undefined) pocXau.innerText = data.liquidity_zones['XAUUSD'];
+            if(pocJpy && data.liquidity_zones['USDJPY'] !== undefined) pocJpy.innerText = data.liquidity_zones['USDJPY'];
+            if(pocOil && data.liquidity_zones['WTI OIL'] !== undefined) pocOil.innerText = data.liquidity_zones['WTI OIL'];
+            if(pocEur && data.liquidity_zones['EURUSD'] !== undefined) pocEur.innerText = data.liquidity_zones['EURUSD'];
+            if(pocGbp && data.liquidity_zones['GBPUSD'] !== undefined) pocGbp.innerText = data.liquidity_zones['GBPUSD'];
         }
 
         // Render Macro Conclusion Badge

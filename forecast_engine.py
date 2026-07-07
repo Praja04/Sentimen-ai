@@ -6,11 +6,11 @@ from datetime import datetime, timedelta
 import MetaTrader5 as mt5
 
 FALLBACK_PARAMS = {
-    "XAUUSD": {"atr": 35.0, "high_offset": 95.0, "low_offset": 120.0, "drift_scale": 25.0, "decimals": 2},
-    "USDJPY": {"atr": 1.0, "high_offset": 2.2, "low_offset": 2.5, "drift_scale": 1.5, "decimals": 3},
-    "XTIUSD": {"atr": 1.2, "high_offset": 2.8, "low_offset": 3.2, "drift_scale": 0.8, "decimals": 2},
-    "EURUSD": {"atr": 0.0070, "high_offset": 0.0150, "low_offset": 0.0180, "drift_scale": 0.0080, "decimals": 4},
-    "GBPUSD": {"atr": 0.0085, "high_offset": 0.0180, "low_offset": 0.0220, "drift_scale": 0.0100, "decimals": 4}
+    "XAUUSD": {"atr": 5.0, "high_offset": 8.0, "low_offset": 8.0, "drift_scale": 1.5, "decimals": 2},
+    "USDJPY": {"atr": 0.15, "high_offset": 0.25, "low_offset": 0.25, "drift_scale": 0.08, "decimals": 3},
+    "XTIUSD": {"atr": 0.20, "high_offset": 0.35, "low_offset": 0.35, "drift_scale": 0.05, "decimals": 2},
+    "EURUSD": {"atr": 0.0008, "high_offset": 0.0012, "low_offset": 0.0012, "drift_scale": 0.0003, "decimals": 4},
+    "GBPUSD": {"atr": 0.0010, "high_offset": 0.0015, "low_offset": 0.0015, "drift_scale": 0.0004, "decimals": 4}
 }
 
 def init_forecast_state(symbol, base_price, fundamental_bias):
@@ -27,15 +27,15 @@ def init_forecast_state(symbol, base_price, fundamental_bias):
         atr = sum(diffs) / len(diffs)
 
     now = datetime.now()
-    start_monday = now + timedelta(days=(7 - now.weekday()) % 7)
+    start_monday = now
     projections = []
     
-    weekly_fundamental_drift = fundamental_bias * params["drift_scale"]
+    weekly_fundamental_drift = fundamental_bias * params["drift_scale"] * 0.05
     
-    for w in range(1, 27):
-        week_start = start_monday + timedelta(weeks=w-1)
-        week_end = week_start + timedelta(days=6)
-        date_range_str = f"{week_start.strftime('%d %b')} - {week_end.strftime('%d %b')}"
+    for w in range(1, 21):
+        week_start = start_monday + timedelta(hours=w-1)
+        week_end = week_start + timedelta(minutes=59)
+        date_range_str = f"{week_start.strftime('%H:%M')}"
         
         expected_drift = weekly_fundamental_drift * w
         vol_factor = math.sqrt(w)
@@ -97,7 +97,7 @@ def recalculate_projections(symbol, state, current_price, fundamental_bias):
     avg_high_offset = params["high_offset"]
     avg_low_offset = params["low_offset"]
     
-    rates_w1 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_W1, 1, 15)
+    rates_w1 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H1, 1, 15)
     if rates_w1 is not None and len(rates_w1) > 1:
         high_offsets = []
         low_offsets = []
@@ -113,13 +113,8 @@ def recalculate_projections(symbol, state, current_price, fundamental_bias):
     now = datetime.now()
     now_str = now.strftime("%Y-%m-%d")
     
-    start_monday = now - timedelta(days=now.weekday())
-    if "projections" in state and len(state["projections"]) > 0:
-        try:
-            start_monday = datetime.strptime(state["projections"][0]["start_date"], "%Y-%m-%d")
-        except Exception:
-            pass
-            
+    start_monday = now
+    
     weights = state.get("model_weights", {
         "fundamental": 0.80,
         "technical": 0.20,
@@ -130,18 +125,18 @@ def recalculate_projections(symbol, state, current_price, fundamental_bias):
     vol_mult = weights.get("volatility_multiplier", 1.0)
     
     fb = fundamental_bias if fundamental_bias is not None else state.get("fundamental_bias", 0.0)
-    weekly_fundamental_drift = fb * params["drift_scale"] * fund_w
+    weekly_fundamental_drift = fb * params["drift_scale"] * fund_w * 0.05
     
     ec = state.get("error_correction", 0.0)
     adjusted_base = state.get("base_price", current_price) + ec
     
     new_projections = []
-    for w in range(1, 26):
-        week_start = start_monday + timedelta(weeks=w-1)
-        week_end = week_start + timedelta(days=6)
-        date_range_str = f"{week_start.strftime('%d %b')} - {week_end.strftime('%d %b')}"
-        week_start_str = week_start.strftime("%Y-%m-%d")
-        week_end_str = week_end.strftime("%Y-%m-%d")
+    for w in range(1, 21):
+        week_start = start_monday + timedelta(hours=w-1)
+        week_end = week_start + timedelta(minutes=59)
+        date_range_str = f"{week_start.strftime('%H:%M')}"
+        week_start_str = week_start.strftime("%Y-%m-%d %H:%M")
+        week_end_str = week_end.strftime("%Y-%m-%d %H:%M")
         
         expected_drift = weekly_fundamental_drift * w
         vol_factor = math.sqrt(w) * vol_mult
@@ -188,11 +183,11 @@ def get_past_projections(symbol, base_price, atr, fundamental_bias, fund_w, vol_
         mt5.initialize()
         
     params = FALLBACK_PARAMS.get(symbol, FALLBACK_PARAMS["XAUUSD"])
-    rates_w1 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_W1, 1, 15)
+    rates_w1 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H1, 1, 23)
     now = datetime.now()
     past_projections = []
     
-    weekly_fundamental_drift = fundamental_bias * params["drift_scale"] * fund_w
+    weekly_fundamental_drift = fundamental_bias * params["drift_scale"] * fund_w * 0.05
     
     avg_high_offset = params["high_offset"]
     avg_low_offset = params["low_offset"]
@@ -208,13 +203,13 @@ def get_past_projections(symbol, base_price, atr, fundamental_bias, fund_w, vol_
             avg_high_offset = sum(high_offsets) / len(high_offsets)
             avg_low_offset = sum(low_offsets) / len(low_offsets)
             
-    rates_to_process = rates_w1[-13:] if rates_w1 is not None else []
+    rates_to_process = rates_w1[-21:] if rates_w1 is not None else []
     
-    for idx in range(1, 13):
+    for idx in range(1, 21):
         prev_rate = rates_to_process[idx - 1] if (rates_to_process is not None and len(rates_to_process) > idx - 1) else None
         rate = rates_to_process[idx] if (rates_to_process is not None and len(rates_to_process) > idx) else None
         
-        w_idx = -13 + idx
+        w_idx = -21 + idx
         dummy_step = w_idx * params["atr"] * 0.2
         actual_high = rate['high'] if rate else (base_price + dummy_step + params["atr"] * 0.5)
         actual_low = rate['low'] if rate else (base_price + dummy_step - params["atr"] * 0.5)
@@ -229,9 +224,8 @@ def get_past_projections(symbol, base_price, atr, fundamental_bias, fund_w, vol_
         err_high = actual_high - high
         err_low = actual_low - low
         
-        w_start = now - timedelta(weeks=abs(w_idx))
-        w_end = w_start + timedelta(days=6)
-        date_range_str = f"{w_start.strftime('%d %b')} - {w_end.strftime('%d %b')}"
+        w_start = now - timedelta(hours=abs(w_idx))
+        date_range_str = f"{w_start.strftime('%H:%M')}"
         
         past_projections.append({
             "week": w_idx,
@@ -254,7 +248,7 @@ def get_past_projections(symbol, base_price, atr, fundamental_bias, fund_w, vol_
 def get_forecast_state(symbol="XAUUSD", current_price=None, fundamental_bias=None):
     """Loads the forecast state, dynamically applies feedback error correction, and appends past historical data."""
     state = None
-    state_file = f"C:\\Users\\ACER\\.gemini\\antigravity\\scratch\\mt5-dashboard\\xedy_v30_forecast_{symbol}.json"
+    state_file = f"C:\\Antigravity\\xedy_v30_forecast_{symbol}.json"
     if os.path.exists(state_file):
         try:
             with open(state_file, 'r', encoding='utf-8') as f:
@@ -296,7 +290,7 @@ def get_forecast_state(symbol="XAUUSD", current_price=None, fundamental_bias=Non
 def save_forecast_state(symbol, state):
     """Saves the forecast state to file."""
     try:
-        state_file = f"C:\\Users\\ACER\\.gemini\\antigravity\\scratch\\mt5-dashboard\\xedy_v30_forecast_{symbol}.json"
+        state_file = f"C:\\Antigravity\\xedy_v30_forecast_{symbol}.json"
         with open(state_file, 'w', encoding='utf-8') as f:
             json.dump(state, f, indent=2)
     except Exception as e:
@@ -473,7 +467,7 @@ def get_symbol_forecast(symbol: str) -> dict:
     if not current_price:
         return {"error": f"Cannot get price for {symbol}"}
 
-    rates_w1 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_W1, 1, 15)
+    rates_w1 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H1, 1, 15)
     trend_bias = 0.0
     if rates_w1 is not None and len(rates_w1) >= 5:
         trend_bias = (rates_w1[-1]['close'] - rates_w1[-5]['close']) / (abs(current_price) + 1e-9)
@@ -649,7 +643,7 @@ def get_forecast_macro_context():
     from datetime import datetime
     
     xedy_data = {}
-    xedy_file = r'C:\Users\ACER\OneDrive\Documents\PROJECT\xedy_v30_data.json'
+    xedy_file = r'C:\Antigravity\xedy_v30_data.json'
     if os.path.exists(xedy_file):
         try:
             with open(xedy_file, 'r', encoding='utf-8') as f:
@@ -705,7 +699,7 @@ def get_economic_reports():
     import os
     
     xedy_data = {}
-    xedy_file = r'C:\Users\ACER\OneDrive\Documents\PROJECT\xedy_v30_data.json'
+    xedy_file = r'C:\Antigravity\xedy_v30_data.json'
     if os.path.exists(xedy_file):
         try:
             with open(xedy_file, 'r', encoding='utf-8') as f:
