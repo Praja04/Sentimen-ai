@@ -487,11 +487,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const pocEur = document.getElementById('liquidity-poc-eur');
             const pocGbp = document.getElementById('liquidity-poc-gbp');
             
-            if(pocXau && data.liquidity_zones['XAUUSD'] !== undefined) pocXau.innerText = data.liquidity_zones['XAUUSD'];
-            if(pocJpy && data.liquidity_zones['USDJPY'] !== undefined) pocJpy.innerText = data.liquidity_zones['USDJPY'];
-            if(pocOil && data.liquidity_zones['WTI OIL'] !== undefined) pocOil.innerText = data.liquidity_zones['WTI OIL'];
-            if(pocEur && data.liquidity_zones['EURUSD'] !== undefined) pocEur.innerText = data.liquidity_zones['EURUSD'];
-            if(pocGbp && data.liquidity_zones['GBPUSD'] !== undefined) pocGbp.innerText = data.liquidity_zones['GBPUSD'];
+            if(pocXau && data.liquidity_zones['XAUUSD'] !== undefined) {
+                const val = Number(data.liquidity_zones['XAUUSD']);
+                pocXau.innerText = isNaN(val) ? data.liquidity_zones['XAUUSD'] : val.toFixed(0);
+            }
+            if(pocJpy && data.liquidity_zones['USDJPY'] !== undefined) {
+                const val = Number(data.liquidity_zones['USDJPY']);
+                pocJpy.innerText = isNaN(val) ? data.liquidity_zones['USDJPY'] : val.toFixed(1);
+            }
+            if(pocOil && data.liquidity_zones['WTI OIL'] !== undefined) {
+                const val = Number(data.liquidity_zones['WTI OIL']);
+                pocOil.innerText = isNaN(val) ? data.liquidity_zones['WTI OIL'] : val.toFixed(1);
+            }
+            if(pocEur && data.liquidity_zones['EURUSD'] !== undefined) {
+                const val = Number(data.liquidity_zones['EURUSD']);
+                pocEur.innerText = isNaN(val) ? data.liquidity_zones['EURUSD'] : val.toFixed(4);
+            }
+            if(pocGbp && data.liquidity_zones['GBPUSD'] !== undefined) {
+                const val = Number(data.liquidity_zones['GBPUSD']);
+                pocGbp.innerText = isNaN(val) ? data.liquidity_zones['GBPUSD'] : val.toFixed(4);
+            }
         }
 
         // Render Macro Conclusion Badge
