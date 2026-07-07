@@ -659,18 +659,21 @@ document.addEventListener('DOMContentLoaded', () => {
         else { mDesc.innerText = 'WEAK'; mDesc.classList.add('text-red'); }
 
         // Market Regime Gauge
-        let rCtx = document.getElementById('regimeGauge').getContext('2d');
-        let rGrad = rCtx.createLinearGradient(0, 0, 150, 0);
-        rGrad.addColorStop(0, '#ff3333');
-        rGrad.addColorStop(0.5, '#00d4ff');
-        rGrad.addColorStop(1, '#00ff41');
-        drawDoughnut('regimeGauge', gaugeData.market_regime_score, [rGrad, 'rgba(255,255,255,0.05)']);
-        document.querySelector('#regimeGauge + .gauge-value .num').innerText = gaugeData.market_regime_score + '%';
-        let rDesc = document.querySelector('#regimeGauge + .gauge-value .desc');
-        rDesc.className = 'desc';
-        if (gaugeData.market_regime_score > 55) { rDesc.innerText = 'RISK ON'; rDesc.classList.add('text-green'); }
-        else if (gaugeData.market_regime_score >= 45) { rDesc.innerText = 'NEUTRAL'; rDesc.classList.add('text-yellow'); }
-        else { rDesc.innerText = 'RISK OFF'; rDesc.classList.add('text-red'); }
+        let rCanvas = document.getElementById('regimeGauge');
+        if (rCanvas) {
+            let rCtx = rCanvas.getContext('2d');
+            let rGrad = rCtx.createLinearGradient(0, 0, 150, 0);
+            rGrad.addColorStop(0, '#ff3333');
+            rGrad.addColorStop(0.5, '#00d4ff');
+            rGrad.addColorStop(1, '#00ff41');
+            drawDoughnut('regimeGauge', gaugeData.market_regime_score, [rGrad, 'rgba(255,255,255,0.05)']);
+            document.querySelector('#regimeGauge + .gauge-value .num').innerText = gaugeData.market_regime_score + '%';
+            let rDesc = document.querySelector('#regimeGauge + .gauge-value .desc');
+            rDesc.className = 'desc';
+            if (gaugeData.market_regime_score > 55) { rDesc.innerText = 'RISK ON'; rDesc.classList.add('text-green'); }
+            else if (gaugeData.market_regime_score >= 45) { rDesc.innerText = 'NEUTRAL'; rDesc.classList.add('text-yellow'); }
+            else { rDesc.innerText = 'RISK OFF'; rDesc.classList.add('text-red'); }
+        }
 
         // LINE CHART: Sentiment
         let sCtx = document.getElementById('sentimentChart').getContext('2d');
