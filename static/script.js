@@ -125,11 +125,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // LAGGARD ROTATION DETECTOR FETCH & RENDER
+    async function fetchLaggardData() {
+        try {
+            const res = await fetch(`/api/laggard_detection?t=${new Date().getTime()}`, {
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
+            const data = await res.json();
+            if (data.status === "success" && data.results) {
+                const tbody = document.getElementById("laggard-table-body");
+                if (tbody) {
+                    tbody.innerHTML = "";
+                    for (const [symbol, info] of Object.entries(data.results)) {
+                        const isLaggard = symbol === data.laggard_leader;
+                        const statusClass = info.gap < 0 ? "text-green" : "text-red";
+                        const gapSign = info.gap >= 0 ? "+" : "";
+                        const rowStyle = isLaggard ? "background: rgba(0, 210, 255, 0.05); font-weight: bold; border-left: 2px solid var(--text-cyan);" : "";
+                        
+                        const aiClass = info.ai_direction === "BULLISH" ? "text-green" : (info.ai_direction === "BEARISH" ? "text-red" : "text-yellow");
+                        const confluenceClass = info.confluence === "MATCHED" ? "text-green" : "text-muted";
+                        
+                        // Action styling
+                        let actionHtml = `<span class="text-muted">HOLD</span>`;
+                        if (info.action === "BUY") {
+                            actionHtml = `<span class="text-green" style="border: 1px solid var(--text-green); padding: 1px 6px; border-radius: 3px; background: rgba(0, 255, 0, 0.05); box-shadow: 0 0 5px rgba(0,255,0,0.15);">BUY</span>`;
+                        } else if (info.action === "SELL") {
+                            actionHtml = `<span class="text-red" style="border: 1px solid var(--text-red); padding: 1px 6px; border-radius: 3px; background: rgba(255, 0, 0, 0.05); box-shadow: 0 0 5px rgba(255,0,0,0.15);">SELL</span>`;
+                        }
+                        
+                        tbody.innerHTML += `
+                            <tr style="${rowStyle}">
+                                <td>${isLaggard ? '⚡ ' : ''}${symbol}</td>
+                                <td>${info.actual.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                                <td>${info.fair_value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                                <td class="${statusClass}">${gapSign}${info.gap.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})} (${gapSign}${info.pct_gap}%)</td>
+                                <td class="${aiClass}">${info.ai_direction}</td>
+                                <td class="${confluenceClass}">${info.confluence}</td>
+                            </tr>
+                        `;
+                    }
+                }
+                
+                // Update footer / stats of laggard panel
+                const leaderVal = document.getElementById("laggard-leader-val");
+                const recVal = document.getElementById("laggard-recommendation-val");
+                if (leaderVal) {
+                    const leaderInfo = data.results[data.laggard_leader];
+                    const leaderAction = leaderInfo ? leaderInfo.action : "HOLD";
+                    leaderVal.innerText = `${data.laggard_leader} (${leaderInfo ? (leaderInfo.pct_gap >= 0 ? '+' : '') + leaderInfo.pct_gap : 0}%)`;
+                    
+                    if (recVal) {
+                        if (leaderAction === "BUY") {
+                            recVal.innerHTML = `<span class="text-green" style="text-shadow: 0 0 8px rgba(0,255,0,0.4);">⚡ OPPORTUNITY: BUY ${data.laggard_leader} (LAGGARD CONFLUENCE)</span>`;
+                        } else if (leaderAction === "SELL") {
+                            recVal.innerHTML = `<span class="text-red" style="text-shadow: 0 0 8px rgba(255,0,0,0.4);">⚡ OPPORTUNITY: SELL ${data.laggard_leader} (LAGGARD CONFLUENCE)</span>`;
+                        } else {
+                            recVal.innerHTML = `<span class="text-yellow">SIDEWAYS / AWAITING CONFLUENCE</span>`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch laggard data", e);
+        }
+    }
+
     // INITIALIZATION
     fetchXedyData();
     fetchLiveTicks();
+    fetchLaggardData();
     setInterval(fetchXedyData, 60000); // Heavy 60s dashboard refresh
     setInterval(fetchLiveTicks, 1000); // Lightweight 1s tick updates
+    setInterval(fetchLaggardData, 5000); // 5s laggard updates
 
     // Auto-reload at 3 AM to flush browser memory/garbage collection
     function checkDailyReload() {

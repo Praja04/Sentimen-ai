@@ -229,6 +229,112 @@ def api_xedy():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/laggard_detection')
+def api_laggard_detection():
+    import numpy as np
+    if not init_mt5():
+        return jsonify({"error": "Failed to connect to MT5"}), 500
+        
+    symbols = {
+        "XAUUSD": ["XAUUSD", "GOLD"],
+        "USDJPY": ["USDJPY"],
+        "WTI OIL": ["WTI", "XTIUSD", "USOIL", "CL"],
+        "EURUSD": ["EURUSD"],
+        "GBPUSD": ["GBPUSD"]
+    }
+    
+    rates_dict = {}
+    for label, options in symbols.items():
+        matched_symbol = None
+        for opt in options:
+            mt5.symbol_select(opt, True)
+            t = mt5.symbol_info_tick(opt)
+            if t:
+                matched_symbol = opt
+                break
+        if matched_symbol:
+            rates = mt5.copy_rates_from_pos(matched_symbol, mt5.TIMEFRAME_D1, 0, 30)
+            if rates is not None and len(rates) > 0:
+                rates_dict[label] = [r['close'] for r in rates]
+                
+    if len(rates_dict) < 5:
+        return jsonify({"error": f"Failed to fetch historical rates for all 5 assets. Found: {list(rates_dict.keys())}"}), 500
+        
+    # Load latest forecast_v32 for comparison
+    forecast_data = {}
+    try:
+        with open(XEDY_DATABASE_PATH, 'r', encoding='utf-8') as f:
+            db_data = json.load(f)
+            forecast_data = db_data.get("forecast_v32", {}).get("assets", {})
+    except Exception as e:
+        print(f"Error loading forecast_v32: {e}")
+        
+    results = {}
+    laggard_leader = None
+    max_abs_gap = -1.0
+    
+    for target in rates_dict.keys():
+        y = np.array(rates_dict[target])
+        X_list = [rates_dict[s] for s in rates_dict.keys() if s != target]
+        X = np.column_stack(X_list)
+        X = np.column_stack([np.ones(len(y)), X])
+        
+        try:
+            beta, residuals, rank, s = np.linalg.lstsq(X, y, rcond=None)
+            current_x = np.array([1.0] + [rates_dict[s][-1] for s in rates_dict.keys() if s != target])
+            fair_value = float(np.dot(current_x, beta))
+            actual = float(rates_dict[target][-1])
+            gap = actual - fair_value
+            pct_gap = (gap / fair_value) * 100.0 if fair_value > 0 else 0.0
+            
+            # Get previous AI forecast direction (D+1)
+            ai_dir = "NEUTRAL"
+            asset_fc = forecast_data.get(target, {}).get("D+1", {})
+            if asset_fc:
+                probs = asset_fc.get("probabilities", {})
+                bull = probs.get("bullish", 33)
+                bear = probs.get("bearish", 33)
+                if bull > bear + 5:
+                    ai_dir = "BULLISH"
+                elif bear > bull + 5:
+                    ai_dir = "BEARISH"
+                    
+            # Confluence logic:
+            # - If gap < 0 (undervalued), we expect price to RISE -> BUY
+            # - If gap > 0 (overvalued), we expect price to FALL -> SELL
+            laggard_status = "Undervalued" if gap < 0 else "Overvalued"
+            expected_direction = "BULLISH" if gap < 0 else "BEARISH"
+            
+            confluence = "DIVERGENT"
+            action = "HOLD"
+            if expected_direction == ai_dir:
+                confluence = "MATCHED"
+                action = "BUY" if expected_direction == "BULLISH" else "SELL"
+                
+            results[target] = {
+                "actual": round(actual, 4),
+                "fair_value": round(fair_value, 4),
+                "gap": round(gap, 4),
+                "pct_gap": round(pct_gap, 3),
+                "laggard_status": laggard_status,
+                "ai_direction": ai_dir,
+                "confluence": confluence,
+                "action": action
+            }
+            
+            if abs(pct_gap) > max_abs_gap:
+                max_abs_gap = abs(pct_gap)
+                laggard_leader = target
+                
+        except Exception as e:
+            print(f"Error calculating regression for {target}: {e}")
+            
+    return jsonify({
+        "status": "success",
+        "laggard_leader": laggard_leader,
+        "results": results
+    })
+
 @app.route('/api/news_calendar')
 def get_news_calendar():
     import feedparser

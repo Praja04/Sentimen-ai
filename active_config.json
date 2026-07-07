@@ -1,11 +1,11 @@
 {
     "timeframe": "M5",
-    "risk_percent": 1.0,
-    "strategy_type": "xedy_v30_ai",
-    "strategy_name": "AI XEDY_V30 Core T0.22 C0.08 Self-Learning",
+    "risk_percent": 2.0,
+    "strategy_type": "xedy_scalper",
+    "strategy_name": "AI XEDY_V31 Scalper T0.22 S0.6",
     "sl_dist": 15.0,
     "tp_dist": 22.0,
-    "win_rate": 45.74,
-    "max_drawdown": 20.38,
-    "net_profit": 103.59
+    "win_rate": 45,
+    "max_drawdown": 21.15,
+    "net_profit": 497.47
 }
