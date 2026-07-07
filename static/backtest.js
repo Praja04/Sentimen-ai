@@ -101,6 +101,7 @@ function renderResults(payload) {
         return;
     }
 
+    let activeFound = false;
     elements.resultsContainer.innerHTML = results.map((item, index) => {
         const params = Object.entries(item.parameters)
             .map(([key, value]) => `<div class="param-chip">${key}: <strong>${value}</strong></div>`)
@@ -112,13 +113,17 @@ function renderResults(payload) {
 
         // Check if this strategy is currently the active one in the demo state
         const activeConfig = currentDemoState?.active_config;
-        const isActive = activeConfig &&
+        const isActive = !activeFound && activeConfig &&
                          activeConfig.timeframe === payload.timeframe &&
                          activeConfig.strategy_type === item.strategy_type &&
                          activeConfig.strategy_name === item.strategy_name &&
                          Math.abs((activeConfig.win_rate || 0) - (item.win_rate || 0)) < 0.01 &&
                          Math.abs((activeConfig.max_drawdown || 0) - (item.max_drawdown_pct || 0)) < 0.01 &&
                          Math.abs((activeConfig.net_profit || 0) - (item.net_profit_pct || 0)) < 0.01;
+
+        if (isActive) {
+            activeFound = true;
+        }
 
         return `
             <article class="result-card" style="${isActive ? 'border: 1.5px solid var(--text-yellow); box-shadow: 0 0 15px rgba(255,215,0,0.15);' : ''}">
@@ -630,6 +635,7 @@ function syncStrategyCheckboxes(activeConfig) {
     const checkboxes = document.querySelectorAll('.strategy-selector-chk');
     if (!checkboxes.length) return;
     
+    let activeFound = false;
     checkboxes.forEach(chk => {
         const tf = chk.getAttribute('data-tf');
         const type = chk.getAttribute('data-type');
@@ -637,7 +643,7 @@ function syncStrategyCheckboxes(activeConfig) {
         const dd = parseFloat(chk.getAttribute('data-dd') || '0');
         const profit = parseFloat(chk.getAttribute('data-profit') || '0');
         
-        const matches = activeConfig && 
+        const matches = !activeFound && activeConfig && 
                         activeConfig.timeframe === tf && 
                         activeConfig.strategy_type === type &&
                         activeConfig.strategy_name === chk.getAttribute('data-name') &&
@@ -646,6 +652,7 @@ function syncStrategyCheckboxes(activeConfig) {
                         Math.abs((activeConfig.net_profit || 0) - profit) < 0.01;
                         
         if (matches) {
+            activeFound = true;
             if (!chk.checked) {
                 chk.checked = true;
                 const card = chk.closest('.result-card');
