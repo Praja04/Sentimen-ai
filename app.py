@@ -1399,6 +1399,7 @@ def run_backtest(rates, strategy, cache, risk_pct=1.0, initial_capital=10000.0, 
         "strategy_type": strategy["type"],
         "parameters": strategy["params"],
         "total_trades": len(trades),
+        "avg_lot": round(sum(t["lot"] for t in trades) / len(trades), 2) if trades else 0.0,
         "total_buy": total_buy,
         "total_sell": total_sell,
         "win_rate": round(win_rate, 2),
@@ -1653,7 +1654,7 @@ def search_backtest_methods(
                     _progress_stats.update({"tested": idx + 1, "found": len(all_results) + len(current_results)})
                     best = max(current_results, key=lambda x: x.get("net_profit_pct", 0), default=None)
                     if best:
-                        _push_log(f"   {idx+1}/{len(strategies)} diuji | Ditemukan: {len(current_results)} | Best - Profit: {best['net_profit_pct']:.1f}%, DD: {best['max_drawdown_pct']:.1f}%, WR: {best['win_rate']:.1f}%", "progress")
+                        _push_log(f"   {idx+1}/{len(strategies)} diuji | Ditemukan: {len(current_results)} | Best - Profit: {best['net_profit_pct']:.1f}%, DD: {best['max_drawdown_pct']:.1f}%, WR: {best['win_rate']:.1f}%, Trades: {best['total_trades']}, AvgLot: {best['avg_lot']:.2f}", "progress")
 
         rank_results(current_results, sort_priority=sort_priority)
         all_results.extend(current_results)
@@ -1671,7 +1672,7 @@ def search_backtest_methods(
         passing_strategies = [item for item in current_results if item["passes_filters"]]
         if passing_strategies and iteration_index >= 3:
             best_passing = max(passing_strategies, key=lambda x: x.get("net_profit_pct", 0))
-            _push_log(f" Target %DD, %Winrate, %Profit tercapai pada iterasi {iteration_index+1}! (Best - Profit: {best_passing['net_profit_pct']:.1f}%, DD: {best_passing['max_drawdown_pct']:.1f}%, WR: {best_passing['win_rate']:.1f}%)", "success")
+            _push_log(f" Target %DD, %Winrate, %Profit tercapai pada iterasi {iteration_index+1}! (Best - Profit: {best_passing['net_profit_pct']:.1f}%, DD: {best_passing['max_drawdown_pct']:.1f}%, WR: {best_passing['win_rate']:.1f}%, Trades: {best_passing['total_trades']}, AvgLot: {best_passing['avg_lot']:.2f})", "success")
             break
         seed_results = current_results[:6]
         rr_values = generate_refined_rr_values(seed_results)
