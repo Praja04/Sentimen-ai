@@ -385,34 +385,56 @@
             </div>
         </div>
 
-        <!-- CENTER: INTERMARKET TABLE ──────────────────────── -->
-        <div class="panel">
-            <div class="panel-hdr">
-                <div class="panel-title">🔗 INTERMARKET vs GOLD</div>
-                <div class="badge badge-warn">⭐ XAUUSD FOCUS</div>
-            </div>
-            <div class="panel-body" style="gap:4px;">
-                <!-- Laggard summary -->
-                <div class="lag-box">
-                    <div>
-                        <div class="lag-label">TOP LAGGARD</div>
-                        <div class="lag-name" id="lag-name">---</div>
-                    </div>
-                    <div class="lag-action" id="lag-action">---</div>
+        <!-- CENTER: STACKED INTERMARKET & LAGGARD ──────────── -->
+        <div style="display:flex; flex-direction:column; gap:5px; height:100%; min-height:0;">
+            <!-- PANEL 1: INTERMARKET TABLE -->
+            <div class="panel" style="flex: 1 1 0; min-height: 0;">
+                <div class="panel-hdr">
+                    <div class="panel-title">🔗 INTERMARKET vs GOLD</div>
+                    <div class="badge badge-warn">⭐ XAUUSD FOCUS</div>
                 </div>
-                <!-- Table -->
-                <table class="im-tbl">
-                    <thead>
-                        <tr>
-                            <th class="col-name">INDEX</th>
-                            <th class="col-chg">TODAY %</th>
-                            <th class="col-imp">GOLD IMPACT</th>
-                            <th class="col-stars">PRIORITY</th>
-                            <th class="col-rule">RULE</th>
-                        </tr>
-                    </thead>
-                    <tbody id="im-tbody"></tbody>
-                </table>
+                <div class="panel-body" style="padding: 4px 6px;">
+                    <table class="im-tbl">
+                        <thead>
+                            <tr>
+                                <th class="col-name">INDEX</th>
+                                <th class="col-chg">TODAY %</th>
+                                <th class="col-imp">GOLD IMPACT</th>
+                                <th class="col-stars">PRIORITY</th>
+                                <th class="col-rule">RULE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="im-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PANEL 2: LAGGARD DETECTION (REAL vs FVG) -->
+            <div class="panel" style="flex: 1.2 1 0; min-height: 0;">
+                <div class="panel-hdr">
+                    <div class="panel-title">⚡ LAGGARD DETECTION (REAL vs FVG)</div>
+                    <div id="lag-action" class="lag-action" style="font-size: 0.75rem;">---</div>
+                </div>
+                <div class="panel-body" style="padding: 4px 6px; gap: 4px;">
+                    <div class="lag-box" style="padding: 4px 8px; flex: 0 0 auto;">
+                        <span class="lag-label">TOP LAGGARD:</span>
+                        <span class="lag-name" id="lag-name" style="font-size: 1rem;">---</span>
+                    </div>
+                    <table class="im-tbl" id="lag-tbl" style="font-size: 0.72rem; flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
+                        <thead style="flex: 0 0 auto;">
+                            <tr style="display: flex; width: 100%;">
+                                <th style="flex: 1.2; text-align: left;">PAIR</th>
+                                <th style="flex: 1.1; text-align: left;">REAL PRICE</th>
+                                <th style="flex: 1.1; text-align: left;">FVG PRICE</th>
+                                <th style="flex: 0.8; text-align: right;">GAP %</th>
+                                <th style="flex: 0.9; text-align: right;">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lag-tbody" style="flex: 1 1 0; overflow-y: auto; display: block; width: 100%;">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -544,15 +566,38 @@
     function renderLaggard(results, leader) {
         const nameEl   = document.getElementById('lag-name');
         const actionEl = document.getElementById('lag-action');
+        const tbody    = document.getElementById('lag-tbody');
+        
         if (nameEl) nameEl.innerText = leader || '---';
+        
         if (actionEl && results && results[leader]) {
             const li = results[leader];
             if (li.action === 'BUY')
-                actionEl.innerHTML = `<span style="color:var(--green);font-weight:bold;">⚡ BUY — LAGGARD</span>`;
+                actionEl.innerHTML = `<span style="color:var(--green);font-weight:bold;text-shadow:0 0 8px rgba(0,255,65,0.35);">⚡ BUY — LAGGARD</span>`;
             else if (li.action === 'SELL')
-                actionEl.innerHTML = `<span style="color:var(--red);font-weight:bold;">⚡ SELL — LAGGARD</span>`;
+                actionEl.innerHTML = `<span style="color:var(--red);font-weight:bold;text-shadow:0 0 8px rgba(255,51,51,0.35);">⚡ SELL — LAGGARD</span>`;
             else
                 actionEl.innerHTML = `<span style="color:var(--gold);">HOLD / WAIT</span>`;
+        }
+        
+        if (tbody && results) {
+            tbody.innerHTML = Object.entries(results).map(([symbol, info]) => {
+                const isLeader = symbol === leader;
+                const isJpy = symbol.includes('JPY');
+                const decimals = isJpy ? 3 : (symbol.includes('EUR') || symbol.includes('GBP') ? 4 : 2);
+                const gapSign = info.gap >= 0 ? '+' : '';
+                const gapColor = info.gap < 0 ? 'var(--green)' : 'var(--red)';
+                const rowBg = isLeader ? 'rgba(0,212,255,0.06)' : 'transparent';
+                const rowBorder = isLeader ? 'border-left: 2px solid var(--cyan);' : '';
+                const actColor = info.action === 'BUY' ? 'var(--green)' : info.action === 'SELL' ? 'var(--red)' : 'var(--gold)';
+                return `<tr style="background:${rowBg}; ${rowBorder} display: flex; width: 100%; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                    <td style="flex: 1.2; font-weight: bold; color: ${isLeader ? 'var(--cyan)' : 'var(--white)'}; padding: 4px 6px;">${isLeader ? '⚡ ' : ''}${symbol}</td>
+                    <td style="flex: 1.1; padding: 4px 6px;">${info.actual.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals})}</td>
+                    <td style="flex: 1.1; color: var(--text); padding: 4px 6px;">${info.fair_value.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals})}</td>
+                    <td style="flex: 0.8; text-align: right; color: ${gapColor}; font-weight: bold; padding: 4px 6px;">${gapSign}${info.pct_gap}%</td>
+                    <td style="flex: 0.9; text-align: right; color: ${actColor}; font-weight: bold; padding: 4px 6px;">${info.action}</td>
+                </tr>`;
+            }).join('');
         }
     }
 
