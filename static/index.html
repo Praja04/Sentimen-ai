@@ -153,8 +153,9 @@
 
             <!-- RIGHT COLUMN -->
             <div class="grid-right">
-                <div class="panel panel-border" style="flex: 1;">
-                    <h3 class="panel-title" style="display:flex; align-items:center;">INSTITUTIONAL FLOW 
+                <!-- INSTITUTIONAL FLOW -->
+                <div class="panel panel-border" style="flex-shrink:0;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">INSTITUTIONAL FLOW
                         <div class="tooltip-container" style="margin-left: 8px;">
                             <span class="info-icon">ⓘ</span>
                             <div class="tooltip-text" style="bottom: auto; top: 150%; width: 280px; left: auto; right: -50px; transform: none; z-index: 1000;">
@@ -168,20 +169,50 @@
                     </h3>
                     <div class="flow-list" id="flow-list"></div>
                 </div>
-                <div class="panel panel-border" style="flex: 1.5; margin-top: 5px;">
-                    <h3 class="panel-title" style="display:flex; align-items:center;">
-                        CURRENCY INDEX STRENGTH (CSI)
-                        <div class="tooltip-container" style="margin-left: 8px;">
+
+                <!-- INTERMARKET INDICES -->
+                <div class="panel panel-border" style="flex-shrink:0; margin-top:4px;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">INTERMARKET INDEX
+                        <div class="tooltip-container" style="margin-left:8px;">
                             <span class="info-icon">ⓘ</span>
-                            <div class="tooltip-text" style="bottom: auto; top: 150%; width: 280px; left: auto; right: -50px; transform: none; z-index: 1000;">
-                                <strong style="color:var(--text-yellow);">Currency Strength Index</strong><br><br>
-                                Mengukur kekuatan relatif 8 mata uang utama secara real-time dari data pergerakan harian seluruh pasangan forex major.<br><br>
-                                Skor 50 adalah netral, >50 menunjukkan penguatan, dan <50 menunjukkan pelelehan/pelemahan.
+                            <div class="tooltip-text" style="bottom:auto; top:150%; width:280px; left:auto; right:-50px; z-index:1000;">
+                                <strong style="color:var(--text-yellow);">Intermarket Analysis</strong><br><br>
+                                Memantau indeks-indeks kunci yang mempengaruhi pergerakan XAUUSD:<br><br>
+                                <strong>DXY↑</strong> → Gold↓ &nbsp;|&nbsp; <strong>US10Y↑</strong> → Gold↓<br>
+                                <strong>VIX↑</strong> → Gold↑ &nbsp;|&nbsp; <strong>Silver↑</strong> → Gold↑
                             </div>
                         </div>
                     </h3>
-                    <div id="csi-bars-container" style="display: flex; flex-direction: column; gap: 8px; padding: 5px 8px; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;">
-                        <div style="color: var(--text-muted); text-align: center;">Loading CSI data...</div>
+                    <div id="intermarket-container" style="display:flex; flex-direction:column; gap:4px; padding:4px 6px; font-size:0.65rem;">
+                        <div style="color:var(--text-muted); text-align:center;">Loading intermarket data...</div>
+                    </div>
+                </div>
+
+                <!-- CURRENCY INDEX STRENGTH -->
+                <div class="panel panel-border" style="flex-shrink:0; margin-top:4px;">
+                    <h3 class="panel-title" style="display:flex; align-items:center; justify-content:space-between;">
+                        <span>CURRENCY STRENGTH (CSI)</span>
+                        <span id="csi-update-time" style="font-size:0.55rem; color:var(--text-muted); font-weight:normal; letter-spacing:0;">LIVE</span>
+                    </h3>
+                    <div id="csi-bars-container" style="display:flex; flex-direction:column; gap:6px; padding:4px 6px; font-size:0.65rem;">
+                        <div style="color:var(--text-muted); text-align:center;">Loading CSI data...</div>
+                    </div>
+                </div>
+
+                <!-- PAIR RECOMMENDATION -->
+                <div class="panel panel-border" style="flex-shrink:0; margin-top:4px;">
+                    <h3 class="panel-title" style="display:flex; align-items:center;">TOP PAIR SIGNALS
+                        <div class="tooltip-container" style="margin-left:8px;">
+                            <span class="info-icon">ⓘ</span>
+                            <div class="tooltip-text" style="bottom:auto; top:150%; width:280px; left:auto; right:-50px; z-index:1000;">
+                                <strong style="color:var(--text-yellow);">CSI Pair Signals</strong><br><br>
+                                Rekomendasi pair berdasarkan selisih kekuatan mata uang terbesar.<br><br>
+                                Pasangkan mata uang <strong>terkuat vs terlemah</strong> untuk probabilitas tren tertinggi.
+                            </div>
+                        </div>
+                    </h3>
+                    <div id="pair-rec-container" style="display:flex; flex-direction:column; gap:4px; padding:4px 6px; font-size:0.65rem;">
+                        <div style="color:var(--text-muted); text-align:center;">Calculating pair signals...</div>
                     </div>
                 </div>
             </div>

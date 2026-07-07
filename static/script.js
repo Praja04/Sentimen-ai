@@ -228,54 +228,98 @@ document.addEventListener('DOMContentLoaded', () => {
                 const csiContainer = document.getElementById('csi-bars-container');
                 if (csiContainer && data.currency_indices) {
                     const indices = data.currency_indices;
-
-                    // Define display order, colors and full names
                     const CSI_META = {
-                        'DXY': { name: 'USD (DXY)', color: '#00d4ff' },
-                        'EXY': { name: 'EUR (EXY)', color: '#3b82f6' },
-                        'BXY': { name: 'GBP (BXY)', color: '#8b5cf6' },
-                        'JXY': { name: 'JPY (JXY)', color: '#f59e0b' },
-                        'SFX': { name: 'CHF (SFX)', color: '#10b981' },
-                        'CXY': { name: 'CAD (CXY)', color: '#ef4444' },
-                        'AXY': { name: 'AUD (AXY)', color: '#f97316' },
-                        'ZXY': { name: 'NZD (ZXY)', color: '#06b6d4' }
+                        'DXY': { name: 'USD', color: '#00d4ff', index: 'DXY' },
+                        'EXY': { name: 'EUR', color: '#3b82f6', index: 'EXY' },
+                        'BXY': { name: 'GBP', color: '#8b5cf6', index: 'BXY' },
+                        'JXY': { name: 'JPY', color: '#f59e0b', index: 'JXY' },
+                        'SFX': { name: 'CHF', color: '#10b981', index: 'SFX' },
+                        'CXY': { name: 'CAD', color: '#ef4444', index: 'CXY' },
+                        'AXY': { name: 'AUD', color: '#f97316', index: 'AXY' },
+                        'ZXY': { name: 'NZD', color: '#06b6d4', index: 'ZXY' }
                     };
-
-                    // Sort by score descending
                     const sorted = Object.entries(indices).sort((a, b) => b[1].score - a[1].score);
-
-                    let html = '';
-                    for (const [key, val] of sorted) {
-                        const meta = CSI_META[key] || { name: key, color: '#94a3b8' };
+                    let html = '<div style="display:grid; grid-template-columns:1fr; gap:5px;">';
+                    sorted.forEach(([key, val], rank) => {
+                        const meta = CSI_META[key] || { name: key, color: '#94a3b8', index: key };
                         const score = val.score;
                         const pct = val.percentage;
                         const pctSign = pct >= 0 ? '+' : '';
-                        const pctStr = `${pctSign}${pct.toFixed(3)}%`;
-                        // bar width clamped 0..100 mapping score 0-100 → bar 0-100%
                         const barWidth = Math.max(2, Math.min(100, score));
-                        // color intensity: strong = saturated, weak = faded
                         const isStrong = score >= 50;
                         const barColor = isStrong ? meta.color : '#334155';
                         const textColor = isStrong ? meta.color : '#64748b';
                         const arrowIcon = isStrong ? '▲' : '▼';
                         const arrowColor = isStrong ? '#00ff41' : '#ff3333';
-
-                        html += `
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: ${textColor}; font-weight: bold; letter-spacing: 0.5px;">${meta.name}</span>
-                                <span style="display: flex; align-items: center; gap: 4px;">
-                                    <span style="color: ${arrowColor}; font-size: 0.6rem;">${arrowIcon}</span>
-                                    <span style="color: ${textColor}; font-size: 0.65rem;">${pctStr}</span>
-                                    <span style="color: #475569; font-size: 0.6rem;">${score.toFixed(1)}</span>
-                                </span>
+                        const rankColor = rank === 0 ? '#ffd700' : (rank <= 2 ? '#c0c0c0' : '#64748b');
+                        html += `<div style="display:flex; flex-direction:column; gap:2px;">
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <span style="color:${rankColor}; font-size:0.6rem; width:12px; font-weight:bold;">#${rank+1}</span>
+                                <span style="color:${textColor}; font-weight:bold; flex:1;">${meta.name} <span style="color:#475569; font-size:0.55rem;">${meta.index}</span></span>
+                                <span style="color:${arrowColor}; font-size:0.6rem;">${arrowIcon}</span>
+                                <span style="color:${textColor};">${pctSign}${pct.toFixed(3)}%</span>
+                                <span style="color:#475569; font-size:0.55rem; min-width:30px; text-align:right;">${score.toFixed(1)}</span>
                             </div>
-                            <div style="background: rgba(255,255,255,0.05); border-radius: 3px; height: 7px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
-                                <div style="width: ${barWidth}%; height: 100%; background: linear-gradient(90deg, ${barColor}88, ${barColor}); border-radius: 3px; transition: width 0.6s ease; box-shadow: 0 0 6px ${barColor}55;"></div>
+                            <div style="background:rgba(255,255,255,0.05); border-radius:3px; height:5px; overflow:hidden;">
+                                <div style="width:${barWidth}%; height:100%; background:linear-gradient(90deg,${barColor}88,${barColor}); border-radius:3px; transition:width 0.6s ease; box-shadow:0 0 6px ${barColor}44;"></div>
                             </div>
                         </div>`;
-                    }
+                    });
+                    html += '</div>';
+                    // Update timestamp
+                    const csiTime = document.getElementById('csi-update-time');
+                    if (csiTime) csiTime.innerText = 'LIVE ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
                     csiContainer.innerHTML = html;
+                }
+
+                // === INTERMARKET INDICES ===
+                const imContainer = document.getElementById('intermarket-container');
+                if (imContainer && data.intermarket) {
+                    const IM_COLORS = { 'BULLISH': '#00ff41', 'BEARISH': '#ff3333', 'NEUTRAL': '#fbbf24' };
+                    let html = '';
+                    for (const im of data.intermarket) {
+                        const chgSign = im.change_pct >= 0 ? '+' : '';
+                        const chgColor = im.change_pct >= 0 ? '#00ff41' : '#ff3333';
+                        const impColor = IM_COLORS[im.gold_impact] || '#fbbf24';
+                        const impIcon = im.gold_impact === 'BULLISH' ? '▲' : (im.gold_impact === 'BEARISH' ? '▼' : '─');
+                        const stars = '⭐'.repeat(im.stars);
+                        const priceStr = im.price !== null ? im.price.toLocaleString('en-US', {maximumFractionDigits: 3}) : 'N/A';
+                        html += `<div style="display:flex; align-items:center; gap:4px; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="flex:1;">
+                                <span style="color:#fff; font-weight:bold;">${im.name}</span>
+                                <span style="color:#475569; font-size:0.55rem; margin-left:4px;">${im.desc}</span>
+                            </div>
+                            <span style="color:${chgColor}; min-width:48px; text-align:right;">${chgSign}${im.change_pct.toFixed(2)}%</span>
+                            <span style="color:${impColor}; min-width:22px; text-align:center; font-size:0.7rem; font-weight:bold;">${impIcon}</span>
+                            <span style="color:${impColor}; min-width:58px; font-size:0.6rem; text-align:right; font-weight:bold;">${im.gold_impact}</span>
+                        </div>`;
+                    }
+                    imContainer.innerHTML = html || '<div style="color:var(--text-muted); text-align:center; padding:10px;">Data N/A dari broker</div>';
+                }
+
+                // === PAIR RECOMMENDATIONS ===
+                const pairContainer = document.getElementById('pair-rec-container');
+                if (pairContainer && data.pair_recommendations) {
+                    const recs = data.pair_recommendations;
+                    if (recs.length === 0) {
+                        pairContainer.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:10px;">CSI gap terlalu kecil - pasar sideways</div>';
+                    } else {
+                        let html = `<div style="display:flex; justify-content:space-between; color:#475569; font-size:0.6rem; padding:0 2px 4px; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.5px;">
+                            <span>PAIR</span><span>AKSI</span><span>GAP</span><span>KUALITAS</span><span>CONF%</span>
+                        </div>`;
+                        for (const rec of recs) {
+                            const actColor = rec.action === 'BUY' ? '#00ff41' : '#ff3333';
+                            const actBg = rec.action === 'BUY' ? 'rgba(0,255,65,0.08)' : 'rgba(255,51,51,0.08)';
+                            html += `<div style="display:flex; align-items:center; gap:4px; padding:4px 2px; border-bottom:1px solid rgba(255,255,255,0.04);">
+                                <span style="color:#fff; font-weight:bold; flex:1;">${rec.pair}</span>
+                                <span style="color:${actColor}; background:${actBg}; border:1px solid ${actColor}44; padding:1px 6px; border-radius:3px; font-weight:bold; font-size:0.6rem;">${rec.action}</span>
+                                <span style="color:#94a3b8; min-width:36px; text-align:center;">${rec.gap.toFixed(3)}</span>
+                                <span style="color:#fbbf24; min-width:52px; text-align:center; font-size:0.6rem;">${rec.quality}</span>
+                                <span style="color:${actColor}; min-width:30px; text-align:right; font-weight:bold;">${rec.confidence}%</span>
+                            </div>`;
+                        }
+                        pairContainer.innerHTML = html;
+                    }
                 }
             }
         } catch (e) {

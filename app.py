@@ -370,12 +370,102 @@ def api_laggard_detection():
             "percentage": round(pct, 3),
             "score": round(min(100.0, max(0.0, score)), 1)
         }
-            
+    
+    # ── Pair Recommendations from CSI ──────────────────────────────────────────
+    # Full names and pair map for recommendations
+    CURR_FULL = {"DXY": "USD","EXY": "EUR","BXY": "GBP","JXY": "JPY","SFX": "CHF","CXY": "CAD","AXY": "AUD","ZXY": "NZD"}
+    PAIR_MAP = {
+        ("USD","EUR"): "EURUSD", ("USD","GBP"): "GBPUSD", ("USD","JPY"): "USDJPY",
+        ("USD","CHF"): "USDCHF", ("USD","CAD"): "USDCAD", ("USD","AUD"): "AUDUSD",
+        ("USD","NZD"): "NZDUSD", ("EUR","JPY"): "EURJPY", ("EUR","GBP"): "EURGBP",
+        ("GBP","JPY"): "GBPJPY", ("AUD","JPY"): "AUDJPY", ("AUD","NZD"): "AUDNZD",
+        ("CAD","JPY"): "CADJPY", ("CHF","JPY"): "CHFJPY",
+    }
+    sorted_csi = sorted(strengths.items(), key=lambda x: x[1], reverse=True)
+    pair_recs = []
+    seen_pairs = set()
+    for i, (strong_key, strong_val) in enumerate(sorted_csi):
+        for j, (weak_key, weak_val) in enumerate(reversed(sorted_csi)):
+            if strong_key == weak_key:
+                continue
+            gap = strong_val - weak_val
+            if gap < 0.05:
+                continue
+            strong_cur = CURR_FULL[strong_key]
+            weak_cur = CURR_FULL[weak_key]
+            pair = PAIR_MAP.get((strong_cur, weak_cur)) or PAIR_MAP.get((weak_cur, strong_cur))
+            if not pair or pair in seen_pairs:
+                continue
+            seen_pairs.add(pair)
+            # Determine action
+            is_base_strong = PAIR_MAP.get((strong_cur, weak_cur)) is not None
+            action = "BUY" if is_base_strong else "SELL"
+            quality = "★★★★★" if gap > 0.3 else ("★★★★" if gap > 0.2 else ("★★★" if gap > 0.1 else "★★"))
+            pair_recs.append({
+                "pair": pair,
+                "action": action,
+                "gap": round(gap, 3),
+                "strong": strong_cur,
+                "weak": weak_cur,
+                "quality": quality,
+                "confidence": round(min(99, 50 + gap * 150), 0)
+            })
+            if len(pair_recs) >= 6:
+                break
+        if len(pair_recs) >= 6:
+            break
+
+    # ── Intermarket Indices ─────────────────────────────────────────────────────
+    def get_price_and_change(sym_opts):
+        for opt in sym_opts:
+            mt5.symbol_select(opt, True)
+            t = mt5.symbol_info_tick(opt)
+            if t:
+                rates = mt5.copy_rates_from_pos(opt, mt5.TIMEFRAME_D1, 0, 1)
+                if rates is not None and len(rates) > 0:
+                    op = rates[0]['open']
+                    if op > 0:
+                        chg = ((t.bid - op) / op) * 100.0
+                        return round(t.bid, 4), round(chg, 3)
+        return None, 0.0
+
+    # Map symbols to intermarket items
+    intermarket = []
+    im_defs = [
+        {"name": "DXY",      "syms": ["DXY","DXYUSD"],     "desc": "US Dollar Index",    "inv": False, "stars": 5},
+        {"name": "US10Y",    "syms": ["US10Y","TNX","TNXUSD"], "desc": "Treasury Yield 10Y", "inv": False, "stars": 5},
+        {"name": "VIX",      "syms": ["VIX","VIXUSD"],     "desc": "Fear Index",         "inv": True,  "stars": 5},
+        {"name": "SILVER",   "syms": ["XAGUSD","SILVER"],  "desc": "Silver (Lead for Gold)", "inv": False, "stars": 4},
+        {"name": "WTI OIL",  "syms": ["WTI","XTIUSD","USOIL","CL"], "desc": "WTI Crude Oil",  "inv": False, "stars": 3},
+        {"name": "S&P 500",  "syms": ["US500","SPX","SPY"], "desc": "S&P500 Equity Index","inv": False, "stars": 4},
+    ]
+    for im in im_defs:
+        price, chg = get_price_and_change(im["syms"])
+        # For Gold-bullish scoring: VIX up=bullish, DXY up=bearish, US10Y up=bearish, Silver up=bullish
+        gold_impact = "NEUTRAL"
+        if im["inv"]:
+            gold_impact = "BULLISH" if chg > 0.05 else ("BEARISH" if chg < -0.05 else "NEUTRAL")
+        else:
+            if im["name"] in ["DXY", "US10Y"]:
+                gold_impact = "BEARISH" if chg > 0.05 else ("BULLISH" if chg < -0.05 else "NEUTRAL")
+            else:
+                gold_impact = "BULLISH" if chg > 0.05 else ("BEARISH" if chg < -0.05 else "NEUTRAL")
+        intermarket.append({
+            "name": im["name"],
+            "desc": im["desc"],
+            "price": price,
+            "change_pct": chg,
+            "gold_impact": gold_impact,
+            "stars": im["stars"]
+        })
+        
     return jsonify({
         "status": "success",
         "laggard_leader": laggard_leader,
         "results": results,
-        "currency_indices": scaled_indices
+        "currency_indices": scaled_indices,
+        "pair_recommendations": pair_recs,
+        "intermarket": intermarket
     })
 
 @app.route('/api/news_calendar')
