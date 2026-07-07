@@ -449,7 +449,33 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("chk-live-ready-state", e.target.checked);
         });
     }
+
+    // Check if backtest is currently running in background
+    checkActiveBacktest();
 });
+
+async function checkActiveBacktest() {
+    try {
+        const resp = await fetch("/api/backtest/progress");
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (data.running) {
+            elements.runBacktest.disabled = true;
+            elements.stopBacktest.style.display = "inline-block";
+            elements.statusText.textContent = "AI XEDY_V30 sedang berjalan di background...";
+            
+            const progressPanel = document.getElementById("aiProgressPanel");
+            if (progressPanel) {
+                progressPanel.style.display = "block";
+            }
+            
+            // Start progress polling loop (5 default timeframes)
+            startProgressPolling(5);
+        }
+    } catch (e) {
+        console.error("Error checking active backtest:", e);
+    }
+}
 
 // Handle single checklist strategy selection across all timeframes with confirmation
 async function handleStrategySelect(checkbox) {

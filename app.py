@@ -166,7 +166,8 @@ def get_live_ticks():
             
     return jsonify({
         "ticks": ticks,
-        "demo": demo_state
+        "demo": demo_state,
+        "backtest_running": _progress_running
     })
 
 @app.route('/api/prices')
@@ -3135,7 +3136,8 @@ def get_trade_status():
             "ticks": ticks,
             "fundamental_bias": bias_val,
             "ai_live_logs": live_logs,
-            "ml_weights": ml_weights
+            "ml_weights": ml_weights,
+            "backtest_running": _progress_running
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -3169,7 +3171,8 @@ def get_xedy_v32_forecast():
                 if v32_data:
                     return jsonify({
                         "status": "success",
-                        "forecast": v32_data
+                        "forecast": v32_data,
+                        "backtest_running": _progress_running
                     })
         return jsonify({"status": "error", "message": "No V32 forecast data found"}), 404
     except Exception as e:
@@ -3197,7 +3200,8 @@ def get_forecast_data():
             "status": "success",
             "forecast": state,
             "macro_context": macro_ctx,
-            "economic_reports": eco_reports
+            "economic_reports": eco_reports,
+            "backtest_running": _progress_running
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -3218,7 +3222,8 @@ def get_symbol_forecast_api():
             "status": "success",
             "forecast": data,
             "macro_context": data.get("macro_context"),
-            "economic_reports": data.get("economic_reports")
+            "economic_reports": data.get("economic_reports"),
+            "backtest_running": _progress_running
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

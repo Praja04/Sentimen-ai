@@ -65,8 +65,37 @@ async function loadForecastData() {
             forecastData = data.forecast;
             updateUI();
         }
+        updateBacktestNavStatus(data.backtest_running);
     } catch (err) {
         console.error("Error loading forecast v32 data:", err);
+    }
+}
+
+function updateBacktestNavStatus(isRunning) {
+    const link = document.querySelector('a[href="/backtest"]');
+    if (!link) return;
+    let dot = link.querySelector('.backtest-running-dot');
+    if (isRunning) {
+        if (!dot) {
+            dot = document.createElement('span');
+            dot.className = 'backtest-running-dot';
+            dot.style.cssText = 'display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10a37f; margin-left: 6px; box-shadow: 0 0 8px #10a37f; animation: pulse-running-dot 1.2s infinite; vertical-align: middle;';
+            if (!document.getElementById('running-dot-style')) {
+                const style = document.createElement('style');
+                style.id = 'running-dot-style';
+                style.innerHTML = `
+                    @keyframes pulse-running-dot {
+                        0% { opacity: 0.3; transform: scale(0.8); }
+                        50% { opacity: 1; transform: scale(1.2); }
+                        100% { opacity: 0.3; transform: scale(0.8); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            link.appendChild(dot);
+        }
+    } else {
+        if (dot) dot.remove();
     }
 }
 
