@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // INITIALIZATION
     fetchXedyData();
+    fetchLiveTicks();
     setInterval(fetchXedyData, 60000); // Heavy 60s dashboard refresh
     setInterval(fetchLiveTicks, 1000); // Lightweight 1s tick updates
 

@@ -326,16 +326,28 @@ async function fetchStatus() {
             summaryLeft.innerText = '';
             summaryRight.innerText = '';
         }
-
     } catch (err) {
         console.error('Error fetching trade status:', err);
+    }
+}
+async function fetchLiveTicks() {
+    try {
+        const response = await fetch('/api/live_ticks?t=' + Date.now());
+        const data = await response.json();
+        if (data.ticks) {
+            renderTicker(data.ticks);
+        }
+    } catch (err) {
+        console.error('Error fetching live ticks:', err);
     }
 }
 
 // Initial pull and periodic loop
 document.addEventListener('DOMContentLoaded', () => {
     fetchStatus();
-    updateInterval = setInterval(fetchStatus, 1000); // Pull every 1 second
+    fetchLiveTicks();
+    setInterval(fetchLiveTicks, 1000);  // Tick updates every 1 second (super fast & lightweight)
+    updateInterval = setInterval(fetchStatus, 10000); // Full status updates every 10 seconds
 });
 
 // 5. Update Live Ticker Bar

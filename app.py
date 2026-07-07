@@ -275,7 +275,7 @@ def get_news_calendar():
 def ensure_mt5():
     if mt5 is None:
         raise RuntimeError("MetaTrader5 Python package is not available.")
-    if not mt5.initialize():
+    if not init_mt5():
         raise RuntimeError(f"MetaTrader5 initialize failed: {mt5.last_error()}")
 
 def load_dashboard_data():
@@ -2698,87 +2698,102 @@ def translate_headline_to_id(text):
         
     return text_clean
 
+_scraping_in_progress = False
+
 def fetch_live_calendar_and_news():
-    global _cached_calendar, _cached_news, _last_scrape_time
-    import requests
-    import warnings
-    from bs4 import XMLParsedAsHTMLWarning
-    warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+    global _cached_calendar, _cached_news, _last_scrape_time, _scraping_in_progress
     now = time.time()
     
     # Cache for 3 minutes (180 seconds) to keep it responsive but light
     if now - _last_scrape_time < 180 and _cached_calendar and _cached_news:
         return _cached_calendar, _cached_news
         
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
-    
-    # 1. Fetch Calendar from Yahoo Finance
-    calendar_events = []
-    try:
-        r = requests.get('https://finance.yahoo.com/calendar/economic/', headers=headers, timeout=5)
-        if r.status_code == 200:
-            from bs4 import BeautifulSoup
-            soup = BeautifulSoup(r.text, 'html.parser')
-            table = soup.find('table')
-            if table:
-                rows = table.find_all('tr')
-                # Skip header row
-                for row in rows[1:30]:  # limit to top 29 events
-                    tds = row.find_all('td')
-                    if len(tds) >= 7:
-                        raw_time = tds[2].get_text(strip=True)
-                        local_time = convert_utc_to_local(raw_time)
-                        raw_country = tds[1].get_text(strip=True)
-                        full_country = get_full_country_name(raw_country)
-                        calendar_events.append({
-                            "event": tds[0].get_text(strip=True),
-                            "country": full_country,
-                            "time": local_time,
-                            "actual": tds[4].get_text(strip=True),
-                            "forecast": tds[5].get_text(strip=True),
-                            "previous": tds[6].get_text(strip=True),
-                        })
-    except Exception as e:
-        print("Error fetching live calendar:", e)
+    if _scraping_in_progress:
+        return _cached_calendar, _cached_news
         
-    if calendar_events:
-        _cached_calendar = calendar_events
-        
-    # 2. Fetch News from Yahoo Finance RSS
-    news_items = []
-    try:
-        r = requests.get('https://finance.yahoo.com/news/rssindex', headers=headers, timeout=5)
-        if r.status_code == 200:
-            from bs4 import BeautifulSoup
-            soup = BeautifulSoup(r.text, 'html.parser')
-            items = soup.find_all('item')
-            for item in items[:20]: # limit to top 20 news items
-                title = item.find('title')
-                pubdate = item.find('pubdate')
+    def run_scrape():
+        global _cached_calendar, _cached_news, _last_scrape_time, _scraping_in_progress
+        _scraping_in_progress = True
+        try:
+            import requests
+            import warnings
+            from bs4 import XMLParsedAsHTMLWarning
+            warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+            
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            
+            # 1. Fetch Calendar from Yahoo Finance
+            calendar_events = []
+            try:
+                r = requests.get('https://finance.yahoo.com/calendar/economic/', headers=headers, timeout=5)
+                if r.status_code == 200:
+                    from bs4 import BeautifulSoup
+                    soup = BeautifulSoup(r.text, 'html.parser')
+                    table = soup.find('table')
+                    if table:
+                        rows = table.find_all('tr')
+                        for row in rows[1:30]:  # limit to top 29 events
+                            tds = row.find_all('td')
+                            if len(tds) >= 7:
+                                raw_time = tds[2].get_text(strip=True)
+                                local_time = convert_utc_to_local(raw_time)
+                                raw_country = tds[1].get_text(strip=True)
+                                full_country = get_full_country_name(raw_country)
+                                calendar_events.append({
+                                    "event": tds[0].get_text(strip=True),
+                                    "country": full_country,
+                                    "time": local_time,
+                                    "actual": tds[4].get_text(strip=True),
+                                    "forecast": tds[5].get_text(strip=True),
+                                    "previous": tds[6].get_text(strip=True),
+                                })
+            except Exception as e:
+                print("Error fetching live calendar in background:", e)
                 
-                t_str = ""
-                if pubdate:
-                    raw_t = pubdate.get_text(strip=True)
-                    if ' ' in raw_t:
-                        parts = raw_t.split(' ')
-                        if len(parts) >= 5:
-                            t_str = parts[4] # HH:MM:SS
-                            
-                raw_title = title.get_text(strip=True) if title else "No Title"
-                translated_title = translate_headline_to_id(raw_title)
-                news_items.append({
-                    "title": translated_title,
-                    "time": t_str
-                })
-    except Exception as e:
-        print("Error fetching live news:", e)
-        
-    if news_items:
-        _cached_news = news_items
-        
-    _last_scrape_time = now
+            if calendar_events:
+                _cached_calendar = calendar_events
+                
+            # 2. Fetch News from Yahoo Finance RSS
+            news_items = []
+            try:
+                r = requests.get('https://finance.yahoo.com/news/rssindex', headers=headers, timeout=5)
+                if r.status_code == 200:
+                    from bs4 import BeautifulSoup
+                    soup = BeautifulSoup(r.text, 'html.parser')
+                    items = soup.find_all('item')
+                    for item in items[:20]: # limit to top 20 news items
+                        title = item.find('title')
+                        pubdate = item.find('pubdate')
+                        
+                        t_str = ""
+                        if pubdate:
+                            raw_t = pubdate.get_text(strip=True)
+                            if ' ' in raw_t:
+                                parts = raw_t.split(' ')
+                                if len(parts) >= 5:
+                                    t_str = parts[4] # HH:MM:SS
+                                    
+                        raw_title = title.get_text(strip=True) if title else "No Title"
+                        translated_title = translate_headline_to_id(raw_title)
+                        news_items.append({
+                            "title": translated_title,
+                            "time": t_str
+                        })
+            except Exception as e:
+                print("Error fetching live news in background:", e)
+                
+            if news_items:
+                _cached_news = news_items
+                
+            _last_scrape_time = time.time()
+        finally:
+            _scraping_in_progress = False
+
+    t = threading.Thread(target=run_scrape, daemon=True)
+    t.start()
+    
     return _cached_calendar, _cached_news
 
 
@@ -2949,18 +2964,8 @@ def get_trade_status():
                 except Exception:
                     pass
 
-        # Initialize connection to MT5 using credentials if present
-        login_val = os.getenv("MT5_LOGIN")
-        password_val = os.getenv("MT5_PASSWORD")
-        server_val = os.getenv("MT5_SERVER")
-        
-        initialized = False
-        if login_val and password_val and server_val:
-            if mt5.initialize(login=int(login_val), password=password_val, server=server_val):
-                initialized = True
-        
-        if not initialized:
-            initialized = mt5.initialize()
+        # Initialize connection to MT5 using cached function
+        initialized = init_mt5()
 
         if not initialized:
             return jsonify({
@@ -3175,8 +3180,8 @@ def get_xedy_v32_forecast():
 def get_forecast_data():
     try:
         current_price = 2300.0
-        if not mt5.initialize():
-            mt5.initialize()
+        if not init_mt5():
+            return jsonify({"status": "error", "message": "Failed to initialize MT5"}), 500
         for opt in ["XAUUSD", "GOLD"]:
             mt5.symbol_select(opt, True)
             t = mt5.symbol_info_tick(opt)
