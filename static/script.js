@@ -510,13 +510,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Render Macro Conclusion Badge
-        if (data.assets && data.assets.length >= 3) {
+        const biasResEl = document.getElementById('bias-result');
+        const biasSubEl = document.getElementById('bias-sub');
+        if (biasResEl && biasSubEl && data.assets && data.assets.length >= 3) {
             let goldDir = data.assets[0].f1.dir;
             let oilDir = data.assets[2].f1.dir; 
             let usdDir = data.assets[1].f1.dir === 'BULLISH' ? 'BULLISH USD' : 'BEARISH USD'; // if USDJPY is bullish, USD is strong
-            document.getElementById('bias-result').innerHTML = goldDir + '<br>GOLD & ' + oilDir + '<br>OIL';
-            document.getElementById('bias-result').className = 'result ' + (goldDir === 'BULLISH' ? 'text-green' : 'text-red');
-            document.getElementById('bias-sub').innerText = usdDir;
+            biasResEl.innerHTML = goldDir + '<br>GOLD & ' + oilDir + '<br>OIL';
+            biasResEl.className = 'result ' + (goldDir === 'BULLISH' ? 'text-green' : 'text-red');
+            biasSubEl.innerText = usdDir;
         }
 
         // Update Sentiment Score Text and Color dynamically
