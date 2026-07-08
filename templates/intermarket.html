@@ -739,15 +739,20 @@
         const displayPct = isBull ? bullPct : isBear ? (100 - bullPct) : 50;
 
         el.innerHTML = `
-        <div class="gold-summary">
-            <div class="gold-summary-verdict" style="color:${verdictC}">${emoji} ${verdict}</div>
-            <div class="gold-summary-bar-wrap">
-                <div class="gold-summary-bar-mid"></div>
-                <div class="gold-summary-bar-bull" style="width:${bullBarW}%"></div>
-                <div class="gold-summary-bar-bear" style="width:${bearBarW}%"></div>
+        <div class="gold-summary" style="display: flex; flex-direction: column; gap: 4px; padding: 5px 8px;">
+            <div style="display: flex; align-items: center; width: 100%; gap: 8px;">
+                <div class="gold-summary-verdict" style="color:${verdictC}">${emoji} ${verdict}</div>
+                <div class="gold-summary-bar-wrap">
+                    <div class="gold-summary-bar-mid"></div>
+                    <div class="gold-summary-bar-bull" style="width:${bullBarW}%"></div>
+                    <div class="gold-summary-bar-bear" style="width:${bearBarW}%"></div>
+                </div>
+                <div class="gold-summary-pct" style="color:${verdictC}">${displayPct}%</div>
+                <div style="font-size:0.58rem;color:#8ab4d4;flex-shrink:0;">${strength}</div>
             </div>
-            <div class="gold-summary-pct" style="color:${verdictC}">${displayPct}%</div>
-            <div style="font-size:0.58rem;color:#8ab4d4;flex-shrink:0;">${strength}</div>
+            <div class="gold-summary-chips" style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 4px; margin-top: 1px;">
+                ${chips.join('')}
+            </div>
         </div>`;
     }
 
