@@ -212,11 +212,12 @@ main.cyber-grid {
 }
 .tv-box iframe {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: -85px;
+    left: -5px;
+    width: calc(100% + 10px);
+    height: calc(100% + 140px);
     border: none;
+    pointer-events: auto;
 }
 .news-box {
     flex: 1.2;
