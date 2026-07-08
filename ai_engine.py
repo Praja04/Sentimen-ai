@@ -562,6 +562,16 @@ def run_news_update():
                 if title is not None and title.text: titles.append(("CNBC", title.text.strip()))
         except Exception as e: pass
             
+        # 1b. Al Jazeera English
+        try:
+            req = urllib.request.Request('https://www.aljazeera.com/xml/rss/all.xml', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("AL JAZEERA", title.text.strip()))
+        except Exception as e: pass
+            
         # 2. Bloomberg
         try:
             req = urllib.request.Request('https://feeds.bloomberg.com/markets/news.rss', headers={'User-Agent': 'Mozilla/5.0'})
