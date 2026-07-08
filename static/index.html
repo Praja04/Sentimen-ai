@@ -115,11 +115,11 @@
                     <div class="tv-box panel-border">
                         <!-- Channel Switcher Bar -->
                         <div id="tv-channel-bar" style="flex:0 0 auto; display:flex; gap:3px; padding:3px 4px; background:rgba(0,0,0,0.6); border-bottom:1px solid rgba(255,255,255,0.08);">
-                            <button onclick="switchTV('aljazeera')" id="tv-btn-aljazeera" class="tv-ch-btn active" title="Al Jazeera English Live">📡 AL JAZEERA</button>
+                            <button onclick="switchTV('aljazeera')" id="tv-btn-aljazeera" class="tv-ch-btn active" title="Al Jazeera English Live 24/7">📡 AL JAZEERA</button>
                             <button onclick="switchTV('bloomberg')" id="tv-btn-bloomberg" class="tv-ch-btn" title="Bloomberg TV Live">📊 BLOOMBERG</button>
-                            <button onclick="switchTV('reuters')" id="tv-btn-reuters" class="tv-ch-btn" title="Reuters Live">🌐 REUTERS</button>
-                            <button onclick="switchTV('yahoo')" id="tv-btn-yahoo" class="tv-ch-btn" title="Yahoo Finance Live">💹 YAHOO FIN</button>
-                            <button onclick="switchTV('cnbc')" id="tv-btn-cnbc" class="tv-ch-btn" title="CNBC International">📺 CNBC</button>
+                            <button onclick="switchTV('dw')" id="tv-btn-dw" class="tv-ch-btn" title="DW News 24/7 (Deutsche Welle)">🌍 DW NEWS</button>
+                            <button onclick="switchTV('nhk')" id="tv-btn-nhk" class="tv-ch-btn" title="NHK World Live 24/7">🗾 NHK WORLD</button>
+                            <button onclick="switchTV('cnbc')" id="tv-btn-cnbc" class="tv-ch-btn" title="CNBC/Bloomberg Live">📺 CNBC</button>
                         </div>
                         <iframe id="live-tv-frame" src="https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="flex:1 1 0;"></iframe>
                     </div>
@@ -262,12 +262,12 @@
     </style>
     <script>
         const TV_CHANNELS = {
-            // Direct 24/7 live stream video IDs (more reliable than live_stream?channel=)
-            'aljazeera': 'https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=1&mute=1',
-            'bloomberg':  'https://www.youtube.com/embed/dp8PhLsUcFE?autoplay=1&mute=1',
-            'reuters':    'https://www.youtube.com/embed/Lw4TuGvSQus?autoplay=1&mute=1',
-            'yahoo':      'https://www.youtube.com/embed/Yd56Z9vJHBY?autoplay=1&mute=1',
-            'cnbc':       'https://www.youtube.com/embed/KQp-e_XQnDE?autoplay=1&mute=1',
+            // Verified 24/7 live channels (using channel ID format - official supported method)
+            'aljazeera': 'https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=1&mute=1',           // Al Jazeera English - permanent 24/7 ID
+            'bloomberg':  'https://www.youtube.com/embed/live_stream?channel=UCrD7BIe3jR0Hn4qK6H0j2qQ&autoplay=1&mute=1',  // Bloomberg TV - channel ID
+            'dw':         'https://www.youtube.com/embed/live_stream?channel=UCknLrEdhRCp1aegoMqRaCZg&autoplay=1&mute=1',   // DW News 24/7 (Deutsche Welle)
+            'nhk':        'https://www.youtube.com/embed/live_stream?channel=UC6fauY2eLalXRPSQS3sAl4g&autoplay=1&mute=1',   // NHK World 24/7
+            'cnbc':       'https://www.youtube.com/embed/KQp-e_XQnDE?autoplay=1&mute=1',           // Bloomberg/CNBC - was working before
         };
 
         function switchTV(channel) {
