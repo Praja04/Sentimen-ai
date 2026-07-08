@@ -42,6 +42,14 @@ def _reset_progress():
 
 
 
+# Global variable to store latest analyzed live speech headlines
+latest_speech_analysis = {
+    "headline": "",
+    "bias": "NEUTRAL",
+    "score": 0.0,
+    "shifts": {} # Map of symbol name to change percent adjustment
+}
+
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.debug = True
 CORS(app)
@@ -550,6 +558,10 @@ def api_laggard_detection():
     im_changes = {}
     for im in im_defs:
         price, chg = get_price_and_change(im["syms"])
+        # Overlay active speech analysis shifts dynamically
+        speech_shift = latest_speech_analysis["shifts"].get(im["name"], 0.0)
+        chg += speech_shift
+        
         im_changes[im["name"]] = chg
         gold_impact = "NEUTRAL"
         if im["inv"]:
@@ -736,6 +748,111 @@ def get_news_calendar():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/analyze_speech', methods=['POST'])
+def api_analyze_speech():
+    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+    analyzer = SentimentIntensityAnalyzer()
+    
+    data = request.get_json() or {}
+    headline = data.get("headline", "").strip()
+    
+    if not headline:
+        return jsonify({"success": False, "error": "Headline is empty"}), 400
+        
+    vs = analyzer.polarity_scores(headline)
+    score = vs["compound"]
+    
+    # Analyze text keywords for direct intermarket impacts
+    headline_lower = headline.lower()
+    shifts = {}
+    
+    # Default shifts based on hawkish / dovish / rate cuts / tariffs
+    if "hawkish" in headline_lower or "rate hike" in headline_lower or "hike" in headline_lower or "tighten" in headline_lower or "delay cut" in headline_lower:
+        bias = "HAWKISH"
+        # Hawkish Fed/US statement -> DXY up, US10Y up, S&P 500 down, DJI down, Nikkei down, Gold down
+        shifts = {
+            "DXY": 0.45,
+            "US10Y": 0.35,
+            "VIX": 0.50,
+            "SILVER": -0.80,
+            "S&P 500": -0.30,
+            "DOW JONES": -0.25,
+            "NIKKEI": -0.40,
+            "WTI OIL": -0.20
+        }
+    elif "dovish" in headline_lower or "rate cut" in headline_lower or "cut" in headline_lower or "easing" in headline_lower or "stimulus" in headline_lower:
+        bias = "DOVISH"
+        # Dovish statement -> DXY down, Yield down, Equities up, Gold up
+        shifts = {
+            "DXY": -0.55,
+            "US10Y": -0.40,
+            "VIX": -0.60,
+            "SILVER": 1.20,
+            "S&P 500": 0.40,
+            "DOW JONES": 0.35,
+            "NIKKEI": 0.50,
+            "WTI OIL": 0.25
+        }
+    elif "tariff" in headline_lower or "trade war" in headline_lower or "sanction" in headline_lower:
+        bias = "TRADE WAR / TARIFFS (Risk-Off)"
+        # Trade war -> VIX up, Equities down, DXY up (safe haven USD), Gold up (safe haven gold)
+        shifts = {
+            "DXY": 0.30,
+            "US10Y": -0.15,
+            "VIX": 0.85,
+            "SILVER": 0.20,
+            "S&P 500": -0.65,
+            "DOW JONES": -0.60,
+            "NIKKEI": -0.80,
+            "WTI OIL": -0.40
+        }
+    else:
+        # Fallback to standard VADER score direction
+        if score > 0.15:
+            bias = "BULLISH / OPTIMISTIC"
+            shifts = {
+                "DXY": -0.15,
+                "US10Y": -0.10,
+                "VIX": -0.20,
+                "SILVER": 0.30,
+                "S&P 500": 0.20,
+                "DOW JONES": 0.15,
+                "NIKKEI": 0.25,
+                "WTI OIL": 0.10
+            }
+        elif score < -0.15:
+            bias = "BEARISH / RISK-OFF"
+            shifts = {
+                "DXY": 0.15,
+                "US10Y": 0.10,
+                "VIX": 0.35,
+                "SILVER": -0.25,
+                "S&P 500": -0.30,
+                "DOW JONES": -0.25,
+                "NIKKEI": -0.35,
+                "WTI OIL": -0.15
+            }
+        else:
+            bias = "NEUTRAL / NO SPECIFIC BIAS"
+            shifts = {}
+
+    global latest_speech_analysis
+    latest_speech_analysis = {
+        "headline": headline,
+        "bias": bias,
+        "score": round(score, 3),
+        "shifts": shifts
+    }
+    
+    return jsonify({
+        "success": True,
+        "headline": headline,
+        "bias": bias,
+        "score": score,
+        "shifts_applied": shifts
+    })
 
 
 # --- BACKTEST CORE LOGIC ---
