@@ -401,7 +401,7 @@
   "gauges": {
     "macro_alignment_score": 47,
     "market_regime_score": 45,
-    "market_sentiment_score": 61,
+    "market_sentiment_score": 41,
     "institutional_flow_score": 84
   },
   "ml_memory": {
