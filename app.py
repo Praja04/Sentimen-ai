@@ -44,11 +44,95 @@ def _reset_progress():
 
 # Global variable to store latest analyzed live speech headlines
 latest_speech_analysis = {
-    "headline": "",
+    "headline": "Belum ada pidato penting yang dideteksi otomatis.",
     "bias": "NEUTRAL",
     "score": 0.0,
-    "shifts": {} # Map of symbol name to change percent adjustment
+    "shifts": {},
+    "last_checked": 0
 }
+
+def auto_update_speech_sentiment():
+    """Automatically search for Fed / US President speeches and parse them to update model without clicking."""
+    import time
+    import feedparser
+    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+    
+    global latest_speech_analysis
+    now = time.time()
+    # Throttled check: 30 seconds
+    if now - latest_speech_analysis.get("last_checked", 0) < 30:
+        return
+        
+    latest_speech_analysis["last_checked"] = now
+    
+    try:
+        # Search queries for Fed speeches, FOMC, and US political news
+        rss_url = "https://news.google.com/rss/search?q=Powell+OR+Fed+OR+FOMC+OR+Trump+OR+Biden&hl=en-US&gl=US&ceid=US:en"
+        feed = feedparser.parse(rss_url)
+        
+        analyzer = SentimentIntensityAnalyzer()
+        
+        for entry in feed.entries[:8]: # Scan top 8 headlines
+            title = entry.title.lower()
+            
+            # Identify critical keywords
+            is_fed = any(k in title for k in ["powell", "fed", "fomc", "interest rate", "inflation"])
+            is_president = any(k in title for k in ["trump", "biden", "president", "tariff", "trade war"])
+            
+            if is_fed or is_president:
+                headline_text = entry.title
+                vs = analyzer.polarity_scores(headline_text)
+                score = vs["compound"]
+                
+                shifts = {}
+                # Hawkish Fed/US statement -> DXY up, US10Y up, equities down, gold down
+                if any(k in title for k in ["hawkish", "hike", "rate hike", "tighten", "delay cut"]):
+                    bias = "HAWKISH (AUTO)"
+                    shifts = {
+                        "DXY": 0.45, "US10Y": 0.35, "VIX": 0.50, "SILVER": -0.80,
+                        "S&P 500": -0.30, "DOW JONES": -0.25, "NIKKEI": -0.40, "WTI OIL": -0.20
+                    }
+                # Dovish statement -> DXY down, Yield down, Equities up, Gold up
+                elif any(k in title for k in ["dovish", "rate cut", "cut", "easing", "stimulus"]):
+                    bias = "DOVISH (AUTO)"
+                    shifts = {
+                        "DXY": -0.55, "US10Y": -0.40, "VIX": -0.60, "SILVER": 1.20,
+                        "S&P 500": 0.40, "DOW JONES": 0.35, "NIKKEI": 0.50, "WTI OIL": 0.25
+                    }
+                elif any(k in title for k in ["tariff", "trade war", "sanction"]):
+                    bias = "TRADE WAR / TARIFFS (Risk-Off AUTO)"
+                    shifts = {
+                        "DXY": 0.30, "US10Y": -0.15, "VIX": 0.85, "SILVER": 0.20,
+                        "S&P 500": -0.65, "DOW JONES": -0.60, "NIKKEI": -0.80, "WTI OIL": -0.40
+                    }
+                else:
+                    # Fallback to standard VADER score direction
+                    if score > 0.15:
+                        bias = "BULLISH / OPTIMISTIC (AUTO)"
+                        shifts = {
+                            "DXY": -0.15, "US10Y": -0.10, "VIX": -0.20, "SILVER": 0.30,
+                            "S&P 500": 0.20, "DOW JONES": 0.15, "NIKKEI": 0.25, "WTI OIL": 0.10
+                        }
+                    elif score < -0.15:
+                        bias = "BEARISH / RISK-OFF (AUTO)"
+                        shifts = {
+                            "DXY": 0.15, "US10Y": 0.10, "VIX": 0.35, "SILVER": -0.25,
+                            "S&P 500": -0.30, "DOW JONES": -0.25, "NIKKEI": -0.35, "WTI OIL": -0.15
+                        }
+                    else:
+                        continue # Skip weak/neutral titles
+                
+                # We found a significant auto-speech headline, save and break
+                latest_speech_analysis = {
+                    "headline": headline_text,
+                    "bias": bias,
+                    "score": round(score, 3),
+                    "shifts": shifts,
+                    "last_checked": now
+                }
+                break
+    except Exception as e:
+        print("Auto speech updating error:", e)
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.debug = True
@@ -240,6 +324,9 @@ def api_xedy():
 
 @app.route('/api/laggard_detection')
 def api_laggard_detection():
+    # Trigger automatic background speech headline updates
+    auto_update_speech_sentiment()
+    
     import numpy as np
     if not init_mt5():
         return jsonify({"error": "Failed to connect to MT5"}), 500
