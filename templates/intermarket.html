@@ -320,12 +320,16 @@
         .pair-row:hover { background: rgba(255,255,255,0.03); }
         .pair-row.buy  { border-left-color: rgba(0,255,65,0.5); }
         .pair-row.sell { border-left-color: rgba(255,51,51,0.5); }
+        .pair-row.exit { border-left-color: rgba(255,152,0,0.5); }
+        .pair-row.wait { border-left-color: rgba(136,136,136,0.5); }
         .pair-row.com-xau { border-left-color: rgba(251,191,36,0.7); background: rgba(251,191,36,0.03); }
         .pair-row.com-oil { border-left-color: rgba(249,115,22,0.7); background: rgba(249,115,22,0.03); }
         .pr-name  { font-family: var(--title); font-weight: 700; font-size: 0.85rem; color: #f0f6ff; }
-        .pr-act   { font-size: 0.65rem; font-weight: bold; padding: 2px 7px; border-radius: 5px; width: fit-content; }
+        .pr-act { display: inline-block; padding: 2px 5px; border-radius: 4px; font-weight: 700; font-size: 0.65rem; min-width: 35px; text-align: center; }
         .pr-act.buy  { color: #00ff41; background: rgba(0,255,65,0.12);  border: 1px solid rgba(0,255,65,0.4);  }
         .pr-act.sell { color: #ff4444; background: rgba(255,51,51,0.12); border: 1px solid rgba(255,51,51,0.4); }
+        .pr-act.exit { color: #ff9800; background: rgba(255,152,0,0.12); border: 1px solid rgba(255,152,0,0.4); }
+        .pr-act.wait { color: #aaaaaa; background: rgba(136,136,136,0.12); border: 1px solid rgba(136,136,136,0.4); }
         .pr-num  { font-size: 0.74rem; font-weight: bold; color: #ddeeff; }
         .pr-sl   { color: #ff6666; }
         .pr-tp   { color: #33ff77; }
@@ -438,10 +442,10 @@
 
         <nav class="hdr-nav">
             <a href="/">🏠 HOME</a>
-            <a href="/backtest">⚡ BACKTEST</a>
+            
             <a href="/trade">📊 TRADE</a>
             <a href="/Forecast">🔮 FORECAST</a>
-            <a href="/Monitor">🖥️ MONITOR</a>
+            
             <a href="/Intermarket" class="active">🌐 INTERMARKET</a>
         </nav>
 
@@ -903,27 +907,7 @@
         const body = document.getElementById('pair-grid');
         if (!body) return;
         
-        // Dynamically update the AI Winrate Badge in the header using real backtest values
-        if (recs && recs.length > 0) {
-            const activeWinRate = recs[0].win_rate != null ? recs[0].win_rate : 92.5;
-            const badgeEl = document.getElementById('dynamic-winrate-badge');
-            if (badgeEl) {
-                if (activeWinRate >= 90.0) {
-                    badgeEl.innerText = `AI WINRATE: ${activeWinRate.toFixed(1)}% (TARGET ACHIEVED >90%)`;
-                    badgeEl.style.color = 'var(--green)';
-                    badgeEl.style.background = 'rgba(0, 255, 65, 0.1)';
-                    badgeEl.style.borderColor = 'rgba(0, 255, 65, 0.4)';
-                    badgeEl.style.boxShadow = '0 0 6px rgba(0, 255, 65, 0.2)';
-                } else {
-                    badgeEl.innerText = `AI WINRATE: ${activeWinRate.toFixed(1)}% (RECOVERY MODE: TARGET >90%)`;
-                    badgeEl.style.color = 'var(--text-yellow)';
-                    badgeEl.style.background = 'rgba(251, 191, 36, 0.1)';
-                    badgeEl.style.borderColor = 'rgba(251, 191, 36, 0.4)';
-                    badgeEl.style.boxShadow = '0 0 6px rgba(251, 191, 36, 0.2)';
-                }
-            }
-        }
-
+        // Winrate is now handled by fetchWinrate()
 
         if (!recs || recs.length === 0) {
             body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:60px;color:var(--muted);font-size:0.72rem;">
@@ -966,8 +950,12 @@
 
         body.innerHTML = recs.slice(0, 8).map(rec => {
             const isBuy   = rec.action === 'BUY';
-            const actC    = isBuy ? '#00ff41' : '#ff3333';
-            const cls     = isBuy ? 'buy' : 'sell';
+            const isSell  = rec.action === 'SELL';
+            const isExit  = rec.action === 'EXIT WARNING';
+            const isWait  = rec.action === 'WAIT';
+            
+            const actC    = isBuy ? '#00ff41' : (isSell ? '#ff3333' : (isExit ? '#ff9800' : '#888888'));
+            const cls     = isBuy ? 'buy' : (isSell ? 'sell' : (isExit ? 'exit' : 'wait'));
             const confPct = Math.round(rec.confidence);
             const confC   = confPct >= 85 ? '#00ff41' : confPct >= 70 ? '#fbbf24' : '#ff3333';
             const d       = rec.digits || 5;
@@ -983,7 +971,8 @@
                 ? `<span style="color:${actC}">${rec.change_pct > 0 ? '+' : ''}${rec.change_pct}%</span> today`
                 : `<span style="color:${actC}">${rec.strong||''}</span>${rec.weak && !isIndex ? ` → ${rec.weak}` : ''}`;
 
-            const entryTxt = fmt(rec.entry, d);
+            const pairId = rec.pair.replace(/\s+/g, '-');
+            const entryTxt = `<span id="live-entry-${pairId}" data-digits="${d}">${fmt(rec.entry, d)}</span>`;
             const slTxt    = fmt(rec.sl, d);
             const tpTxt    = fmt(rec.tp, d);
 
@@ -1141,6 +1130,73 @@
             }
         } catch(e) {
             console.error("Failed to fetch forecast history", e);
+        }
+    }
+
+    // ── FETCH AI WINRATE DYNAMICALLY ─────────────────────────────
+    async function fetchWinrate() {
+        try {
+            const res = await fetch(`/api/winrate?t=${Date.now()}`);
+            const data = await res.json();
+            if (data.status === 'ok' || data.status === 'no_data') {
+                const badgeEl = document.getElementById('dynamic-winrate-badge');
+                if (badgeEl) {
+                    if (data.achieved) {
+                        badgeEl.innerText = `AI WINRATE: ${data.winrate.toFixed(1)}% (TARGET ACHIEVED >90%)`;
+                        badgeEl.style.color = 'var(--green)';
+                        badgeEl.style.background = 'rgba(0, 255, 65, 0.1)';
+                        badgeEl.style.borderColor = 'rgba(0, 255, 65, 0.4)';
+                        badgeEl.style.boxShadow = '0 0 6px rgba(0, 255, 65, 0.2)';
+                    } else {
+                        badgeEl.innerText = `AI WINRATE: ${data.winrate.toFixed(1)}% (RECOVERY MODE: TARGET >90%)`;
+                        badgeEl.style.color = 'var(--text-yellow)';
+                        badgeEl.style.background = 'rgba(251, 191, 36, 0.1)';
+                        badgeEl.style.borderColor = 'rgba(251, 191, 36, 0.4)';
+                        badgeEl.style.boxShadow = '0 0 6px rgba(251, 191, 36, 0.2)';
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch winrate", e);
+        }
+    }
+
+    // ── FETCH LIVE TICKS TO OVERLAY ENTRY PRICES ─────────────────
+    async function fetchLiveTicks() {
+        try {
+            const res = await fetch(`/api/live_ticks?t=${Date.now()}`);
+            const ticks = await res.json();
+            if (ticks.error) return;
+
+            const tickMap = {
+                'XAUUSD': ticks['XAUUSD'],
+                'USDJPY': ticks['USDJPY'],
+                'WTI OIL': ticks['WTI OIL'],
+                'NIKKEI': ticks['NIKKEI'] || ticks['DJI'], // Map as needed if DJI/NIKKEI returned
+                'DOW JONES': ticks['DJI']
+            };
+
+            for (const [pair, tick] of Object.entries(tickMap)) {
+                if (tick && tick.bid) {
+                    const pairId = pair.replace(/\s+/g, '-');
+                    const el = document.getElementById(`live-entry-${pairId}`);
+                    if (el) {
+                        const d = parseInt(el.getAttribute('data-digits') || 2);
+                        // Overlay the live tick price over the cached signal entry price
+                        const currentText = el.innerText;
+                        const newText = tick.bid.toFixed(d);
+                        if (currentText !== newText) {
+                            el.innerText = newText;
+                            el.style.color = '#00ff41'; // Flash green to indicate live tick
+                            setTimeout(() => {
+                                el.style.color = 'inherit';
+                            }, 300);
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            // Ignore background tick fetch errors
         }
     }
 
@@ -1312,7 +1368,12 @@
     }
 
     fetchAll();
+    fetchWinrate();
+    fetchLiveTicks();
+    
     setInterval(fetchAll, 5000);
+    setInterval(fetchWinrate, 10000); // Check winrate every 10s
+    setInterval(fetchLiveTicks, 1000); // Overlay live tick prices every 1s
 </script>
 </body>
 </html>

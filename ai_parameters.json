@@ -1,0 +1,9 @@
+{
+    "time_window": 300,
+    "velocity_threshold": 0.1,
+    "momentum_threshold": 1.5,
+    "whipsaw_sd_threshold": 0.005,
+    "spam_cooldown": 60,
+    "deceleration_tolerance": 3,
+    "trailing_buffer_multiplier": 1.0
+}

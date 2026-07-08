@@ -49,7 +49,9 @@ async function fetchStatus() {
         
         if (data.active_config && Object.keys(data.active_config).length > 0) {
             document.getElementById('trade-method').innerText = data.active_config.strategy_name;
-            document.getElementById('trade-timeframe').innerText = `TF: ${data.active_config.timeframe} / Risk: ${data.active_config.risk_percent}%`;
+            
+            // Add dynamic risk input since Backtest Lab is removed
+            document.getElementById('trade-timeframe').innerHTML = `TF: Adaptive / Risk: <input type="number" id="live-risk-input" style="width: 45px; background: rgba(0,0,0,0.3); color: var(--text-gold); border: 1px solid rgba(255,215,0,0.3); border-radius: 3px; padding: 1px 4px; font-size: 0.75rem;" value="${data.active_config.risk_percent}" step="0.5"> % <button onclick="updateLiveRisk()" style="background: rgba(255,215,0,0.15); color: var(--text-gold); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 3px; cursor: pointer; font-size: 0.65rem; margin-left: 4px;">Set</button>`;
             
             // Populate AI Decision Explainer elements
             const bias = data.fundamental_bias !== undefined ? data.fundamental_bias : 0.0;
@@ -139,11 +141,12 @@ async function fetchStatus() {
             logsContainer.scrollTop = logsContainer.scrollHeight;
         }
 
-        // Collect all unique symbols currently being traded (Urutan Pair)
-        const activeSymbols = new Set(data.positions.map(p => p.symbol));
-        const historySymbols = new Set(data.history.map(h => h.symbol).filter(s => s));
-        const combinedSymbols = [...new Set([...activeSymbols, ...historySymbols])];
-        document.getElementById('traded-pairs').innerText = combinedSymbols.length > 0 ? combinedSymbols.join(', ') : 'XAUUSD';
+        // Update Urutan Pair with dynamic AI top pairs
+        let topPairsStr = 'XAUUSD';
+        if (data.top_pairs && data.top_pairs.length > 0) {
+            topPairsStr = data.top_pairs.join(', ');
+        }
+        document.getElementById('traded-pairs').innerText = topPairsStr;
 
         // 2. Render Trade Tab Table
         const tradeTbody = document.getElementById('trade-tbody');
@@ -555,5 +558,33 @@ async function submitOrder() {
         alert(`Request failed: ${err}`);
         document.getElementById('order-submit-btn').disabled = false;
         document.getElementById('order-submit-btn').innerText = "Place Order";
+    }
+}
+
+async function updateLiveRisk() {
+    const riskInput = document.getElementById('live-risk-input');
+    if (!riskInput) return;
+    
+    const newRisk = parseFloat(riskInput.value);
+    if (isNaN(newRisk) || newRisk <= 0) {
+        alert("Persentase Risk tidak valid.");
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/config/update_risk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ risk_percent: newRisk })
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert(`Berhasil! Risk AI diperbarui menjadi ${newRisk}%. AI akan langsung menggunakan Risk ini pada open posisi berikutnya.`);
+        } else {
+            alert("Gagal memperbarui Risk: " + result.message);
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Terjadi kesalahan saat menghubungi server.");
     }
 }

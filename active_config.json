@@ -1,6 +1,6 @@
 {
     "timeframe": "M5",
-    "risk_percent": 2.0,
+    "risk_percent": 1.0,
     "strategy_type": "xedy_scalper",
     "strategy_name": "AI XEDY_V31 Scalper T0.22 S0.6",
     "sl_dist": 15.0,
