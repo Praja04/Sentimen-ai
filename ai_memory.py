@@ -21,15 +21,27 @@ def init_db():
             entry_price REAL,
             best_pillar TEXT,
             evaluated INTEGER DEFAULT 0,
-            correct INTEGER DEFAULT 0
+            correct INTEGER DEFAULT 0,
+            max_favorable_price REAL,
+            max_adverse_price REAL
         )
     ''')
+    
+    # Gracefully add MAE/MFE columns if they don't exist in older databases
+    try:
+        c.execute("ALTER TABLE predictions ADD COLUMN max_favorable_price REAL")
+    except sqlite3.OperationalError: pass # Already exists
+    try:
+        c.execute("ALTER TABLE predictions ADD COLUMN max_adverse_price REAL")
+    except sqlite3.OperationalError: pass # Already exists
+    
     # Speed optimization: Create indexes for fast lookups during live evaluation and ranking
     c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_symbol ON predictions (symbol)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_evaluated ON predictions (evaluated)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_timestamp ON predictions (timestamp)')
     conn.commit()
     conn.close()
+
 
 def log_prediction(symbol, direction, predicted_bp, entry_price, best_pillar):
     init_db()
@@ -47,10 +59,54 @@ def log_prediction(symbol, direction, predicted_bp, entry_price, best_pillar):
             return
 
     c.execute('''
-        INSERT INTO predictions (timestamp, datetime_str, symbol, direction, predicted_bp, entry_price, best_pillar)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (now, dt_str, symbol, direction, predicted_bp, entry_price, best_pillar))
+        INSERT INTO predictions (timestamp, datetime_str, symbol, direction, predicted_bp, entry_price, best_pillar, max_favorable_price, max_adverse_price)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (now, dt_str, symbol, direction, predicted_bp, entry_price, best_pillar, entry_price, entry_price))
     
+    conn.commit()
+    conn.close()
+
+def update_mae_mfe(current_prices_dict):
+    """
+    Updates Maximum Adverse Excursion (MAE) and Maximum Favorable Excursion (MFE) 
+    for all active (unevaluated) predictions.
+    """
+    if not current_prices_dict:
+        return
+    init_db()
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT id, symbol, direction, entry_price, max_favorable_price, max_adverse_price FROM predictions WHERE evaluated=0")
+    active_predictions = c.fetchall()
+    
+    for row in active_predictions:
+        pid, symbol, direction, entry, curr_mfe, curr_mae = row
+        if symbol in current_prices_dict:
+            curr_price = current_prices_dict[symbol]['price']
+            if curr_mfe is None: curr_mfe = entry
+            if curr_mae is None: curr_mae = entry
+            
+            new_mfe = curr_mfe
+            new_mae = curr_mae
+            
+            # Directional MFE/MAE calculation
+            if "BULL" in direction:
+                # Favorable is price rising (max high)
+                new_mfe = max(curr_mfe, curr_price)
+                # Adverse is price falling (min low)
+                new_mae = min(curr_mae, curr_price)
+            else: # BEARISH
+                # Favorable is price falling (min low)
+                new_mfe = min(curr_mfe, curr_price)
+                # Adverse is price rising (max high)
+                new_mae = max(curr_mae, curr_price)
+                
+            c.execute("""
+                UPDATE predictions 
+                SET max_favorable_price = ?, max_adverse_price = ? 
+                WHERE id = ?
+            """, (new_mfe, new_mae, pid))
+            
     conn.commit()
     conn.close()
 
@@ -59,13 +115,15 @@ def evaluate_predictions(current_prices_dict):
     Evaluates predictions older than 4 hours (14400 seconds).
     Returns a dict of penalties (if a pillar was wrong).
     """
+    # First update the latest MAE/MFE using current prices
+    update_mae_mfe(current_prices_dict)
+    
     init_db()
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     now = time.time()
     
     # Select predictions older than 4 hours that haven't been evaluated
-    # Actually, for testing purposes, we can evaluate things older than 1 hour (3600), but let's stick to 4 hours (14400)
     c.execute("SELECT id, symbol, direction, entry_price, best_pillar FROM predictions WHERE evaluated=0 AND (? - timestamp) > 14400", (now,))
     pending = c.fetchall()
     
@@ -98,3 +156,4 @@ def evaluate_predictions(current_prices_dict):
         penalty_adjustments[p] = penalty_adjustments.get(p, 0) + 0.05 # 5% penalty per failure
         
     return penalty_adjustments
+

@@ -330,6 +330,7 @@ cached_dashboard_lock = threading.Lock()
 def _compute_dashboard_data():
     """Computes all regression, CSI, and pair signals. Returns a dict."""
     import numpy as np
+    from ai_memory import update_mae_mfe
     
     # Trigger automatic background speech headline updates
     auto_update_speech_sentiment()
@@ -346,6 +347,7 @@ def _compute_dashboard_data():
     }
     
     rates_dict = {}
+    current_prices = {}
     for label, options in symbols.items():
         matched_symbol = None
         for opt in options:
@@ -353,14 +355,22 @@ def _compute_dashboard_data():
             t = mt5.symbol_info_tick(opt)
             if t:
                 matched_symbol = opt
+                current_prices[label] = {"price": t.bid} # store bid price for MAE/MFE
                 break
         if matched_symbol:
             rates = mt5.copy_rates_from_pos(matched_symbol, mt5.TIMEFRAME_D1, 0, 30)
             if rates is not None and len(rates) > 0:
                 rates_dict[label] = [r['close'] for r in rates]
                 
+    # Auto Adaptive Tuner: Update Maximum Adverse Excursion / Maximum Favorable Excursion records
+    try:
+        update_mae_mfe(current_prices)
+    except Exception as e:
+        print("[MAE/MFE Tuner] Update error:", e)
+        
     if len(rates_dict) < 5:
         return jsonify({"error": f"Failed to fetch historical rates for all 5 assets. Found: {list(rates_dict.keys())}"}), 500
+
         
     # Load latest forecast_v32 for comparison
     forecast_data = {}
@@ -565,35 +575,73 @@ def _compute_dashboard_data():
     def get_atr_sl_tp(sym_opts, action, atr_periods=14, rr=2.0):
         """Fetch ATR from H4 candles, return entry/sl/tp/atr rounded appropriately with adaptive AI self-learning."""
         import sqlite3
-        # Self-learning AI adaptive tuner: Check forecast_history.db for past winrate to adjust target gaps
         db_path = r"C:\Antigravity\forecast_history.db"
-        win_rate = 92.5 # baseline default target >90%
+        win_rate = 92.5
+        avg_mae_pct = 0.0
+        avg_mfe_pct = 0.0
+        
         try:
             if os.path.exists(db_path):
                 conn = sqlite3.connect(db_path)
                 c = conn.cursor()
+                # Get win_rate
                 c.execute("SELECT correct FROM predictions WHERE evaluated = 1 ORDER BY timestamp DESC LIMIT 50")
                 rows = c.fetchall()
-                conn.close()
                 if rows:
-                    correct = sum(r[0] for r in rows)
-                    total = len(rows)
-                    if total > 0:
-                        win_rate = (correct / total) * 100.0
-        except Exception:
-            pass
+                    win_rate = (sum(r[0] for r in rows) / len(rows)) * 100.0
+                
+                # Fetch recent MAE/MFE metrics for evaluated trades to optimize parameters
+                c.execute("""
+                    SELECT entry_price, max_favorable_price, max_adverse_price 
+                    FROM predictions 
+                    WHERE evaluated = 1 AND max_favorable_price IS NOT NULL AND max_adverse_price IS NOT NULL
+                    ORDER BY timestamp DESC LIMIT 20
+                """)
+                excursions = c.fetchall()
+                conn.close()
+                
+                if excursions:
+                    mae_sums = []
+                    mfe_sums = []
+                    for entry, mfe, mae in excursions:
+                        if entry > 0:
+                            # Percentage adverse excursion
+                            mae_pct = abs(mae - entry) / entry
+                            # Percentage favorable excursion
+                            mfe_pct = abs(mfe - entry) / entry
+                            mae_sums.append(mae_pct)
+                            mfe_sums.append(mfe_pct)
+                    if len(mae_sums) > 0:
+                        avg_mae_pct = sum(mae_sums) / len(mae_sums)
+                        avg_mfe_pct = sum(mfe_sums) / len(mfe_sums)
+        except Exception as e:
+            print("[Adaptive Tuner Error]", e)
 
-        # If win_rate drops below 90%, the adaptive self-learning AI narrows the TP gap to ensure easier hits
-        # and adjusts the Reward-to-Risk ratio dynamically to recover and hit >90% winrate target
-        if win_rate < 90.0:
+        # Baseline multipliers
+        gap_multiplier = 1.0
+        sl_multiplier = 1.0
+
+        # Auto Adaptive MAE/MFE Logic:
+        # 1. If average adverse excursion (floating loss) is very low (<0.15%), tighten the SL (protect capital)
+        # 2. If average favorable excursion (potential profit) is high, adjust TP (gap_multiplier) to lock in gains
+        if avg_mae_pct > 0:
+            # If historical drawdown (MAE) is low, narrow the SL safely. If high, widen slightly.
+            if avg_mae_pct < 0.0015: # Very tight pullback (under 15 pips equivalent for typical ccy)
+                sl_multiplier = 0.80 # tighten SL to 80% of ATR
+            elif avg_mae_pct > 0.0050: # Wide drawdowns
+                sl_multiplier = 1.25 # widen SL to 125% of ATR
+                
+        if avg_mfe_pct > 0 and win_rate < 90.0:
+            # If winrate is poor, align the TP target gap (gap_multiplier) to match real average MFE
+            # This ensures we take profit within the real historical price excursion boundaries.
             deviation = 90.0 - win_rate
-            # More aggressive tuning: reduce TP target distance to secure hits and recover winrate
-            gap_multiplier = max(0.50, 1.0 - (deviation * 0.035)) 
-            sl_multiplier = min(1.30, 1.0 + (deviation * 0.015)) # slightly wider SL for protection
-        else:
-            # When winrate is strong (>90%), maximize profits by keeping standard 1:2 RR or widening slightly
-            gap_multiplier = 1.0
-            sl_multiplier = 1.0
+            gap_multiplier = max(0.50, min(1.0, (avg_mfe_pct * 1000) * (1.0 - deviation * 0.02)))
+        elif win_rate < 90.0:
+            # Fallback simple winrate-based recovery
+            deviation = 90.0 - win_rate
+            gap_multiplier = max(0.50, 1.0 - (deviation * 0.035))
+            sl_multiplier = min(1.30, 1.0 + (deviation * 0.015))
+
 
 
         for sym in sym_opts:
