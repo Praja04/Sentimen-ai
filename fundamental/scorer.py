@@ -47,39 +47,34 @@ def _fetch_all_scores(instrument: str) -> dict:
     return {"calendar": cal, "news": news, "cot": cot, "fed": fed}
 
 
-def get_fundamental_score(instrument: str) -> dict:
-    """
-    Returns a combined fundamental score for an instrument.
+import threading
+import time
 
-    Returns:
-        {
-          "combined_score": float (-1 to +1),
-          "combined_confidence_adj": float (-20 to +20, added to technical conf),
-          "bias": str,
-          "bias_icon": str,
-          "components": { calendar, news, cot, fed },
-          "summary": str,
-        }
-    """
+def _background_worker():
+    """Background worker that updates the cache for all instruments every 5 minutes."""
+    # Warm startup immediately
+    time.sleep(2)
+    while True:
+        for inst in INSTRUMENTS:
+            try:
+                # Force fetch and populate cache
+                _fetch_and_build_score(inst)
+            except Exception:
+                pass
+            time.sleep(1) # stagger requests by 1s to prevent API limits
+        time.sleep(300) # wait 5 minutes before polling again
+
+# Start background thread automatically on load
+threading.Thread(target=_background_worker, daemon=True).start()
+
+
+def _fetch_and_build_score(instrument: str) -> dict:
+    """Synchronously fetches and builds the combined score, updating the cache."""
     global _score_cache
     now = datetime.datetime.utcnow()
-
-    if (instrument in _score_cache and
-            (now - _score_cache[instrument]["ts"]).total_seconds() < CACHE_TTL):
-        return _score_cache[instrument]["data"]
-
-    try:
-        components = _fetch_all_scores(instrument)
-    except Exception as e:
-        return {
-            "combined_score": 0.0,
-            "combined_confidence_adj": 0.0,
-            "bias": "NEUTRAL",
-            "bias_icon": "🟡",
-            "components": {},
-            "summary": f"Fundamental data unavailable: {e}",
-        }
-
+    
+    components = _fetch_all_scores(instrument)
+    
     # Weighted average
     cal_s  = components["calendar"]["score"]
     news_s = components["news"]["score"]
@@ -157,21 +152,35 @@ def get_fundamental_score(instrument: str) -> dict:
     return result
 
 
+def get_fundamental_score(instrument: str) -> dict:
+    """
+    Returns a combined fundamental score for an instrument instantly from cache.
+    """
+    global _score_cache
+    
+    # Return from cache immediately if present
+    if instrument in _score_cache:
+        return _score_cache[instrument]["data"]
+
+    # Fallback to fast default during startup before background worker finishes
+    return {
+        "combined_score": 0.0,
+        "combined_confidence_adj": 0.0,
+        "bias": "NEUTRAL",
+        "bias_icon": "🟡",
+        "components": {
+            "calendar": {"score": 0, "note": "Loading fundamental feed...", "alerts": []},
+            "news": {"score": 0, "bias": "NEUTRAL", "bias_icon": "🟡", "headlines": []},
+            "cot": {"score": 0, "bias": "NEUTRAL", "net_position": 0, "note": "Loading COT data..."},
+            "fed": {"score": 0, "bias": "NEUTRAL", "details": []}
+        },
+        "summary": "AI Fundamental Agent updating in background..."
+    }
+
+
 def get_all_fundamental_scores() -> dict:
-    """Fetch fundamental scores for all 5 instruments in parallel."""
+    """Instant lookups for all fundamental scores."""
     results = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
-        futures = {ex.submit(get_fundamental_score, inst): inst for inst in INSTRUMENTS}
-        for future, inst in futures.items():
-            try:
-                results[inst] = future.result(timeout=15)
-            except Exception:
-                results[inst] = {
-                    "combined_score": 0.0,
-                    "combined_confidence_adj": 0.0,
-                    "bias": "NEUTRAL",
-                    "bias_icon": "🟡",
-                    "components": {},
-                    "summary": "Timeout",
-                }
+    for inst in INSTRUMENTS:
+        results[inst] = get_fundamental_score(inst)
     return results
