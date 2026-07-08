@@ -16,9 +16,9 @@
             --green:     #00ff41;
             --red:       #ff3333;
             --purple:    #a78bfa;
-            --muted:     #475569;
-            --text:      #94a3b8;
-            --white:     #e2e8f0;
+            --muted:     #7ca0c7;
+            --text:      #ccd9e8;
+            --white:     #f0f6ff;
             --mono:      'Share Tech Mono', monospace;
             --title:     'Rajdhani', sans-serif;
             --orbit:     'Orbitron', sans-serif;
@@ -215,20 +215,20 @@
             display: flex; align-items: center; gap: 7px;
             flex: 1;
         }
-        .csi-rank  { font-size: 0.75rem; font-weight: bold; min-width: 20px; flex-shrink:0; }
-        .csi-name  { font-size: 0.88rem; font-weight: bold; min-width: 32px; flex-shrink:0; }
-        .csi-tag   { font-size: 0.65rem; color: var(--muted); min-width: 28px; flex-shrink:0; }
+        .csi-rank  { font-size: 0.78rem; font-weight: bold; min-width: 20px; flex-shrink:0; color: #c8ddf0; }
+        .csi-name  { font-size: 0.92rem; font-weight: bold; min-width: 32px; flex-shrink:0; color: #f0f6ff; }
+        .csi-tag   { font-size: 0.67rem; color: #8ab4d4; min-width: 28px; flex-shrink:0; }
         .csi-track {
             flex: 1; height: 18px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.07);
             border-radius: 4px; overflow: hidden;
         }
         .csi-fill  {
             height: 100%; border-radius: 4px;
             transition: width .8s cubic-bezier(.4,0,.2,1);
         }
-        .csi-pct   { font-size: 0.78rem; min-width: 58px; text-align: right; flex-shrink:0; }
-        .csi-score { font-size: 0.68rem; color: var(--muted); min-width: 30px; text-align: right; flex-shrink:0; }
+        .csi-pct   { font-size: 0.80rem; min-width: 58px; text-align: right; flex-shrink:0; color: #e0f0ff; font-weight: bold; }
+        .csi-score { font-size: 0.70rem; color: #8ab4d4; min-width: 30px; text-align: right; flex-shrink:0; }
 
         /* ── LAGGARD + TABLE (center) ── */
         .lag-box {
@@ -239,9 +239,9 @@
             padding: 8px 12px;
             display: flex; align-items: center; gap: 12px;
         }
-        .lag-label { font-size: 0.68rem; color: var(--muted); letter-spacing:1px; }
+        .lag-label { font-size: 0.68rem; color: #8ab4d4; letter-spacing:1px; font-weight: 600; }
         .lag-name  { font-family: var(--title); font-size: 1.2rem; font-weight:700; color: var(--cyan); }
-        .lag-action{ font-size: 0.78rem; margin-left: auto; }
+        .lag-action{ font-size: 0.78rem; margin-left: auto; color: #e0f0ff; }
 
         .im-tbl {
             flex: 1 1 0; min-height: 0;
@@ -256,17 +256,19 @@
         .im-tbl th, .im-tbl td {
             flex: 1; padding: 6px 6px;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            color: #ccd9e8;
         }
         .im-tbl th {
-            font-size: 0.65rem; color: var(--muted);
-            letter-spacing: 1px; font-weight: normal;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.67rem; color: #a8c4e0;
+            letter-spacing: 1.2px; font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
             padding-bottom: 5px;
+            text-transform: uppercase;
         }
         .im-tbl .col-name { flex: 1.2; font-weight: bold; color: var(--white); }
         .im-tbl .col-chg  { flex: 0.9; font-weight: bold; }
         .im-tbl .col-imp  { flex: 1.4; }
-        .im-tbl .col-rule { flex: 2; font-size: 0.68rem; color: var(--muted); }
+        .im-tbl .col-rule { flex: 2; font-size: 0.7rem; color: #b8d0e8; }
         .im-tbl .col-stars{ flex: 0.8; color: var(--gold); font-size: 0.72rem; letter-spacing:-1px; }
 
         .imp-badge {
@@ -292,8 +294,8 @@
             flex: 0 0 auto;
         }
         .pair-tbl-head span {
-            font-size: 0.6rem; color: var(--muted);
-            letter-spacing: 1px; font-weight: normal;
+            font-size: 0.62rem; color: #a8c4e0;
+            letter-spacing: 1.2px; font-weight: 600;
             text-transform: uppercase;
         }
         .pair-tbl-body {
@@ -320,14 +322,14 @@
         .pair-row.sell { border-left-color: rgba(255,51,51,0.5); }
         .pair-row.com-xau { border-left-color: rgba(251,191,36,0.7); background: rgba(251,191,36,0.03); }
         .pair-row.com-oil { border-left-color: rgba(249,115,22,0.7); background: rgba(249,115,22,0.03); }
-        .pr-name  { font-family: var(--title); font-weight: 700; font-size: 0.82rem; color: var(--white); }
+        .pr-name  { font-family: var(--title); font-weight: 700; font-size: 0.85rem; color: #f0f6ff; }
         .pr-act   { font-size: 0.65rem; font-weight: bold; padding: 2px 7px; border-radius: 5px; width: fit-content; }
-        .pr-act.buy  { color: var(--green); background: rgba(0,255,65,0.1);  border: 1px solid rgba(0,255,65,0.3);  }
-        .pr-act.sell { color: var(--red);   background: rgba(255,51,51,0.1); border: 1px solid rgba(255,51,51,0.3); }
-        .pr-num  { font-size: 0.72rem; font-weight: bold; }
-        .pr-sl   { color: #ff4444; }
-        .pr-tp   { color: #00ff41; }
-        .pr-conf { font-size: 0.68rem; font-weight: bold; }
+        .pr-act.buy  { color: #00ff41; background: rgba(0,255,65,0.12);  border: 1px solid rgba(0,255,65,0.4);  }
+        .pr-act.sell { color: #ff4444; background: rgba(255,51,51,0.12); border: 1px solid rgba(255,51,51,0.4); }
+        .pr-num  { font-size: 0.74rem; font-weight: bold; color: #ddeeff; }
+        .pr-sl   { color: #ff6666; }
+        .pr-tp   { color: #33ff77; }
+        .pr-conf { font-size: 0.70rem; font-weight: bold; }
         .pr-qual { color: var(--gold); font-size: 0.62rem; letter-spacing: -1px; text-align: right; }
         .pr-fund {
             font-size: 0.75rem; text-align: center; cursor: help;
