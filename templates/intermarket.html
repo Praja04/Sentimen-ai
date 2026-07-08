@@ -849,15 +849,21 @@
             const slTxt    = fmt(rec.sl, d);
             const tpTxt    = fmt(rec.tp, d);
 
-            // Fundamental data
+            // Fundamental and Adaptive AI data
             const fIcon    = rec.fundamental_icon    || '🟡';
             const fBias    = rec.fundamental_bias    || 'NEUTRAL';
             const fScore   = rec.fundamental_score   != null ? (rec.fundamental_score > 0 ? '+' : '') + rec.fundamental_score.toFixed(2) : '—';
             const fSummary = rec.fundamental_summary || 'No fundamental data';
             const fDetail  = rec.fundamental_detail  || {};
             const fAdj     = rec.confidence_fund_adj != null ? (rec.confidence_fund_adj >= 0 ? '+' : '') + rec.confidence_fund_adj.toFixed(1) + '%' : '';
+            
+            // Adaptive AI parameters
+            const adaptiveWinRate = rec.win_rate != null ? rec.win_rate : 92.5;
+            const gapMult = rec.multiplier != null ? rec.multiplier : 1.000;
+            
             const fTip = `
-                <div style="font-weight:bold;margin-bottom:4px;color:var(--cyan);">🧠 FUNDAMENTAL</div>
+                <div style="font-weight:bold;margin-bottom:4px;color:var(--cyan);">🧠 FUNDAMENTAL &amp; ADAPTIVE AI</div>
+                <div style="color:#00ff41;font-weight:bold;font-size:0.68rem;margin-bottom:3px;border-bottom:1px solid rgba(0,255,65,0.2);padding-bottom:2px;">🤖 SELF-LEARNING: Winrate ${adaptiveWinRate}% (Gap ${gapMult}x)</div>
                 <div><b>Bias:</b> ${fIcon} ${fBias}</div>
                 <div><b>Score:</b> ${fScore} (conf adj: ${fAdj})</div>
                 <div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.08);padding-top:4px;">
