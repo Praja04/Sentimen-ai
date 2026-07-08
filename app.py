@@ -12,6 +12,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import product
 from pathlib import Path
+from fundamental.scorer import get_fundamental_score
 
 XEDY_DATABASE_PATH = r"C:\Antigravity\xedy_v30_data.json"
 
@@ -555,6 +556,34 @@ def api_laggard_detection():
         rec.pop("_digits", None)
         rec.pop("_entry",  None)
 
+    # ── Inject Fundamental Intelligence scores ───────────────────────────────────
+    for rec in pair_recs:
+        try:
+            f = get_fundamental_score(rec["pair"])
+            tech_conf = float(rec.get("confidence", 50))
+            adj       = float(f.get("combined_confidence_adj", 0.0))
+            rec["confidence_tech"]     = tech_conf
+            rec["confidence_fund_adj"] = adj
+            rec["confidence"]          = round(max(1, min(99, tech_conf + adj)), 1)
+            rec["fundamental_bias"]    = f.get("bias", "NEUTRAL")
+            rec["fundamental_icon"]    = f.get("bias_icon", "🟡")
+            rec["fundamental_score"]   = f.get("combined_score", 0.0)
+            rec["fundamental_summary"] = f.get("summary", "")
+            # Compact detail for tooltip
+            comp = f.get("components", {})
+            rec["fundamental_detail"] = {
+                "calendar": comp.get("calendar", {}).get("note", ""),
+                "news":     comp.get("news",     {}).get("bias", ""),
+                "cot":      comp.get("cot",      {}).get("note", ""),
+                "fed":      comp.get("fed",       {}).get("bias", ""),
+            }
+        except Exception:
+            rec["fundamental_bias"]    = "NEUTRAL"
+            rec["fundamental_icon"]    = "🟡"
+            rec["fundamental_score"]   = 0.0
+            rec["fundamental_summary"] = ""
+            rec["fundamental_detail"]  = {}
+
     return jsonify({
         "status": "success",
         "laggard_leader": laggard_leader,
@@ -564,6 +593,16 @@ def api_laggard_detection():
         "intermarket": intermarket
     })
 
+
+@app.route('/api/fundamental_scores')
+def api_fundamental_scores():
+    """Dedicated endpoint for fundamental scores — cached 30 min."""
+    from fundamental.scorer import get_all_fundamental_scores
+    try:
+        scores = get_all_fundamental_scores()
+        return jsonify({"status": "success", "scores": scores})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 @app.route('/api/news_calendar')
 def get_news_calendar():

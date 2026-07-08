@@ -285,7 +285,7 @@
         }
         .pair-tbl-head {
             display: grid;
-            grid-template-columns: 1.3fr 0.7fr 1.1fr 1.1fr 1.1fr 0.65fr 0.55fr;
+            grid-template-columns: 1.3fr 0.7fr 1.1fr 1.1fr 1.1fr 0.65fr 0.55fr 0.5fr;
             gap: 0;
             border-bottom: 1px solid rgba(59,130,246,0.25);
             padding: 4px 6px;
@@ -329,6 +329,26 @@
         .pr-tp   { color: #00ff41; }
         .pr-conf { font-size: 0.68rem; font-weight: bold; }
         .pr-qual { color: var(--gold); font-size: 0.62rem; letter-spacing: -1px; text-align: right; }
+        .pr-fund {
+            font-size: 0.75rem; text-align: center; cursor: help;
+            position: relative;
+        }
+        .pr-fund-tip {
+            display: none;
+            position: absolute; z-index: 99;
+            right: 0; top: 110%;
+            background: #0d1117;
+            border: 1px solid rgba(59,130,246,0.35);
+            border-radius: 8px;
+            padding: 8px 10px;
+            width: 220px;
+            font-size: 0.62rem;
+            line-height: 1.6;
+            color: var(--text);
+            box-shadow: 0 8px 32px rgba(0,0,0,.7);
+            text-align: left;
+        }
+        .pr-fund:hover .pr-fund-tip { display: block; }
         .pr-conf-bar {
             height: 3px; border-radius: 2px;
             background: rgba(255,255,255,0.07);
@@ -473,6 +493,7 @@
                     <span style="color:#ff4444;">SL</span>
                     <span style="color:#00ff41;">TP</span>
                     <span>CONF</span>
+                    <span style="text-align:center;">FUND</span>
                     <span style="text-align:right;">KUAL</span>
                 </div>
                 <!-- Table body injected by JS -->
@@ -486,7 +507,7 @@
     <footer class="ftr">
         XEDY INTERMARKET INTELLIGENCE &nbsp;·&nbsp;
         <span>MT5 REAL-TIME DATA</span> &nbsp;·&nbsp;
-        FED · CFTC · CME · BLOOMBERG · WGC · EIA
+        FED · CFTC COT · CME · BLOOMBERG · GOOGLE NEWS · VADER SENTIMENT · FOREX FACTORY
     </footer>
 
 </div>
@@ -681,6 +702,25 @@
             const slTxt    = fmt(rec.sl, d);
             const tpTxt    = fmt(rec.tp, d);
 
+            // Fundamental data
+            const fIcon    = rec.fundamental_icon    || '🟡';
+            const fBias    = rec.fundamental_bias    || 'NEUTRAL';
+            const fScore   = rec.fundamental_score   != null ? (rec.fundamental_score > 0 ? '+' : '') + rec.fundamental_score.toFixed(2) : '—';
+            const fSummary = rec.fundamental_summary || 'No fundamental data';
+            const fDetail  = rec.fundamental_detail  || {};
+            const fAdj     = rec.confidence_fund_adj != null ? (rec.confidence_fund_adj >= 0 ? '+' : '') + rec.confidence_fund_adj.toFixed(1) + '%' : '';
+            const fTip = `
+                <div style="font-weight:bold;margin-bottom:4px;color:var(--cyan);">🧠 FUNDAMENTAL</div>
+                <div><b>Bias:</b> ${fIcon} ${fBias}</div>
+                <div><b>Score:</b> ${fScore} (conf adj: ${fAdj})</div>
+                <div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.08);padding-top:4px;">
+                    📅 <b>Calendar:</b> ${fDetail.calendar || '—'}<br>
+                    📰 <b>News:</b> ${fDetail.news || '—'}<br>
+                    📊 <b>COT:</b> ${fDetail.cot || '—'}<br>
+                    🏦 <b>Fed/CB:</b> ${fDetail.fed || '—'}
+                </div>
+                <div style="margin-top:4px;color:var(--muted);font-style:italic;">${fSummary}</div>`;
+
             return `<div class="${rowCls}">
                 <!-- PAIR -->
                 <div>
@@ -701,6 +741,11 @@
                     <div class="pr-conf-bar">
                         <div style="height:100%;border-radius:2px;width:${confPct}%;background:linear-gradient(90deg,${actC}55,${actC});transition:width .8s;"></div>
                     </div>
+                </div>
+                <!-- FUND -->
+                <div class="pr-fund" title="${fBias}">
+                    ${fIcon}
+                    <div class="pr-fund-tip">${fTip}</div>
                 </div>
                 <!-- KUAL -->
                 <div class="pr-qual">${rec.quality || ''}</div>
