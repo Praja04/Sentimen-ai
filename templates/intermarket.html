@@ -337,8 +337,8 @@
         }
         .pr-fund-tip {
             display: none;
-            position: absolute; z-index: 99;
-            right: 0; top: 110%;
+            position: absolute; z-index: 999;
+            right: 0; bottom: 110%; top: auto;
             background: #0d1117;
             border: 1px solid rgba(59,130,246,0.35);
             border-radius: 8px;
@@ -349,6 +349,7 @@
             color: var(--text);
             box-shadow: 0 8px 32px rgba(0,0,0,.7);
             text-align: left;
+            margin-bottom: 5px;
         }
         .pr-fund:hover .pr-fund-tip { display: block; }
         .pr-conf-bar {
