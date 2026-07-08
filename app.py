@@ -378,7 +378,7 @@ def api_laggard_detection():
         ("USD","EUR"): "EURUSD", ("USD","GBP"): "GBPUSD", ("USD","JPY"): "USDJPY",
         ("USD","CHF"): "USDCHF", ("USD","CAD"): "USDCAD", ("USD","AUD"): "AUDUSD",
         ("USD","NZD"): "NZDUSD", ("EUR","JPY"): "EURJPY", ("EUR","GBP"): "EURGBP",
-        ("GBP","JPY"): "GBPJPY", ("AUD","JPY"): "AUDJPY", ("AUD","NZD"): "AUDNZD",
+                ("GBP","JPY"): "GBPJPY", ("AUD","JPY"): "AUDJPY", ("AUD","NZD"): "AUDNZD",
         ("CAD","JPY"): "CADJPY", ("CHF","JPY"): "CHFJPY", ("EUR","CHF"): "EURCHF",
         ("EUR","CAD"): "EURCAD", ("EUR","AUD"): "EURAUD", ("EUR","NZD"): "EURNZD",
         ("GBP","CHF"): "GBPCHF", ("GBP","CAD"): "GBPCAD", ("GBP","AUD"): "GBPAUD",
@@ -389,6 +389,9 @@ def api_laggard_detection():
     sorted_csi = sorted(strengths.items(), key=lambda x: x[1], reverse=True)
     pair_recs = []
     seen_pairs = set()
+    currency_count = {}   # limit: each currency appears at most MAX_PER_CCY times
+    MAX_PER_CCY = 2       # e.g. NZD can appear in max 2 pairs → diversity guaranteed
+
     for i, (strong_key, strong_val) in enumerate(sorted_csi):
         for j, (weak_key, weak_val) in enumerate(reversed(sorted_csi)):
             if strong_key == weak_key:
@@ -397,28 +400,72 @@ def api_laggard_detection():
             if gap < 0.01:   # lowered from 0.05 so sideways market still yields signals
                 continue
             strong_cur = CURR_FULL[strong_key]
-            weak_cur = CURR_FULL[weak_key]
+            weak_cur   = CURR_FULL[weak_key]
             pair = PAIR_MAP.get((strong_cur, weak_cur)) or PAIR_MAP.get((weak_cur, strong_cur))
             if not pair or pair in seen_pairs:
                 continue
+            # Diversity guard: skip if either currency already reached the cap
+            if currency_count.get(strong_cur, 0) >= MAX_PER_CCY:
+                continue
+            if currency_count.get(weak_cur, 0) >= MAX_PER_CCY:
+                continue
             seen_pairs.add(pair)
+            currency_count[strong_cur] = currency_count.get(strong_cur, 0) + 1
+            currency_count[weak_cur]   = currency_count.get(weak_cur, 0) + 1
             # Determine action
             is_base_strong = PAIR_MAP.get((strong_cur, weak_cur)) is not None
-            action = "BUY" if is_base_strong else "SELL"
+            action  = "BUY" if is_base_strong else "SELL"
             quality = "★★★★★" if gap > 0.3 else ("★★★★" if gap > 0.15 else ("★★★" if gap > 0.05 else ("★★" if gap > 0.02 else "★")))
             pair_recs.append({
-                "pair": pair,
-                "action": action,
-                "gap": round(gap, 3),
-                "strong": strong_cur,
-                "weak": weak_cur,
-                "quality": quality,
+                "pair":       pair,
+                "action":     action,
+                "gap":        round(gap, 3),
+                "strong":     strong_cur,
+                "weak":       weak_cur,
+                "quality":    quality,
                 "confidence": round(min(99, 50 + gap * 200), 0)
             })
             if len(pair_recs) >= 8:
                 break
         if len(pair_recs) >= 8:
             break
+
+    # ── Priority pairs: USDJPY & EURUSD guaranteed in top signals ────────────────
+    PRIORITY_PAIRS = [
+        ("USD", "JPY", "USDJPY"),   # most-watched major
+        ("EUR", "USD", "EURUSD"),   # most-traded major
+    ]
+    existing_pairs = {r["pair"] for r in pair_recs}
+    csi_by_cur = {CURR_FULL[k]: v for k, v in strengths.items()}
+
+    insert_pos = 2   # inject after XAUUSD (0) and WTI OIL (1)
+    for base_cur, quote_cur, symbol in PRIORITY_PAIRS:
+        if symbol in existing_pairs:
+            continue
+        base_str  = csi_by_cur.get(base_cur, 0)
+        quote_str = csi_by_cur.get(quote_cur, 0)
+        gap    = abs(base_str - quote_str)
+        if gap < 0.001:
+            continue
+        action = "BUY" if base_str > quote_str else "SELL"
+        strong = base_cur  if action == "BUY" else quote_cur
+        weak   = quote_cur if action == "BUY" else base_cur
+        quality = "★★★★★" if gap > 0.3 else ("★★★★" if gap > 0.15 else ("★★★" if gap > 0.05 else "★★"))
+        priority_obj = {
+            "pair":       symbol,
+            "action":     action,
+            "gap":        round(gap, 3),
+            "strong":     strong,
+            "weak":       weak,
+            "quality":    quality,
+            "confidence": round(min(99, 50 + gap * 200), 0)
+        }
+        # Insert at fixed position, drop the last slot to keep total ≤ 8
+        pair_recs.insert(insert_pos, priority_obj)
+        if len(pair_recs) > 8:
+            pair_recs.pop()          # remove weakest (last) to stay at 8
+        existing_pairs.add(symbol)
+        insert_pos += 1
 
     # ── Intermarket Indices ─────────────────────────────────────────────────────
     def get_price_and_change(sym_opts):
