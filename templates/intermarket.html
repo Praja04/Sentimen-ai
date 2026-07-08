@@ -244,10 +244,10 @@
         .lag-action{ font-size: 0.78rem; margin-left: auto; color: #e0f0ff; }
 
         .im-tbl {
-            flex: 1 1 0; min-height: 0;
+            flex: 0 0 auto;
             width: 100%; border-collapse: collapse;
             font-size: 0.78rem;
-            display: block; overflow: hidden;
+            display: block;
         }
         .im-tbl thead { display: block; width: 100%; }
         .im-tbl tbody { display: block; width: 100%; overflow: hidden; }
@@ -474,12 +474,12 @@
         <!-- CENTER: STACKED INTERMARKET & LAGGARD ──────────── -->
         <div style="display:flex; flex-direction:column; gap:5px; height:100%; min-height:0;">
             <!-- PANEL 1: INTERMARKET TABLE -->
-            <div class="panel" style="flex: 1.65 1 0; min-height: 0;">
+            <div class="panel" style="flex: 1 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">🔗 INTERMARKET vs GOLD</div>
                     <div class="badge badge-warn">⭐ XAUUSD FOCUS</div>
                 </div>
-                <div class="panel-body" style="padding: 3px 5px; display:flex; flex-direction:column; gap:0; flex:1 1 0; min-height:0; overflow:hidden;">
+                <div class="panel-body" style="padding: 4px 6px; display:flex; flex-direction:column; gap:0; flex:1 1 0; min-height:0; overflow:hidden;">
                     <table class="im-tbl">
                         <thead>
                             <tr>
@@ -493,20 +493,20 @@
                         <tbody id="im-tbody"></tbody>
                     </table>
                     <!-- GOLD OUTLOOK SUMMARY -->
-                    <div id="gold-summary" style="flex:0 0 auto;margin-top:3px;"></div>
+                    <div id="gold-summary" style="flex:0 0 auto; margin-top:auto; padding-top:4px;"></div>
                 </div>
             </div>
 
             <!-- PANEL 2: LAGGARD DETECTION (REAL vs FVG) -->
-            <div class="panel" style="flex: 0.65 1 0; min-height: 0;">
+            <div class="panel" style="flex: 1 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">⚡ LAGGARD DETECTION (REAL vs FVG)</div>
                     <div id="lag-action" class="lag-action" style="font-size: 0.75rem;">---</div>
                 </div>
                 <div class="panel-body" style="padding: 4px 6px; gap: 4px;">
-                    <div class="lag-box" style="padding: 4px 8px; flex: 0 0 auto;">
+                    <div class="lag-box" style="padding: 3px 8px; flex: 0 0 auto;">
                         <span class="lag-label">TOP LAGGARD:</span>
-                        <span class="lag-name" id="lag-name" style="font-size: 1rem;">---</span>
+                        <span class="lag-name" id="lag-name" style="font-size: 0.9rem;">---</span>
                     </div>
                     <table class="im-tbl" id="lag-tbl" style="font-size: 0.72rem; flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
                         <thead style="flex: 0 0 auto;">
@@ -518,7 +518,7 @@
                                 <th style="flex: 0.9; text-align: right;">ACTION</th>
                             </tr>
                         </thead>
-                        <tbody id="lag-tbody" style="flex: 1 1 0; overflow-y: auto; display: block; width: 100%;">
+                        <tbody id="lag-tbody" style="flex: 1 1 0; overflow: hidden; display: block; width: 100%;">
                             <!-- Injected by JS -->
                         </tbody>
                     </table>
@@ -741,11 +741,11 @@
                 const rowBorder = isLeader ? 'border-left: 2px solid var(--cyan);' : '';
                 const actColor = info.action === 'BUY' ? 'var(--green)' : info.action === 'SELL' ? 'var(--red)' : 'var(--gold)';
                 return `<tr style="background:${rowBg}; ${rowBorder} display: flex; width: 100%; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.04);">
-                    <td style="flex: 1.2; font-weight: bold; color: ${isLeader ? 'var(--cyan)' : 'var(--white)'}; padding: 4px 6px;">${isLeader ? '⚡ ' : ''}${symbol}</td>
-                    <td style="flex: 1.1; padding: 4px 6px;">${info.actual.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals})}</td>
-                    <td style="flex: 1.1; color: var(--text); padding: 4px 6px;">${info.fair_value.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals})}</td>
-                    <td style="flex: 0.8; text-align: right; color: ${gapColor}; font-weight: bold; padding: 4px 6px;">${gapSign}${info.pct_gap}%</td>
-                    <td style="flex: 0.9; text-align: right; color: ${actColor}; font-weight: bold; padding: 4px 6px;">${info.action}</td>
+                    <td style="flex: 1.2; font-weight: bold; color: ${isLeader ? 'var(--cyan)' : 'var(--white)'}; padding: 3px 5px;">${isLeader ? '⚡ ' : ''}${symbol}</td>
+                    <td style="flex: 1.1; padding: 3px 5px;">${info.actual.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals})}</td>
+                    <td style="flex: 1.1; color: var(--text); padding: 3px 5px;">${info.fair_value.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals})}</td>
+                    <td style="flex: 0.8; text-align: right; color: ${gapColor}; font-weight: bold; padding: 3px 5px;">${gapSign}${info.pct_gap}%</td>
+                    <td style="flex: 0.9; text-align: right; color: ${actColor}; font-weight: bold; padding: 3px 5px;">${info.action}</td>
                 </tr>`;
             }).join('');
         }

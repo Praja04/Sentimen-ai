@@ -132,12 +132,12 @@
     },
     {
       "time": "BLOOMBERG",
-      "title": "Iran tidak bisa menahan rasa sombongnya, dan harga minyak naik",
+      "title": "Saham Tiongkok di HK Melonjak Tertinggi dalam 14 Bulan seiring Reli Teknologi",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "CEO Momenta Global Melihat Profitabilitas pada tahun 2028",
+      "title": "Badan Pertahanan AS Berusaha Membeli Lithium Hingga $300 Juta",
       "impact": "text-yellow"
     },
     {
@@ -197,36 +197,36 @@
     },
     {
       "time": "YAHOO",
-      "title": "Gugatan Montgomery kemungkinan besar akan diajukan kembali ke pengadilan distrik Illinois",
+      "title": "Apakah Equinor ASA (EQNR) termasuk Saham Teknologi Baterai Terbaik yang Dapat Dibeli untuk Penyimpanan Jaringan?",
       "impact": "text-yellow"
     },
     {
       "time": "CNBC",
       "title": "Pedagang di Kalshi memperkirakan Nasdaq-100 akan berakhir pada tahun 2026 di atas 30.000, memperkirakan paruh kedua tahun ini akan lebih dingin",
-      "impact": "text-green"
+      "impact": "text-yellow"
     },
     {
       "time": "CNBC",
       "title": "Belilah saham-saham berkualitas dan rendah stres ini untuk musim panas, kata Jefferies",
+      "impact": "text-yellow"
+    },
+    {
+      "time": "BLOOMBERG",
+      "title": "Iran tidak bisa menahan rasa sombongnya, dan harga minyak naik",
       "impact": "text-green"
     },
     {
       "time": "BLOOMBERG",
-      "title": "Pekerja BHP Akan Mogok di Pelabuhan Ekspor Bijih Besi Terbaik Dunia",
-      "impact": "text-red"
-    },
-    {
-      "time": "BLOOMBERG",
-      "title": "Obligasi Mundur, Minyak Melonjak Setelah Serangan AS terhadap Iran: Pasar Selesai",
-      "impact": "text-red"
+      "title": "CEO Momenta Global Melihat Profitabilitas pada tahun 2028",
+      "impact": "text-yellow"
     }
   ],
   "assets": [
     {
       "symbol": "XAUUSD",
       "icon": "🪙",
-      "price": "4,126.30",
-      "change": "+20.94 (+0.51%)",
+      "price": "4,125.64",
+      "change": "+20.28 (+0.49%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -260,7 +260,7 @@
     {
       "symbol": "USDJPY",
       "icon": "🇺🇸",
-      "price": "162.374",
+      "price": "162.378",
       "change": "+0.29 (+0.18%)",
       "cColor": "text-green",
       "f4": {
@@ -295,8 +295,8 @@
     {
       "symbol": "WTI OIL",
       "icon": "🛢️",
-      "price": "72.07",
-      "change": "+0.12 (+0.17%)",
+      "price": "72.08",
+      "change": "+0.13 (+0.18%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -330,8 +330,8 @@
     {
       "symbol": "EURUSD",
       "icon": "🇪🇺",
-      "price": "1.1415",
-      "change": "+0.0004 (+0.03%)",
+      "price": "1.1414",
+      "change": "+0.0003 (+0.03%)",
       "cColor": "text-green",
       "f4": {
         "dir": "BULLISH",
@@ -365,8 +365,8 @@
     {
       "symbol": "GBPUSD",
       "icon": "🇬🇧",
-      "price": "1.3353",
-      "change": "-0.0004 (-0.03%)",
+      "price": "1.3354",
+      "change": "-0.0003 (-0.02%)",
       "cColor": "text-red",
       "f4": {
         "dir": "BULLISH",
@@ -401,7 +401,7 @@
   "gauges": {
     "macro_alignment_score": 49,
     "market_regime_score": 45,
-    "market_sentiment_score": 36,
+    "market_sentiment_score": 76,
     "institutional_flow_score": 84
   },
   "ml_memory": {
@@ -483,7 +483,7 @@
   "technical_signals": {
     "XAUUSD": {
       "trend": "BULLISH",
-      "rsi": 40,
+      "rsi": 39,
       "ma50": "UP"
     },
     "USDJPY": {
@@ -493,7 +493,7 @@
     },
     "WTI OIL": {
       "trend": "BULLISH",
-      "rsi": 77,
+      "rsi": 78,
       "ma50": "UP"
     },
     "EURUSD": {
@@ -509,7 +509,7 @@
   },
   "economic_calendar": [
     {
-      "time": "12:46",
+      "time": "12:52",
       "cur": "USD",
       "event": "Core PCE Price Index m/m",
       "impact": "HIGH",
@@ -518,7 +518,7 @@
       "prev": "0.2%"
     },
     {
-      "time": "13:46",
+      "time": "13:52",
       "cur": "USD",
       "event": "Unemployment Claims",
       "impact": "HIGH",
@@ -527,7 +527,7 @@
       "prev": "215K"
     },
     {
-      "time": "15:46",
+      "time": "15:52",
       "cur": "USD",
       "event": "ISM Manufacturing PMI",
       "impact": "HIGH",
@@ -536,7 +536,7 @@
       "prev": "49.1"
     },
     {
-      "time": "16:46",
+      "time": "16:52",
       "cur": "EUR",
       "event": "ECB President Lagarde Speaks",
       "impact": "MED",
@@ -596,15 +596,15 @@
             },
             {
               "rank": 2,
-              "date": "2026-05-28",
-              "similarity": "34%",
-              "outcome": "+2.05%"
-            },
-            {
-              "rank": 3,
               "date": "2025-12-09",
               "similarity": "34%",
               "outcome": "+0.43%"
+            },
+            {
+              "rank": 3,
+              "date": "2026-05-28",
+              "similarity": "34%",
+              "outcome": "+2.05%"
             },
             {
               "rank": 4,
@@ -626,7 +626,7 @@
           "trend": "BULLISH",
           "volatility": "NORMAL",
           "vol_ratio": 1.0427251728979963,
-          "risk_state": "RISK OFF"
+          "risk_state": "RISK ON"
         },
         "seasonality": {
           "day_bias": "BULLISH",
@@ -639,12 +639,12 @@
             "Technical AI": "BULLISH",
             "Statistical AI": "BEARISH",
             "Fundamental AI": "BEARISH",
-            "Macro AI": "BEARISH",
+            "Macro AI": "BULLISH",
             "Pattern AI": "BULLISH",
             "Similarity AI": "BULLISH"
           },
-          "bullish_probability": 50,
-          "bearish_probability": 50,
+          "bullish_probability": 66,
+          "bearish_probability": 34,
           "expected_return": "+0.10%",
           "expected_drawdown": "28.55%"
         },
@@ -665,9 +665,9 @@
             "type": "negative"
           },
           {
-            "factor": "Global Sentiment Risk Off (Pencarian Safe Haven)",
-            "effect": "-15%",
-            "type": "negative"
+            "factor": "Global Sentiment Risk On",
+            "effect": "+15%",
+            "type": "positive"
           },
           {
             "factor": "Pola Histori Mirip Cenderung Naik (Similarity)",
@@ -681,7 +681,7 @@
           }
         ],
         "confidence_validation": {
-          "overall": 50,
+          "overall": 65,
           "historical": 60,
           "statistical": 63,
           "similarity": 34,
@@ -744,14 +744,14 @@
               "outcome": "+0.15%"
             }
           ],
-          "avg_outcome": "+0.09%",
-          "win_rate": 70.0
+          "avg_outcome": "+0.13%",
+          "win_rate": 80.0
         },
         "market_regime": {
           "trend": "BULLISH",
           "volatility": "NORMAL",
           "vol_ratio": 0.6072207208599721,
-          "risk_state": "RISK OFF"
+          "risk_state": "RISK ON"
         },
         "seasonality": {
           "day_bias": "BULLISH",
@@ -764,13 +764,13 @@
             "Technical AI": "BULLISH",
             "Statistical AI": "BULLISH",
             "Fundamental AI": "BEARISH",
-            "Macro AI": "BEARISH",
+            "Macro AI": "BULLISH",
             "Pattern AI": "BULLISH",
             "Similarity AI": "BULLISH"
           },
-          "bullish_probability": 66,
-          "bearish_probability": 34,
-          "expected_return": "+0.09%",
+          "bullish_probability": 83,
+          "bearish_probability": 17,
+          "expected_return": "+0.13%",
           "expected_drawdown": "4.48%"
         },
         "explainable_ai": [
@@ -790,13 +790,13 @@
             "type": "negative"
           },
           {
-            "factor": "Global Sentiment Risk Off (Pencarian Safe Haven)",
-            "effect": "-15%",
-            "type": "negative"
+            "factor": "Global Sentiment Risk On",
+            "effect": "+15%",
+            "type": "positive"
           },
           {
             "factor": "Pola Histori Mirip Cenderung Naik (Similarity)",
-            "effect": "+0.09%",
+            "effect": "+0.13%",
             "type": "positive"
           },
           {
@@ -806,8 +806,8 @@
           }
         ],
         "confidence_validation": {
-          "overall": 65,
-          "historical": 70,
+          "overall": 80,
+          "historical": 80,
           "statistical": 65,
           "similarity": 48,
           "fundamental": 49
@@ -853,7 +853,7 @@
             {
               "rank": 3,
               "date": "2026-04-28",
-              "similarity": "59%",
+              "similarity": "58%",
               "outcome": "+7.26%"
             },
             {
@@ -876,7 +876,7 @@
           "trend": "BULLISH",
           "volatility": "NORMAL",
           "vol_ratio": 0.8460918518571467,
-          "risk_state": "RISK OFF"
+          "risk_state": "RISK ON"
         },
         "seasonality": {
           "day_bias": "BULLISH",
@@ -889,12 +889,12 @@
             "Technical AI": "BULLISH",
             "Statistical AI": "BULLISH",
             "Fundamental AI": "BEARISH",
-            "Macro AI": "BEARISH",
+            "Macro AI": "BULLISH",
             "Pattern AI": "BULLISH",
             "Similarity AI": "BULLISH"
           },
-          "bullish_probability": 66,
-          "bearish_probability": 34,
+          "bullish_probability": 83,
+          "bearish_probability": 17,
           "expected_return": "+2.05%",
           "expected_drawdown": "39.09%"
         },
@@ -915,9 +915,9 @@
             "type": "negative"
           },
           {
-            "factor": "Global Sentiment Risk Off (Pencarian Safe Haven)",
-            "effect": "-15%",
-            "type": "negative"
+            "factor": "Global Sentiment Risk On",
+            "effect": "+15%",
+            "type": "positive"
           },
           {
             "factor": "Pola Histori Mirip Cenderung Naik (Similarity)",
@@ -931,7 +931,7 @@
           }
         ],
         "confidence_validation": {
-          "overall": 65,
+          "overall": 80,
           "historical": 70,
           "statistical": 81,
           "similarity": 64,
@@ -984,7 +984,7 @@
             {
               "rank": 4,
               "date": "2026-06-18",
-              "similarity": "44%",
+              "similarity": "45%",
               "outcome": "-0.82%"
             },
             {
@@ -994,14 +994,14 @@
               "outcome": "-0.31%"
             }
           ],
-          "avg_outcome": "-0.13%",
-          "win_rate": 30.0
+          "avg_outcome": "-0.09%",
+          "win_rate": 40.0
         },
         "market_regime": {
           "trend": "BULLISH",
           "volatility": "NORMAL",
           "vol_ratio": 1.155487379469437,
-          "risk_state": "RISK OFF"
+          "risk_state": "RISK ON"
         },
         "seasonality": {
           "day_bias": "BULLISH",
@@ -1014,13 +1014,13 @@
             "Technical AI": "BULLISH",
             "Statistical AI": "BEARISH",
             "Fundamental AI": "BEARISH",
-            "Macro AI": "BEARISH",
+            "Macro AI": "BULLISH",
             "Pattern AI": "BULLISH",
             "Similarity AI": "BEARISH"
           },
-          "bullish_probability": 33,
-          "bearish_probability": 67,
-          "expected_return": "-0.13%",
+          "bullish_probability": 50,
+          "bearish_probability": 50,
+          "expected_return": "-0.09%",
           "expected_drawdown": "5.90%"
         },
         "explainable_ai": [
@@ -1040,13 +1040,13 @@
             "type": "negative"
           },
           {
-            "factor": "Global Sentiment Risk Off (Pencarian Safe Haven)",
-            "effect": "-15%",
-            "type": "negative"
+            "factor": "Global Sentiment Risk On",
+            "effect": "+15%",
+            "type": "positive"
           },
           {
             "factor": "Pola Histori Mirip Cenderung Turun (Similarity)",
-            "effect": "-0.13%",
+            "effect": "-0.09%",
             "type": "negative"
           },
           {
@@ -1056,8 +1056,8 @@
           }
         ],
         "confidence_validation": {
-          "overall": 65,
-          "historical": 30,
+          "overall": 50,
+          "historical": 40,
           "statistical": 51,
           "similarity": 46,
           "fundamental": 49
@@ -1114,9 +1114,9 @@
             },
             {
               "rank": 5,
-              "date": "2026-05-12",
+              "date": "2026-04-06",
               "similarity": "49%",
-              "outcome": "-0.02%"
+              "outcome": "+0.26%"
             }
           ],
           "avg_outcome": "-0.22%",
@@ -1126,7 +1126,7 @@
           "trend": "BULLISH",
           "volatility": "NORMAL",
           "vol_ratio": 0.8133340025177695,
-          "risk_state": "RISK OFF"
+          "risk_state": "RISK ON"
         },
         "seasonality": {
           "day_bias": "BULLISH",
@@ -1139,12 +1139,12 @@
             "Technical AI": "BULLISH",
             "Statistical AI": "BEARISH",
             "Fundamental AI": "BEARISH",
-            "Macro AI": "BEARISH",
+            "Macro AI": "BULLISH",
             "Pattern AI": "BULLISH",
             "Similarity AI": "BEARISH"
           },
-          "bullish_probability": 33,
-          "bearish_probability": 67,
+          "bullish_probability": 50,
+          "bearish_probability": 50,
           "expected_return": "-0.22%",
           "expected_drawdown": "5.03%"
         },
@@ -1165,9 +1165,9 @@
             "type": "negative"
           },
           {
-            "factor": "Global Sentiment Risk Off (Pencarian Safe Haven)",
-            "effect": "-15%",
-            "type": "negative"
+            "factor": "Global Sentiment Risk On",
+            "effect": "+15%",
+            "type": "positive"
           },
           {
             "factor": "Pola Histori Mirip Cenderung Turun (Similarity)",
@@ -1181,7 +1181,7 @@
           }
         ],
         "confidence_validation": {
-          "overall": 65,
+          "overall": 50,
           "historical": 30,
           "statistical": 78,
           "similarity": 61,
@@ -1195,25 +1195,25 @@
       }
     },
     "lead_lag_chain": "US10Y → DXY → XAUUSD → WTI OIL → EURUSD",
-    "calculated_at": "2026-07-08 11:46:14"
+    "calculated_at": "2026-07-08 11:52:35"
   },
   "institutional_data_lake": {
-    "calculated_at": "2026-07-08 11:46:14",
-    "dxy_proxy": 101.471,
+    "calculated_at": "2026-07-08 11:52:35",
+    "dxy_proxy": 101.472,
     "bond_market": {
-      "us2y": "4.69%",
+      "us2y": "4.66%",
       "us5y": "4.42%",
       "us10y": "4.30%",
-      "us30y": "4.48%",
-      "yield_spread_2y10y": "-0.39%",
+      "us30y": "4.49%",
+      "yield_spread_2y10y": "-0.36%",
       "real_yield_10y": "+1.00%",
       "move_index": "95.9"
     },
     "dollar_liquidity": {
       "fed_balance_sheet": "$7.38T",
-      "reverse_repo_rrp": "$415.8B",
-      "sofr_rate": "5.308%",
-      "tga_balance": "$723.8B",
+      "reverse_repo_rrp": "$408.2B",
+      "sofr_rate": "5.318%",
+      "tga_balance": "$727.5B",
       "liquidity_state": "EXPANDING"
     },
     "macro_economy": {
@@ -1235,24 +1235,24 @@
         "microstructure": {
           "real_volume": "1,288,731 lots",
           "bid_ask_spread": "0.29 USD",
-          "order_book_imbalance": "+11.1%",
-          "delta_volume": "+143,033 lots",
-          "vwap": "4126.25"
+          "order_book_imbalance": "+14.6%",
+          "delta_volume": "+187,534 lots",
+          "vwap": "4125.58"
         },
         "futures_market": {
-          "futures_price": "4126.45",
-          "cot_commercial_net": "-124,735 contracts",
+          "futures_price": "4125.78",
+          "cot_commercial_net": "-124,751 contracts",
           "cot_sentiment": "STRONG BULLISH",
           "open_interest": "4,510,558 contracts"
         },
         "options_market": {
-          "put_call_ratio": "0.76",
-          "gamma_exposure": "$+519.1M",
-          "max_pain": "4064.42",
+          "put_call_ratio": "0.73",
+          "gamma_exposure": "$+508.4M",
+          "max_pain": "4063.76",
           "implied_volatility": "15.9%"
         },
         "etf_flows": {
-          "gld_flow_daily": "$+53.6M",
+          "gld_flow_daily": "$+48.9M",
           "etf_positioning": "ACCUMULATING"
         },
         "sentiment_data": {
@@ -1264,7 +1264,7 @@
           "mine_production": "850 Tonnes (Global Q1)"
         },
         "ml_probabilistic": {
-          "monte_carlo_bull_paths": "59.3%",
+          "monte_carlo_bull_paths": "57.3%",
           "model_drift_index": "0.02 (STABLE)",
           "top_feature_importance": "1. US10Y (34%), 2. DXY (28%), 3. COT (15%)"
         }
@@ -1273,19 +1273,19 @@
         "microstructure": {
           "real_volume": "161,660 lots",
           "bid_ask_spread": "22.0 pips",
-          "order_book_imbalance": "+5.9%",
-          "delta_volume": "+9,499 lots",
-          "vwap": "162.3740"
+          "order_book_imbalance": "-1.2%",
+          "delta_volume": "-1,878 lots",
+          "vwap": "162.3780"
         },
         "futures_market": {
-          "futures_price": "162.3740",
-          "cot_commercial_net": "+45,393 contracts",
+          "futures_price": "162.3780",
+          "cot_commercial_net": "+45,395 contracts",
           "cot_sentiment": "BULLISH",
           "open_interest": "565,810 contracts"
         },
         "options_market": {
-          "put_call_ratio": "0.77",
-          "gamma_exposure": "$+467.4M",
+          "put_call_ratio": "0.78",
+          "gamma_exposure": "$+467.1M",
           "max_pain": "-",
           "implied_volatility": "14.9%"
         },
@@ -1302,7 +1302,7 @@
           "mine_production": "-"
         },
         "ml_probabilistic": {
-          "monte_carlo_bull_paths": "52.6%",
+          "monte_carlo_bull_paths": "51.6%",
           "model_drift_index": "0.02 (STABLE)",
           "top_feature_importance": "1. US10Y (34%), 2. DXY (28%), 3. COT (15%)"
         }
@@ -1310,20 +1310,20 @@
       "WTI OIL": {
         "microstructure": {
           "real_volume": "29,478 lots",
-          "bid_ask_spread": "0.12 USD",
-          "order_book_imbalance": "+3.9%",
-          "delta_volume": "+1,149 lots",
-          "vwap": "72.0700"
+          "bid_ask_spread": "0.11 USD",
+          "order_book_imbalance": "+2.8%",
+          "delta_volume": "+840 lots",
+          "vwap": "72.0800"
         },
         "futures_market": {
-          "futures_price": "72.0700",
-          "cot_commercial_net": "-48,241 contracts",
+          "futures_price": "72.0800",
+          "cot_commercial_net": "-48,227 contracts",
           "cot_sentiment": "BEARISH",
           "open_interest": "103,173 contracts"
         },
         "options_market": {
-          "put_call_ratio": "0.77",
-          "gamma_exposure": "$+455.2M",
+          "put_call_ratio": "0.80",
+          "gamma_exposure": "$+445.0M",
           "max_pain": "-",
           "implied_volatility": "14.4%"
         },
@@ -1340,7 +1340,7 @@
           "mine_production": "-"
         },
         "ml_probabilistic": {
-          "monte_carlo_bull_paths": "53.0%",
+          "monte_carlo_bull_paths": "46.4%",
           "model_drift_index": "0.02 (STABLE)",
           "top_feature_importance": "1. US10Y (34%), 2. DXY (28%), 3. COT (15%)"
         }
@@ -1349,19 +1349,19 @@
         "microstructure": {
           "real_volume": "93,713 lots",
           "bid_ask_spread": "1.3 pips",
-          "order_book_imbalance": "-3.6%",
-          "delta_volume": "-3,369 lots",
-          "vwap": "1.1415"
+          "order_book_imbalance": "+4.9%",
+          "delta_volume": "+4,578 lots",
+          "vwap": "1.1414"
         },
         "futures_market": {
-          "futures_price": "1.1415",
-          "cot_commercial_net": "+35,240 contracts",
+          "futures_price": "1.1414",
+          "cot_commercial_net": "+35,238 contracts",
           "cot_sentiment": "BULLISH",
           "open_interest": "327,996 contracts"
         },
         "options_market": {
           "put_call_ratio": "0.78",
-          "gamma_exposure": "$+457.4M",
+          "gamma_exposure": "$+453.9M",
           "max_pain": "-",
           "implied_volatility": "14.6%"
         },
@@ -1378,7 +1378,7 @@
           "mine_production": "-"
         },
         "ml_probabilistic": {
-          "monte_carlo_bull_paths": "50.6%",
+          "monte_carlo_bull_paths": "45.6%",
           "model_drift_index": "0.02 (STABLE)",
           "top_feature_importance": "1. US10Y (34%), 2. DXY (28%), 3. COT (15%)"
         }
@@ -1387,19 +1387,19 @@
         "microstructure": {
           "real_volume": "207,799 lots",
           "bid_ask_spread": "1.8 pips",
-          "order_book_imbalance": "+0.3%",
-          "delta_volume": "+610 lots",
-          "vwap": "1.3353"
+          "order_book_imbalance": "+3.4%",
+          "delta_volume": "+7,109 lots",
+          "vwap": "1.3354"
         },
         "futures_market": {
-          "futures_price": "1.3353",
-          "cot_commercial_net": "+35,202 contracts",
+          "futures_price": "1.3354",
+          "cot_commercial_net": "+35,205 contracts",
           "cot_sentiment": "BULLISH",
           "open_interest": "727,296 contracts"
         },
         "options_market": {
           "put_call_ratio": "0.77",
-          "gamma_exposure": "$+442.0M",
+          "gamma_exposure": "$+446.7M",
           "max_pain": "-",
           "implied_volatility": "14.5%"
         },
@@ -1416,7 +1416,7 @@
           "mine_production": "-"
         },
         "ml_probabilistic": {
-          "monte_carlo_bull_paths": "51.9%",
+          "monte_carlo_bull_paths": "45.5%",
           "model_drift_index": "0.02 (STABLE)",
           "top_feature_importance": "1. US10Y (34%), 2. DXY (28%), 3. COT (15%)"
         }
@@ -1424,352 +1424,90 @@
     }
   },
   "forecast_v32": {
-    "calculated_at": "2026-07-08 11:46:15",
+    "calculated_at": "2026-07-08 11:52:35",
     "assets": {
       "XAUUSD": {
         "D+1": {
-          "base_price": 4126.31,
+          "base_price": 4125.66,
           "ohlc": {
-            "open": "4126.31",
-            "high": "4133.81",
-            "low": "4117.77",
-            "close": "4125.27"
+            "open": "4125.66",
+            "high": "4143.16",
+            "low": "4118.16",
+            "close": "4135.66"
           },
           "expected_range_atr": "25.00",
           "error_band": "±8.75",
-          "probabilities": {
-            "bullish": 40,
-            "neutral": 20,
-            "bearish": 40
-          },
-          "confidence_intervals": {
-            "ci_80": "4122.15 - 4129.44",
-            "ci_95": "4115.15 - 4136.44"
-          },
-          "similarity": {
-            "overall_score": "92.2%",
-            "top_10": [
-              {
-                "date": "2023-02-04",
-                "similarity_score": "95.4%",
-                "outcome": "DOWN",
-                "close_delta": "-0.83"
-              },
-              {
-                "date": "2023-01-21",
-                "similarity_score": "93.9%",
-                "outcome": "DOWN",
-                "close_delta": "-3.00"
-              },
-              {
-                "date": "2023-01-07",
-                "similarity_score": "92.4%",
-                "outcome": "DOWN",
-                "close_delta": "-2.91"
-              },
-              {
-                "date": "2022-12-24",
-                "similarity_score": "91.0%",
-                "outcome": "DOWN",
-                "close_delta": "-0.22"
-              },
-              {
-                "date": "2022-12-10",
-                "similarity_score": "89.3%",
-                "outcome": "UP",
-                "close_delta": "+1.75"
-              },
-              {
-                "date": "2022-11-26",
-                "similarity_score": "87.9%",
-                "outcome": "DOWN",
-                "close_delta": "-1.75"
-              },
-              {
-                "date": "2022-11-12",
-                "similarity_score": "86.2%",
-                "outcome": "UP",
-                "close_delta": "+0.37"
-              },
-              {
-                "date": "2022-10-29",
-                "similarity_score": "84.9%",
-                "outcome": "DOWN",
-                "close_delta": "-1.31"
-              },
-              {
-                "date": "2022-10-15",
-                "similarity_score": "83.4%",
-                "outcome": "UP",
-                "close_delta": "+0.62"
-              },
-              {
-                "date": "2022-10-01",
-                "similarity_score": "81.9%",
-                "outcome": "DOWN",
-                "close_delta": "-0.89"
-              }
-            ]
-          },
-          "market_regime": "SIDEWAYS COMPRESSION",
-          "scores": {
-            "macro": 49,
-            "liquidity": 50,
-            "intermarket": 50,
-            "fundamental": 50
-          },
-          "indexes": {
-            "ici": 47,
-            "fqi": 49
-          },
-          "expected_drawdown": "-12.50",
-          "expected_rally": "+12.50",
-          "explainable_ai": [
-            {
-              "factor": "Yield Curve Inversion (spread < 0)",
-              "weight": "-15% impact"
-            },
-            {
-              "factor": "Fed Balance Sheet Expansion",
-              "weight": "+18% impact"
-            },
-            {
-              "factor": "Vector Similarity Match (94.2%)",
-              "weight": "+22% impact"
-            }
-          ],
-          "decision_gate": {
-            "status": "HOLD/WAIT",
-            "reason": "Low Institutional Confidence Index (<65%). Awaiting volume spike."
-          },
-          "scenarios": {
-            "bullish": {
-              "target": "4133.81",
-              "probability": "40%"
-            },
-            "neutral": {
-              "target": "4125.79",
-              "probability": "20%"
-            },
-            "bearish": {
-              "target": "4117.77",
-              "probability": "40%"
-            }
-          }
-        },
-        "W+1": {
-          "base_price": 4126.31,
-          "ohlc": {
-            "open": "4126.31",
-            "high": "4152.91",
-            "low": "4105.31",
-            "close": "4131.91"
-          },
-          "expected_range_atr": "70.00",
-          "error_band": "±31.50",
-          "probabilities": {
-            "bullish": 40,
-            "neutral": 20,
-            "bearish": 40
-          },
-          "confidence_intervals": {
-            "ci_80": "4121.06 - 4137.16",
-            "ci_95": "4095.86 - 4162.36"
-          },
-          "similarity": {
-            "overall_score": "93.6%",
-            "top_10": [
-              {
-                "date": "2025-06-22",
-                "similarity_score": "95.3%",
-                "outcome": "UP",
-                "close_delta": "+10.73"
-              },
-              {
-                "date": "2025-06-08",
-                "similarity_score": "93.6%",
-                "outcome": "UP",
-                "close_delta": "+2.03"
-              },
-              {
-                "date": "2025-05-25",
-                "similarity_score": "92.3%",
-                "outcome": "UP",
-                "close_delta": "+6.42"
-              },
-              {
-                "date": "2025-05-11",
-                "similarity_score": "90.9%",
-                "outcome": "UP",
-                "close_delta": "+9.35"
-              },
-              {
-                "date": "2025-04-27",
-                "similarity_score": "89.4%",
-                "outcome": "UP",
-                "close_delta": "+8.20"
-              },
-              {
-                "date": "2025-04-13",
-                "similarity_score": "87.6%",
-                "outcome": "DOWN",
-                "close_delta": "-1.30"
-              },
-              {
-                "date": "2025-03-30",
-                "similarity_score": "86.5%",
-                "outcome": "UP",
-                "close_delta": "+2.37"
-              },
-              {
-                "date": "2025-03-16",
-                "similarity_score": "84.9%",
-                "outcome": "UP",
-                "close_delta": "+5.56"
-              },
-              {
-                "date": "2025-03-02",
-                "similarity_score": "83.4%",
-                "outcome": "DOWN",
-                "close_delta": "-5.51"
-              },
-              {
-                "date": "2025-02-16",
-                "similarity_score": "81.9%",
-                "outcome": "UP",
-                "close_delta": "+4.62"
-              }
-            ]
-          },
-          "market_regime": "SIDEWAYS COMPRESSION",
-          "scores": {
-            "macro": 49,
-            "liquidity": 50,
-            "intermarket": 50,
-            "fundamental": 50
-          },
-          "indexes": {
-            "ici": 47,
-            "fqi": 49
-          },
-          "expected_drawdown": "-35.00",
-          "expected_rally": "+35.00",
-          "explainable_ai": [
-            {
-              "factor": "Yield Curve Inversion (spread < 0)",
-              "weight": "-15% impact"
-            },
-            {
-              "factor": "Fed Balance Sheet Expansion",
-              "weight": "+18% impact"
-            },
-            {
-              "factor": "Vector Similarity Match (94.2%)",
-              "weight": "+22% impact"
-            }
-          ],
-          "decision_gate": {
-            "status": "HOLD/WAIT",
-            "reason": "Low Institutional Confidence Index (<65%). Awaiting volume spike."
-          },
-          "scenarios": {
-            "bullish": {
-              "target": "4152.91",
-              "probability": "40%"
-            },
-            "neutral": {
-              "target": "4129.11",
-              "probability": "20%"
-            },
-            "bearish": {
-              "target": "4105.31",
-              "probability": "40%"
-            }
-          }
-        }
-      },
-      "USDJPY": {
-        "D+1": {
-          "base_price": 162.374,
-          "ohlc": {
-            "open": "162.3740",
-            "high": "163.2140",
-            "low": "162.0140",
-            "close": "162.8540"
-          },
-          "expected_range_atr": "1.2000",
-          "error_band": "±0.4200",
           "probabilities": {
             "bullish": 66,
             "neutral": 15,
             "bearish": 34
           },
           "confidence_intervals": {
-            "ci_80": "162.2240 - 163.0040",
-            "ci_95": "161.8880 - 163.3400"
+            "ci_80": "4122.53 - 4138.78",
+            "ci_95": "4115.53 - 4145.78"
           },
           "similarity": {
-            "overall_score": "94.1%",
+            "overall_score": "93.7%",
             "top_10": [
               {
-                "date": "2023-07-15",
-                "similarity_score": "95.2%",
+                "date": "2022-11-05",
+                "similarity_score": "95.1%",
                 "outcome": "UP",
-                "close_delta": "+0.5506"
+                "close_delta": "+10.50"
               },
               {
-                "date": "2023-07-01",
-                "similarity_score": "93.9%",
+                "date": "2022-10-22",
+                "similarity_score": "93.8%",
                 "outcome": "UP",
-                "close_delta": "+0.3653"
+                "close_delta": "+6.71"
               },
               {
-                "date": "2023-06-17",
-                "similarity_score": "92.5%",
+                "date": "2022-10-08",
+                "similarity_score": "92.4%",
                 "outcome": "UP",
-                "close_delta": "+0.4562"
+                "close_delta": "+10.27"
               },
               {
-                "date": "2023-06-03",
+                "date": "2022-09-24",
                 "similarity_score": "90.7%",
                 "outcome": "UP",
-                "close_delta": "+0.4406"
+                "close_delta": "+7.78"
               },
               {
-                "date": "2023-05-20",
-                "similarity_score": "89.4%",
+                "date": "2022-09-10",
+                "similarity_score": "89.1%",
                 "outcome": "UP",
-                "close_delta": "+0.3733"
+                "close_delta": "+3.81"
               },
               {
-                "date": "2023-05-06",
-                "similarity_score": "87.7%",
+                "date": "2022-08-27",
+                "similarity_score": "87.8%",
                 "outcome": "UP",
-                "close_delta": "+0.1255"
+                "close_delta": "+3.70"
               },
               {
-                "date": "2023-04-22",
+                "date": "2022-08-13",
                 "similarity_score": "86.1%",
                 "outcome": "UP",
-                "close_delta": "+0.1013"
+                "close_delta": "+5.97"
               },
               {
-                "date": "2023-04-08",
-                "similarity_score": "84.9%",
+                "date": "2022-07-30",
+                "similarity_score": "85.0%",
                 "outcome": "UP",
-                "close_delta": "+0.0578"
+                "close_delta": "+4.36"
               },
               {
-                "date": "2023-03-25",
-                "similarity_score": "83.0%",
+                "date": "2022-07-16",
+                "similarity_score": "83.2%",
                 "outcome": "UP",
-                "close_delta": "+0.1627"
+                "close_delta": "+1.39"
               },
               {
-                "date": "2023-03-11",
-                "similarity_score": "82.0%",
+                "date": "2022-07-02",
+                "similarity_score": "81.9%",
                 "outcome": "UP",
-                "close_delta": "+0.1070"
+                "close_delta": "+3.43"
               }
             ]
           },
@@ -1781,8 +1519,270 @@
             "fundamental": 59
           },
           "indexes": {
-            "ici": 50,
-            "fqi": 52
+            "ici": 55,
+            "fqi": 57
+          },
+          "expected_drawdown": "-7.50",
+          "expected_rally": "+17.50",
+          "explainable_ai": [
+            {
+              "factor": "Yield Curve Inversion (spread < 0)",
+              "weight": "-15% impact"
+            },
+            {
+              "factor": "Fed Balance Sheet Expansion",
+              "weight": "+18% impact"
+            },
+            {
+              "factor": "Vector Similarity Match (94.2%)",
+              "weight": "+22% impact"
+            }
+          ],
+          "decision_gate": {
+            "status": "HOLD/WAIT",
+            "reason": "Low Institutional Confidence Index (<65%). Awaiting volume spike."
+          },
+          "scenarios": {
+            "bullish": {
+              "target": "4143.16",
+              "probability": "66%"
+            },
+            "neutral": {
+              "target": "4130.66",
+              "probability": "15%"
+            },
+            "bearish": {
+              "target": "4118.16",
+              "probability": "34%"
+            }
+          }
+        },
+        "W+1": {
+          "base_price": 4125.66,
+          "ohlc": {
+            "open": "4125.66",
+            "high": "4174.66",
+            "low": "4104.66",
+            "close": "4153.66"
+          },
+          "expected_range_atr": "70.00",
+          "error_band": "±31.50",
+          "probabilities": {
+            "bullish": 66,
+            "neutral": 15,
+            "bearish": 34
+          },
+          "confidence_intervals": {
+            "ci_80": "4120.41 - 4158.91",
+            "ci_95": "4095.21 - 4184.11"
+          },
+          "similarity": {
+            "overall_score": "92.6%",
+            "top_10": [
+              {
+                "date": "2024-08-03",
+                "similarity_score": "95.2%",
+                "outcome": "UP",
+                "close_delta": "+28.65"
+              },
+              {
+                "date": "2024-07-20",
+                "similarity_score": "93.6%",
+                "outcome": "UP",
+                "close_delta": "+27.08"
+              },
+              {
+                "date": "2024-07-06",
+                "similarity_score": "92.2%",
+                "outcome": "UP",
+                "close_delta": "+28.55"
+              },
+              {
+                "date": "2024-06-22",
+                "similarity_score": "90.5%",
+                "outcome": "UP",
+                "close_delta": "+13.27"
+              },
+              {
+                "date": "2024-06-08",
+                "similarity_score": "89.5%",
+                "outcome": "UP",
+                "close_delta": "+16.47"
+              },
+              {
+                "date": "2024-05-25",
+                "similarity_score": "87.9%",
+                "outcome": "UP",
+                "close_delta": "+12.63"
+              },
+              {
+                "date": "2024-05-11",
+                "similarity_score": "86.5%",
+                "outcome": "UP",
+                "close_delta": "+14.48"
+              },
+              {
+                "date": "2024-04-27",
+                "similarity_score": "84.6%",
+                "outcome": "UP",
+                "close_delta": "+9.22"
+              },
+              {
+                "date": "2024-04-13",
+                "similarity_score": "83.3%",
+                "outcome": "UP",
+                "close_delta": "+5.33"
+              },
+              {
+                "date": "2024-03-30",
+                "similarity_score": "81.6%",
+                "outcome": "DOWN",
+                "close_delta": "-2.24"
+              }
+            ]
+          },
+          "market_regime": "TRENDING BULLISH (NORMAL VOLATILITY)",
+          "scores": {
+            "macro": 49,
+            "liquidity": 58,
+            "intermarket": 56,
+            "fundamental": 59
+          },
+          "indexes": {
+            "ici": 55,
+            "fqi": 57
+          },
+          "expected_drawdown": "-21.00",
+          "expected_rally": "+49.00",
+          "explainable_ai": [
+            {
+              "factor": "Yield Curve Inversion (spread < 0)",
+              "weight": "-15% impact"
+            },
+            {
+              "factor": "Fed Balance Sheet Expansion",
+              "weight": "+18% impact"
+            },
+            {
+              "factor": "Vector Similarity Match (94.2%)",
+              "weight": "+22% impact"
+            }
+          ],
+          "decision_gate": {
+            "status": "HOLD/WAIT",
+            "reason": "Low Institutional Confidence Index (<65%). Awaiting volume spike."
+          },
+          "scenarios": {
+            "bullish": {
+              "target": "4174.66",
+              "probability": "66%"
+            },
+            "neutral": {
+              "target": "4139.66",
+              "probability": "15%"
+            },
+            "bearish": {
+              "target": "4104.66",
+              "probability": "34%"
+            }
+          }
+        }
+      },
+      "USDJPY": {
+        "D+1": {
+          "base_price": 162.378,
+          "ohlc": {
+            "open": "162.3780",
+            "high": "163.2180",
+            "low": "162.0180",
+            "close": "162.8580"
+          },
+          "expected_range_atr": "1.2000",
+          "error_band": "±0.4200",
+          "probabilities": {
+            "bullish": 83,
+            "neutral": 15,
+            "bearish": 17
+          },
+          "confidence_intervals": {
+            "ci_80": "162.2280 - 163.0080",
+            "ci_95": "161.8920 - 163.3440"
+          },
+          "similarity": {
+            "overall_score": "93.8%",
+            "top_10": [
+              {
+                "date": "2024-03-02",
+                "similarity_score": "95.0%",
+                "outcome": "UP",
+                "close_delta": "+0.5097"
+              },
+              {
+                "date": "2024-02-17",
+                "similarity_score": "94.0%",
+                "outcome": "UP",
+                "close_delta": "+0.4579"
+              },
+              {
+                "date": "2024-02-03",
+                "similarity_score": "92.2%",
+                "outcome": "UP",
+                "close_delta": "+0.2663"
+              },
+              {
+                "date": "2024-01-20",
+                "similarity_score": "90.9%",
+                "outcome": "UP",
+                "close_delta": "+0.3308"
+              },
+              {
+                "date": "2024-01-06",
+                "similarity_score": "89.2%",
+                "outcome": "UP",
+                "close_delta": "+0.2973"
+              },
+              {
+                "date": "2023-12-23",
+                "similarity_score": "87.5%",
+                "outcome": "UP",
+                "close_delta": "+0.2911"
+              },
+              {
+                "date": "2023-12-09",
+                "similarity_score": "86.3%",
+                "outcome": "UP",
+                "close_delta": "+0.3085"
+              },
+              {
+                "date": "2023-11-25",
+                "similarity_score": "84.9%",
+                "outcome": "UP",
+                "close_delta": "+0.2040"
+              },
+              {
+                "date": "2023-11-11",
+                "similarity_score": "83.2%",
+                "outcome": "UP",
+                "close_delta": "+0.1846"
+              },
+              {
+                "date": "2023-10-28",
+                "similarity_score": "82.0%",
+                "outcome": "UP",
+                "close_delta": "+0.1639"
+              }
+            ]
+          },
+          "market_regime": "TRENDING BULLISH (NORMAL VOLATILITY)",
+          "scores": {
+            "macro": 49,
+            "liquidity": 66,
+            "intermarket": 63,
+            "fundamental": 69
+          },
+          "indexes": {
+            "ici": 66,
+            "fqi": 69
           },
           "expected_drawdown": "-0.3600",
           "expected_rally": "+0.8400",
@@ -1801,118 +1801,118 @@
             }
           ],
           "decision_gate": {
-            "status": "HOLD/WAIT",
-            "reason": "Low Institutional Confidence Index (<65%). Awaiting volume spike."
+            "status": "APPROVED",
+            "reason": "Data quality validation passed, Institutional Confidence exceeds 65% threshold."
           },
           "scenarios": {
             "bullish": {
-              "target": "163.2140",
-              "probability": "66%"
+              "target": "163.2180",
+              "probability": "83%"
             },
             "neutral": {
-              "target": "162.6140",
+              "target": "162.6180",
               "probability": "15%"
             },
             "bearish": {
-              "target": "162.0140",
-              "probability": "34%"
+              "target": "162.0180",
+              "probability": "17%"
             }
           }
         },
         "W+1": {
-          "base_price": 162.374,
+          "base_price": 162.378,
           "ohlc": {
-            "open": "162.3740",
-            "high": "164.7260",
-            "low": "161.3660",
-            "close": "163.7180"
+            "open": "162.3780",
+            "high": "164.7300",
+            "low": "161.3700",
+            "close": "163.7220"
           },
           "expected_range_atr": "3.3600",
           "error_band": "±1.5120",
           "probabilities": {
-            "bullish": 66,
+            "bullish": 83,
             "neutral": 15,
-            "bearish": 34
+            "bearish": 17
           },
           "confidence_intervals": {
-            "ci_80": "162.1220 - 163.9700",
-            "ci_95": "160.9124 - 165.1796"
+            "ci_80": "162.1260 - 163.9740",
+            "ci_95": "160.9164 - 165.1836"
           },
           "similarity": {
-            "overall_score": "93.8%",
+            "overall_score": "93.5%",
             "top_10": [
               {
-                "date": "2025-11-27",
-                "similarity_score": "95.4%",
+                "date": "2025-11-02",
+                "similarity_score": "95.1%",
                 "outcome": "UP",
-                "close_delta": "+1.3245"
+                "close_delta": "+1.6534"
               },
               {
-                "date": "2025-11-13",
+                "date": "2025-10-19",
                 "similarity_score": "93.9%",
                 "outcome": "UP",
-                "close_delta": "+1.1010"
+                "close_delta": "+1.2371"
               },
               {
-                "date": "2025-10-30",
+                "date": "2025-10-05",
                 "similarity_score": "92.2%",
                 "outcome": "UP",
-                "close_delta": "+1.0839"
+                "close_delta": "+0.9431"
               },
               {
-                "date": "2025-10-16",
-                "similarity_score": "90.7%",
+                "date": "2025-09-21",
+                "similarity_score": "90.6%",
                 "outcome": "UP",
-                "close_delta": "+1.2353"
+                "close_delta": "+1.2368"
               },
               {
-                "date": "2025-10-02",
-                "similarity_score": "89.3%",
+                "date": "2025-09-07",
+                "similarity_score": "89.2%",
                 "outcome": "UP",
-                "close_delta": "+0.8959"
+                "close_delta": "+0.5750"
               },
               {
-                "date": "2025-09-18",
+                "date": "2025-08-24",
                 "similarity_score": "87.8%",
                 "outcome": "UP",
-                "close_delta": "+0.6113"
+                "close_delta": "+0.4160"
               },
               {
-                "date": "2025-09-04",
+                "date": "2025-08-10",
                 "similarity_score": "86.1%",
                 "outcome": "UP",
-                "close_delta": "+0.6384"
+                "close_delta": "+0.4652"
               },
               {
-                "date": "2025-08-21",
-                "similarity_score": "84.6%",
+                "date": "2025-07-27",
+                "similarity_score": "84.9%",
                 "outcome": "UP",
-                "close_delta": "+0.4199"
+                "close_delta": "+0.5383"
               },
               {
-                "date": "2025-08-07",
-                "similarity_score": "83.2%",
+                "date": "2025-07-13",
+                "similarity_score": "83.3%",
                 "outcome": "UP",
-                "close_delta": "+0.0827"
+                "close_delta": "+0.3767"
               },
               {
-                "date": "2025-07-24",
+                "date": "2025-06-29",
                 "similarity_score": "81.8%",
                 "outcome": "UP",
-                "close_delta": "+0.2672"
+                "close_delta": "+0.0254"
               }
             ]
           },
           "market_regime": "TRENDING BULLISH (NORMAL VOLATILITY)",
           "scores": {
             "macro": 49,
-            "liquidity": 58,
-            "intermarket": 56,
-            "fundamental": 59
+            "liquidity": 66,
+            "intermarket": 63,
+            "fundamental": 69
           },
           "indexes": {
-            "ici": 58,
-            "fqi": 60
+            "ici": 60,
+            "fqi": 63
           },
           "expected_drawdown": "-1.0080",
           "expected_rally": "+2.3520",
@@ -1936,28 +1936,28 @@
           },
           "scenarios": {
             "bullish": {
-              "target": "164.7260",
-              "probability": "66%"
+              "target": "164.7300",
+              "probability": "83%"
             },
             "neutral": {
-              "target": "163.0460",
+              "target": "163.0500",
               "probability": "15%"
             },
             "bearish": {
-              "target": "161.3660",
-              "probability": "34%"
+              "target": "161.3700",
+              "probability": "17%"
             }
           }
         }
       },
       "WTI OIL": {
         "D+1": {
-          "base_price": 72.07,
+          "base_price": 72.08,
           "ohlc": {
-            "open": "72.0700",
-            "high": "72.6908",
-            "low": "71.5300",
-            "close": "72.1508"
+            "open": "72.0800",
+            "high": "72.6200",
+            "low": "71.5210",
+            "close": "72.0610"
           },
           "expected_range_atr": "1.8000",
           "error_band": "±0.6300",
@@ -1967,71 +1967,71 @@
             "bearish": 40
           },
           "confidence_intervals": {
-            "ci_80": "71.8450 - 72.3758",
-            "ci_95": "71.3410 - 72.8798"
+            "ci_80": "71.8360 - 72.3050",
+            "ci_95": "71.3320 - 72.8090"
           },
           "similarity": {
-            "overall_score": "93.0%",
+            "overall_score": "93.3%",
             "top_10": [
               {
-                "date": "2023-10-01",
-                "similarity_score": "95.1%",
+                "date": "2025-10-24",
+                "similarity_score": "95.0%",
                 "outcome": "UP",
-                "close_delta": "+0.0750"
+                "close_delta": "+0.0232"
               },
               {
-                "date": "2023-09-17",
-                "similarity_score": "93.9%",
-                "outcome": "UP",
-                "close_delta": "+0.1337"
+                "date": "2025-10-10",
+                "similarity_score": "93.6%",
+                "outcome": "DOWN",
+                "close_delta": "-0.0721"
               },
               {
-                "date": "2023-09-03",
+                "date": "2025-09-26",
                 "similarity_score": "92.1%",
-                "outcome": "UP",
-                "close_delta": "+0.1502"
-              },
-              {
-                "date": "2023-08-20",
-                "similarity_score": "90.7%",
-                "outcome": "UP",
-                "close_delta": "+0.1294"
-              },
-              {
-                "date": "2023-08-06",
-                "similarity_score": "89.3%",
-                "outcome": "UP",
-                "close_delta": "+0.0308"
-              },
-              {
-                "date": "2023-07-23",
-                "similarity_score": "87.8%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0775"
+                "close_delta": "-0.0869"
               },
               {
-                "date": "2023-07-09",
-                "similarity_score": "86.3%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0414"
+                "date": "2025-09-12",
+                "similarity_score": "91.0%",
+                "outcome": "UP",
+                "close_delta": "+0.1097"
               },
               {
-                "date": "2023-06-25",
+                "date": "2025-08-29",
+                "similarity_score": "89.5%",
+                "outcome": "UP",
+                "close_delta": "+0.1538"
+              },
+              {
+                "date": "2025-08-15",
+                "similarity_score": "87.6%",
+                "outcome": "UP",
+                "close_delta": "+0.0379"
+              },
+              {
+                "date": "2025-08-01",
+                "similarity_score": "86.4%",
+                "outcome": "UP",
+                "close_delta": "+0.1238"
+              },
+              {
+                "date": "2025-07-18",
                 "similarity_score": "84.9%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0934"
+                "close_delta": "-0.0748"
               },
               {
-                "date": "2023-06-11",
-                "similarity_score": "83.2%",
-                "outcome": "UP",
-                "close_delta": "+0.1651"
+                "date": "2025-07-04",
+                "similarity_score": "83.3%",
+                "outcome": "DOWN",
+                "close_delta": "-0.0457"
               },
               {
-                "date": "2023-05-28",
-                "similarity_score": "81.5%",
-                "outcome": "UP",
-                "close_delta": "+0.1415"
+                "date": "2025-06-20",
+                "similarity_score": "81.8%",
+                "outcome": "DOWN",
+                "close_delta": "-0.0591"
               }
             ]
           },
@@ -2068,26 +2068,26 @@
           },
           "scenarios": {
             "bullish": {
-              "target": "72.6908",
+              "target": "72.6200",
               "probability": "40%"
             },
             "neutral": {
-              "target": "72.1104",
+              "target": "72.0705",
               "probability": "20%"
             },
             "bearish": {
-              "target": "71.5300",
+              "target": "71.5210",
               "probability": "40%"
             }
           }
         },
         "W+1": {
-          "base_price": 72.07,
+          "base_price": 72.08,
           "ohlc": {
-            "open": "72.0700",
-            "high": "73.5820",
-            "low": "70.0740",
-            "close": "71.5860"
+            "open": "72.0800",
+            "high": "73.5920",
+            "low": "70.4914",
+            "close": "72.0034"
           },
           "expected_range_atr": "5.0400",
           "error_band": "±2.2680",
@@ -2097,71 +2097,71 @@
             "bearish": 40
           },
           "confidence_intervals": {
-            "ci_80": "71.2080 - 72.4480",
-            "ci_95": "69.3936 - 74.2624"
+            "ci_80": "71.6254 - 72.4580",
+            "ci_95": "69.8110 - 74.2724"
           },
           "similarity": {
-            "overall_score": "93.9%",
+            "overall_score": "92.5%",
             "top_10": [
               {
-                "date": "2023-02-17",
+                "date": "2022-09-19",
                 "similarity_score": "95.1%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0722"
+                "close_delta": "-0.3183"
               },
               {
-                "date": "2023-02-03",
-                "similarity_score": "93.9%",
-                "outcome": "DOWN",
-                "close_delta": "-0.8296"
-              },
-              {
-                "date": "2023-01-20",
-                "similarity_score": "92.0%",
-                "outcome": "DOWN",
-                "close_delta": "-0.6875"
-              },
-              {
-                "date": "2023-01-06",
-                "similarity_score": "90.8%",
-                "outcome": "DOWN",
-                "close_delta": "-0.2321"
-              },
-              {
-                "date": "2022-12-23",
-                "similarity_score": "89.5%",
-                "outcome": "DOWN",
-                "close_delta": "-0.5975"
-              },
-              {
-                "date": "2022-12-09",
-                "similarity_score": "87.7%",
-                "outcome": "DOWN",
-                "close_delta": "-0.5878"
-              },
-              {
-                "date": "2022-11-25",
-                "similarity_score": "86.5%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0099"
-              },
-              {
-                "date": "2022-11-11",
-                "similarity_score": "84.7%",
+                "date": "2022-09-05",
+                "similarity_score": "93.8%",
                 "outcome": "UP",
-                "close_delta": "+0.1724"
+                "close_delta": "+0.3736"
               },
               {
-                "date": "2022-10-28",
-                "similarity_score": "83.5%",
+                "date": "2022-08-22",
+                "similarity_score": "92.3%",
                 "outcome": "DOWN",
-                "close_delta": "-0.1330"
+                "close_delta": "-0.3336"
               },
               {
-                "date": "2022-10-14",
-                "similarity_score": "81.8%",
+                "date": "2022-08-08",
+                "similarity_score": "91.0%",
+                "outcome": "DOWN",
+                "close_delta": "-0.0471"
+              },
+              {
+                "date": "2022-07-25",
+                "similarity_score": "89.3%",
+                "outcome": "DOWN",
+                "close_delta": "-0.2381"
+              },
+              {
+                "date": "2022-07-11",
+                "similarity_score": "87.5%",
                 "outcome": "UP",
-                "close_delta": "+0.3888"
+                "close_delta": "+0.2308"
+              },
+              {
+                "date": "2022-06-27",
+                "similarity_score": "86.1%",
+                "outcome": "UP",
+                "close_delta": "+0.3721"
+              },
+              {
+                "date": "2022-06-13",
+                "similarity_score": "84.9%",
+                "outcome": "DOWN",
+                "close_delta": "-0.0156"
+              },
+              {
+                "date": "2022-05-30",
+                "similarity_score": "83.0%",
+                "outcome": "UP",
+                "close_delta": "+0.1466"
+              },
+              {
+                "date": "2022-05-16",
+                "similarity_score": "81.6%",
+                "outcome": "UP",
+                "close_delta": "+0.4733"
               }
             ]
           },
@@ -2173,8 +2173,8 @@
             "fundamental": 50
           },
           "indexes": {
-            "ici": 45,
-            "fqi": 47
+            "ici": 47,
+            "fqi": 49
           },
           "expected_drawdown": "-2.5200",
           "expected_rally": "+2.5200",
@@ -2198,15 +2198,15 @@
           },
           "scenarios": {
             "bullish": {
-              "target": "73.5820",
+              "target": "73.5920",
               "probability": "40%"
             },
             "neutral": {
-              "target": "71.8280",
+              "target": "72.0417",
               "probability": "20%"
             },
             "bearish": {
-              "target": "70.0740",
+              "target": "70.4914",
               "probability": "40%"
             }
           }
@@ -2214,102 +2214,102 @@
       },
       "EURUSD": {
         "D+1": {
-          "base_price": 1.14146,
+          "base_price": 1.14143,
           "ohlc": {
-            "open": "1.1415",
-            "high": "1.1436",
-            "low": "1.1366",
-            "close": "1.1387"
+            "open": "1.1414",
+            "high": "1.1435",
+            "low": "1.1391",
+            "close": "1.1412"
           },
           "expected_range_atr": "0.0070",
           "error_band": "±0.0024",
           "probabilities": {
-            "bullish": 33,
-            "neutral": 15,
-            "bearish": 67
+            "bullish": 40,
+            "neutral": 20,
+            "bearish": 40
           },
           "confidence_intervals": {
-            "ci_80": "1.1378 - 1.1423",
-            "ci_95": "1.1358 - 1.1443"
+            "ci_80": "1.1403 - 1.1423",
+            "ci_95": "1.1384 - 1.1443"
           },
           "similarity": {
-            "overall_score": "93.7%",
+            "overall_score": "93.3%",
             "top_10": [
               {
-                "date": "2024-02-27",
-                "similarity_score": "95.1%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0030"
+                "date": "2025-10-30",
+                "similarity_score": "95.2%",
+                "outcome": "UP",
+                "close_delta": "+0.0002"
               },
               {
-                "date": "2024-02-13",
-                "similarity_score": "93.8%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0022"
+                "date": "2025-10-16",
+                "similarity_score": "93.5%",
+                "outcome": "UP",
+                "close_delta": "+0.0004"
               },
               {
-                "date": "2024-01-30",
-                "similarity_score": "92.3%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0023"
-              },
-              {
-                "date": "2024-01-16",
-                "similarity_score": "90.5%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0026"
-              },
-              {
-                "date": "2024-01-02",
-                "similarity_score": "89.5%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0011"
-              },
-              {
-                "date": "2023-12-19",
-                "similarity_score": "87.6%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0008"
-              },
-              {
-                "date": "2023-12-05",
-                "similarity_score": "86.0%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0015"
-              },
-              {
-                "date": "2023-11-21",
-                "similarity_score": "84.6%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0003"
-              },
-              {
-                "date": "2023-11-07",
-                "similarity_score": "83.3%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0003"
-              },
-              {
-                "date": "2023-10-24",
-                "similarity_score": "81.8%",
+                "date": "2025-10-02",
+                "similarity_score": "92.0%",
                 "outcome": "DOWN",
                 "close_delta": "-0.0004"
+              },
+              {
+                "date": "2025-09-18",
+                "similarity_score": "91.0%",
+                "outcome": "DOWN",
+                "close_delta": "-0.0001"
+              },
+              {
+                "date": "2025-09-04",
+                "similarity_score": "89.0%",
+                "outcome": "UP",
+                "close_delta": "+0.0002"
+              },
+              {
+                "date": "2025-08-21",
+                "similarity_score": "87.6%",
+                "outcome": "DOWN",
+                "close_delta": "-0.0002"
+              },
+              {
+                "date": "2025-08-07",
+                "similarity_score": "86.0%",
+                "outcome": "DOWN",
+                "close_delta": "-0.0005"
+              },
+              {
+                "date": "2025-07-24",
+                "similarity_score": "84.6%",
+                "outcome": "UP",
+                "close_delta": "+0.0002"
+              },
+              {
+                "date": "2025-07-10",
+                "similarity_score": "83.0%",
+                "outcome": "UP",
+                "close_delta": "+0.0004"
+              },
+              {
+                "date": "2025-06-26",
+                "similarity_score": "81.5%",
+                "outcome": "UP",
+                "close_delta": "+0.0006"
               }
             ]
           },
-          "market_regime": "TRENDING BEARISH (NORMAL VOLATILITY)",
+          "market_regime": "SIDEWAYS COMPRESSION",
           "scores": {
             "macro": 49,
-            "liquidity": 42,
-            "intermarket": 44,
-            "fundamental": 40
+            "liquidity": 50,
+            "intermarket": 50,
+            "fundamental": 50
           },
           "indexes": {
-            "ici": 43,
-            "fqi": 45
+            "ici": 54,
+            "fqi": 56
           },
-          "expected_drawdown": "-0.0049",
-          "expected_rally": "+0.0021",
+          "expected_drawdown": "-0.0035",
+          "expected_rally": "+0.0035",
           "explainable_ai": [
             {
               "factor": "Yield Curve Inversion (spread < 0)",
@@ -2330,116 +2330,116 @@
           },
           "scenarios": {
             "bullish": {
-              "target": "1.1436",
-              "probability": "33%"
+              "target": "1.1435",
+              "probability": "40%"
             },
             "neutral": {
-              "target": "1.1401",
-              "probability": "15%"
+              "target": "1.1413",
+              "probability": "20%"
             },
             "bearish": {
-              "target": "1.1366",
-              "probability": "67%"
+              "target": "1.1391",
+              "probability": "40%"
             }
           }
         },
         "W+1": {
-          "base_price": 1.14146,
+          "base_price": 1.14143,
           "ohlc": {
-            "open": "1.1415",
+            "open": "1.1414",
             "high": "1.1473",
-            "low": "1.1277",
-            "close": "1.1336"
+            "low": "1.1351",
+            "close": "1.1410"
           },
           "expected_range_atr": "0.0196",
           "error_band": "±0.0088",
           "probabilities": {
-            "bullish": 33,
-            "neutral": 15,
-            "bearish": 67
+            "bullish": 40,
+            "neutral": 20,
+            "bearish": 40
           },
           "confidence_intervals": {
-            "ci_80": "1.1321 - 1.1429",
-            "ci_95": "1.1251 - 1.1500"
+            "ci_80": "1.1395 - 1.1429",
+            "ci_95": "1.1325 - 1.1500"
           },
           "similarity": {
-            "overall_score": "93.8%",
+            "overall_score": "94.1%",
             "top_10": [
               {
-                "date": "2024-11-03",
-                "similarity_score": "95.0%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0061"
+                "date": "2024-01-12",
+                "similarity_score": "95.1%",
+                "outcome": "UP",
+                "close_delta": "+0.0007"
               },
               {
-                "date": "2024-10-20",
-                "similarity_score": "94.0%",
+                "date": "2023-12-29",
+                "similarity_score": "93.7%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0079"
+                "close_delta": "-0.0023"
               },
               {
-                "date": "2024-10-06",
-                "similarity_score": "92.1%",
+                "date": "2023-12-15",
+                "similarity_score": "92.4%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0050"
+                "close_delta": "-0.0005"
               },
               {
-                "date": "2024-09-22",
-                "similarity_score": "90.6%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0041"
+                "date": "2023-12-01",
+                "similarity_score": "90.8%",
+                "outcome": "UP",
+                "close_delta": "+0.0012"
               },
               {
-                "date": "2024-09-08",
-                "similarity_score": "89.5%",
+                "date": "2023-11-17",
+                "similarity_score": "89.1%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0063"
+                "close_delta": "-0.0009"
               },
               {
-                "date": "2024-08-25",
-                "similarity_score": "87.6%",
+                "date": "2023-11-03",
+                "similarity_score": "87.8%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0036"
+                "close_delta": "-0.0013"
               },
               {
-                "date": "2024-08-11",
+                "date": "2023-10-20",
                 "similarity_score": "86.1%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0018"
+                "close_delta": "-0.0011"
               },
               {
-                "date": "2024-07-28",
-                "similarity_score": "84.7%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0025"
+                "date": "2023-10-06",
+                "similarity_score": "85.0%",
+                "outcome": "UP",
+                "close_delta": "+0.0018"
               },
               {
-                "date": "2024-07-14",
+                "date": "2023-09-22",
                 "similarity_score": "83.3%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0020"
+                "outcome": "UP",
+                "close_delta": "+0.0013"
               },
               {
-                "date": "2024-06-30",
+                "date": "2023-09-08",
                 "similarity_score": "81.8%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0008"
+                "close_delta": "-0.0006"
               }
             ]
           },
-          "market_regime": "TRENDING BEARISH (NORMAL VOLATILITY)",
+          "market_regime": "SIDEWAYS COMPRESSION",
           "scores": {
             "macro": 49,
-            "liquidity": 42,
-            "intermarket": 44,
-            "fundamental": 40
+            "liquidity": 50,
+            "intermarket": 50,
+            "fundamental": 50
           },
           "indexes": {
-            "ici": 41,
-            "fqi": 43
+            "ici": 48,
+            "fqi": 50
           },
-          "expected_drawdown": "-0.0137",
-          "expected_rally": "+0.0059",
+          "expected_drawdown": "-0.0098",
+          "expected_rally": "+0.0098",
           "explainable_ai": [
             {
               "factor": "Yield Curve Inversion (spread < 0)",
@@ -2461,117 +2461,117 @@
           "scenarios": {
             "bullish": {
               "target": "1.1473",
-              "probability": "33%"
+              "probability": "40%"
             },
             "neutral": {
-              "target": "1.1375",
-              "probability": "15%"
+              "target": "1.1412",
+              "probability": "20%"
             },
             "bearish": {
-              "target": "1.1277",
-              "probability": "67%"
+              "target": "1.1351",
+              "probability": "40%"
             }
           }
         }
       },
       "GBPUSD": {
         "D+1": {
-          "base_price": 1.33531,
+          "base_price": 1.33535,
           "ohlc": {
-            "open": "1.3353",
+            "open": "1.3354",
             "high": "1.3380",
-            "low": "1.3290",
-            "close": "1.3317"
+            "low": "1.3320",
+            "close": "1.3347"
           },
           "expected_range_atr": "0.0090",
           "error_band": "±0.0031",
           "probabilities": {
-            "bullish": 33,
-            "neutral": 15,
-            "bearish": 67
+            "bullish": 40,
+            "neutral": 20,
+            "bearish": 40
           },
           "confidence_intervals": {
-            "ci_80": "1.3306 - 1.3364",
-            "ci_95": "1.3281 - 1.3390"
+            "ci_80": "1.3335 - 1.3365",
+            "ci_95": "1.3310 - 1.3390"
           },
           "similarity": {
-            "overall_score": "94.1%",
+            "overall_score": "94.2%",
             "top_10": [
               {
-                "date": "2024-07-31",
-                "similarity_score": "95.4%",
+                "date": "2023-09-25",
+                "similarity_score": "95.3%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0035"
+                "close_delta": "-0.0000"
               },
               {
-                "date": "2024-07-17",
-                "similarity_score": "93.9%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0040"
+                "date": "2023-09-11",
+                "similarity_score": "93.8%",
+                "outcome": "UP",
+                "close_delta": "+0.0000"
               },
               {
-                "date": "2024-07-03",
+                "date": "2023-08-28",
                 "similarity_score": "92.4%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0035"
+                "close_delta": "-0.0012"
               },
               {
-                "date": "2024-06-19",
-                "similarity_score": "90.6%",
+                "date": "2023-08-14",
+                "similarity_score": "91.0%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0020"
+                "close_delta": "-0.0011"
               },
               {
-                "date": "2024-06-05",
+                "date": "2023-07-31",
                 "similarity_score": "89.3%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0022"
+                "close_delta": "-0.0002"
               },
               {
-                "date": "2024-05-22",
-                "similarity_score": "87.8%",
+                "date": "2023-07-17",
+                "similarity_score": "87.7%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0021"
+                "close_delta": "-0.0008"
               },
               {
-                "date": "2024-05-08",
-                "similarity_score": "86.4%",
+                "date": "2023-07-03",
+                "similarity_score": "86.1%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0023"
+                "close_delta": "-0.0001"
               },
               {
-                "date": "2024-04-24",
-                "similarity_score": "84.7%",
+                "date": "2023-06-19",
+                "similarity_score": "84.6%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0017"
+                "close_delta": "-0.0010"
               },
               {
-                "date": "2024-04-10",
-                "similarity_score": "83.2%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0005"
+                "date": "2023-06-05",
+                "similarity_score": "83.3%",
+                "outcome": "UP",
+                "close_delta": "+0.0005"
               },
               {
-                "date": "2024-03-27",
-                "similarity_score": "81.7%",
+                "date": "2023-05-22",
+                "similarity_score": "81.8%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0003"
+                "close_delta": "-0.0007"
               }
             ]
           },
-          "market_regime": "TRENDING BEARISH (NORMAL VOLATILITY)",
+          "market_regime": "SIDEWAYS COMPRESSION",
           "scores": {
             "macro": 49,
-            "liquidity": 42,
-            "intermarket": 44,
-            "fundamental": 40
+            "liquidity": 50,
+            "intermarket": 50,
+            "fundamental": 50
           },
           "indexes": {
-            "ici": 45,
-            "fqi": 47
+            "ici": 53,
+            "fqi": 55
           },
-          "expected_drawdown": "-0.0063",
-          "expected_rally": "+0.0027",
+          "expected_drawdown": "-0.0045",
+          "expected_rally": "+0.0045",
           "explainable_ai": [
             {
               "factor": "Yield Curve Inversion (spread < 0)",
@@ -2593,115 +2593,115 @@
           "scenarios": {
             "bullish": {
               "target": "1.3380",
-              "probability": "33%"
+              "probability": "40%"
             },
             "neutral": {
-              "target": "1.3335",
-              "probability": "15%"
+              "target": "1.3350",
+              "probability": "20%"
             },
             "bearish": {
-              "target": "1.3290",
-              "probability": "67%"
+              "target": "1.3320",
+              "probability": "40%"
             }
           }
         },
         "W+1": {
-          "base_price": 1.33531,
+          "base_price": 1.33535,
           "ohlc": {
-            "open": "1.3353",
+            "open": "1.3354",
             "high": "1.3429",
-            "low": "1.3177",
-            "close": "1.3252"
+            "low": "1.3257",
+            "close": "1.3332"
           },
           "expected_range_atr": "0.0252",
           "error_band": "±0.0113",
           "probabilities": {
-            "bullish": 33,
-            "neutral": 15,
-            "bearish": 67
+            "bullish": 40,
+            "neutral": 20,
+            "bearish": 40
           },
           "confidence_intervals": {
-            "ci_80": "1.3233 - 1.3372",
-            "ci_95": "1.3143 - 1.3463"
+            "ci_80": "1.3313 - 1.3372",
+            "ci_95": "1.3223 - 1.3463"
           },
           "similarity": {
-            "overall_score": "92.2%",
+            "overall_score": "93.1%",
             "top_10": [
               {
-                "date": "2022-10-01",
-                "similarity_score": "95.0%",
+                "date": "2024-08-28",
+                "similarity_score": "95.3%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0111"
+                "close_delta": "-0.0020"
               },
               {
-                "date": "2022-09-17",
-                "similarity_score": "93.6%",
+                "date": "2024-08-14",
+                "similarity_score": "93.7%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0116"
+                "close_delta": "-0.0020"
               },
               {
-                "date": "2022-09-03",
-                "similarity_score": "92.2%",
+                "date": "2024-07-31",
+                "similarity_score": "92.4%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0097"
+                "close_delta": "-0.0014"
               },
               {
-                "date": "2022-08-20",
-                "similarity_score": "91.0%",
+                "date": "2024-07-17",
+                "similarity_score": "90.9%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0075"
+                "close_delta": "-0.0010"
               },
               {
-                "date": "2022-08-06",
-                "similarity_score": "89.5%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0050"
+                "date": "2024-07-03",
+                "similarity_score": "89.4%",
+                "outcome": "UP",
+                "close_delta": "+0.0002"
               },
               {
-                "date": "2022-07-23",
-                "similarity_score": "87.6%",
+                "date": "2024-06-19",
+                "similarity_score": "87.5%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0074"
+                "close_delta": "-0.0020"
               },
               {
-                "date": "2022-07-09",
-                "similarity_score": "86.1%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0026"
+                "date": "2024-06-05",
+                "similarity_score": "86.4%",
+                "outcome": "UP",
+                "close_delta": "+0.0000"
               },
               {
-                "date": "2022-06-25",
-                "similarity_score": "84.7%",
+                "date": "2024-05-22",
+                "similarity_score": "84.9%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0053"
+                "close_delta": "-0.0012"
               },
               {
-                "date": "2022-06-11",
-                "similarity_score": "83.3%",
+                "date": "2024-05-08",
+                "similarity_score": "83.1%",
                 "outcome": "DOWN",
-                "close_delta": "-0.0017"
+                "close_delta": "-0.0027"
               },
               {
-                "date": "2022-05-28",
+                "date": "2024-04-24",
                 "similarity_score": "81.6%",
-                "outcome": "DOWN",
-                "close_delta": "-0.0033"
+                "outcome": "UP",
+                "close_delta": "+0.0006"
               }
             ]
           },
-          "market_regime": "TRENDING BEARISH (NORMAL VOLATILITY)",
+          "market_regime": "SIDEWAYS COMPRESSION",
           "scores": {
             "macro": 49,
-            "liquidity": 42,
-            "intermarket": 44,
-            "fundamental": 40
+            "liquidity": 50,
+            "intermarket": 50,
+            "fundamental": 50
           },
           "indexes": {
-            "ici": 45,
-            "fqi": 47
+            "ici": 54,
+            "fqi": 56
           },
-          "expected_drawdown": "-0.0176",
-          "expected_rally": "+0.0076",
+          "expected_drawdown": "-0.0126",
+          "expected_rally": "+0.0126",
           "explainable_ai": [
             {
               "factor": "Yield Curve Inversion (spread < 0)",
@@ -2723,15 +2723,15 @@
           "scenarios": {
             "bullish": {
               "target": "1.3429",
-              "probability": "33%"
+              "probability": "40%"
             },
             "neutral": {
-              "target": "1.3303",
-              "probability": "15%"
+              "target": "1.3343",
+              "probability": "20%"
             },
             "bearish": {
-              "target": "1.3177",
-              "probability": "67%"
+              "target": "1.3257",
+              "probability": "40%"
             }
           }
         }
