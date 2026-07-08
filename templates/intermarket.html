@@ -610,20 +610,31 @@
                 Pasar sideways — CSI gap terlalu kecil</div>`;
             return;
         }
+        const COMMODITY_ICONS = { 'XAUUSD': '🥇', 'WTI OIL': '🛢️' };
+        const COMMODITY_BORDER = { 'XAUUSD': 'rgba(251,191,36,0.35)', 'WTI OIL': 'rgba(249,115,22,0.35)' };
+        const COMMODITY_BG    = { 'XAUUSD': 'rgba(251,191,36,0.06)',  'WTI OIL': 'rgba(249,115,22,0.06)'  };
+
         grid.innerHTML = recs.slice(0, 8).map(rec => {
-            const isBuy  = rec.action === 'BUY';
-            const actC   = isBuy ? '#00ff41' : '#ff3333';
-            const cls    = isBuy ? 'buy' : 'sell';
-            const confPct= Math.round(rec.confidence);
-            const confC  = confPct >= 85 ? '#00ff41' : confPct >= 70 ? '#fbbf24' : '#ff3333';
-            return `<div class="pc ${cls}">
+            const isBuy   = rec.action === 'BUY';
+            const actC    = isBuy ? '#00ff41' : '#ff3333';
+            const cls     = isBuy ? 'buy' : 'sell';
+            const confPct = Math.round(rec.confidence);
+            const confC   = confPct >= 85 ? '#00ff41' : confPct >= 70 ? '#fbbf24' : '#ff3333';
+            const isCom   = COMMODITY_ICONS[rec.pair] !== undefined;
+            const icon    = COMMODITY_ICONS[rec.pair] || '';
+            const chgTxt  = rec.change_pct != null
+                ? `<span style="color:${actC};font-size:0.7rem;">${rec.change_pct > 0 ? '+' : ''}${rec.change_pct}%</span>`
+                : '';
+            const cardBorder = isCom ? COMMODITY_BORDER[rec.pair] : (isBuy ? 'rgba(0,255,65,0.2)' : 'rgba(255,51,51,0.2)');
+            const cardBg     = isCom ? COMMODITY_BG[rec.pair]     : 'transparent';
+            return `<div class="pc ${cls}" style="border-color:${cardBorder};background:${cardBg};">
                 <div class="pc-top">
-                    <span class="pc-pair">${rec.pair}</span>
+                    <span class="pc-pair">${icon} ${rec.pair}</span>
                     <span class="pc-act ${cls}">${rec.action}</span>
                 </div>
-                <div class="pc-ccy">
-                    <span style="color:${actC}">${rec.strong || ''}</span>
-                    ${rec.weak ? ` vs <span style="color:var(--muted)">${rec.weak}</span>` : ''}
+                <div class="pc-ccy" style="display:flex;justify-content:space-between;align-items:center;">
+                    <span><span style="color:${actC}">${rec.strong || ''}</span>${rec.weak ? ` vs <span style="color:var(--muted)">${rec.weak}</span>` : ''}</span>
+                    ${chgTxt}
                 </div>
                 <div class="pc-mid">
                     <span class="pc-qual">${rec.quality || '---'}</span>

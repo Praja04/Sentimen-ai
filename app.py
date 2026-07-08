@@ -464,6 +464,47 @@ def api_laggard_detection():
             "stars": im["stars"]
         })
         
+    # ── Commodity Signals: XAUUSD & WTI Oil ─────────────────────────────────────
+    # Fetch XAUUSD live
+    xau_price, xau_chg = get_price_and_change(["XAUUSD"])
+    oil_price, oil_chg = get_price_and_change(["WTI", "XTIUSD", "USOIL", "CL"])
+
+    COMMODITY_SYMBOLS = ["XAUUSD", "WTI OIL"]
+    seen_syms = {r["pair"] for r in pair_recs}
+
+    if xau_price and "XAUUSD" not in seen_syms:
+        xau_action = "BUY" if xau_chg > 0 else "SELL"
+        xau_gap    = abs(xau_chg) / 100.0
+        xau_qual   = "★★★★★" if abs(xau_chg) > 0.5 else ("★★★★" if abs(xau_chg) > 0.3 else ("★★★" if abs(xau_chg) > 0.1 else "★★"))
+        pair_recs.insert(0, {          # always show XAUUSD first
+            "pair": "XAUUSD",
+            "action": xau_action,
+            "gap": round(xau_gap, 4),
+            "strong": "XAU" if xau_action == "BUY" else "USD",
+            "weak":   "USD" if xau_action == "BUY" else "XAU",
+            "quality": xau_qual,
+            "confidence": round(min(99, 50 + abs(xau_chg) * 30), 0),
+            "change_pct": round(xau_chg, 3)
+        })
+
+    if oil_price and "WTI OIL" not in seen_syms:
+        oil_action = "BUY" if oil_chg > 0 else "SELL"
+        oil_gap    = abs(oil_chg) / 100.0
+        oil_qual   = "★★★★★" if abs(oil_chg) > 1.5 else ("★★★★" if abs(oil_chg) > 1.0 else ("★★★" if abs(oil_chg) > 0.5 else "★★"))
+        pair_recs.insert(1, {          # show Oil second
+            "pair": "WTI OIL",
+            "action": oil_action,
+            "gap": round(oil_gap, 4),
+            "strong": "OIL" if oil_action == "BUY" else "USD",
+            "weak":   "USD" if oil_action == "BUY" else "OIL",
+            "quality": oil_qual,
+            "confidence": round(min(99, 50 + abs(oil_chg) * 20), 0),
+            "change_pct": round(oil_chg, 3)
+        })
+
+    # Keep max 8 total (commodities + forex)
+    pair_recs = pair_recs[:8]
+
     return jsonify({
         "status": "success",
         "laggard_leader": laggard_leader,

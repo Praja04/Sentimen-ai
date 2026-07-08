@@ -1,104 +1,24 @@
 {
-    "balance": 9996.6,
-    "equity": 9866.99,
+    "balance": 10543.1,
+    "equity": 10771.02,
     "active_trades": [
         {
-            "ticket": 27316512,
-            "time": "2026-07-08 08:12:45",
+            "ticket": 27491683,
+            "time": "2026-07-08 08:41:56",
             "symbol": "XAUUSD",
             "type": "BUY",
-            "lots": 0.13,
-            "entry_price": 4109.12,
-            "current_price": 4099.15,
-            "sl": 4094.12,
-            "tp": 4131.12,
+            "lots": 0.14,
+            "entry_price": 4102.04,
+            "current_price": 4118.32,
+            "sl": 4087.04,
+            "tp": 4124.04,
             "commission": -1.5,
             "swap": 0.0,
             "status": "RUNNING",
-            "profit": -129.61
+            "profit": 227.92
         }
     ],
     "history": [
-        {
-            "ticket": 27166512,
-            "open_time": "2026-07-08 07:47:45",
-            "close_time": "2026-07-08 08:11:45",
-            "symbol": "XAUUSD",
-            "type": "BUY",
-            "lots": 0.14,
-            "entry": 4122.42,
-            "exit": 4107.42,
-            "commission": -1.5,
-            "swap": 0.0,
-            "gross_profit": -210.0,
-            "net_profit": -211.5,
-            "exit_reason": "SL HIT",
-            "result": "LOSS"
-        },
-        {
-            "ticket": 25172822,
-            "open_time": "2026-07-08 02:15:28",
-            "close_time": "2026-07-08 07:46:45",
-            "symbol": "XAUUSD",
-            "type": "BUY",
-            "lots": 0.13,
-            "entry": 4098.4,
-            "exit": 4120.4,
-            "commission": -1.5,
-            "swap": 0.0,
-            "gross_profit": 286.0,
-            "net_profit": 284.5,
-            "exit_reason": "TP HIT",
-            "result": "PROFIT"
-        },
-        {
-            "ticket": 25121534,
-            "open_time": "2026-07-08 02:06:55",
-            "close_time": "2026-07-08 02:15:27",
-            "symbol": "XAUUSD",
-            "type": "BUY",
-            "lots": 0.13,
-            "entry": 4113.49,
-            "exit": 4098.49,
-            "commission": -1.5,
-            "swap": 0.0,
-            "gross_profit": -195.0,
-            "net_profit": -196.5,
-            "exit_reason": "SL HIT",
-            "result": "LOSS"
-        },
-        {
-            "ticket": 25026823,
-            "open_time": "2026-07-08 01:51:08",
-            "close_time": "2026-07-08 02:06:54",
-            "symbol": "XAUUSD",
-            "type": "BUY",
-            "lots": 0.14,
-            "entry": 4127.72,
-            "exit": 4112.72,
-            "commission": -1.5,
-            "swap": 0.0,
-            "gross_profit": -210.0,
-            "net_profit": -211.5,
-            "exit_reason": "SL HIT",
-            "result": "LOSS"
-        },
-        {
-            "ticket": 24041527,
-            "open_time": "2026-07-07 23:06:55",
-            "close_time": "2026-07-08 01:51:07",
-            "symbol": "XAUUSD",
-            "type": "BUY",
-            "lots": 0.14,
-            "entry": 4142.35,
-            "exit": 4127.35,
-            "commission": -1.5,
-            "swap": 0.0,
-            "gross_profit": -210.0,
-            "net_profit": -211.5,
-            "exit_reason": "SL HIT",
-            "result": "LOSS"
-        },
         {
             "ticket": 2873426,
             "open_time": "2026-06-29 10:15:30",
@@ -148,5 +68,5 @@
             "result": "PROFIT"
         }
     ],
-    "last_update": 1783474831.0572999
+    "last_update": 1783477999.4315288
 }
