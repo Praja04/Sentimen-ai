@@ -908,9 +908,22 @@
             const activeWinRate = recs[0].win_rate != null ? recs[0].win_rate : 92.5;
             const badgeEl = document.getElementById('dynamic-winrate-badge');
             if (badgeEl) {
-                badgeEl.innerText = `AI WINRATE: ${activeWinRate.toFixed(1)}%`;
+                if (activeWinRate >= 90.0) {
+                    badgeEl.innerText = `AI WINRATE: ${activeWinRate.toFixed(1)}% (TARGET ACHIEVED >90%)`;
+                    badgeEl.style.color = 'var(--green)';
+                    badgeEl.style.background = 'rgba(0, 255, 65, 0.1)';
+                    badgeEl.style.borderColor = 'rgba(0, 255, 65, 0.4)';
+                    badgeEl.style.boxShadow = '0 0 6px rgba(0, 255, 65, 0.2)';
+                } else {
+                    badgeEl.innerText = `AI WINRATE: ${activeWinRate.toFixed(1)}% (RECOVERY MODE: TARGET >90%)`;
+                    badgeEl.style.color = 'var(--text-yellow)';
+                    badgeEl.style.background = 'rgba(251, 191, 36, 0.1)';
+                    badgeEl.style.borderColor = 'rgba(251, 191, 36, 0.4)';
+                    badgeEl.style.boxShadow = '0 0 6px rgba(251, 191, 36, 0.2)';
+                }
             }
         }
+
 
         if (!recs || recs.length === 0) {
             body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:60px;color:var(--muted);font-size:0.72rem;">

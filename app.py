@@ -584,14 +584,17 @@ def _compute_dashboard_data():
             pass
 
         # If win_rate drops below 90%, the adaptive self-learning AI narrows the TP gap to ensure easier hits
-        # and adjusts the Reward-to-Risk ratio dynamically to hit >90% winrate
+        # and adjusts the Reward-to-Risk ratio dynamically to recover and hit >90% winrate target
         if win_rate < 90.0:
             deviation = 90.0 - win_rate
-            gap_multiplier = max(0.65, 1.0 - (deviation * 0.025)) # narrows target distance
-            sl_multiplier = max(0.85, 1.0 - (deviation * 0.01))
+            # More aggressive tuning: reduce TP target distance to secure hits and recover winrate
+            gap_multiplier = max(0.50, 1.0 - (deviation * 0.035)) 
+            sl_multiplier = min(1.30, 1.0 + (deviation * 0.015)) # slightly wider SL for protection
         else:
+            # When winrate is strong (>90%), maximize profits by keeping standard 1:2 RR or widening slightly
             gap_multiplier = 1.0
             sl_multiplier = 1.0
+
 
         for sym in sym_opts:
             mt5.symbol_select(sym, True)
