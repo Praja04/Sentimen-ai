@@ -971,6 +971,63 @@
         } catch(e) { console.error('Fetch error:', e); }
     }
 
+    // Floating Overlay Helper to handle Autoplay Policy restrictions
+    function showTtsResumeOverlay(sentences, index) {
+        if (document.getElementById('tts-resume-overlay')) return;
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'tts-resume-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99999;
+            background: rgba(8, 16, 40, 0.95);
+            border: 2px solid var(--accent, #3b82f6);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            border-radius: 8px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            animation: slideInUp 0.3s ease;
+            font-family: var(--mono, monospace);
+            color: #fff;
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+        `;
+        overlay.innerHTML = `
+            <span style="animation: blink-neon 1.2s infinite; color: var(--gold, #fbbf24); font-size:0.9rem;">🎙️</span>
+            <span>RESUME NEWS READOUT (CLICK TO LISTEN)</span>
+            <button style="background: var(--accent, #3b82f6); border:none; color:#fff; border-radius:3px; padding:2px 6px; font-weight:bold; font-size:0.65rem; cursor:pointer;">PLAY</button>
+        `;
+
+        if (!document.getElementById('tts-animation-style')) {
+            const style = document.createElement('style');
+            style.id = 'tts-animation-style';
+            style.innerHTML = `
+                @keyframes slideInUp {
+                    from { transform: translateY(50px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                @keyframes blink-neon {
+                    0% { opacity: 0.3; }
+                    50% { opacity: 1; }
+                    100% { opacity: 0.3; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        overlay.addEventListener('click', () => {
+            overlay.remove();
+            speakQueue(sentences, index);
+        });
+
+        document.body.appendChild(overlay);
+    }
+
     // Persistent Text to Speech Manager
     function speakQueue(sentences, index) {
         if (index >= sentences.length) {
@@ -1026,6 +1083,13 @@
                 const savedIndex = parseInt(localStorage.getItem('tts_index') || '0');
                 if (savedSentences.length > 0) {
                     speakQueue(savedSentences, savedIndex);
+                    
+                    // Check if blocked by browser autoplay policy after 400ms
+                    setTimeout(() => {
+                        if (!window.speechSynthesis.speaking && localStorage.getItem('tts_active') === 'true') {
+                            showTtsResumeOverlay(savedSentences, savedIndex);
+                        }
+                    }, 400);
                 }
             }
         }, 1000);
@@ -1035,6 +1099,8 @@
                 localStorage.removeItem('tts_active');
                 window.speechSynthesis.cancel();
                 btnReadNews.innerText = '🔊 BACA';
+                const overlay = document.getElementById('tts-resume-overlay');
+                if (overlay) overlay.remove();
             } else {
                 const titles = Array.from(document.querySelectorAll('.news-title')).map(el => el.innerText);
                 if (titles.length === 0) return;
