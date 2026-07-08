@@ -488,22 +488,6 @@
                     <div class="badge badge-warn">⭐ XAUUSD FOCUS</div>
                 </div>
                 <div class="panel-body" style="padding: 4px 6px; display:flex; flex-direction:column; gap:0; flex:1 1 0; min-height:0; overflow:hidden;">
-                    <!-- TV & NEWS CONTAINER (Moved from Home) -->
-                    <div class="tv-news-container" style="flex: 0 0 160px; margin-bottom: 5px; width: 100%;">
-                        <div class="tv-box panel-border" style="height: 100%; border: 1px solid rgba(255,255,255,0.08);">
-                            <iframe src="https://www.youtube.com/embed/KQp-e_XQnDE?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                        </div>
-                        <div class="news-box panel-border" style="flex: 1.2; height: 100%; display: flex; flex-direction: column;">
-                            <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2px; font-size: 0.65rem; border-left: 2px solid var(--accent); padding: 1px 4px;">
-                                LIVE MACRO NEWS
-                                <button id="btn-read-news" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:var(--gold); cursor:pointer; font-size:0.55rem; padding:1px 4px; border-radius:3px;">🔊 BACA</button>
-                            </h3>
-                            <div class="news-list" id="news-list" style="overflow-y: hidden; flex: 1;">
-                                <div style="padding: 10px; color: var(--muted); text-align: center; font-size: 0.65rem;">Loading AI News Feed...</div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- GLOBAL RISK RADAR BANNER -->
                     <div id="risk-radar-banner" style="flex: 0 0 auto; margin-bottom: 4px; padding: 4px 8px; border-radius: 4px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between;">
                         <span style="font-size: 0.65rem; color: #8ab4d4; letter-spacing: 1px; font-weight: bold;">🚨 GLOBAL RISK RADAR:</span>
@@ -965,7 +949,6 @@
                 renderIMTable(data.intermarket);
                 renderLaggard(data.results, data.laggard_leader);
                 renderPairs(data.pair_recommendations);
-                renderNews(data.news_feed);
                 
                 // Update Risk Radar
                 if (data.risk_radar) {
@@ -986,58 +969,6 @@
                 if (ts) ts.innerText = new Date().toLocaleTimeString('en-GB');
             }
         } catch(e) { console.error('Fetch error:', e); }
-    }
-
-    // Render News in a seamless loop marquee format
-    function renderNews(news_feed) {
-        const newsListEl = document.getElementById('news-list');
-        if (newsListEl && news_feed) {
-            let newsHtml = '';
-            news_feed.forEach(n => {
-                newsHtml += `
-                <div class="news-item">
-                    <div class="news-time">${n.time}</div>
-                    <div class="news-title ${n.impact || 'MEDIUM'}">${n.title}</div>
-                </div>
-                `;
-            });
-            // Pure CSS Marquee Approach
-            const infiniteHtml = newsHtml + newsHtml;
-            const wrappedHtml = `<div class="news-ticker-content">${infiniteHtml}</div>`;
-            if (newsListEl.innerHTML !== wrappedHtml) {
-                newsListEl.innerHTML = wrappedHtml;
-            }
-
-            // Text to Speech
-            const btnReadNews = document.getElementById('btn-read-news');
-            if (btnReadNews && !window.newsTtsBound) {
-                window.newsTtsBound = true;
-                btnReadNews.addEventListener('click', () => {
-                    if (window.speechSynthesis.speaking) {
-                        window.speechSynthesis.cancel();
-                        btnReadNews.innerText = '🔊 BACA';
-                        return;
-                    }
-                    
-                    const titles = Array.from(document.querySelectorAll('.news-title')).map(el => el.innerText);
-                    if (titles.length === 0) return;
-                    
-                    const fullText = "Berita Makro Terkini. " + titles.slice(0, 10).join(". Berita selanjutnya. ");
-                    const utterance = new SpeechSynthesisUtterance(fullText);
-                    utterance.lang = 'id-ID';
-                    utterance.rate = 1.4;
-                    
-                    let voices = window.speechSynthesis.getVoices();
-                    let idVoice = voices.find(v => v.lang.includes('id') && v.name.toLowerCase().includes('female'));
-                    if (!idVoice) idVoice = voices.find(v => v.lang.includes('id'));
-                    if (idVoice) utterance.voice = idVoice;
-                    
-                    utterance.onend = () => { btnReadNews.innerText = '🔊 BACA'; };
-                    window.speechSynthesis.speak(utterance);
-                    btnReadNews.innerText = '⏸ STOP';
-                });
-            }
-        }
     }
 
     fetchAll();
