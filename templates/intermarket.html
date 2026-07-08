@@ -590,7 +590,7 @@
         'AXY': { name:'AUD', color:'#f97316', index:'AXY' },
         'ZXY': { name:'NZD', color:'#06b6d4', index:'ZXY' },
     };
-    const RANK_COLORS = ['#ffd700','#c0c0c0','#cd7f32','#64748b','#475569','#334155','#1e293b','#0f172a'];
+    const RANK_COLORS = ['#ffd700','#ffb300','#e59900','#b0c8e0','#9cbdde','#80a4c2','#60809b','#476278'];
 
     // ── MACRO STRIP ────────────────────────────────────────────
     function renderMacro(arr) {
@@ -626,11 +626,11 @@
             const sign  = pct >= 0 ? '+' : '';
             const w     = Math.max(2, Math.min(100, score));
             const strong= score >= 50;
-            const barC  = strong ? meta.color : '#334155';
-            const textC = strong ? meta.color : '#64748b';
-            const rC    = RANK_COLORS[rank] || '#1e293b';
+            const barC  = strong ? meta.color : '#475e7a';
+            const textC = strong ? meta.color : '#b0cce3';
+            const rC    = RANK_COLORS[rank] || '#80a4c2';
             const arrow = strong ? '▲' : '▼';
-            const arrowC= strong ? '#00ff41' : '#ff3333';
+            const arrowC= strong ? '#00ff41' : '#ff4444';
             return `<div class="csi-row" style="height:${rowH}%;">
                 <span class="csi-rank" style="color:${rC}">#${rank+1}</span>
                 <span class="csi-name" style="color:${textC}">${meta.name}</span>
