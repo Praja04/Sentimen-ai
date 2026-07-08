@@ -112,8 +112,16 @@
             <!-- CENTER COLUMN -->
             <div class="grid-center">
                 <div class="tv-news-container">
-                    <div class="tv-box panel-border">
-                        <iframe src="https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqg5qoBtXSqRJFZA&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    <div class="tv-box panel-border" style="display:flex; flex-direction:column;">
+                        <!-- Channel Switcher Bar -->
+                        <div id="tv-channel-bar" style="flex:0 0 auto; display:flex; gap:3px; padding:3px 4px; background:rgba(0,0,0,0.6); border-bottom:1px solid rgba(255,255,255,0.08);">
+                            <button onclick="switchTV('aljazeera')" id="tv-btn-aljazeera" class="tv-ch-btn active" title="Al Jazeera English Live">📡 AL JAZEERA</button>
+                            <button onclick="switchTV('bloomberg')" id="tv-btn-bloomberg" class="tv-ch-btn" title="Bloomberg TV Live">📊 BLOOMBERG</button>
+                            <button onclick="switchTV('reuters')" id="tv-btn-reuters" class="tv-ch-btn" title="Reuters Live">🌐 REUTERS</button>
+                            <button onclick="switchTV('yahoo')" id="tv-btn-yahoo" class="tv-ch-btn" title="Yahoo Finance Live">💹 YAHOO FIN</button>
+                            <button onclick="switchTV('cnbc')" id="tv-btn-cnbc" class="tv-ch-btn" title="CNBC International">📺 CNBC</button>
+                        </div>
+                        <iframe id="live-tv-frame" src="https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqg5qoBtXSqRJFZA&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="flex:1 1 0;"></iframe>
                     </div>
                     <div class="news-box panel-border">
                         <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
@@ -226,5 +234,62 @@
     </div>
     
     <script src="script.js?v=37"></script>
+    <style>
+        .tv-ch-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: var(--text-muted, #7ca0c7);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.5rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tv-ch-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+            color: #fff;
+        }
+        .tv-ch-btn.active {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: #3b82f6;
+            color: #60a5fa;
+            box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+    <script>
+        const TV_CHANNELS = {
+            'aljazeera': 'https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqg5qoBtXSqRJFZA&autoplay=1&mute=1',
+            'bloomberg':  'https://www.youtube.com/embed/live_stream?channel=UCIALMKvobgryh9CfDeNqPBA&autoplay=1&mute=1',
+            'reuters':    'https://www.youtube.com/embed/live_stream?channel=UChqUTb7kYRX8-EiaN3XFrSQ&autoplay=1&mute=1',
+            'yahoo':      'https://www.youtube.com/embed/live_stream?channel=UCEAZeUIeJs0IjQiqTCdVSIg&autoplay=1&mute=1',
+            'cnbc':       'https://www.youtube.com/embed/live_stream?channel=UCvJJ_dzjViJCoLf5uKUTwoA&autoplay=1&mute=1',
+        };
+
+        function switchTV(channel) {
+            const frame = document.getElementById('live-tv-frame');
+            if (frame && TV_CHANNELS[channel]) {
+                frame.src = TV_CHANNELS[channel];
+            }
+            // Update active button styles
+            document.querySelectorAll('.tv-ch-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('tv-btn-' + channel);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Save last selected channel
+            localStorage.setItem('tv_channel', channel);
+        }
+
+        // Auto-restore last selected channel on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('tv_channel');
+            if (saved && TV_CHANNELS[saved]) {
+                switchTV(saved);
+            }
+        });
+    </script>
 </body>
 </html>

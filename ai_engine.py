@@ -646,6 +646,27 @@ def run_news_update():
                 title = item.find('title')
                 if title is not None and title.text: titles.append(("YAHOO", title.text.strip()))
         except Exception as e: pass
+
+        # 8b. MarketWatch
+        try:
+            req = urllib.request.Request('https://feeds.marketwatch.com/marketwatch/topstories/', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("MARKETWATCH", title.text.strip()))
+        except Exception as e: pass
+
+        # 8c. Reuters Business News (RSS)
+        try:
+            req = urllib.request.Request('https://feeds.reuters.com/reuters/businessNews', headers={'User-Agent': 'Mozilla/5.0'})
+            xml_data = urllib.request.urlopen(req, timeout=10).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:2]:
+                title = item.find('title')
+                if title is not None and title.text: titles.append(("REUTERS", title.text.strip()))
+        except Exception as e: pass
+
             
         # 9. FXStreet
         try:
