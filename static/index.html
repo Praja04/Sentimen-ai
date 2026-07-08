@@ -121,7 +121,7 @@
                             <button onclick="switchTV('yahoo')" id="tv-btn-yahoo" class="tv-ch-btn" title="Yahoo Finance Live">💹 YAHOO FIN</button>
                             <button onclick="switchTV('cnbc')" id="tv-btn-cnbc" class="tv-ch-btn" title="CNBC International">📺 CNBC</button>
                         </div>
-                        <iframe id="live-tv-frame" src="https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqg5qoBtXSqRJFZA&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="flex:1 1 0;"></iframe>
+                        <iframe id="live-tv-frame" src="https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="flex:1 1 0;"></iframe>
                     </div>
                     <div class="news-box panel-border">
                         <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
@@ -262,11 +262,12 @@
     </style>
     <script>
         const TV_CHANNELS = {
-            'aljazeera': 'https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqg5qoBtXSqRJFZA&autoplay=1&mute=1',
-            'bloomberg':  'https://www.youtube.com/embed/live_stream?channel=UCIALMKvobgryh9CfDeNqPBA&autoplay=1&mute=1',
-            'reuters':    'https://www.youtube.com/embed/live_stream?channel=UChqUTb7kYRX8-EiaN3XFrSQ&autoplay=1&mute=1',
-            'yahoo':      'https://www.youtube.com/embed/live_stream?channel=UCEAZeUIeJs0IjQiqTCdVSIg&autoplay=1&mute=1',
-            'cnbc':       'https://www.youtube.com/embed/live_stream?channel=UCvJJ_dzjViJCoLf5uKUTwoA&autoplay=1&mute=1',
+            // Direct 24/7 live stream video IDs (more reliable than live_stream?channel=)
+            'aljazeera': 'https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=1&mute=1',
+            'bloomberg':  'https://www.youtube.com/embed/dp8PhLsUcFE?autoplay=1&mute=1',
+            'reuters':    'https://www.youtube.com/embed/Lw4TuGvSQus?autoplay=1&mute=1',
+            'yahoo':      'https://www.youtube.com/embed/Yd56Z9vJHBY?autoplay=1&mute=1',
+            'cnbc':       'https://www.youtube.com/embed/KQp-e_XQnDE?autoplay=1&mute=1',
         };
 
         function switchTV(channel) {
