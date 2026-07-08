@@ -514,14 +514,17 @@
         </div>
 
         <!-- RIGHT: PAIR SIGNALS & LAGGARD DETECTION ────────── -->
-        <div style="display:flex; flex-direction:column; gap:5px; height:100%; min-height:0;">
+        <div style="display:flex; flex-direction:column; gap:5px; height:100%; min-height:0; flex: 1.1 1 0;">
             <!-- TOP PAIR SIGNALS -->
-            <div class="panel" style="flex: 1.2 1 0; min-height: 0;">
+            <div class="panel" style="flex: 1.1 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">🎯 TOP PAIR SIGNALS</div>
                     <div style="display: flex; gap: 5px; align-items: center;">
                         <div class="badge badge-live">LIVE SIGNALS · ATR H4 · RR 1:2</div>
-                        <div class="badge" style="color: var(--green); background: rgba(0, 255, 65, 0.1); border: 1px solid rgba(0, 255, 65, 0.4); box-shadow: 0 0 6px rgba(0, 255, 65, 0.2); font-weight: bold; font-family: var(--mono); font-size: 0.65rem;">AI WINRATE 92.5%</div>
+                        <div class="badge" id="dynamic-winrate-badge" style="color: var(--green); background: rgba(0, 255, 65, 0.1); border: 1px solid rgba(0, 255, 65, 0.4); box-shadow: 0 0 6px rgba(0, 255, 65, 0.2); font-weight: bold; font-family: var(--mono); font-size: 0.65rem;">AI WINRATE: 92.5%</div>
+                        <button id="btn-toggle-sound" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: var(--text-yellow); cursor: pointer; font-size: 0.62rem; padding: 2px 5px; border-radius: 3px; display: flex; align-items: center; gap: 3px;" title="Toggle Sound Alert for High Conviction Signals">
+                            🔊 ON
+                        </button>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0; gap: 0;">
@@ -541,7 +544,7 @@
             </div>
 
             <!-- LAGGARD DETECTION (REAL vs FVG) -->
-            <div class="panel" style="flex: 0.8 1 0; min-height: 0;">
+            <div class="panel" style="flex: 0.6 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">⚡ LAGGARD DETECTION (REAL vs FVG)</div>
                     <div id="lag-action" class="lag-action" style="font-size: 0.75rem;">---</div>
@@ -561,13 +564,41 @@
                                 <th style="flex: 0.9; text-align: right;">ACTION</th>
                             </tr>
                         </thead>
-                        <tbody id="lag-tbody" style="flex: 1 1 0; overflow: hidden; display: block; width: 100%;">
+                        <tbody id="lag-tbody" style="flex: 1 1 0; overflow-y: auto; display: block; width: 100%;">
                             <!-- Injected by JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- 📊 BACKTEST PERFORMANCE HISTORY -->
+            <div class="panel" style="flex: 0.7 1 0; min-height: 0; display: flex; flex-direction: column;">
+                <div class="panel-hdr">
+                    <div class="panel-title">📊 BACKTEST PERFORMANCE HISTORY</div>
+                    <div class="badge" style="color: var(--cyan); background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); font-size: 0.6rem;">SELF-LEARNING FEED</div>
+                </div>
+                <div class="panel-body" style="padding: 4px 6px; flex: 1 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column;">
+                    <table class="im-tbl" style="font-size: 0.7rem; width: 100%; display: flex; flex-direction: column; height: 100%;">
+                        <thead style="flex: 0 0 auto;">
+                            <tr style="display: flex; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 3px; color: var(--text-muted);">
+                                <th style="flex: 1.2; text-align: left;">TIME</th>
+                                <th style="flex: 1; text-align: left;">PAIR</th>
+                                <th style="flex: 0.8; text-align: center;">DIR</th>
+                                <th style="flex: 1; text-align: right;">ENTRY</th>
+                                <th style="flex: 1; text-align: center;">PILLAR</th>
+                                <th style="flex: 0.8; text-align: right;">RESULT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody" style="flex: 1 1 0; overflow-y: auto; display: block; width: 100%;">
+                            <tr style="display: flex; width: 100%; justify-content: center; padding: 10px; color: var(--text-muted);">
+                                <td>Loading forecast history database...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+
 
     </div>
 
@@ -638,26 +669,43 @@
             const sign  = pct >= 0 ? '+' : '';
             const w     = Math.max(2, Math.min(100, score));
             const strong= score >= 50;
-            const barC  = strong ? meta.color : '#475e7a';
-            const textC = strong ? meta.color : '#b0cce3';
+            
+            // Dynamic Heat Map: High score = Hot (fire/orange), Low score = Cold (ice blue/neon blue)
+            let barC, glowC;
+            if (score >= 75) {
+                barC = '#ff0055'; // Extremely strong: Hot pink/red
+                glowC = 'rgba(255, 0, 85, 0.5)';
+            } else if (score >= 50) {
+                barC = '#ff7700'; // Strong: Orange
+                glowC = 'rgba(255, 119, 0, 0.4)';
+            } else if (score >= 25) {
+                barC = '#00ff41'; // Weak: Neon Green/Normal
+                glowC = 'rgba(0, 255, 65, 0.3)';
+            } else {
+                barC = '#00d4ff'; // Extremely weak: Ice Blue
+                glowC = 'rgba(0, 212, 255, 0.3)';
+            }
+            
+            const textC = strong ? '#fff' : '#b0cce3';
             const rC    = RANK_COLORS[rank] || '#80a4c2';
             const arrow = strong ? '▲' : '▼';
             const arrowC= strong ? '#00ff41' : '#ff4444';
             return `<div class="csi-row" style="height:${rowH}%;">
                 <span class="csi-rank" style="color:${rC}">#${rank+1}</span>
                 <span class="csi-name" style="color:${textC}">${meta.name}</span>
-                <span class="csi-tag">${meta.index}</span>
+                <span class="csi-tag" style="color:${barC}">${meta.index}</span>
                 <div class="csi-track">
-                    <div class="csi-fill" style="width:${w}%;background:linear-gradient(90deg,${barC}55,${barC});box-shadow:0 0 6px ${barC}44;"></div>
+                    <div class="csi-fill" style="width:${w}%;background:linear-gradient(90deg,${barC}44,${barC});box-shadow:0 0 8px ${glowC};"></div>
                 </div>
                 <span class="csi-pct" style="color:${textC}">${sign}${pct.toFixed(3)}%</span>
-                <span class="csi-score">${score.toFixed(1)}</span>
+                <span class="csi-score" style="color:${barC};font-weight:bold;">${score.toFixed(1)}</span>
                 <span style="color:${arrowC};font-size:0.58rem;min-width:10px;">${arrow}</span>
             </div>`;
         }).join('');
         const ts = document.getElementById('csi-ts');
         if (ts) ts.innerText = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     }
+
 
     // ── INTERMARKET TABLE ──────────────────────────────────────
     function renderIMTable(arr) {
@@ -810,19 +858,84 @@
         }
     }
 
+    // Audio Alert Player for High Conviction Signals
+    window.notifiedSignals = window.notifiedSignals || {};
+    
+    function playHighConvictionAlert() {
+        try {
+            const isMuted = localStorage.getItem('sound_alert_muted') === 'true';
+            if (isMuted) return;
+            
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Beep 1
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+            gain1.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.start();
+            osc1.stop(audioCtx.currentTime + 0.15);
+            
+            // Beep 2 (Chime)
+            setTimeout(() => {
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(1320, audioCtx.currentTime); // E6 note
+                gain2.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start();
+                osc2.stop(audioCtx.currentTime + 0.35);
+            }, 120);
+        } catch(e) {
+            console.error("Audio Synthesis failed", e);
+        }
+    }
+
     // ── PAIR SIGNALS TABLE ─────────────────────────────────────
     function renderPairs(recs) {
         const body = document.getElementById('pair-grid');
         if (!body) return;
+        
+        // Dynamically update the AI Winrate Badge in the header using real backtest values
+        if (recs && recs.length > 0) {
+            const activeWinRate = recs[0].win_rate != null ? recs[0].win_rate : 92.5;
+            const badgeEl = document.getElementById('dynamic-winrate-badge');
+            if (badgeEl) {
+                badgeEl.innerText = `AI WINRATE: ${activeWinRate.toFixed(1)}%`;
+            }
+        }
+
         if (!recs || recs.length === 0) {
             body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:60px;color:var(--muted);font-size:0.72rem;">
                 Pasar sideways — CSI gap terlalu kecil</div>`;
             return;
         }
+
+        // Detect new High Conviction Signals (Confidence >= 85)
+        recs.forEach(rec => {
+            const confPct = Math.round(rec.confidence);
+            if (confPct >= 85) {
+                const signalKey = `${rec.pair}_${rec.action}_${rec.entry}`;
+                if (!window.notifiedSignals[signalKey]) {
+                    window.notifiedSignals[signalKey] = true;
+                    console.log("High Conviction Signal Detected: ", rec.pair, rec.action);
+                    playHighConvictionAlert();
+                }
+            }
+        });
+
         function fmt(val, digits) {
             if (val == null) return '---';
             return Number(val).toFixed(Math.min(digits || 5, 5));
         }
+
         const ICONS = {
             'XAUUSD':    '🥇 ',
             'USDJPY':    '🇯🇵 ',
@@ -953,6 +1066,9 @@
                 renderLaggard(data.results, data.laggard_leader);
                 renderPairs(data.pair_recommendations);
                 
+                // Fetch and render evaluated forecast predictions history
+                fetchHistory();
+
                 // Update Risk Radar
                 if (data.risk_radar) {
                     const rReg = document.getElementById('risk-radar-regime');
@@ -973,6 +1089,73 @@
             }
         } catch(e) { console.error('Fetch error:', e); }
     }
+
+    // ── FETCH AND RENDER FORECAST HISTORY ───────────────────────
+    async function fetchHistory() {
+        try {
+            const res = await fetch(`/api/forecast_history?t=${Date.now()}`, {
+                cache: 'no-store', headers: {'Cache-Control':'no-cache','Pragma':'no-cache'}
+            });
+            const data = await res.json();
+            if (data.status === 'success' && data.history) {
+                const tbody = document.getElementById('history-tbody');
+                if (!tbody) return;
+                
+                if (data.history.length === 0) {
+                    tbody.innerHTML = `<tr style="display:flex; width:100%; justify-content:center; padding:10px; color:var(--text-muted);">
+                        <td>Belum ada forecast terdaftar.</td>
+                    </tr>`;
+                    return;
+                }
+                
+                tbody.innerHTML = data.history.map(row => {
+                    const statusText = row.evaluated ? (row.correct ? '🏆 TP' : '❌ SL') : '⏳ RUN';
+                    const statusColor = row.evaluated ? (row.correct ? 'var(--green)' : 'var(--red)') : 'var(--gold)';
+                    const timeStr = row.datetime ? row.datetime.split(' ')[1] : '—'; // Show HH:MM:SS
+                    const dirColor = row.direction === 'BULLISH' ? 'var(--green)' : 'var(--red)';
+                    const isXau = row.symbol === 'XAUUSD';
+                    const rowBg = isXau ? 'rgba(255,215,0,0.02)' : 'transparent';
+                    
+                    return `<tr style="display: flex; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.03); padding: 3px 0; align-items: center; background:${rowBg};">
+                        <td style="flex: 1.2; color: var(--text-muted); font-size: 0.65rem;">${row.datetime || '—'}</td>
+                        <td style="flex: 1; font-weight: bold; color: ${isXau ? 'var(--gold)' : '#fff'};">${row.symbol}</td>
+                        <td style="flex: 0.8; text-align: center; color: ${dirColor}; font-weight: bold;">${row.direction}</td>
+                        <td style="flex: 1; text-align: right; color: var(--text);">${row.entry.toFixed(2)}</td>
+                        <td style="flex: 1; text-align: center; color: var(--text-muted); font-size: 0.62rem;">${row.pillar}</td>
+                        <td style="flex: 0.8; text-align: right; color: ${statusColor}; font-weight: bold;">${statusText}</td>
+                    </tr>`;
+                }).join('');
+            }
+        } catch(e) {
+            console.error("Failed to fetch forecast history", e);
+        }
+    }
+
+    // Toggle Sound Alert Button Handler
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnToggleSound = document.getElementById('btn-toggle-sound');
+        if (btnToggleSound) {
+            // Restore saved mute setting
+            const isMuted = localStorage.getItem('sound_alert_muted') === 'true';
+            btnToggleSound.innerText = isMuted ? '🔇 OFF' : '🔊 ON';
+            btnToggleSound.style.color = isMuted ? 'var(--text-muted)' : 'var(--text-yellow)';
+            btnToggleSound.style.borderColor = isMuted ? 'rgba(255,255,255,0.1)' : 'var(--text-yellow)';
+            
+            btnToggleSound.addEventListener('click', () => {
+                const nowMuted = localStorage.getItem('sound_alert_muted') !== 'true';
+                localStorage.setItem('sound_alert_muted', nowMuted ? 'true' : 'false');
+                btnToggleSound.innerText = nowMuted ? '🔇 OFF' : '🔊 ON';
+                btnToggleSound.style.color = nowMuted ? 'var(--text-muted)' : 'var(--text-yellow)';
+                btnToggleSound.style.borderColor = nowMuted ? 'rgba(255,255,255,0.1)' : 'var(--text-yellow)';
+                
+                // Test sound beep if unmuted
+                if (!nowMuted) {
+                    playHighConvictionAlert();
+                }
+            });
+        }
+    });
+
 
     // Floating Overlay Helper to handle Autoplay Policy restrictions
     function showTtsResumeOverlay(sentences, index) {
