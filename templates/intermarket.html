@@ -498,11 +498,38 @@
                         </thead>
                         <tbody id="im-tbody"></tbody>
                     </table>
+                    <!-- GOLD OUTLOOK SUMMARY -->
+                    <div id="gold-summary" style="flex:0 0 auto; margin-top:auto; padding-top:4px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: PAIR SIGNALS & LAGGARD DETECTION ────────── -->
+        <div style="display:flex; flex-direction:column; gap:5px; height:100%; min-height:0;">
+            <!-- TOP PAIR SIGNALS -->
+            <div class="panel" style="flex: 1.2 1 0; min-height: 0;">
+                <div class="panel-hdr">
+                    <div class="panel-title">🎯 TOP PAIR SIGNALS</div>
+                    <div class="badge badge-live">LIVE SIGNALS · ATR H4 · RR 1:2</div>
+                </div>
+                <div class="panel-body" style="padding: 0; gap: 0;">
+                    <!-- Table header -->
+                    <div class="pair-tbl-head">
+                        <span>PAIR &amp; KUAL</span>
+                        <span>AKSI</span>
+                        <span>ENTRY</span>
+                        <span style="color:#ff4444;">SL</span>
+                        <span style="color:#00ff41;">TP</span>
+                        <span>CONF</span>
+                        <span style="text-align:center;">FUND ℹ️</span>
+                    </div>
+                    <!-- Table body injected by JS -->
+                    <div class="pair-tbl-body" id="pair-grid"></div>
                 </div>
             </div>
 
-            <!-- PANEL 2: LAGGARD DETECTION (REAL vs FVG) -->
-            <div class="panel" style="flex: 0.9 1 0; min-height: 0;">
+            <!-- LAGGARD DETECTION (REAL vs FVG) -->
+            <div class="panel" style="flex: 0.8 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">⚡ LAGGARD DETECTION (REAL vs FVG)</div>
                     <div id="lag-action" class="lag-action" style="font-size: 0.75rem;">---</div>
@@ -527,30 +554,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-        <!-- RIGHT: PAIR SIGNALS TABLE ────────────────── -->
-        <div class="panel">
-            <div class="panel-hdr">
-                <div class="panel-title">🎯 TOP PAIR SIGNALS</div>
-                <div class="badge badge-live">LIVE SIGNALS · ATR H4 · RR 1:2</div>
-            </div>
-            <div class="panel-body" style="padding: 0; gap: 0;">
-                <!-- Table header -->
-                <div class="pair-tbl-head">
-                    <span>PAIR &amp; KUAL</span>
-                    <span>AKSI</span>
-                    <span>ENTRY</span>
-                    <span style="color:#ff4444;">SL</span>
-                    <span style="color:#00ff41;">TP</span>
-                    <span>CONF</span>
-                    <span style="text-align:center;">FUND ℹ️</span>
-                </div>
-                <!-- Table body injected by JS -->
-                <div class="pair-tbl-body" id="pair-grid"></div>
-                <!-- GOLD OUTLOOK SUMMARY -->
-                <div id="gold-summary" style="flex:0 0 auto; margin-top:auto; padding: 6px 10px; border-top: 1px solid var(--border);"></div>
             </div>
         </div>
 
