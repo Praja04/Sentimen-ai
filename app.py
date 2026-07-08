@@ -658,11 +658,21 @@ def _compute_dashboard_data():
         im_changes[im["name"]] = chg
         gold_impact = "NEUTRAL"
         if im["inv"]:
+            # VIX: inverse=True means VIX↑ → BULLISH for gold (fear = safe haven)
             gold_impact = "BULLISH" if chg > 0.05 else ("BEARISH" if chg < -0.05 else "NEUTRAL")
         else:
             if im["name"] in ["DXY", "US10Y"]:
+                # DXY↑ → Gold↓ (BEARISH). DXY↓ → Gold↑ (BULLISH). Inverse.
                 gold_impact = "BEARISH" if chg > 0.05 else ("BULLISH" if chg < -0.05 else "NEUTRAL")
+            elif im["name"] in ["S&P 500", "DOW JONES", "NIKKEI"]:
+                # Equity↑ = Risk-On → Gold↓ (BEARISH). Equity↓ = Risk-Off → Gold↑ (BULLISH).
+                # This matches the displayed rule: "S&P↓ → Risk-Off → Gold↑"
+                gold_impact = "BEARISH" if chg > 0.05 else ("BULLISH" if chg < -0.05 else "NEUTRAL")
+            elif im["name"] == "SILVER":
+                # Silver leads gold: Silver↑ → Gold↑ (BULLISH). Direct.
+                gold_impact = "BULLISH" if chg > 0.05 else ("BEARISH" if chg < -0.05 else "NEUTRAL")
             else:
+                # WTI OIL: Oil↑ = inflation fear = mild gold support
                 gold_impact = "BULLISH" if chg > 0.05 else ("BEARISH" if chg < -0.05 else "NEUTRAL")
         intermarket.append({
             "name": im["name"],
