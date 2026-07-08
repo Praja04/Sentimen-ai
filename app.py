@@ -371,101 +371,80 @@ def api_laggard_detection():
             "score": round(min(100.0, max(0.0, score)), 1)
         }
     
-    # ── Pair Recommendations from CSI ──────────────────────────────────────────
-    # Full names and pair map for recommendations
-    CURR_FULL = {"DXY": "USD","EXY": "EUR","BXY": "GBP","JXY": "JPY","SFX": "CHF","CXY": "CAD","AXY": "AUD","ZXY": "NZD"}
-    PAIR_MAP = {
-        ("USD","EUR"): "EURUSD", ("USD","GBP"): "GBPUSD", ("USD","JPY"): "USDJPY",
-        ("USD","CHF"): "USDCHF", ("USD","CAD"): "USDCAD", ("USD","AUD"): "AUDUSD",
-        ("USD","NZD"): "NZDUSD", ("EUR","JPY"): "EURJPY", ("EUR","GBP"): "EURGBP",
-                ("GBP","JPY"): "GBPJPY", ("AUD","JPY"): "AUDJPY", ("AUD","NZD"): "AUDNZD",
-        ("CAD","JPY"): "CADJPY", ("CHF","JPY"): "CHFJPY", ("EUR","CHF"): "EURCHF",
-        ("EUR","CAD"): "EURCAD", ("EUR","AUD"): "EURAUD", ("EUR","NZD"): "EURNZD",
-        ("GBP","CHF"): "GBPCHF", ("GBP","CAD"): "GBPCAD", ("GBP","AUD"): "GBPAUD",
-        ("GBP","NZD"): "GBPNZD", ("AUD","CAD"): "AUDCAD", ("AUD","CHF"): "AUDCHF",
-        ("NZD","JPY"): "NZDJPY", ("NZD","CAD"): "NZDCAD", ("NZD","CHF"): "NZDCHF",
-        ("CAD","CHF"): "CADCHF",
-    }
-    sorted_csi = sorted(strengths.items(), key=lambda x: x[1], reverse=True)
-    pair_recs = []
-    seen_pairs = set()
-    currency_count = {}   # limit: each currency appears at most MAX_PER_CCY times
-    MAX_PER_CCY = 2       # e.g. NZD can appear in max 2 pairs → diversity guaranteed
+    # ── Fixed Instrument Signals: XAUUSD, USDJPY, OIL, NIKKEI, DOWJONES ──────────
+    def get_signal(sym_opts, label, kind="forex"):
+        """Fetch price, daily change and return signal dict for a fixed instrument."""
+        for sym in sym_opts:
+            try:
+                mt5.symbol_select(sym, True)
+                tick  = mt5.symbol_info_tick(sym)
+                info  = mt5.symbol_info(sym)
+                if not tick or not info:
+                    continue
+                rates_d1 = mt5.copy_rates_from_pos(sym, mt5.TIMEFRAME_D1, 0, 1)
+                if rates_d1 is None or len(rates_d1) == 0:
+                    continue
+                open_d  = rates_d1[0]['open']
+                if open_d <= 0:
+                    continue
+                chg_pct = ((tick.bid - open_d) / open_d) * 100.0
+                action  = "BUY" if chg_pct > 0 else "SELL"
+                digits  = info.digits if info.digits else 2
+                entry   = round(tick.bid, digits)
 
-    for i, (strong_key, strong_val) in enumerate(sorted_csi):
-        for j, (weak_key, weak_val) in enumerate(reversed(sorted_csi)):
-            if strong_key == weak_key:
-                continue
-            gap = strong_val - weak_val
-            if gap < 0.01:   # lowered from 0.05 so sideways market still yields signals
-                continue
-            strong_cur = CURR_FULL[strong_key]
-            weak_cur   = CURR_FULL[weak_key]
-            pair = PAIR_MAP.get((strong_cur, weak_cur)) or PAIR_MAP.get((weak_cur, strong_cur))
-            if not pair or pair in seen_pairs:
-                continue
-            # Diversity guard: skip if either currency already reached the cap
-            if currency_count.get(strong_cur, 0) >= MAX_PER_CCY:
-                continue
-            if currency_count.get(weak_cur, 0) >= MAX_PER_CCY:
-                continue
-            seen_pairs.add(pair)
-            currency_count[strong_cur] = currency_count.get(strong_cur, 0) + 1
-            currency_count[weak_cur]   = currency_count.get(weak_cur, 0) + 1
-            # Determine action
-            is_base_strong = PAIR_MAP.get((strong_cur, weak_cur)) is not None
-            action  = "BUY" if is_base_strong else "SELL"
-            quality = "★★★★★" if gap > 0.3 else ("★★★★" if gap > 0.15 else ("★★★" if gap > 0.05 else ("★★" if gap > 0.02 else "★")))
-            pair_recs.append({
-                "pair":       pair,
-                "action":     action,
-                "gap":        round(gap, 3),
-                "strong":     strong_cur,
-                "weak":       weak_cur,
-                "quality":    quality,
-                "confidence": round(min(99, 50 + gap * 200), 0)
-            })
-            if len(pair_recs) >= 8:
-                break
-        if len(pair_recs) >= 8:
-            break
+                # Quality & confidence based on move magnitude
+                abs_chg = abs(chg_pct)
+                if kind == "index":
+                    q_th = [0.8, 0.5, 0.25, 0.1]
+                    c_mul = 15
+                else:
+                    q_th = [0.5, 0.3, 0.1, 0.05]
+                    c_mul = 30
+                quality = ("★★★★★" if abs_chg > q_th[0] else
+                           "★★★★"  if abs_chg > q_th[1] else
+                           "★★★"   if abs_chg > q_th[2] else
+                           "★★"    if abs_chg > q_th[3] else "★")
+                confidence = round(min(99, 50 + abs_chg * c_mul), 0)
 
-    # ── Priority pairs: USDJPY & EURUSD guaranteed in top signals ────────────────
-    PRIORITY_PAIRS = [
-        ("USD", "JPY", "USDJPY"),   # most-watched major
-        ("EUR", "USD", "EURUSD"),   # most-traded major
+                return {
+                    "pair":       label,
+                    "action":     action,
+                    "gap":        round(abs_chg / 100, 4),
+                    "strong":     "BULL" if action == "BUY" else "BEAR",
+                    "weak":       "BEAR" if action == "BUY" else "BULL",
+                    "quality":    quality,
+                    "confidence": confidence,
+                    "change_pct": round(chg_pct, 3),
+                    "_sym":       sym,
+                    "_digits":    digits,
+                    "_entry":     entry,
+                }
+            except Exception:
+                continue
+        return None
+
+    FIXED_INSTRUMENTS = [
+        ("XAUUSD",  ["XAUUSD"],                      "forex"),
+        ("USDJPY",  ["USDJPY"],                      "forex"),
+        ("WTI OIL", ["WTI","XTIUSD","USOIL","CL"],  "index"),
+        ("NIKKEI",  ["JP225","JPN225","NI225","JP225Cash","JAPAN225"], "index"),
+        ("DOW JONES",["US30","DJ30","DJIA","WS30","USA30"],             "index"),
     ]
-    existing_pairs = {r["pair"] for r in pair_recs}
-    csi_by_cur = {CURR_FULL[k]: v for k, v in strengths.items()}
 
-    insert_pos = 2   # inject after XAUUSD (0) and WTI OIL (1)
-    for base_cur, quote_cur, symbol in PRIORITY_PAIRS:
-        if symbol in existing_pairs:
-            continue
-        base_str  = csi_by_cur.get(base_cur, 0)
-        quote_str = csi_by_cur.get(quote_cur, 0)
-        gap    = abs(base_str - quote_str)
-        if gap < 0.001:
-            continue
-        action = "BUY" if base_str > quote_str else "SELL"
-        strong = base_cur  if action == "BUY" else quote_cur
-        weak   = quote_cur if action == "BUY" else base_cur
-        quality = "★★★★★" if gap > 0.3 else ("★★★★" if gap > 0.15 else ("★★★" if gap > 0.05 else "★★"))
-        priority_obj = {
-            "pair":       symbol,
-            "action":     action,
-            "gap":        round(gap, 3),
-            "strong":     strong,
-            "weak":       weak,
-            "quality":    quality,
-            "confidence": round(min(99, 50 + gap * 200), 0)
-        }
-        # Insert at fixed position, drop the last slot to keep total ≤ 8
-        pair_recs.insert(insert_pos, priority_obj)
-        if len(pair_recs) > 8:
-            pair_recs.pop()          # remove weakest (last) to stay at 8
-        existing_pairs.add(symbol)
-        insert_pos += 1
+    pair_recs = []
+    for label, sym_opts, kind in FIXED_INSTRUMENTS:
+        sig = get_signal(sym_opts, label, kind)
+        if sig:
+            pair_recs.append(sig)
+        else:
+            # Placeholder when MT5 data unavailable (e.g. market closed)
+            pair_recs.append({
+                "pair": label, "action": "WAIT",
+                "gap": 0, "strong": "---", "weak": "---",
+                "quality": "★", "confidence": 0,
+                "change_pct": None
+            })
+
 
     # ── Intermarket Indices ─────────────────────────────────────────────────────
     def get_price_and_change(sym_opts):
@@ -548,64 +527,16 @@ def api_laggard_detection():
             "stars": im["stars"]
         })
         
-    # ── Commodity Signals: XAUUSD & WTI Oil ─────────────────────────────────────
-    # Fetch XAUUSD live
-    xau_price, xau_chg = get_price_and_change(["XAUUSD"])
-    oil_price, oil_chg = get_price_and_change(["WTI", "XTIUSD", "USOIL", "CL"])
-
-    COMMODITY_SYMBOLS = ["XAUUSD", "WTI OIL"]
-    seen_syms = {r["pair"] for r in pair_recs}
-
-    if xau_price and "XAUUSD" not in seen_syms:
-        xau_action = "BUY" if xau_chg > 0 else "SELL"
-        xau_gap    = abs(xau_chg) / 100.0
-        xau_qual   = "★★★★★" if abs(xau_chg) > 0.5 else ("★★★★" if abs(xau_chg) > 0.3 else ("★★★" if abs(xau_chg) > 0.1 else "★★"))
-        pair_recs.insert(0, {          # always show XAUUSD first
-            "pair": "XAUUSD",
-            "action": xau_action,
-            "gap": round(xau_gap, 4),
-            "strong": "XAU" if xau_action == "BUY" else "USD",
-            "weak":   "USD" if xau_action == "BUY" else "XAU",
-            "quality": xau_qual,
-            "confidence": round(min(99, 50 + abs(xau_chg) * 30), 0),
-            "change_pct": round(xau_chg, 3)
-        })
-
-    if oil_price and "WTI OIL" not in seen_syms:
-        oil_action = "BUY" if oil_chg > 0 else "SELL"
-        oil_gap    = abs(oil_chg) / 100.0
-        oil_qual   = "★★★★★" if abs(oil_chg) > 1.5 else ("★★★★" if abs(oil_chg) > 1.0 else ("★★★" if abs(oil_chg) > 0.5 else "★★"))
-        pair_recs.insert(1, {          # show Oil second
-            "pair": "WTI OIL",
-            "action": oil_action,
-            "gap": round(oil_gap, 4),
-            "strong": "OIL" if oil_action == "BUY" else "USD",
-            "weak":   "USD" if oil_action == "BUY" else "OIL",
-            "quality": oil_qual,
-            "confidence": round(min(99, 50 + abs(oil_chg) * 20), 0),
-            "change_pct": round(oil_chg, 3)
-        })
-
-    # Keep max 8 total (commodities + forex)
-    pair_recs = pair_recs[:8]
-
-    # ── Enrich every pair with ATR-based Entry / SL / TP ────────────────────────
+    # ── ATR-based Entry / SL / TP for each fixed instrument ─────────────────────
     SYM_OPTS_MAP = {
-        "XAUUSD":  ["XAUUSD"],
-        "WTI OIL": ["WTI", "XTIUSD", "USOIL", "CL"],
-        "EURUSD":  ["EURUSD"],  "GBPUSD":  ["GBPUSD"],  "USDJPY":  ["USDJPY"],
-        "USDCHF":  ["USDCHF"],  "USDCAD":  ["USDCAD"],  "AUDUSD":  ["AUDUSD"],
-        "NZDUSD":  ["NZDUSD"],  "EURJPY":  ["EURJPY"],  "EURGBP":  ["EURGBP"],
-        "GBPJPY":  ["GBPJPY"],  "AUDJPY":  ["AUDJPY"],  "AUDNZD":  ["AUDNZD"],
-        "CADJPY":  ["CADJPY"],  "CHFJPY":  ["CHFJPY"],  "EURCHF":  ["EURCHF"],
-        "EURCAD":  ["EURCAD"],  "EURAUD":  ["EURAUD"],  "EURNZD":  ["EURNZD"],
-        "GBPCHF":  ["GBPCHF"],  "GBPCAD":  ["GBPCAD"],  "GBPAUD":  ["GBPAUD"],
-        "GBPNZD":  ["GBPNZD"],  "AUDCAD":  ["AUDCAD"],  "AUDCHF":  ["AUDCHF"],
-        "NZDJPY":  ["NZDJPY"],  "NZDCAD":  ["NZDCAD"],  "NZDCHF":  ["NZDCHF"],
-        "CADCHF":  ["CADCHF"],
+        "XAUUSD":   ["XAUUSD"],
+        "USDJPY":   ["USDJPY"],
+        "WTI OIL":  ["WTI", "XTIUSD", "USOIL", "CL"],
+        "NIKKEI":   ["JP225", "JPN225", "NI225", "JP225Cash", "JAPAN225"],
+        "DOW JONES":["US30", "DJ30", "DJIA", "WS30", "USA30"],
     }
     for rec in pair_recs:
-        sym_opts = SYM_OPTS_MAP.get(rec["pair"], [rec["pair"]])
+        sym_opts = SYM_OPTS_MAP.get(rec["pair"], [rec.get("_sym", rec["pair"])])
         atr_data = get_atr_sl_tp(sym_opts, rec["action"])
         if atr_data:
             rec["entry"]  = atr_data["entry"]
@@ -614,10 +545,15 @@ def api_laggard_detection():
             rec["atr"]    = atr_data["atr"]
             rec["digits"] = atr_data["digits"]
         else:
-            rec["entry"] = None
+            rec["entry"] = rec.get("_entry")
             rec["sl"]    = None
             rec["tp"]    = None
             rec["atr"]   = None
+            rec["digits"] = rec.get("_digits", 2)
+        # Clean internal keys before sending to frontend
+        rec.pop("_sym",    None)
+        rec.pop("_digits", None)
+        rec.pop("_entry",  None)
 
     return jsonify({
         "status": "success",
@@ -627,6 +563,7 @@ def api_laggard_detection():
         "pair_recommendations": pair_recs,
         "intermarket": intermarket
     })
+
 
 @app.route('/api/news_calendar')
 def get_news_calendar():

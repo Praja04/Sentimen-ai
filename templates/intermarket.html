@@ -462,7 +462,7 @@
         <div class="panel">
             <div class="panel-hdr">
                 <div class="panel-title">🎯 TOP PAIR SIGNALS</div>
-                <div class="badge badge-live">CSI + ATR H4 · RR 1:2</div>
+                <div class="badge badge-live">LIVE SIGNALS · ATR H4 · RR 1:2</div>
             </div>
             <div class="panel-body" style="padding: 0; gap: 0;">
                 <!-- Table header -->
@@ -643,7 +643,20 @@
             if (val == null) return '---';
             return Number(val).toFixed(Math.min(digits || 5, 5));
         }
-        const ICONS = { 'XAUUSD': '🥇 ', 'WTI OIL': '🛢️ ' };
+        const ICONS = {
+            'XAUUSD':    '🥇 ',
+            'USDJPY':    '🇯🇵 ',
+            'WTI OIL':   '🛢️ ',
+            'NIKKEI':    '🗼 ',
+            'DOW JONES': '🏛️ ',
+        };
+        const ROW_CLASS = {
+            'XAUUSD':    'pair-row com-xau',
+            'WTI OIL':   'pair-row com-oil',
+            'NIKKEI':    'pair-row',
+            'DOW JONES': 'pair-row',
+            'USDJPY':    'pair-row',
+        };
 
         body.innerHTML = recs.slice(0, 8).map(rec => {
             const isBuy   = rec.action === 'BUY';
@@ -653,9 +666,16 @@
             const confC   = confPct >= 85 ? '#00ff41' : confPct >= 70 ? '#fbbf24' : '#ff3333';
             const d       = rec.digits || 5;
             const icon    = ICONS[rec.pair] || '';
-            const rowCls  = rec.pair === 'XAUUSD' ? 'pair-row com-xau'
-                          : rec.pair === 'WTI OIL' ? 'pair-row com-oil'
+            const rowCls  = rec.pair === 'XAUUSD'    ? 'pair-row com-xau'
+                          : rec.pair === 'WTI OIL'   ? 'pair-row com-oil'
+                          : rec.pair === 'NIKKEI'     ? `pair-row ${cls}` + ' nikkei-row'
+                          : rec.pair === 'DOW JONES'  ? `pair-row ${cls}` + ' dj-row'
                           : `pair-row ${cls}`;
+            // For indices, show change_pct instead of strong/weak ccy label
+            const isIndex = ['NIKKEI','DOW JONES','WTI OIL'].includes(rec.pair);
+            const subLabel = rec.change_pct != null
+                ? `<span style="color:${actC}">${rec.change_pct > 0 ? '+' : ''}${rec.change_pct}%</span> today`
+                : `<span style="color:${actC}">${rec.strong||''}</span>${rec.weak && !isIndex ? ` → ${rec.weak}` : ''}`;
 
             const entryTxt = fmt(rec.entry, d);
             const slTxt    = fmt(rec.sl, d);
@@ -665,9 +685,7 @@
                 <!-- PAIR -->
                 <div>
                     <div class="pr-name">${icon}${rec.pair}</div>
-                    <div style="font-size:0.58rem;color:var(--muted);margin-top:1px;">
-                        <span style="color:${actC}">${rec.strong||''}</span>${rec.weak ? ` → ${rec.weak}` : ''}
-                    </div>
+                    <div style="font-size:0.58rem;color:var(--muted);margin-top:1px;">${subLabel}</div>
                 </div>
                 <!-- AKSI -->
                 <div><span class="pr-act ${cls}">${rec.action}</span></div>
