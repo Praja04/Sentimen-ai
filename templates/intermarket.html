@@ -246,23 +246,23 @@
         .im-tbl {
             flex: 1 1 0; min-height: 0;
             width: 100%; border-collapse: collapse;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             display: block; overflow: hidden;
         }
         .im-tbl thead { display: block; width: 100%; }
         .im-tbl tbody { display: block; width: 100%; overflow: hidden; }
-        .im-tbl tr    { display: flex; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .im-tbl tr:hover { background: rgba(255,255,255,0.02); }
+        .im-tbl tr    { display: flex; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .im-tbl tr:hover { background: rgba(255,255,255,0.03); }
         .im-tbl th, .im-tbl td {
-            flex: 1; padding: 6px 6px;
+            flex: 1; padding: 5px 6px;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             color: #ccd9e8;
         }
         .im-tbl th {
-            font-size: 0.67rem; color: #a8c4e0;
-            letter-spacing: 1.2px; font-weight: 600;
+            font-size: 0.62rem; color: #a8c4e0;
+            letter-spacing: 1.2px; font-weight: 700;
             border-bottom: 1px solid rgba(255,255,255,0.12);
-            padding-bottom: 5px;
+            padding-bottom: 4px;
             text-transform: uppercase;
         }
         .im-tbl .col-name { flex: 1.2; font-weight: bold; color: var(--white); }
@@ -357,52 +357,48 @@
             margin-top: 2px; overflow: hidden;
         }
 
-        /* ── GOLD OUTLOOK SUMMARY ── */
+        /* ── GOLD OUTLOOK SUMMARY (compact 1-line) ── */
         .gold-summary {
-            background: linear-gradient(90deg,rgba(251,191,36,0.06),rgba(251,191,36,0.02));
-            border: 1px solid rgba(251,191,36,0.25);
-            border-radius: 6px;
-            padding: 6px 10px;
-            display: flex; flex-direction: column; gap: 4px;
-        }
-        .gold-summary-header {
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .gold-summary-label {
-            font-size: 0.62rem; color: #fbbf24; letter-spacing: 1.5px; font-weight: 700;
+            background: linear-gradient(90deg,rgba(251,191,36,0.08),rgba(0,255,65,0.03));
+            border: 1px solid rgba(251,191,36,0.3);
+            border-radius: 5px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .gold-summary-verdict {
-            font-family: var(--title); font-size: 0.92rem; font-weight: 700;
-            letter-spacing: 1px;
+            font-family: var(--title); font-size: 0.88rem; font-weight: 800;
+            letter-spacing: 1px; flex-shrink: 0;
         }
         .gold-summary-bar-wrap {
-            height: 8px; border-radius: 4px;
+            flex: 1; height: 7px; border-radius: 4px;
             background: rgba(255,255,255,0.07);
             overflow: hidden; position: relative;
+        }
+        .gold-summary-bar-bull {
+            position: absolute; left: 0; top: 0; height: 100%;
+            background: linear-gradient(90deg,#fbbf24,#00ff4188);
+            border-radius: 4px; transition: width .8s;
         }
         .gold-summary-bar-bear {
             position: absolute; right: 0; top: 0; height: 100%;
             background: linear-gradient(90deg,#ff666655,#ff4444);
-            border-radius: 4px;
-            transition: width .8s;
-        }
-        .gold-summary-bar-bull {
-            position: absolute; left: 0; top: 0; height: 100%;
-            background: linear-gradient(90deg,#fbbf24,#00ff4155);
-            border-radius: 4px;
-            transition: width .8s;
+            border-radius: 4px; transition: width .8s;
         }
         .gold-summary-bar-mid {
-            position: absolute; left: 50%; top: -1px; width: 2px; height: 110%;
-            background: rgba(255,255,255,0.3);
+            position: absolute; left: 50%; top: 0; width: 2px; height: 100%;
+            background: rgba(255,255,255,0.25);
         }
-        .gold-summary-detail {
-            display: flex; gap: 6px; flex-wrap: wrap;
+        .gold-summary-pct {
+            font-size: 0.78rem; font-weight: 800; flex-shrink: 0;
+        }
+        .gold-summary-chips {
+            display: flex; gap: 4px; flex-wrap: wrap; margin-top: 0;
         }
         .gsd-chip {
-            font-size: 0.56rem; padding: 1px 6px;
-            border-radius: 4px; border: 1px solid;
-            opacity: 0.85;
+            font-size: 0.55rem; padding: 1px 5px;
+            border-radius: 3px; border: 1px solid;
         }
 
         /* ── FOOTER ── */
@@ -478,12 +474,12 @@
         <!-- CENTER: STACKED INTERMARKET & LAGGARD ──────────── -->
         <div style="display:flex; flex-direction:column; gap:5px; height:100%; min-height:0;">
             <!-- PANEL 1: INTERMARKET TABLE -->
-            <div class="panel" style="flex: 1 1 0; min-height: 0;">
+            <div class="panel" style="flex: 1.65 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">🔗 INTERMARKET vs GOLD</div>
                     <div class="badge badge-warn">⭐ XAUUSD FOCUS</div>
                 </div>
-                <div class="panel-body" style="padding: 4px 6px;">
+                <div class="panel-body" style="padding: 3px 5px; display:flex; flex-direction:column; gap:0; flex:1 1 0; min-height:0; overflow:hidden;">
                     <table class="im-tbl">
                         <thead>
                             <tr>
@@ -497,12 +493,12 @@
                         <tbody id="im-tbody"></tbody>
                     </table>
                     <!-- GOLD OUTLOOK SUMMARY -->
-                    <div id="gold-summary" style="flex:0 0 auto;margin-top:5px;"></div>
+                    <div id="gold-summary" style="flex:0 0 auto;margin-top:3px;"></div>
                 </div>
             </div>
 
             <!-- PANEL 2: LAGGARD DETECTION (REAL vs FVG) -->
-            <div class="panel" style="flex: 1.2 1 0; min-height: 0;">
+            <div class="panel" style="flex: 0.65 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">⚡ LAGGARD DETECTION (REAL vs FVG)</div>
                     <div id="lag-action" class="lag-action" style="font-size: 0.75rem;">---</div>
@@ -705,22 +701,14 @@
 
         el.innerHTML = `
         <div class="gold-summary">
-            <div class="gold-summary-header">
-                <div>
-                    <div class="gold-summary-label">🥇 XAUUSD INTERMARKET OUTLOOK</div>
-                    <div class="gold-summary-verdict" style="color:${verdictC}">${emoji} ${verdict}</div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:0.78rem;font-weight:bold;color:${verdictC}">${displayPct}% ${isBull?'BULLISH':isBear?'BEARISH':'NEUTRAL'}</div>
-                    <div style="font-size:0.56rem;color:#8ab4d4;margin-top:1px;">${arr.length} signals · ${strength}</div>
-                </div>
-            </div>
+            <div class="gold-summary-verdict" style="color:${verdictC}">${emoji} ${verdict}</div>
             <div class="gold-summary-bar-wrap">
                 <div class="gold-summary-bar-mid"></div>
                 <div class="gold-summary-bar-bull" style="width:${bullBarW}%"></div>
                 <div class="gold-summary-bar-bear" style="width:${bearBarW}%"></div>
             </div>
-            <div class="gold-summary-detail">${chips.join('')}</div>
+            <div class="gold-summary-pct" style="color:${verdictC}">${displayPct}%</div>
+            <div style="font-size:0.58rem;color:#8ab4d4;flex-shrink:0;">${strength}</div>
         </div>`;
     }
 
