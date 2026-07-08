@@ -434,6 +434,43 @@ def api_laggard_detection():
                         return round(t.bid, 4), round(chg, 3)
         return None, 0.0
 
+    def get_atr_sl_tp(sym_opts, action, atr_periods=14, rr=2.0):
+        """Fetch ATR from H4 candles, return entry/sl/tp/atr rounded appropriately."""
+        for sym in sym_opts:
+            mt5.symbol_select(sym, True)
+            info = mt5.symbol_info(sym)
+            tick = mt5.symbol_info_tick(sym)
+            if not tick or not info:
+                continue
+            rates = mt5.copy_rates_from_pos(sym, mt5.TIMEFRAME_H4, 0, atr_periods + 1)
+            if rates is None or len(rates) < atr_periods:
+                continue
+            # Calculate ATR (Wilder)
+            trs = []
+            for i in range(1, len(rates)):
+                h  = rates[i]['high']
+                l  = rates[i]['low']
+                pc = rates[i-1]['close']
+                trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+            atr = sum(trs[-atr_periods:]) / atr_periods
+            # Determine decimal places from symbol
+            digits = info.digits if info.digits else 5
+            entry = round(tick.bid, digits)
+            if action == "BUY":
+                sl = round(entry - atr, digits)
+                tp = round(entry + rr * atr, digits)
+            else:
+                sl = round(entry + atr, digits)
+                tp = round(entry - rr * atr, digits)
+            return {
+                "entry": entry,
+                "sl":    sl,
+                "tp":    tp,
+                "atr":   round(atr, digits),
+                "digits": digits
+            }
+        return None
+
     # Map symbols to intermarket items
     intermarket = []
     im_defs = [
@@ -504,6 +541,36 @@ def api_laggard_detection():
 
     # Keep max 8 total (commodities + forex)
     pair_recs = pair_recs[:8]
+
+    # ── Enrich every pair with ATR-based Entry / SL / TP ────────────────────────
+    SYM_OPTS_MAP = {
+        "XAUUSD":  ["XAUUSD"],
+        "WTI OIL": ["WTI", "XTIUSD", "USOIL", "CL"],
+        "EURUSD":  ["EURUSD"],  "GBPUSD":  ["GBPUSD"],  "USDJPY":  ["USDJPY"],
+        "USDCHF":  ["USDCHF"],  "USDCAD":  ["USDCAD"],  "AUDUSD":  ["AUDUSD"],
+        "NZDUSD":  ["NZDUSD"],  "EURJPY":  ["EURJPY"],  "EURGBP":  ["EURGBP"],
+        "GBPJPY":  ["GBPJPY"],  "AUDJPY":  ["AUDJPY"],  "AUDNZD":  ["AUDNZD"],
+        "CADJPY":  ["CADJPY"],  "CHFJPY":  ["CHFJPY"],  "EURCHF":  ["EURCHF"],
+        "EURCAD":  ["EURCAD"],  "EURAUD":  ["EURAUD"],  "EURNZD":  ["EURNZD"],
+        "GBPCHF":  ["GBPCHF"],  "GBPCAD":  ["GBPCAD"],  "GBPAUD":  ["GBPAUD"],
+        "GBPNZD":  ["GBPNZD"],  "AUDCAD":  ["AUDCAD"],  "AUDCHF":  ["AUDCHF"],
+        "NZDJPY":  ["NZDJPY"],  "NZDCAD":  ["NZDCAD"],  "NZDCHF":  ["NZDCHF"],
+        "CADCHF":  ["CADCHF"],
+    }
+    for rec in pair_recs:
+        sym_opts = SYM_OPTS_MAP.get(rec["pair"], [rec["pair"]])
+        atr_data = get_atr_sl_tp(sym_opts, rec["action"])
+        if atr_data:
+            rec["entry"]  = atr_data["entry"]
+            rec["sl"]     = atr_data["sl"]
+            rec["tp"]     = atr_data["tp"]
+            rec["atr"]    = atr_data["atr"]
+            rec["digits"] = atr_data["digits"]
+        else:
+            rec["entry"] = None
+            rec["sl"]    = None
+            rec["tp"]    = None
+            rec["atr"]   = None
 
     return jsonify({
         "status": "success",

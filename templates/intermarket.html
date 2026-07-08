@@ -610,9 +610,14 @@
                 Pasar sideways — CSI gap terlalu kecil</div>`;
             return;
         }
-        const COMMODITY_ICONS = { 'XAUUSD': '🥇', 'WTI OIL': '🛢️' };
+        const COMMODITY_ICONS  = { 'XAUUSD': '🥇', 'WTI OIL': '🛢️' };
         const COMMODITY_BORDER = { 'XAUUSD': 'rgba(251,191,36,0.35)', 'WTI OIL': 'rgba(249,115,22,0.35)' };
-        const COMMODITY_BG    = { 'XAUUSD': 'rgba(251,191,36,0.06)',  'WTI OIL': 'rgba(249,115,22,0.06)'  };
+        const COMMODITY_BG     = { 'XAUUSD': 'rgba(251,191,36,0.06)',  'WTI OIL': 'rgba(249,115,22,0.06)'  };
+
+        function fmt(val, digits) {
+            if (val == null) return '---';
+            return Number(val).toFixed(Math.min(digits || 5, 5));
+        }
 
         grid.innerHTML = recs.slice(0, 8).map(rec => {
             const isBuy   = rec.action === 'BUY';
@@ -622,25 +627,51 @@
             const confC   = confPct >= 85 ? '#00ff41' : confPct >= 70 ? '#fbbf24' : '#ff3333';
             const isCom   = COMMODITY_ICONS[rec.pair] !== undefined;
             const icon    = COMMODITY_ICONS[rec.pair] || '';
-            const chgTxt  = rec.change_pct != null
-                ? `<span style="color:${actC};font-size:0.7rem;">${rec.change_pct > 0 ? '+' : ''}${rec.change_pct}%</span>`
-                : '';
-            const cardBorder = isCom ? COMMODITY_BORDER[rec.pair] : (isBuy ? 'rgba(0,255,65,0.2)' : 'rgba(255,51,51,0.2)');
+            const d       = rec.digits || 5;
+            const chgBadge = rec.change_pct != null
+                ? `<span style="color:${actC};font-size:0.68rem;font-weight:bold;">${rec.change_pct > 0 ? '+' : ''}${rec.change_pct}%</span>`
+                : `<span style="color:var(--muted);font-size:0.65rem;">CONF ${confPct}%</span>`;
+            const cardBorder = isCom ? COMMODITY_BORDER[rec.pair] : (isBuy ? 'rgba(0,255,65,0.22)' : 'rgba(255,51,51,0.22)');
             const cardBg     = isCom ? COMMODITY_BG[rec.pair]     : 'transparent';
-            return `<div class="pc ${cls}" style="border-color:${cardBorder};background:${cardBg};">
+
+            // TP/SL rows
+            const hasLevels = rec.entry != null;
+            const levelsHTML = hasLevels ? `
+                <div style="display:grid;grid-template-columns:auto 1fr auto 1fr;gap:2px 6px;font-size:0.65rem;margin-top:2px;">
+                    <span style="color:var(--muted);">ENTRY</span>
+                    <span style="color:var(--white);font-weight:bold;">${fmt(rec.entry, d)}</span>
+                    <span style="color:var(--muted);">ATR</span>
+                    <span style="color:var(--text);">${fmt(rec.atr, d)}</span>
+                    <span style="color:#ff3333;">SL</span>
+                    <span style="color:#ff3333;font-weight:bold;">${fmt(rec.sl, d)}</span>
+                    <span style="color:#00ff41;">TP</span>
+                    <span style="color:#00ff41;font-weight:bold;">${fmt(rec.tp, d)}</span>
+                </div>
+                <div style="display:flex;gap:6px;margin-top:2px;font-size:0.6rem;">
+                    <span style="color:var(--muted);">RR</span>
+                    <span style="color:var(--gold);font-weight:bold;">1:2</span>
+                    <span style="color:var(--muted);">·</span>
+                    <span style="color:var(--muted);">ATR H4</span>
+                    <span style="color:var(--muted);margin-left:auto;">${rec.quality || ''}</span>
+                </div>` : `
+                <div style="color:var(--muted);font-size:0.62rem;text-align:center;padding:4px 0;">
+                    TP/SL: Tidak tersedia (MT5 offline)
+                </div>`;
+
+            return `<div class="pc ${cls}" style="border-color:${cardBorder};background:${cardBg};gap:4px;">
                 <div class="pc-top">
-                    <span class="pc-pair">${icon} ${rec.pair}</span>
+                    <span class="pc-pair" style="font-size:0.9rem;">${icon}${icon ? ' ' : ''}${rec.pair}</span>
                     <span class="pc-act ${cls}">${rec.action}</span>
                 </div>
-                <div class="pc-ccy" style="display:flex;justify-content:space-between;align-items:center;">
-                    <span><span style="color:${actC}">${rec.strong || ''}</span>${rec.weak ? ` vs <span style="color:var(--muted)">${rec.weak}</span>` : ''}</span>
-                    ${chgTxt}
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:0.68rem;color:var(--muted);">
+                        <span style="color:${actC}">${rec.strong||''}</span>${rec.weak ? ` → ${rec.weak}` : ''}
+                    </span>
+                    ${chgBadge}
                 </div>
-                <div class="pc-mid">
-                    <span class="pc-qual">${rec.quality || '---'}</span>
-                    <span class="pc-conf" style="color:${confC}">${confPct}%</span>
-                </div>
-                <div class="pc-bar">
+                <div style="height:1px;background:rgba(255,255,255,0.06);margin:1px 0;"></div>
+                ${levelsHTML}
+                <div class="pc-bar" style="margin-top:2px;">
                     <div class="pc-fill" style="width:${confPct}%;background:linear-gradient(90deg,${actC}55,${actC})"></div>
                 </div>
             </div>`;

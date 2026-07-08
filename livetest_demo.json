@@ -1,21 +1,21 @@
 {
     "balance": 10543.1,
-    "equity": 10771.02,
+    "equity": 10558.22,
     "active_trades": [
         {
-            "ticket": 27491683,
-            "time": "2026-07-08 08:41:56",
+            "ticket": 27911421,
+            "time": "2026-07-08 09:51:54",
             "symbol": "XAUUSD",
             "type": "BUY",
             "lots": 0.14,
-            "entry_price": 4102.04,
-            "current_price": 4118.32,
-            "sl": 4087.04,
-            "tp": 4124.04,
+            "entry_price": 4115.68,
+            "current_price": 4116.76,
+            "sl": 4100.68,
+            "tp": 4137.68,
             "commission": -1.5,
             "swap": 0.0,
             "status": "RUNNING",
-            "profit": 227.92
+            "profit": 15.12
         }
     ],
     "history": [
@@ -68,5 +68,5 @@
             "result": "PROFIT"
         }
     ],
-    "last_update": 1783477999.4315288
+    "last_update": 1783479227.145723
 }
