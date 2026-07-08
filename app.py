@@ -322,14 +322,19 @@ def api_xedy():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/laggard_detection')
-def api_laggard_detection():
+# Global cache for real-time dashboard data
+cached_dashboard_data = {}
+cached_dashboard_lock = threading.Lock()
+
+def _compute_dashboard_data():
+    """Computes all regression, CSI, and pair signals. Returns a dict."""
+    import numpy as np
+    
     # Trigger automatic background speech headline updates
     auto_update_speech_sentiment()
     
-    import numpy as np
     if not init_mt5():
-        return jsonify({"error": "Failed to connect to MT5"}), 500
+        return {"error": "Failed to connect to MT5"}
         
     symbols = {
         "XAUUSD": ["XAUUSD", "GOLD"],
@@ -774,7 +779,11 @@ def api_laggard_detection():
             rec["fundamental_summary"] = ""
             rec["fundamental_detail"]  = {}
 
-    return jsonify({
+    # Minimasi Payload: Remove verbose tooltip text if we want the smallest payload size
+    for rec in pair_recs:
+        rec.pop("fundamental_detail", None)
+        
+    return {
         "status": "success",
         "laggard_leader": laggard_leader,
         "results": results,
@@ -782,7 +791,43 @@ def api_laggard_detection():
         "pair_recommendations": pair_recs,
         "intermarket": intermarket,
         "risk_radar": risk_radar
-    })
+    }
+
+
+@app.route('/api/laggard_detection')
+def api_laggard_detection():
+    global cached_dashboard_data
+    # Return from cache instantly with no latency
+    with cached_dashboard_lock:
+        if not cached_dashboard_data:
+            # Fallback computation on startup if cache is empty
+            cached_dashboard_data = _compute_dashboard_data()
+        
+        # If an error occurred in background, compute on demand
+        if "error" in cached_dashboard_data:
+            return jsonify(cached_dashboard_data), 500
+            
+        return jsonify(cached_dashboard_data)
+
+
+def run_dashboard_updater_loop():
+    """Background thread that runs calculations every 5 seconds to keep all pages updated without user activity."""
+    import time
+    time.sleep(5) # Warmup delay
+    global cached_dashboard_data
+    while True:
+        try:
+            new_data = _compute_dashboard_data()
+            if "error" not in new_data:
+                with cached_dashboard_lock:
+                    cached_dashboard_data = new_data
+        except Exception as e:
+            print("[Dashboard Thread] Update error:", e)
+        time.sleep(5)
+
+# Auto start the background dashboard updater thread on load
+import threading
+threading.Thread(target=run_dashboard_updater_loop, daemon=True).start()
 
 
 @app.route('/api/fundamental_scores')
