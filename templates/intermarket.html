@@ -338,7 +338,7 @@
         .pr-fund-tip {
             display: none;
             position: absolute; z-index: 999;
-            right: 0; bottom: 110%; top: auto;
+            right: 0; top: 110%; bottom: auto;
             background: #0d1117;
             border: 1px solid rgba(59,130,246,0.35);
             border-radius: 8px;
@@ -349,6 +349,13 @@
             color: var(--text);
             box-shadow: 0 8px 32px rgba(0,0,0,.7);
             text-align: left;
+            margin-top: 5px;
+        }
+        /* Overlap for bottom rows (last 2 rows in the list) to display upwards instead of downwards */
+        .pair-tbl-body .pair-row:nth-last-child(-n+2) .pr-fund-tip {
+            bottom: 110%;
+            top: auto;
+            margin-top: 0;
             margin-bottom: 5px;
         }
         .pr-fund:hover .pr-fund-tip { display: block; }
