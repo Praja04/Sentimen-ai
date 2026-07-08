@@ -784,6 +784,15 @@ def _compute_dashboard_data():
     for rec in pair_recs:
         rec.pop("fundamental_detail", None)
         
+    # Read news feed to pass it along to the intermarket page
+    news_feed = []
+    try:
+        with open(XEDY_DATABASE_PATH, 'r', encoding='utf-8') as f_xedy:
+            db_data = json.load(f_xedy)
+            news_feed = db_data.get("news_feed", [])
+    except Exception as e:
+        print("[Dashboard Compute] Error loading news_feed for cache:", e)
+
     return {
         "status": "success",
         "laggard_leader": laggard_leader,
@@ -791,7 +800,8 @@ def _compute_dashboard_data():
         "currency_indices": scaled_indices,
         "pair_recommendations": pair_recs,
         "intermarket": intermarket,
-        "risk_radar": risk_radar
+        "risk_radar": risk_radar,
+        "news_feed": news_feed
     }
 
 
