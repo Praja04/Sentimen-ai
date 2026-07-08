@@ -474,7 +474,7 @@
         <!-- CENTER: STACKED INTERMARKET & LAGGARD ──────────── -->
         <div style="display:flex; flex-direction:column; gap:5px; height:100%; min-height:0;">
             <!-- PANEL 1: INTERMARKET TABLE -->
-            <div class="panel" style="flex: 1.85 1 0; min-height: 0;">
+            <div class="panel" style="flex: 1.1 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">🔗 INTERMARKET vs GOLD</div>
                     <div class="badge badge-warn">⭐ XAUUSD FOCUS</div>
@@ -498,13 +498,11 @@
                         </thead>
                         <tbody id="im-tbody"></tbody>
                     </table>
-                    <!-- GOLD OUTLOOK SUMMARY -->
-                    <div id="gold-summary" style="flex:0 0 auto; margin-top:auto; padding-top:4px;"></div>
                 </div>
             </div>
 
             <!-- PANEL 2: LAGGARD DETECTION (REAL vs FVG) -->
-            <div class="panel" style="flex: 0.45 1 0; min-height: 0;">
+            <div class="panel" style="flex: 0.9 1 0; min-height: 0;">
                 <div class="panel-hdr">
                     <div class="panel-title">⚡ LAGGARD DETECTION (REAL vs FVG)</div>
                     <div id="lag-action" class="lag-action" style="font-size: 0.75rem;">---</div>
@@ -551,6 +549,8 @@
                 </div>
                 <!-- Table body injected by JS -->
                 <div class="pair-tbl-body" id="pair-grid"></div>
+                <!-- GOLD OUTLOOK SUMMARY -->
+                <div id="gold-summary" style="flex:0 0 auto; margin-top:auto; padding: 6px 10px; border-top: 1px solid var(--border);"></div>
             </div>
         </div>
 
