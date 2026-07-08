@@ -285,7 +285,7 @@
         }
         .pair-tbl-head {
             display: grid;
-            grid-template-columns: 1.3fr 0.7fr 1.1fr 1.1fr 1.1fr 0.65fr 0.55fr 0.5fr;
+            grid-template-columns: 1.4fr 0.7fr 1.1fr 1.1fr 1.1fr 0.7fr 0.65fr;
             gap: 0;
             border-bottom: 1px solid rgba(59,130,246,0.25);
             padding: 4px 6px;
@@ -487,14 +487,13 @@
             <div class="panel-body" style="padding: 0; gap: 0;">
                 <!-- Table header -->
                 <div class="pair-tbl-head">
-                    <span>PAIR</span>
+                    <span>PAIR &amp; KUAL</span>
                     <span>AKSI</span>
                     <span>ENTRY</span>
                     <span style="color:#ff4444;">SL</span>
                     <span style="color:#00ff41;">TP</span>
                     <span>CONF</span>
-                    <span style="text-align:center;">FUND</span>
-                    <span style="text-align:right;">KUAL</span>
+                    <span style="text-align:center;">FUND ℹ️</span>
                 </div>
                 <!-- Table body injected by JS -->
                 <div class="pair-tbl-body" id="pair-grid"></div>
@@ -722,10 +721,11 @@
                 <div style="margin-top:4px;color:var(--muted);font-style:italic;">${fSummary}</div>`;
 
             return `<div class="${rowCls}">
-                <!-- PAIR -->
+                <!-- PAIR + quality stars -->
                 <div>
                     <div class="pr-name">${icon}${rec.pair}</div>
                     <div style="font-size:0.58rem;color:var(--muted);margin-top:1px;">${subLabel}</div>
+                    <div style="color:var(--gold);font-size:0.6rem;letter-spacing:-1px;margin-top:1px;">${rec.quality || ''}</div>
                 </div>
                 <!-- AKSI -->
                 <div><span class="pr-act ${cls}">${rec.action}</span></div>
@@ -742,13 +742,12 @@
                         <div style="height:100%;border-radius:2px;width:${confPct}%;background:linear-gradient(90deg,${actC}55,${actC});transition:width .8s;"></div>
                     </div>
                 </div>
-                <!-- FUND -->
-                <div class="pr-fund" title="${fBias}">
-                    ${fIcon}
+                <!-- FUND (hover tooltip) -->
+                <div class="pr-fund" title="${fBias}: ${fScore}">
+                    <div style="font-size:0.68rem;font-weight:bold;">F:${fIcon}</div>
+                    <div style="font-size:0.55rem;color:var(--muted);">${fAdj || '±0'}</div>
                     <div class="pr-fund-tip">${fTip}</div>
                 </div>
-                <!-- KUAL -->
-                <div class="pr-qual">${rec.quality || ''}</div>
             </div>`;
         }).join('');
     }
