@@ -913,6 +913,9 @@
         }).join('');
     }
 
+    // Cache state to implement DOM Diffing / Targeted updates
+    let lastFetchedState = null;
+
     // ── MAIN FETCH ─────────────────────────────────────────────
     async function fetchAll() {
         try {
@@ -921,6 +924,24 @@
             });
             const data = await res.json();
             if (data.status === 'success') {
+                // Serialized comparison check to skip heavy DOM rebuilds if data is unchanged
+                const stateStr = JSON.stringify({
+                    im: data.intermarket,
+                    csi: data.currency_indices,
+                    recs: data.pair_recommendations,
+                    res: data.results,
+                    radar: data.risk_radar
+                });
+                
+                if (lastFetchedState === stateStr) {
+                    // Update only timestamp to show connectivity without heavy DOM rebuild
+                    const ts = document.getElementById('hdr-ts');
+                    if (ts) ts.innerText = new Date().toLocaleTimeString('en-GB');
+                    return;
+                }
+                
+                lastFetchedState = stateStr;
+
                 renderMacro(data.intermarket);
                 renderCSI(data.currency_indices);
                 renderIMTable(data.intermarket);

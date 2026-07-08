@@ -24,6 +24,10 @@ def init_db():
             correct INTEGER DEFAULT 0
         )
     ''')
+    # Speed optimization: Create indexes for fast lookups during live evaluation and ranking
+    c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_symbol ON predictions (symbol)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_evaluated ON predictions (evaluated)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_timestamp ON predictions (timestamp)')
     conn.commit()
     conn.close()
 
