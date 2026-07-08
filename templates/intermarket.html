@@ -610,7 +610,7 @@
                 Pasar sideways — CSI gap terlalu kecil</div>`;
             return;
         }
-        grid.innerHTML = recs.slice(0, 6).map(rec => {
+        grid.innerHTML = recs.slice(0, 8).map(rec => {
             const isBuy  = rec.action === 'BUY';
             const actC   = isBuy ? '#00ff41' : '#ff3333';
             const cls    = isBuy ? 'buy' : 'sell';

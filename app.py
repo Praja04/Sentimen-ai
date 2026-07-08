@@ -379,7 +379,12 @@ def api_laggard_detection():
         ("USD","CHF"): "USDCHF", ("USD","CAD"): "USDCAD", ("USD","AUD"): "AUDUSD",
         ("USD","NZD"): "NZDUSD", ("EUR","JPY"): "EURJPY", ("EUR","GBP"): "EURGBP",
         ("GBP","JPY"): "GBPJPY", ("AUD","JPY"): "AUDJPY", ("AUD","NZD"): "AUDNZD",
-        ("CAD","JPY"): "CADJPY", ("CHF","JPY"): "CHFJPY",
+        ("CAD","JPY"): "CADJPY", ("CHF","JPY"): "CHFJPY", ("EUR","CHF"): "EURCHF",
+        ("EUR","CAD"): "EURCAD", ("EUR","AUD"): "EURAUD", ("EUR","NZD"): "EURNZD",
+        ("GBP","CHF"): "GBPCHF", ("GBP","CAD"): "GBPCAD", ("GBP","AUD"): "GBPAUD",
+        ("GBP","NZD"): "GBPNZD", ("AUD","CAD"): "AUDCAD", ("AUD","CHF"): "AUDCHF",
+        ("NZD","JPY"): "NZDJPY", ("NZD","CAD"): "NZDCAD", ("NZD","CHF"): "NZDCHF",
+        ("CAD","CHF"): "CADCHF",
     }
     sorted_csi = sorted(strengths.items(), key=lambda x: x[1], reverse=True)
     pair_recs = []
@@ -389,7 +394,7 @@ def api_laggard_detection():
             if strong_key == weak_key:
                 continue
             gap = strong_val - weak_val
-            if gap < 0.05:
+            if gap < 0.01:   # lowered from 0.05 so sideways market still yields signals
                 continue
             strong_cur = CURR_FULL[strong_key]
             weak_cur = CURR_FULL[weak_key]
@@ -400,7 +405,7 @@ def api_laggard_detection():
             # Determine action
             is_base_strong = PAIR_MAP.get((strong_cur, weak_cur)) is not None
             action = "BUY" if is_base_strong else "SELL"
-            quality = "★★★★★" if gap > 0.3 else ("★★★★" if gap > 0.2 else ("★★★" if gap > 0.1 else "★★"))
+            quality = "★★★★★" if gap > 0.3 else ("★★★★" if gap > 0.15 else ("★★★" if gap > 0.05 else ("★★" if gap > 0.02 else "★")))
             pair_recs.append({
                 "pair": pair,
                 "action": action,
@@ -408,11 +413,11 @@ def api_laggard_detection():
                 "strong": strong_cur,
                 "weak": weak_cur,
                 "quality": quality,
-                "confidence": round(min(99, 50 + gap * 150), 0)
+                "confidence": round(min(99, 50 + gap * 200), 0)
             })
-            if len(pair_recs) >= 6:
+            if len(pair_recs) >= 8:
                 break
-        if len(pair_recs) >= 6:
+        if len(pair_recs) >= 8:
             break
 
     # ── Intermarket Indices ─────────────────────────────────────────────────────
