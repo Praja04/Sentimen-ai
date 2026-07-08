@@ -480,6 +480,12 @@
                     <div class="badge badge-warn">⭐ XAUUSD FOCUS</div>
                 </div>
                 <div class="panel-body" style="padding: 4px 6px; display:flex; flex-direction:column; gap:0; flex:1 1 0; min-height:0; overflow:hidden;">
+                    <!-- GLOBAL RISK RADAR BANNER -->
+                    <div id="risk-radar-banner" style="flex: 0 0 auto; margin-bottom: 4px; padding: 4px 8px; border-radius: 4px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 0.65rem; color: #8ab4d4; letter-spacing: 1px; font-weight: bold;">🚨 GLOBAL RISK RADAR:</span>
+                        <span id="risk-radar-regime" style="font-size: 0.72rem; font-weight: 800; font-family: var(--title); padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px;">---</span>
+                        <span id="risk-radar-gold-bias" style="font-size: 0.65rem; color: #ccd9e8; font-style: italic;">---</span>
+                    </div>
                     <table class="im-tbl">
                         <thead>
                             <tr>
@@ -561,12 +567,14 @@
 
 <script>
     const IM_RULES = {
-        'DXY':     'DXY↑ → Gold↓ | DXY↓ → Gold↑',
-        'US10Y':   'Yield↑ → Gold↓ | Yield↓ → Gold↑',
-        'VIX':     'VIX↑ → Gold↑ (Safe Haven)',
-        'SILVER':  'Silver↑ → Gold↑ (Leader)',
-        'WTI OIL': 'Oil↑ → Inflation → Complex',
-        'S&P 500': 'S&P↓ → Risk-Off → Gold↑',
+        'DXY':       'DXY↑ → Gold↓ | DXY↓ → Gold↑',
+        'US10Y':     'Yield↑ → Gold↓ | Yield↓ → Gold↑',
+        'SILVER':    'Silver↑ → Gold↑ (Leader)',
+        'VIX':       'VIX↑ → Gold↑ (Safe Haven)',
+        'S&P 500':   'S&P↓ → Risk-Off → Gold↑',
+        'DOW JONES': 'DJI↓ → Risk-Off → Gold↑',
+        'NIKKEI':    'Nikkei↓ → Risk-Off → Gold↑',
+        'WTI OIL':   'Oil↑ → Inflation → Complex',
     };
 
     const CSI_META = {
@@ -640,29 +648,60 @@
     function renderIMTable(arr) {
         if (!arr) return;
         const tbody = document.getElementById('im-tbody');
-        tbody.innerHTML = arr.map(im => {
-            const sign  = im.change_pct >= 0 ? '+' : '';
-            const chgC  = im.change_pct > 0.05 ? '#00ff41' : im.change_pct < -0.05 ? '#ff3333' : '#94a3b8';
-            const isBull= im.gold_impact === 'BULLISH';
-            const isBear= im.gold_impact === 'BEARISH';
-            const impCls= isBull ? 'bull' : isBear ? 'bear' : 'neut';
-            const icon  = isBull ? '▲' : isBear ? '▼' : '─';
-            const stars = '⭐'.repeat(im.stars || 3);
-            const rule  = IM_RULES[im.name] || '—';
-            return `<tr>
-                <td class="col-name">${im.name}</td>
-                <td class="col-chg" style="color:${chgC}">${sign}${im.change_pct.toFixed(2)}%</td>
-                <td class="col-imp"><span class="imp-badge ${impCls}">${icon} ${im.gold_impact}</span></td>
-                <td class="col-stars">${stars}</td>
-                <td class="col-rule">${rule}</td>
-            </tr>`;
-        }).join('');
+        
+        // Group by category
+        const categories = {
+            'CORE DRIVER': [],
+            'RISK SENTIMENT': [],
+            'COMMODITY': []
+        };
+        arr.forEach(im => {
+            if (categories[im.category]) {
+                categories[im.category].push(im);
+            } else {
+                categories['CORE DRIVER'].push(im); // fallback
+            }
+        });
+
+        let html = '';
+        Object.entries(categories).forEach(([catName, items]) => {
+            if (items.length > 0) {
+                // Add a small styled header row for category
+                html += `<tr style="background: rgba(59,130,246,0.1); border-bottom: 1px solid rgba(59,130,246,0.2);">
+                    <td colspan="5" style="font-size: 0.58rem; color: var(--cyan); font-weight: bold; letter-spacing: 1px; padding: 2px 6px; text-transform: uppercase;">
+                        📁 ${catName}
+                    </td>
+                </tr>`;
+                
+                items.forEach(im => {
+                    const sign  = im.change_pct >= 0 ? '+' : '';
+                    const chgC  = im.change_pct > 0.05 ? '#00ff41' : im.change_pct < -0.05 ? '#ff3333' : '#94a3b8';
+                    const isBuy = im.gold_impact === 'BULLISH';
+                    const isSell= im.gold_impact === 'BEARISH';
+                    const impCls= isBuy ? 'bull' : isSell ? 'bear' : 'neut';
+                    const icon  = isBuy ? '▲' : isSell ? '▼' : '─';
+                    const stars = '⭐'.repeat(im.stars || 3);
+                    const rule  = IM_RULES[im.name] || '—';
+                    const weightLabel = im.weight ? `<span style="font-size: 0.58rem; color: var(--muted); margin-left: 4px;">(${im.weight}%)</span>` : '';
+                    
+                    html += `<tr>
+                        <td class="col-name">${im.name}${weightLabel}</td>
+                        <td class="col-chg" style="color:${chgC}">${sign}${im.change_pct.toFixed(2)}%</td>
+                        <td class="col-imp"><span class="imp-badge ${impCls}">${icon} ${im.gold_impact}</span></td>
+                        <td class="col-stars">${stars}</td>
+                        <td class="col-rule">${rule}</td>
+                    </tr>`;
+                });
+            }
+        });
+        
+        tbody.innerHTML = html;
 
         // call summary
         renderGoldSummary(arr);
     }
 
-    // ── GOLD OUTLOOK SUMMARY (weighted priority × impact) ──────────
+    // ── GOLD OUTLOOK SUMMARY (weighted weight% × impact) ──────────
     function renderGoldSummary(arr) {
         const el = document.getElementById('gold-summary');
         if (!el || !arr || !arr.length) return;
@@ -671,14 +710,14 @@
         const chips = [];
 
         arr.forEach(im => {
-            const w     = im.stars || 3;
+            const w     = im.weight || 10; // Use actual weight % from backend
             const val   = im.gold_impact === 'BULLISH' ? 1 : im.gold_impact === 'BEARISH' ? -1 : 0;
             const sign  = im.change_pct >= 0 ? '+' : '';
             totalWeight += w;
             weightedSum += val * w;
             const chipC = im.gold_impact === 'BULLISH' ? '#00ff41' : im.gold_impact === 'BEARISH' ? '#ff4444' : '#fbbf24';
             const icon  = im.gold_impact === 'BULLISH' ? '▲' : im.gold_impact === 'BEARISH' ? '▼' : '─';
-            chips.push(`<span class="gsd-chip" style="color:${chipC};border-color:${chipC}44;background:${chipC}0d;">${icon} ${im.name} ${'★'.repeat(w)} ${sign}${im.change_pct.toFixed(2)}%</span>`);
+            chips.push(`<span class="gsd-chip" style="color:${chipC};border-color:${chipC}44;background:${chipC}0d;">${icon} ${im.name} ${w}% ${sign}${im.change_pct.toFixed(2)}%</span>`);
         });
 
         // Score: -100 to +100 → convert to 0-100% bullish
@@ -866,6 +905,22 @@
                 renderIMTable(data.intermarket);
                 renderLaggard(data.results, data.laggard_leader);
                 renderPairs(data.pair_recommendations);
+                
+                // Update Risk Radar
+                if (data.risk_radar) {
+                    const rReg = document.getElementById('risk-radar-regime');
+                    const rGold = document.getElementById('risk-radar-gold-bias');
+                    if (rReg) {
+                        rReg.innerText = data.risk_radar.regime;
+                        rReg.style.color = data.risk_radar.color;
+                        rReg.style.border = `1px solid ${data.risk_radar.color}44`;
+                        rReg.style.background = `${data.risk_radar.color}0d`;
+                    }
+                    if (rGold) {
+                        rGold.innerHTML = `Gold Bias: <span style="font-weight:bold;color:${data.risk_radar.color}">${data.risk_radar.gold_bias}</span>`;
+                    }
+                }
+
                 const ts = document.getElementById('hdr-ts');
                 if (ts) ts.innerText = new Date().toLocaleTimeString('en-GB');
             }

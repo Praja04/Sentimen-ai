@@ -498,19 +498,23 @@ def api_laggard_detection():
             }
         return None
 
-    # Map symbols to intermarket items
+    # Map symbols to intermarket items with weights and categories
     intermarket = []
     im_defs = [
-        {"name": "DXY",      "syms": ["DXY","DXYUSD"],     "desc": "US Dollar Index",    "inv": False, "stars": 5},
-        {"name": "US10Y",    "syms": ["US10Y","TNX","TNXUSD"], "desc": "Treasury Yield 10Y", "inv": False, "stars": 5},
-        {"name": "VIX",      "syms": ["VIX","VIXUSD"],     "desc": "Fear Index",         "inv": True,  "stars": 5},
-        {"name": "SILVER",   "syms": ["XAGUSD","SILVER"],  "desc": "Silver (Lead for Gold)", "inv": False, "stars": 4},
-        {"name": "WTI OIL",  "syms": ["WTI","XTIUSD","USOIL","CL"], "desc": "WTI Crude Oil",  "inv": False, "stars": 3},
-        {"name": "S&P 500",  "syms": ["US500","SPX","SPY"], "desc": "S&P500 Equity Index","inv": False, "stars": 4},
+        {"name": "DXY",       "syms": ["DXY","DXYUSD"],         "desc": "US Dollar Index",        "inv": False, "stars": 5, "weight": 30, "cat": "CORE DRIVER"},
+        {"name": "US10Y",     "syms": ["US10Y","TNX","TNXUSD"], "desc": "Treasury Yield 10Y",     "inv": False, "stars": 5, "weight": 25, "cat": "CORE DRIVER"},
+        {"name": "SILVER",    "syms": ["XAGUSD","SILVER"],      "desc": "Silver (Lead for Gold)", "inv": False, "stars": 4, "weight": 15, "cat": "CORE DRIVER"},
+        {"name": "VIX",       "syms": ["VIX","VIXUSD"],         "desc": "Fear Index",             "inv": True,  "stars": 4, "weight": 10, "cat": "RISK SENTIMENT"},
+        {"name": "S&P 500",   "syms": ["US500","SPX","SPY"],     "desc": "S&P500 Equity Index",    "inv": False, "stars": 3, "weight": 5,  "cat": "RISK SENTIMENT"},
+        {"name": "DOW JONES", "syms": ["US30","DJ30","WS30","USA30"], "desc": "Dow Jones Industrial", "inv": False, "stars": 3, "weight": 5,  "cat": "RISK SENTIMENT"},
+        {"name": "NIKKEI",    "syms": ["JP225","JPN225","NI225"], "desc": "Nikkei 225 Stock Avg", "inv": False, "stars": 2, "weight": 5,  "cat": "RISK SENTIMENT"},
+        {"name": "WTI OIL",   "syms": ["WTI","XTIUSD","USOIL","CL"], "desc": "WTI Crude Oil",     "inv": False, "stars": 2, "weight": 5,  "cat": "COMMODITY"},
     ]
+
+    im_changes = {}
     for im in im_defs:
         price, chg = get_price_and_change(im["syms"])
-        # For Gold-bullish scoring: VIX up=bullish, DXY up=bearish, US10Y up=bearish, Silver up=bullish
+        im_changes[im["name"]] = chg
         gold_impact = "NEUTRAL"
         if im["inv"]:
             gold_impact = "BULLISH" if chg > 0.05 else ("BEARISH" if chg < -0.05 else "NEUTRAL")
@@ -525,8 +529,59 @@ def api_laggard_detection():
             "price": price,
             "change_pct": chg,
             "gold_impact": gold_impact,
-            "stars": im["stars"]
+            "stars": im["stars"],
+            "weight": im["weight"],
+            "category": im["cat"]
         })
+
+    # ── Risk Regime Detector (Global Risk Radar) ──────────────────────────────
+    # Risk-On: DJI ↑, Nikkei ↑, VIX ↓, Yield ↑, USD stabil (DXY ~ 0)
+    # Risk-Off: DJI ↓, Nikkei ↓, VIX ↑, USD ↑ (DXY ↑), Yield ↓
+    dji_chg = im_changes.get("DOW JONES", 0.0)
+    nik_chg = im_changes.get("NIKKEI", 0.0)
+    vix_chg = im_changes.get("VIX", 0.0)
+    yld_chg = im_changes.get("US10Y", 0.0)
+    dxy_chg = im_changes.get("DXY", 0.0)
+
+    # Simple conditions scoring:
+    risk_on_score = 0
+    risk_off_score = 0
+
+    if dji_chg > 0: risk_on_score += 1
+    elif dji_chg < 0: risk_off_score += 1
+
+    if nik_chg > 0: risk_on_score += 1
+    elif nik_chg < 0: risk_off_score += 1
+
+    if vix_chg < -0.05: risk_on_score += 1
+    elif vix_chg > 0.05: risk_off_score += 1
+
+    if yld_chg > 0.05: risk_on_score += 1
+    elif yld_chg < -0.05: risk_off_score += 1
+
+    if abs(dxy_chg) <= 0.05: risk_on_score += 1
+    if dxy_chg > 0.05: risk_off_score += 1
+
+    if risk_on_score > risk_off_score:
+        risk_regime = "RISK-ON (Risk Appetite)"
+        risk_color = "#00ff41" # green
+        gold_bias = "BEARISH (Risk Asset Demand)"
+    elif risk_off_score > risk_on_score:
+        risk_regime = "RISK-OFF (Capital Protection)"
+        risk_color = "#ff3333" # red
+        gold_bias = "BULLISH (Safe Haven Demand)"
+    else:
+        risk_regime = "NEUTRAL / MIXED"
+        risk_color = "#fbbf24" # gold
+        gold_bias = "NEUTRAL (No Regime Bias)"
+
+    risk_radar = {
+        "regime": risk_regime,
+        "color": risk_color,
+        "gold_bias": gold_bias,
+        "score_on": risk_on_score,
+        "score_off": risk_off_score
+    }
         
     # ── ATR-based Entry / SL / TP for each fixed instrument ─────────────────────
     SYM_OPTS_MAP = {
@@ -590,7 +645,8 @@ def api_laggard_detection():
         "results": results,
         "currency_indices": scaled_indices,
         "pair_recommendations": pair_recs,
-        "intermarket": intermarket
+        "intermarket": intermarket,
+        "risk_radar": risk_radar
     })
 
 
