@@ -535,44 +535,78 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // NO JS SCROLLING NEEDED ANYMORE! Handled 100% by CSS.
 
+            // Persistent Text to Speech Manager
+            function speakQueue(sentences, index) {
+                if (index >= sentences.length) {
+                    localStorage.removeItem('tts_active');
+                    localStorage.removeItem('tts_index');
+                    localStorage.removeItem('tts_sentences');
+                    const btn = document.getElementById('btn-read-news');
+                    if (btn) btn.innerText = '🔊 BACA';
+                    return;
+                }
+                
+                localStorage.setItem('tts_active', 'true');
+                localStorage.setItem('tts_index', index.toString());
+                localStorage.setItem('tts_sentences', JSON.stringify(sentences));
+                
+                window.speechSynthesis.cancel(); // Stop any current speech
+                
+                const utterance = new SpeechSynthesisUtterance(sentences[index]);
+                utterance.lang = 'id-ID';
+                utterance.rate = 1.4;
+                
+                let voices = window.speechSynthesis.getVoices();
+                let idVoice = voices.find(v => v.lang.includes('id') && v.name.toLowerCase().includes('female'));
+                if (!idVoice) idVoice = voices.find(v => v.lang.includes('id'));
+                if (idVoice) utterance.voice = idVoice;
+                
+                utterance.onend = () => {
+                    if (localStorage.getItem('tts_active') === 'true') {
+                        speakQueue(sentences, index + 1);
+                    }
+                };
+                
+                utterance.onerror = () => {
+                    if (localStorage.getItem('tts_active') === 'true') {
+                        speakQueue(sentences, index + 1);
+                    }
+                };
+                
+                window.speechSynthesis.speak(utterance);
+                const btn = document.getElementById('btn-read-news');
+                if (btn) btn.innerText = '⏸ STOP';
+            }
+
             // Text to Speech (Indonesian Female)
             const btnReadNews = document.getElementById('btn-read-news');
             if (btnReadNews && !window.newsTtsBound) {
                 window.newsTtsBound = true;
+                
+                // Auto-resume speech if it was active on page load
+                setTimeout(() => {
+                    if (localStorage.getItem('tts_active') === 'true') {
+                        const savedSentences = JSON.parse(localStorage.getItem('tts_sentences') || '[]');
+                        const savedIndex = parseInt(localStorage.getItem('tts_index') || '0');
+                        if (savedSentences.length > 0) {
+                            speakQueue(savedSentences, savedIndex);
+                        }
+                    }
+                }, 1000);
+
                 btnReadNews.addEventListener('click', () => {
-                    if (window.speechSynthesis.speaking) {
+                    if (localStorage.getItem('tts_active') === 'true') {
+                        localStorage.removeItem('tts_active');
                         window.speechSynthesis.cancel();
                         btnReadNews.innerText = '🔊 BACA';
-                        return;
+                    } else {
+                        const titles = Array.from(document.querySelectorAll('.news-title')).map(el => el.innerText);
+                        if (titles.length === 0) return;
+                        
+                        const sentences = ["Berita Makro Terkini."];
+                        titles.slice(0, 10).forEach(t => sentences.push(t));
+                        speakQueue(sentences, 0);
                     }
-                    
-                    const titles = Array.from(document.querySelectorAll('.news-title')).map(el => el.innerText);
-                    if (titles.length === 0) return;
-                    
-                    // Add intro
-                    const fullText = "Berita Makro Terkini. " + titles.join(". Berita selanjutnya. ");
-                    
-                    const utterance = new SpeechSynthesisUtterance(fullText);
-                    utterance.lang = 'id-ID';
-                    utterance.rate = 1.5; // Increased speed by 1/2
-                    
-                    // Force finding a female voice if possible
-                    let voices = window.speechSynthesis.getVoices();
-                    if(voices.length === 0) {
-                        // Sometimes voices load asynchronously
-                        speechSynthesis.addEventListener('voiceschanged', function() {
-                            voices = window.speechSynthesis.getVoices();
-                        });
-                    }
-                    
-                    // Look for Indonesian female voice
-                    let idVoice = voices.find(v => v.lang.includes('id') && v.name.toLowerCase().includes('female'));
-                    if (!idVoice) idVoice = voices.find(v => v.lang.includes('id')); // fallback
-                    if (idVoice) utterance.voice = idVoice;
-                    
-                    utterance.onend = () => { btnReadNews.innerText = '🔊 BACA'; };
-                    window.speechSynthesis.speak(utterance);
-                    btnReadNews.innerText = '⏸ STOP';
                 });
             }
         }

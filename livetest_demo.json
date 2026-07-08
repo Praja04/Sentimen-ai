@@ -1,24 +1,40 @@
 {
-    "balance": 10120.1,
-    "equity": 10234.63,
+    "balance": 9923.6,
+    "equity": 10023.83,
     "active_trades": [
         {
-            "ticket": 20685571,
-            "time": "2026-07-08 17:34:15",
+            "ticket": 21130708,
+            "time": "2026-07-08 18:48:27",
             "symbol": "XAUUSD",
             "type": "SELL",
             "lots": 0.13,
-            "entry_price": 4054.12,
-            "current_price": 4045.31,
-            "sl": 4069.12,
-            "tp": 4032.12,
+            "entry_price": 4070.36,
+            "current_price": 4062.65,
+            "sl": 4085.36,
+            "tp": 4048.36,
             "commission": -1.5,
             "swap": 0.0,
             "status": "RUNNING",
-            "profit": 114.53
+            "profit": 100.23
         }
     ],
     "history": [
+        {
+            "ticket": 20685571,
+            "open_time": "2026-07-08 17:34:15",
+            "close_time": "2026-07-08 18:48:23",
+            "symbol": "XAUUSD",
+            "type": "SELL",
+            "lots": 0.13,
+            "entry": 4054.12,
+            "exit": 4069.12,
+            "commission": -1.5,
+            "swap": 0.0,
+            "gross_profit": -195.0,
+            "net_profit": -196.5,
+            "exit_reason": "SL HIT",
+            "result": "LOSS"
+        },
         {
             "ticket": 29874726,
             "open_time": "2026-07-08 15:19:07",
@@ -100,5 +116,5 @@
             "result": "PROFIT"
         }
     ],
-    "last_update": 1783510582.1623507
+    "last_update": 1783511677.8863144
 }
