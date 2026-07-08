@@ -59,8 +59,8 @@ def auto_update_speech_sentiment():
     
     global latest_speech_analysis
     now = time.time()
-    # Throttled check: 30 seconds
-    if now - latest_speech_analysis.get("last_checked", 0) < 30:
+    # Throttled check: 5 seconds
+    if now - latest_speech_analysis.get("last_checked", 0) < 5:
         return
         
     latest_speech_analysis["last_checked"] = now

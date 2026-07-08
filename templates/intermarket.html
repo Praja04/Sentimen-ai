@@ -487,12 +487,6 @@
                         <span id="risk-radar-gold-bias" style="font-size: 0.65rem; color: #ccd9e8; font-style: italic;">---</span>
                     </div>
 
-                    <!-- REAL-TIME SPEECH SENTIMENT INJECTOR -->
-                    <div style="flex: 0 0 auto; margin-bottom: 4px; padding: 4px 6px; border-radius: 4px; background: rgba(59,130,246,0.07); border: 1px solid rgba(59,130,246,0.25); display: flex; align-items: center; gap: 4px;">
-                        <span style="font-size: 0.62rem; color: #fbbf24; font-weight: bold; white-space: nowrap;">🎙️ SPEECH ANALYZER:</span>
-                        <input type="text" id="speech-headline-input" placeholder="Ketik headline pidato (misal: Powell hawkish rate hike delay...)" style="flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; padding: 2px 6px; color: #f0f6ff; font-family: var(--mono); font-size: 0.65rem; outline: none;">
-                        <button onclick="injectSpeechHeadline()" style="background: var(--accent); border: none; border-radius: 3px; padding: 2px 8px; color: #fff; font-family: var(--title); font-size: 0.65rem; font-weight: bold; cursor: pointer; transition: background 0.2s;">ANALYZE</button>
-                    </div>
                     <table class="im-tbl">
                         <thead>
                             <tr>
@@ -967,32 +961,6 @@
                 if (ts) ts.innerText = new Date().toLocaleTimeString('en-GB');
             }
         } catch(e) { console.error('Fetch error:', e); }
-    }
-
-    async function injectSpeechHeadline() {
-        const input = document.getElementById('speech-headline-input');
-        if (!input || !input.value.trim()) {
-            alert('Silakan ketik headline speech terlebih dahulu.');
-            return;
-        }
-        try {
-            const res = await fetch('/api/analyze_speech', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ headline: input.value.trim() })
-            });
-            const result = await res.json();
-            if (result.success) {
-                alert(`SPEECH ANALYZED! Bias: ${result.bias} (Score: ${result.score}). Dashboard akan memperbarui data sekarang.`);
-                input.value = '';
-                fetchAll(); // Refresh dashboard instantly
-            } else {
-                alert('Gagal menganalisa speech: ' + result.error);
-            }
-        } catch(e) {
-            console.error('Speech Analyzer error:', e);
-            alert('Error saat mengirim headline ke server.');
-        }
     }
 
     fetchAll();
