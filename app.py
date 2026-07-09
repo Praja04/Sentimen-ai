@@ -779,8 +779,8 @@ def _compute_dashboard_data():
                     if action != "EXIT WARNING" and not is_cooldown:
                         # Acceleration Entry Logic
                         if len(hist) >= 3:
-                            is_accel_bull = (hist[-3] < hist[-2] < hist[-1]) and chg_pct > 0
-                            is_accel_bear = (hist[-3] < hist[-2] < hist[-1]) and chg_pct < 0
+                            is_accel_bull = (hist[-3] <= hist[-2] <= hist[-1]) and chg_pct > 0
+                            is_accel_bear = (hist[-3] <= hist[-2] <= hist[-1]) and chg_pct < 0
                             
                             # Macro Alignment for Gold (Intermarket)
                             macro_blocked = False
@@ -822,10 +822,16 @@ def _compute_dashboard_data():
                                     macro_blocked = True
                                     
                             if not macro_blocked:
-                                if is_accel_bull and "BULLISH" in current_trend:
+                                # Use per-instrument trend from daily chg_pct as primary signal
+                                # This prevents cross-instrument basket averaging from cancelling signals
+                                inst_trend_bull = chg_pct > ai_params["velocity_threshold"] * 100
+                                inst_trend_bear = chg_pct < -(ai_params["velocity_threshold"] * 100)
+                                trend_ok_bull = "BULLISH" in current_trend or inst_trend_bull
+                                trend_ok_bear = "BEARISH" in current_trend or inst_trend_bear
+                                if is_accel_bull and trend_ok_bull:
                                     action = "BUY"
                                     last_trade_time[sym] = now
-                                elif is_accel_bear and "BEARISH" in current_trend:
+                                elif is_accel_bear and trend_ok_bear:
                                     action = "SELL"
                                     last_trade_time[sym] = now
 

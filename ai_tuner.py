@@ -86,9 +86,9 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
     if params["time_window"] < 300:
         params["time_window"] += 15
         
-    # 2. Increase velocity threshold to require stronger moves (max 0.10%)
-    if params["velocity_threshold"] < 0.10:
-        params["velocity_threshold"] = round(params["velocity_threshold"] + 0.005, 4)
+    # 2. Increase velocity threshold to require stronger moves (max 0.015%)
+    if params["velocity_threshold"] < 0.015:
+        params["velocity_threshold"] = round(params["velocity_threshold"] + 0.002, 4)
         
     # 3. Increase whipsaw sensitivity (lower the threshold so we detect it earlier)
     if params["whipsaw_sd_threshold"] > 0.005:
