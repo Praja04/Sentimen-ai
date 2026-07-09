@@ -137,7 +137,8 @@ def process_auto_trades(recs):
                 current_price = tick.bid if is_buy else tick.ask
                 open_price = pos.price_open
                 
-                if action in ["EXIT WARNING", "WAIT"]:
+                should_close = (action == "EXIT WARNING") or (is_buy and action == "SELL") or (not is_buy and action == "BUY")
+                if should_close:
                     order_type = mt5.ORDER_TYPE_SELL if is_buy else mt5.ORDER_TYPE_BUY
                     close_price = tick.bid if is_buy else tick.ask
                     
