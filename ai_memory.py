@@ -39,6 +39,26 @@ def init_db():
     c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_symbol ON predictions (symbol)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_evaluated ON predictions (evaluated)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_predictions_timestamp ON predictions (timestamp)')
+    
+    # Create grid_events table to store averaging event logs for Deep Learning feed
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS grid_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp REAL,
+            datetime_str TEXT,
+            symbol TEXT,
+            direction TEXT,
+            grid_index INTEGER,
+            entry_price REAL,
+            atr_points REAL,
+            atr_gap REAL,
+            evaluated INTEGER DEFAULT 0,
+            is_successful_exit INTEGER DEFAULT 0
+        )
+    ''')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_grid_events_symbol ON grid_events (symbol)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_grid_events_timestamp ON grid_events (timestamp)')
+    
     conn.commit()
     conn.close()
 
@@ -156,4 +176,23 @@ def evaluate_predictions(current_prices_dict):
         penalty_adjustments[p] = penalty_adjustments.get(p, 0) + 0.05 # 5% penalty per failure
         
     return penalty_adjustments
+
+
+def log_grid_event(symbol, direction, grid_index, entry_price, atr_points, atr_gap):
+    """Logs grid averaging execution details into database for Deep Learning feedback."""
+    init_db()
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    now = time.time()
+    dt_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        c.execute('''
+            INSERT INTO grid_events (timestamp, datetime_str, symbol, direction, grid_index, entry_price, atr_points, atr_gap)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (now, dt_str, symbol, direction, grid_index, entry_price, atr_points, atr_gap))
+        conn.commit()
+    except Exception as e:
+        print(f"[Database Error] Failed to log grid event: {e}")
+    finally:
+        conn.close()
 

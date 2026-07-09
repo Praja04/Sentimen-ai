@@ -306,6 +306,20 @@ def process_auto_trades(recs):
                                             f"(ATR Gap: {round(entry_diff_points, 1)} pts)"
                                         )
                                         
+                                        # Log grid event into Database for Deep Learning training
+                                        try:
+                                            import ai_memory
+                                            ai_memory.log_grid_event(
+                                                symbol=active_symbol,
+                                                direction=action,
+                                                grid_index=len(positions) + 1,
+                                                entry_price=price,
+                                                atr_points=atr_points,
+                                                atr_gap=entry_diff_points
+                                            )
+                                        except Exception as db_err:
+                                            print(f"[Grid DB Logging Error] {db_err}")
+                                            
                                         # Synchronize stop loss levels across all positions for this symbol
                                         time.sleep(1) # Let order record update
                                         positions_updated = mt5.positions_get(symbol=active_symbol)
