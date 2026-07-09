@@ -169,29 +169,68 @@ def process_auto_trades(recs):
                         print(f"[AutoTrade Error] Close {active_symbol}: {res.comment if res else mt5.last_error()}")
                     continue
 
-                # Auto Break-Even & Trailing Stop Logic
-                profit_points = (current_price - open_price) / point if is_buy else (open_price - current_price) / point
-                profit_pips = profit_points / 10.0
+                # Auto Break-Even & Trailing Stop Logic (Dynamic ATR-based with AI Self-Learning)
+                atr_val = 0.0
+                try:
+                    rates = mt5.copy_rates_from_pos(active_symbol, mt5.TIMEFRAME_H4, 0, 15)
+                    if rates is not None and len(rates) >= 14:
+                        trs = []
+                        for i in range(1, len(rates)):
+                            h  = rates[i]['high']
+                            l  = rates[i]['low']
+                            pc = rates[i-1]['close']
+                            trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+                        atr_val = sum(trs[-14:]) / 14.0
+                except Exception as e:
+                    print(f"[ATR Trailing Error] {active_symbol}: {e}")
                 
-                be_trigger_pips = 15.0
-                tsl_trigger_pips = 25.0
-                tsl_buffer_pips = 10.0 * ai_params.get("trailing_buffer_multiplier", 1.0)
+                # Default ATR if calculation failed: 15 pips equivalent
+                if atr_val <= 0:
+                    atr_points = 150.0
+                else:
+                    atr_points = atr_val / point
+                
+                # Fetch recent Win Rate from database for adaptive multiplier scaling
+                win_rate = 92.5
+                try:
+                    import sqlite3
+                    conn = sqlite3.connect(r"C:\Antigravity\forecast_history.db")
+                    c = conn.cursor()
+                    c.execute("SELECT correct FROM predictions WHERE evaluated = 1 ORDER BY timestamp DESC LIMIT 50")
+                    rows = c.fetchall()
+                    if rows:
+                        win_rate = (sum(r[0] for r in rows) / len(rows)) * 100.0
+                    conn.close()
+                except Exception:
+                    pass
+                
+                # Base ATR multiplier is 1.5, adjusted by parameter settings
+                atr_mult = 1.5 * ai_params.get("trailing_buffer_multiplier", 1.0)
+                # Self-learning: If win rate is low, widen buffer to avoid premature exit
+                if win_rate < 90.0:
+                    atr_mult *= (1.0 + (90.0 - win_rate) * 0.02)
+                
+                tsl_buffer_points = atr_points * atr_mult
+                be_trigger_points = atr_points * 1.0
+                tsl_trigger_points = atr_points * atr_mult
+                
+                profit_points = (current_price - open_price) / point if is_buy else (open_price - current_price) / point
                 
                 new_sl = None
                 
-                if profit_pips >= be_trigger_pips and profit_pips < tsl_trigger_pips:
+                if profit_points >= be_trigger_points and profit_points < tsl_trigger_points:
                     # Break Even
                     if pos.sl == 0.0 or (is_buy and pos.sl < open_price) or (not is_buy and (pos.sl > open_price or pos.sl == 0.0)):
                         new_sl = open_price
                         
-                elif profit_pips >= tsl_trigger_pips:
+                elif profit_points >= tsl_trigger_points:
                     # Trailing Stop
                     if is_buy:
-                        trail_price = current_price - (tsl_buffer_pips * 10 * point)
+                        trail_price = current_price - (tsl_buffer_points * point)
                         if pos.sl == 0.0 or trail_price > pos.sl:
                             new_sl = round(trail_price, digits)
                     else:
-                        trail_price = current_price + (tsl_buffer_pips * 10 * point)
+                        trail_price = current_price + (tsl_buffer_points * point)
                         if pos.sl == 0.0 or trail_price < pos.sl:
                             new_sl = round(trail_price, digits)
                             
@@ -231,7 +270,7 @@ def process_auto_trades(recs):
                 "type": order_type,
                 "price": float(price),
                 "sl": float(sl),
-                "tp": float(tp),
+                "tp": 0.0,
                 "deviation": 20,
                 "magic": 998877,
                 "comment": "AI AutoTrade",
