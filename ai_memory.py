@@ -52,10 +52,22 @@ def init_db():
             entry_price REAL,
             atr_points REAL,
             atr_gap REAL,
+            tp REAL,
+            mae REAL,
+            mfe REAL,
+            confidence REAL,
             evaluated INTEGER DEFAULT 0,
             is_successful_exit INTEGER DEFAULT 0
         )
     ''')
+    
+    # Gracefully add new grid columns for older databases
+    for col in ["tp", "mae", "mfe", "confidence"]:
+        try:
+            c.execute(f"ALTER TABLE grid_events ADD COLUMN {col} REAL")
+        except sqlite3.OperationalError:
+            pass # Already exists
+            
     c.execute('CREATE INDEX IF NOT EXISTS idx_grid_events_symbol ON grid_events (symbol)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_grid_events_timestamp ON grid_events (timestamp)')
     
@@ -178,7 +190,7 @@ def evaluate_predictions(current_prices_dict):
     return penalty_adjustments
 
 
-def log_grid_event(symbol, direction, grid_index, entry_price, atr_points, atr_gap):
+def log_grid_event(symbol, direction, grid_index, entry_price, atr_points, atr_gap, tp=0.0, mae=0.0, mfe=0.0, confidence=0.0):
     """Logs grid averaging execution details into database for Deep Learning feedback."""
     init_db()
     conn = sqlite3.connect(DB_PATH)
@@ -187,9 +199,9 @@ def log_grid_event(symbol, direction, grid_index, entry_price, atr_points, atr_g
     dt_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         c.execute('''
-            INSERT INTO grid_events (timestamp, datetime_str, symbol, direction, grid_index, entry_price, atr_points, atr_gap)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (now, dt_str, symbol, direction, grid_index, entry_price, atr_points, atr_gap))
+            INSERT INTO grid_events (timestamp, datetime_str, symbol, direction, grid_index, entry_price, atr_points, atr_gap, tp, mae, mfe, confidence)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (now, dt_str, symbol, direction, grid_index, entry_price, atr_points, atr_gap, tp, mae, mfe, confidence))
         conn.commit()
     except Exception as e:
         print(f"[Database Error] Failed to log grid event: {e}")

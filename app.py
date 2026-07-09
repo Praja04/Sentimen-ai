@@ -308,6 +308,29 @@ def process_auto_trades(recs):
                                         
                                         # Log grid event into Database for Deep Learning training
                                         try:
+                                            # Calculate MAE/MFE dynamically from M5 bar history since trade start
+                                            mae_pts = entry_diff_points
+                                            mfe_pts = 0.0
+                                            try:
+                                                cycle_start = positions[0].time
+                                                history_rates = mt5.copy_rates_from(active_symbol, mt5.TIMEFRAME_M5, int(cycle_start), int(time.time()))
+                                                if history_rates is not None and len(history_rates) > 0:
+                                                    highs = [r['high'] for r in history_rates]
+                                                    lows = [r['low'] for r in history_rates]
+                                                    first_entry = positions[0].price_open
+                                                    if is_action_buy:
+                                                        max_high = max(highs)
+                                                        min_low = min(lows)
+                                                        mfe_pts = max(0.0, (max_high - first_entry) / point)
+                                                        mae_pts = max(mae_pts, (first_entry - min_low) / point)
+                                                    else:
+                                                        max_high = max(highs)
+                                                        min_low = min(lows)
+                                                        mfe_pts = max(0.0, (first_entry - min_low) / point)
+                                                        mae_pts = max(mae_pts, (max_high - first_entry) / point)
+                                            except Exception as hist_err:
+                                                print(f"[Grid Hist Error] {hist_err}")
+                                                
                                             import ai_memory
                                             ai_memory.log_grid_event(
                                                 symbol=active_symbol,
@@ -315,7 +338,11 @@ def process_auto_trades(recs):
                                                 grid_index=len(positions) + 1,
                                                 entry_price=price,
                                                 atr_points=atr_points,
-                                                atr_gap=entry_diff_points
+                                                atr_gap=entry_diff_points,
+                                                tp=float(positions[0].tp),
+                                                mae=float(mae_pts),
+                                                mfe=float(mfe_pts),
+                                                confidence=float(rec.get("confidence", 0))
                                             )
                                         except Exception as db_err:
                                             print(f"[Grid DB Logging Error] {db_err}")
