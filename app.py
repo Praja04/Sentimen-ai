@@ -690,9 +690,9 @@ def _compute_dashboard_data():
     chg_cad = -get_change(["USDCAD"])
     chg_aud = get_change(["AUDUSD"])
     chg_nzd = get_change(["NZDUSD"])
-    chg_usd = 0.0
+    chg_usd = -(chg_eur + chg_gbp + chg_jpy + chg_chf + chg_cad + chg_aud + chg_nzd) / 7.0
     
-    avg_chg = (chg_eur + chg_gbp + chg_jpy + chg_chf + chg_cad + chg_aud + chg_nzd) / 8.0
+    avg_chg = (chg_eur + chg_gbp + chg_jpy + chg_chf + chg_cad + chg_aud + chg_nzd + chg_usd) / 8.0
     
     strengths = {
         "DXY": chg_usd - avg_chg,
