@@ -857,12 +857,12 @@ def _compute_dashboard_data():
                             # Currency Strength Index (CSI) Filter
                             dxy = strengths.get("DXY", 0.0)
                             csi_th = ai_params.get("csi_macro_threshold", 0.2)
-                            oil_th = ai_params.get("csi_oil_threshold", 0.3)
                             if label in ["XAUUSD", "EURUSD", "GBPUSD"]:
                                 # Inverse relationship to USD
-                                if is_accel_bull and dxy > csi_th: # Strong USD blocks BUY
+                                th = ai_params.get("xauusd_macro_threshold", 0.15) if label == "XAUUSD" else csi_th
+                                if is_accel_bull and dxy > th: # Strong USD blocks BUY
                                     macro_blocked = True
-                                elif is_accel_bear and dxy < -csi_th: # Weak USD blocks SELL
+                                elif is_accel_bear and dxy < -th: # Weak USD blocks SELL
                                     macro_blocked = True
                             elif label == "USDJPY":
                                 # Direct relationship to USD, Inverse to JPY

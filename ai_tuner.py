@@ -17,7 +17,9 @@ DEFAULT_PARAMS = {
     "deceleration_tolerance": 3,      # Number of ticks of decelerating confidence before EXIT WARNING
     "trailing_buffer_multiplier": 1.0, # Multiplier for ATR padding on Trailing Stop
     "csi_macro_threshold": 0.2,       # Baseline Currency Strength Index filter for major pairs
-    "csi_oil_threshold": 0.3          # Baseline Currency Strength Index filter for WTI Oil
+    "csi_oil_threshold": 0.3,         # Baseline Currency Strength Index filter for WTI Oil
+    "xauusd_velocity_threshold": 0.010, # Dedicated velocity threshold for Gold
+    "xauusd_macro_threshold": 0.15      # Dedicated Currency Strength Index filter for Gold
 }
 
 # Hard limits to prevent AI Tuner from over-tightening and blocking all signals
@@ -27,6 +29,8 @@ PARAM_LIMITS = {
     "whipsaw_sd_threshold":  {"min": 0.15,  "max": 0.5},   # Min 0.15% SD - instruments naturally diverge
     "csi_macro_threshold":   {"min": 0.15,  "max": 0.3},
     "csi_oil_threshold":     {"min": 0.2,   "max": 0.4},
+    "xauusd_velocity_threshold": {"min": 0.006, "max": 0.015},
+    "xauusd_macro_threshold":    {"min": 0.10,  "max": 0.25}
 }
 
 def _clamp_params(params):
@@ -92,8 +96,12 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
             params["time_window"] -= 5
         if params["velocity_threshold"] > 0.005:
             params["velocity_threshold"] = round(params["velocity_threshold"] - 0.001, 4)
+        if params.get("xauusd_velocity_threshold", 0.010) > 0.006:
+            params["xauusd_velocity_threshold"] = round(params.get("xauusd_velocity_threshold", 0.010) - 0.001, 4)
         if params.get("csi_macro_threshold", 0.2) < 0.3:
             params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) + 0.01, 3)
+        if params.get("xauusd_macro_threshold", 0.15) < 0.25:
+            params["xauusd_macro_threshold"] = round(params.get("xauusd_macro_threshold", 0.15) + 0.01, 3)
         if params.get("csi_oil_threshold", 0.3) < 0.4:
             params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) + 0.01, 3)
         save_ai_params(params)
@@ -105,9 +113,11 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
     if params["time_window"] < PARAM_LIMITS["time_window"]["max"]:
         params["time_window"] += 5
         
-    # 2. Increase velocity threshold slightly (max 0.012%, NOT 0.10%)
+    # 2. Increase velocity thresholds slightly (respect limits)
     if params["velocity_threshold"] < PARAM_LIMITS["velocity_threshold"]["max"]:
         params["velocity_threshold"] = round(params["velocity_threshold"] + 0.001, 4)
+    if params.get("xauusd_velocity_threshold", 0.010) < PARAM_LIMITS["xauusd_velocity_threshold"]["max"]:
+        params["xauusd_velocity_threshold"] = round(params.get("xauusd_velocity_threshold", 0.010) + 0.001, 4)
         
     # 3. Tighten whipsaw sensitivity — but keep floor at 0.15% so normal divergence doesn't trigger
     if params["whipsaw_sd_threshold"] > PARAM_LIMITS["whipsaw_sd_threshold"]["min"]:
@@ -116,6 +126,8 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
     # 4. Tighten CSI thresholds slightly
     if params.get("csi_macro_threshold", 0.2) > PARAM_LIMITS["csi_macro_threshold"]["min"]:
         params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) - 0.01, 3)
+    if params.get("xauusd_macro_threshold", 0.15) > PARAM_LIMITS["xauusd_macro_threshold"]["min"]:
+        params["xauusd_macro_threshold"] = round(params.get("xauusd_macro_threshold", 0.15) - 0.01, 3)
     if params.get("csi_oil_threshold", 0.3) > PARAM_LIMITS["csi_oil_threshold"]["min"]:
         params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) - 0.01, 3)
         
