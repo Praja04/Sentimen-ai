@@ -125,13 +125,35 @@ def process_auto_trades(recs):
         ai_params = ai_tuner.load_ai_params()
         
         if positions:
+            info = mt5.symbol_info(active_symbol)
+            if not info: continue
+            digits = info.digits
+            point = info.point
+            
+            # Compute ATR
+            atr_val = 0.0
+            try:
+                rates = mt5.copy_rates_from_pos(active_symbol, mt5.TIMEFRAME_H4, 0, 15)
+                if rates is not None and len(rates) >= 14:
+                    trs = []
+                    for i in range(1, len(rates)):
+                        h  = rates[i]['high']
+                        l  = rates[i]['low']
+                        pc = rates[i-1]['close']
+                        trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+                    atr_val = sum(trs[-14:]) / 14.0
+            except Exception as e:
+                print(f"[ATR Trailing Error] {active_symbol}: {e}")
+            
+            # Default ATR if calculation failed: 15 pips equivalent
+            if atr_val <= 0:
+                atr_points = 150.0
+            else:
+                atr_points = atr_val / point
+                
             for pos in positions:
                 tick = mt5.symbol_info_tick(active_symbol)
                 if not tick: continue
-                
-                info = mt5.symbol_info(active_symbol)
-                digits = info.digits
-                point = info.point
                 
                 is_buy = (pos.type == mt5.ORDER_TYPE_BUY)
                 current_price = tick.bid if is_buy else tick.ask
@@ -170,26 +192,6 @@ def process_auto_trades(recs):
                     continue
 
                 # Auto Break-Even & Trailing Stop Logic (Dynamic ATR-based with AI Self-Learning)
-                atr_val = 0.0
-                try:
-                    rates = mt5.copy_rates_from_pos(active_symbol, mt5.TIMEFRAME_H4, 0, 15)
-                    if rates is not None and len(rates) >= 14:
-                        trs = []
-                        for i in range(1, len(rates)):
-                            h  = rates[i]['high']
-                            l  = rates[i]['low']
-                            pc = rates[i-1]['close']
-                            trs.append(max(h - l, abs(h - pc), abs(l - pc)))
-                        atr_val = sum(trs[-14:]) / 14.0
-                except Exception as e:
-                    print(f"[ATR Trailing Error] {active_symbol}: {e}")
-                
-                # Default ATR if calculation failed: 15 pips equivalent
-                if atr_val <= 0:
-                    atr_points = 150.0
-                else:
-                    atr_points = atr_val / point
-                
                 # Fetch recent Win Rate from database for adaptive multiplier scaling
                 win_rate = 92.5
                 try:
@@ -243,6 +245,84 @@ def process_auto_trades(recs):
                         "tp": pos.tp
                     }
                     mt5.order_send(sl_request)
+
+            # 3. SMART ATR GRID AVERAGING ON FLOATING NEGATIVE
+            if action in ["BUY", "SELL"]:
+                # Limit to 3 averaging positions per instrument (total 4 positions max)
+                max_grid = 4
+                if len(positions) < max_grid:
+                    grid_distance = atr_points * 1.0 # Dynamic grid distance: 1.0 H4 ATR
+                    
+                    # Sort positions by entry price
+                    sorted_pos = sorted(positions, key=lambda p: p.price_open)
+                    is_action_buy = (action == "BUY")
+                    
+                    # Find the latest (deepest) active grid level
+                    latest_pos = sorted_pos[0] if is_action_buy else sorted_pos[-1]
+                    
+                    tick = mt5.symbol_info_tick(active_symbol)
+                    if tick:
+                        current_price = tick.ask if is_action_buy else tick.bid
+                        
+                        # Distance from the latest grid entry in points
+                        entry_diff_points = (latest_pos.price_open - current_price) / point if is_action_buy else (current_price - latest_pos.price_open) / point
+                        
+                        # If price has fallen/risen against our latest grid by 1.0 ATR, trigger averaging
+                        if entry_diff_points >= grid_distance:
+                            # Cooldown check: 5 minutes cooldown to avoid rapid double entries on fast moves
+                            if time.time() - last_trade_time.get(active_symbol, 0) >= 300:
+                                base_lot = positions[0].volume
+                                grid_lot = round(base_lot, 2)
+                                
+                                order_type = mt5.ORDER_TYPE_BUY if is_action_buy else mt5.ORDER_TYPE_SELL
+                                price = tick.ask if is_action_buy else tick.bid
+                                
+                                # Set stop loss level to match existing positions
+                                grid_sl = positions[0].sl
+                                
+                                grid_request = {
+                                    "action": mt5.TRADE_ACTION_DEAL,
+                                    "symbol": active_symbol,
+                                    "volume": float(grid_lot),
+                                    "type": order_type,
+                                    "price": float(price),
+                                    "sl": float(grid_sl) if grid_sl > 0 else 0.0,
+                                    "tp": 0.0,
+                                    "deviation": 20,
+                                    "magic": 998877,
+                                    "comment": f"AI Grid #{len(positions) + 1}",
+                                    "type_time": mt5.ORDER_TIME_GTC,
+                                    "type_filling": mt5.ORDER_FILLING_IOC,
+                                }
+                                
+                                # Auto-retry filling modes
+                                for filling in [mt5.ORDER_FILLING_FOK, mt5.ORDER_FILLING_IOC, mt5.ORDER_FILLING_RETURN]:
+                                    grid_request["type_filling"] = filling
+                                    res = mt5.order_send(grid_request)
+                                    if res and res.retcode == mt5.TRADE_RETCODE_DONE:
+                                        last_trade_time[active_symbol] = time.time()
+                                        send_telegram_alert(
+                                            f"🟢 [Smart Grid] Opened Averaging {action} #{len(positions) + 1} for {active_symbol} @ {price} "
+                                            f"(ATR Gap: {round(entry_diff_points, 1)} pts)"
+                                        )
+                                        
+                                        # Synchronize stop loss levels across all positions for this symbol
+                                        time.sleep(1) # Let order record update
+                                        positions_updated = mt5.positions_get(symbol=active_symbol)
+                                        if positions_updated:
+                                            target_sl = positions_updated[-1].sl
+                                            if target_sl > 0:
+                                                for p in positions_updated:
+                                                    if p.sl != target_sl:
+                                                        sync_req = {
+                                                            "action": mt5.TRADE_ACTION_SLTP,
+                                                            "symbol": active_symbol,
+                                                            "position": p.ticket,
+                                                            "sl": target_sl,
+                                                            "tp": p.tp
+                                                        }
+                                                        mt5.order_send(sync_req)
+                                        break
                     
         # 2. AUTO OPEN
         elif action in ["BUY", "SELL"] and not positions:
