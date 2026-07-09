@@ -95,10 +95,42 @@ def save_demo_state(state):
     except Exception as e:
         print("Error saving demo state:", e)
 
-def update_livetest_sim(current_gold_price, bias, news_halt_active=False):
+def update_livetest_sim(current_gold_price, bias, news_halt_active=False, confidence=70.0):
     state = get_demo_state()
     if not state:
         return None
+
+    # Connect to DB to load dynamic self-learning parameters for TP and SL scaling
+    import sqlite3
+    db_path = r"C:\Antigravity\forecast_history.db"
+    win_rate = 92.5
+    avg_mae_pct = 0.0
+    avg_mfe_pct = 0.0
+    try:
+        if os.path.exists(db_path):
+            conn = sqlite3.connect(db_path)
+            c = conn.cursor()
+            c.execute("SELECT correct FROM predictions WHERE evaluated = 1 ORDER BY timestamp DESC LIMIT 50")
+            rows = c.fetchall()
+            if rows:
+                win_rate = (sum(r[0] for r in rows) / len(rows)) * 100.0
+            
+            c.execute("""
+                SELECT entry_price, max_favorable_price, max_adverse_price 
+                FROM predictions 
+                WHERE evaluated = 1 AND max_favorable_price IS NOT NULL AND max_adverse_price IS NOT NULL
+                ORDER BY timestamp DESC LIMIT 20
+            """)
+            excursions = c.fetchall()
+            conn.close()
+            if excursions:
+                mae_sums = [abs(mae - entry)/entry for entry, mfe, mae in excursions if entry > 0]
+                mfe_sums = [abs(mfe - entry)/entry for entry, mfe, mae in excursions if entry > 0]
+                if mae_sums:
+                    avg_mae_pct = sum(mae_sums) / len(mae_sums)
+                    avg_mfe_pct = sum(mfe_sums) / len(mfe_sums)
+    except Exception as db_err:
+        print("[Demo Adaptive Engine Error]", db_err)
 
     # 1. Update Active Trade
     active_list = state.get("active_trades", [])
@@ -107,8 +139,6 @@ def update_livetest_sim(current_gold_price, bias, news_halt_active=False):
         trade["current_price"] = current_gold_price
         
         # Calculate profit in USD (Gold contract size = 100)
-        # Sell trade profit = (entry - current) * lots * 100
-        # Buy trade profit = (current - entry) * lots * 100
         if trade["type"] == "SELL":
             profit = (trade["entry_price"] - current_gold_price) * trade["lots"] * 100.0
         else:
@@ -200,15 +230,41 @@ def update_livetest_sim(current_gold_price, bias, news_halt_active=False):
             return state
             
         risk_percent = config.get("risk_percent", 1.0)
+        
+        # Base distances
         sl_dist = config.get("sl_dist", 15.0)
         tp_dist = config.get("tp_dist", 22.0)
+        
+        # Self-learning adjustments on SL/TP bounds based on historical MAE / MFE
+        gap_multiplier = 1.0
+        sl_multiplier = 1.0
+        if avg_mae_pct > 0:
+            if avg_mae_pct < 0.0015:
+                sl_multiplier = 0.80
+            elif avg_mae_pct > 0.0050:
+                sl_multiplier = 1.25
+        if avg_mfe_pct > 0 and win_rate < 90.0:
+            deviation = 90.0 - win_rate
+            gap_multiplier = max(0.50, min(1.0, (avg_mfe_pct * 1000) * (1.0 - deviation * 0.02)))
+        elif win_rate < 90.0:
+            deviation = 90.0 - win_rate
+            gap_multiplier = max(0.50, 1.0 - (deviation * 0.035))
+            sl_multiplier = min(1.30, 1.0 + (deviation * 0.015))
+            
+        sl_dist = sl_dist * sl_multiplier
+        tp_dist = tp_dist * gap_multiplier
         
         # Open Sell since fundamental bias is Bearish, Buy if Bullish
         trade_type = "SELL" if bias < 0 else "BUY"
         
+        # Smart Dynamic Lot sizing scaled directly with confidence %
+        conf_factor = float(confidence) / 70.0
+        conf_factor = max(0.5, min(1.5, conf_factor))
+        effective_risk_pct = risk_percent * conf_factor
+        
         # Calculate dynamic lot size based on risk and balance: Lot Size = (Balance * Risk%) / (SL * 100)
         balance = state.get("balance", 10000.0)
-        risk_amount = balance * (risk_percent / 100.0)
+        risk_amount = balance * (effective_risk_pct / 100.0)
         lots = round(risk_amount / (sl_dist * 100.0), 2)
         if lots < 0.01:
             lots = 0.01

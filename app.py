@@ -29,14 +29,21 @@ def send_telegram_alert(msg):
     except Exception as e:
         print(f"[Telegram Error] {e}")
 
-def calculate_lot_size(symbol, entry_price, sl_price, risk_pct=1.0):
+def calculate_lot_size(symbol, entry_price, sl_price, risk_pct=1.0, confidence=70.0):
     if not init_mt5():
         return 0.01
     account_info = mt5.account_info()
     if not account_info:
         return 0.01
     balance = account_info.balance
-    risk_money = balance * (risk_pct / 100.0)
+    
+    # Smart Lot Dynamic: scale risk dynamically based on confidence (e.g. 50% to 150% of baseline risk)
+    # Baseline confidence is 70%. If confidence is 90%, multiplier = 1.3. If confidence is 50%, multiplier = 0.7.
+    conf_factor = float(confidence) / 70.0
+    conf_factor = max(0.5, min(1.5, conf_factor))
+    effective_risk_pct = risk_pct * conf_factor
+    
+    risk_money = balance * (effective_risk_pct / 100.0)
     
     symbol_info = mt5.symbol_info(symbol)
     if not symbol_info:
@@ -120,36 +127,64 @@ def process_auto_trades(recs):
         
         positions = mt5.positions_get(symbol=active_symbol)
         
+        # Retrieve symbol info, digits, point, and calculate H4 ATR
+        info = mt5.symbol_info(active_symbol)
+        if not info: continue
+        digits = info.digits
+        point = info.point
+        
+        # Compute ATR
+        atr_val = 0.0
+        try:
+            rates = mt5.copy_rates_from_pos(active_symbol, mt5.TIMEFRAME_H4, 0, 15)
+            if rates is not None and len(rates) >= 14:
+                trs = []
+                for i in range(1, len(rates)):
+                    h  = rates[i]['high']
+                    l  = rates[i]['low']
+                    pc = rates[i-1]['close']
+                    trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+                atr_val = sum(trs[-14:]) / 14.0
+        except Exception as e:
+            print(f"[ATR Calculation Error] {active_symbol}: {e}")
+        
+        # Default ATR if calculation failed: 15 pips equivalent
+        if atr_val <= 0:
+            atr_val = 150.0 * point
+            atr_points = 150.0
+        else:
+            atr_points = atr_val / point
+            
+        # 1-Hour Price Momentum Action Resolver
+        try:
+            tick_now = mt5.symbol_info_tick(active_symbol)
+            if tick_now:
+                current_bid = tick_now.bid
+                one_hour_ago_ts = int(time.time()) - 3600
+                rates_1h = mt5.copy_rates_from(active_symbol, mt5.TIMEFRAME_M5, one_hour_ago_ts, 1)
+                price_1h_ago = None
+                if rates_1h is not None and len(rates_1h) > 0:
+                    price_1h_ago = rates_1h[0]['close']
+                else:
+                    rates_h1 = mt5.copy_rates_from_pos(active_symbol, mt5.TIMEFRAME_H1, 0, 2)
+                    if rates_h1 is not None and len(rates_h1) >= 2:
+                        price_1h_ago = rates_h1[0]['close']
+                
+                if price_1h_ago:
+                    diff_1h = current_bid - price_1h_ago
+                    if diff_1h > 0:
+                        action = "BUY"
+                    elif diff_1h < 0:
+                        action = "SELL"
+                    print(f"[{active_symbol}] 1H Momentum: Now {current_bid} vs 1H Ago {price_1h_ago} (Diff: {round(diff_1h, 2)}) -> Action resolved to {action}")
+        except Exception as momentum_err:
+            print(f"[1H Momentum Resolver Error] {momentum_err}")
+            
         # 1. AUTO CLOSE on EXIT WARNING or WAIT
         import ai_tuner
         ai_params = ai_tuner.load_ai_params()
         
         if positions:
-            info = mt5.symbol_info(active_symbol)
-            if not info: continue
-            digits = info.digits
-            point = info.point
-            
-            # Compute ATR
-            atr_val = 0.0
-            try:
-                rates = mt5.copy_rates_from_pos(active_symbol, mt5.TIMEFRAME_H4, 0, 15)
-                if rates is not None and len(rates) >= 14:
-                    trs = []
-                    for i in range(1, len(rates)):
-                        h  = rates[i]['high']
-                        l  = rates[i]['low']
-                        pc = rates[i-1]['close']
-                        trs.append(max(h - l, abs(h - pc), abs(l - pc)))
-                    atr_val = sum(trs[-14:]) / 14.0
-            except Exception as e:
-                print(f"[ATR Trailing Error] {active_symbol}: {e}")
-            
-            # Default ATR if calculation failed: 15 pips equivalent
-            if atr_val <= 0:
-                atr_points = 150.0
-            else:
-                atr_points = atr_val / point
                 
             for pos in positions:
                 tick = mt5.symbol_info_tick(active_symbol)
@@ -251,7 +286,7 @@ def process_auto_trades(recs):
                 # Limit to 3 averaging positions per instrument (total 4 positions max)
                 max_grid = 4
                 if len(positions) < max_grid:
-                    grid_distance = atr_points * 1.0 # Dynamic grid distance: 1.0 H4 ATR
+                    grid_distance = atr_points * 1.25 # Dynamic grid distance: 1.25 H4 ATR
                     
                     # Sort positions by entry price
                     sorted_pos = sorted(positions, key=lambda p: p.price_open)
@@ -372,17 +407,22 @@ def process_auto_trades(recs):
                 continue
                 
             sig_id = f"{active_symbol}_{action}"
-            entry = rec.get("entry")
-            sl = rec.get("sl")
-            tp = rec.get("tp")
-            
-            if not entry or not sl or not tp: continue
-            lot = calculate_lot_size(active_symbol, entry, sl, risk_pct=risk_pct)
             tick = mt5.symbol_info_tick(active_symbol)
             if not tick: continue
             
+            price_now = tick.ask if action == "BUY" else tick.bid
+            entry = rec.get("entry") or price_now
+            sl = rec.get("sl")
+            tp = rec.get("tp")
+            
+            if not sl:
+                sl = (price_now - (1.5 * atr_val)) if action == "BUY" else (price_now + (1.5 * atr_val))
+            if not tp:
+                tp = (price_now + (2.0 * atr_val)) if action == "BUY" else (price_now - (2.0 * atr_val))
+                
+            lot = calculate_lot_size(active_symbol, entry, sl, risk_pct=risk_pct, confidence=conf)
             order_type = mt5.ORDER_TYPE_BUY if action == "BUY" else mt5.ORDER_TYPE_SELL
-            price = tick.ask if action == "BUY" else tick.bid
+            price = price_now
             
             request = {
                 "action": mt5.TRADE_ACTION_DEAL,
@@ -660,7 +700,17 @@ def get_live_ticks():
             import livetest_sim
             bias = compute_xedy_fundamental_bias()
             news_halt, _ = is_news_halt_active()
-            demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"]["bid"], bias, news_halt_active=news_halt)
+            
+            # Fetch real-time XAUUSD confidence from cached dashboard data
+            xau_conf = 70.0
+            with cached_dashboard_lock:
+                if cached_dashboard_data and "pair_recommendations" in cached_dashboard_data:
+                    for rec in cached_dashboard_data["pair_recommendations"]:
+                        if rec.get("pair") == "XAUUSD":
+                            xau_conf = rec.get("confidence", 70.0)
+                            break
+            
+            demo_state = livetest_sim.update_livetest_sim(ticks["XAUUSD"]["bid"], bias, news_halt_active=news_halt, confidence=xau_conf)
             if demo_state:
                 config_file = r'C:\Antigravity\active_config.json'
                 if os.path.exists(config_file):
@@ -931,9 +981,7 @@ def _compute_dashboard_data():
                            "★★★★"  if abs_chg > q_th[1] else
                            "★★★"   if abs_chg > q_th[2] else
                            "★★"    if abs_chg > q_th[3] else "★")
-                confidence = round(min(99, 50 + abs_chg * c_mul), 0)
-
-                # --- NEW SIGNAL OVERHAUL BASED ON DYNAMIC TREND & WHIPSAW ---
+                               # --- NEW SIGNAL OVERHAUL BASED ON QUANTITATIVE OPTIMIZATION ---
                 global confidence_history, last_trade_time
                 if sym not in confidence_history:
                     confidence_history[sym] = []
@@ -941,81 +989,58 @@ def _compute_dashboard_data():
                 if len(confidence_history[sym]) > 5:
                     confidence_history[sym].pop(0)
                 
-                hist = confidence_history[sym]
                 action = "WAIT"
                 if is_whipsaw:
                     action = "WAIT"
+                elif label in ["XAUUSD", "USDJPY"]:
+                    # Fetch M15 historical rates to compute RSI and SMA trend alignment
+                    rates_m15 = mt5.copy_rates_from_pos(sym, mt5.TIMEFRAME_M15, 0, 50)
+                    if rates_m15 is not None and len(rates_m15) >= 30:
+                        closes_m15 = [r['close'] for r in rates_m15]
+                        
+                        # SMA-10 (Fast) & SMA-30 (Slow)
+                        sma_10 = sum(closes_m15[-10:]) / 10.0
+                        sma_30 = sum(closes_m15[-30:]) / 30.0
+                        
+                        # RSI-14
+                        deltas = [closes_m15[idx] - closes_m15[idx-1] for idx in range(1, len(closes_m15))]
+                        gains = [d if d > 0 else 0 for d in deltas]
+                        losses = [-d if d < 0 else 0 for d in deltas]
+                        avg_gain = sum(gains[-14:]) / 14.0
+                        avg_loss = sum(losses[-14:]) / 14.0
+                        if avg_loss == 0:
+                            rsi_val = 100.0
+                        else:
+                            rs = avg_gain / avg_loss
+                            rsi_val = 100.0 - (100.0 / (1.0 + rs))
+                            
+                        # Apply optimized parameters: RSI Buy < 45, RSI Sell > 55 with SMA trend direction
+                        if rsi_val < 45.0 and sma_10 > sma_30:
+                            action = "BUY"
+                            confidence = round(min(99.0, 50.0 + (45.0 - rsi_val) * 2.2), 0)
+                        elif rsi_val > 55.0 and sma_10 < sma_30:
+                            action = "SELL"
+                            confidence = round(min(99.0, 50.0 + (rsi_val - 55.0) * 2.2), 0)
+                        else:
+                            action = "WAIT"
+                            confidence = 50.0
                 else:
-                    # Deceleration Exit Logic
+                    # Fallback logic for other symbols
+                    hist = confidence_history[sym]
                     dec_tol = ai_params.get("deceleration_tolerance", 3)
                     if len(hist) >= dec_tol + 1:
-                        # Check if confidence dropped for dec_tol consecutive ticks
                         is_decelerating = all(hist[-(i+1)] < hist[-(i+2)] for i in range(dec_tol))
                         if is_decelerating:
                             action = "EXIT WARNING"
 
                     if action != "EXIT WARNING":
-                        # Acceleration Entry Logic
                         if len(hist) >= 3:
                             is_accel_bull = (hist[-3] <= hist[-2] <= hist[-1]) and chg_pct > 0
                             is_accel_bear = (hist[-3] <= hist[-2] <= hist[-1]) and chg_pct < 0
-                            
-                            # Macro Alignment for Gold (Intermarket)
-                            macro_blocked = False
-                            if label == "XAUUSD":
-                                macro = "NEUTRAL"
-                                if cached_dashboard_data and "intermarket" in cached_dashboard_data:
-                                    bulls = sum(1 for x in cached_dashboard_data["intermarket"] if x.get("gold_impact") == "BULLISH")
-                                    bears = sum(1 for x in cached_dashboard_data["intermarket"] if x.get("gold_impact") == "BEARISH")
-                                    min_div = ai_params.get("xauusd_macro_min_divergence", 2)
-                                    
-                                    # Block BUY only if Bearish sentiment is strong enough (bears - bulls >= min_div)
-                                    if bears - bulls >= min_div:
-                                        macro = "BEARISH"
-                                    # Block SELL only if Bullish sentiment is strong enough (bulls - bears >= min_div)
-                                    elif bulls - bears >= min_div:
-                                        macro = "BULLISH"
-                                
-                                if is_accel_bull and macro == "BEARISH":
-                                    macro_blocked = True
-                                elif is_accel_bear and macro == "BULLISH":
-                                    macro_blocked = True
-                            
-                            # Currency Strength Index (CSI) Filter
-                            dxy = strengths.get("DXY", 0.0)
-                            csi_th = ai_params.get("csi_macro_threshold", 0.2)
-                            if label in ["XAUUSD", "EURUSD", "GBPUSD"]:
-                                # Inverse relationship to USD
-                                th = ai_params.get("xauusd_macro_threshold", 0.15) if label == "XAUUSD" else csi_th
-                                if is_accel_bull and dxy > th: # Strong USD blocks BUY
-                                    macro_blocked = True
-                                elif is_accel_bear and dxy < -th: # Weak USD blocks SELL
-                                    macro_blocked = True
-                            elif label == "USDJPY":
-                                # Direct relationship to USD, Inverse to JPY
-                                jxy = strengths.get("JXY", 0.0)
-                                if is_accel_bull and (dxy < -csi_th or jxy > csi_th): 
-                                    macro_blocked = True
-                                elif is_accel_bear and (dxy > csi_th or jxy < -csi_th):
-                                    macro_blocked = True
-                            elif label == "WTI OIL":
-                                # Oil generally inversely correlated to USD
-                                if is_accel_bull and dxy > oil_th:
-                                    macro_blocked = True
-                                elif is_accel_bear and dxy < -oil_th:
-                                    macro_blocked = True
-                                    
-                            if not macro_blocked:
-                                # Per-instrument trend: simply use direction of daily chg_pct
-                                # A move > 0.05% is considered directional (velocity filter already handled above)
-                                inst_trend_bull = chg_pct > 0.05
-                                inst_trend_bear = chg_pct < -0.05
-                                trend_ok_bull = "BULLISH" in current_trend or inst_trend_bull
-                                trend_ok_bear = "BEARISH" in current_trend or inst_trend_bear
-                                if is_accel_bull and trend_ok_bull:
-                                    action = "BUY"
-                                elif is_accel_bear and trend_ok_bear:
-                                    action = "SELL"
+                            if is_accel_bull and chg_pct > 0.05:
+                                action = "BUY"
+                            elif is_accel_bear and chg_pct < -0.05:
+                                action = "SELL"
 
                 return {
                     "pair":       label,
@@ -1208,16 +1233,19 @@ def _compute_dashboard_data():
             digits = info.digits if info.digits else 5
             entry = round(tick.bid, digits)
             
-            # Apply adaptive multipliers
-            target_tp = rr * atr * gap_multiplier
-            target_sl = atr * sl_multiplier
+            # Apply adaptive multipliers (Optimized baseline: SL=2.0 * ATR, TP=2.0 * ATR)
+            target_tp = 2.0 * atr * gap_multiplier
+            target_sl = 2.0 * atr * sl_multiplier
             
             if action == "BUY":
                 sl = round(entry - target_sl, digits)
                 tp = round(entry + target_tp, digits)
-            else:
+            elif action == "SELL":
                 sl = round(entry + target_sl, digits)
                 tp = round(entry - target_tp, digits)
+            else:
+                sl = None
+                tp = None
             return {
                 "entry": entry,
                 "sl":    sl,
