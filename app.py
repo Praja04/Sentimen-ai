@@ -885,9 +885,6 @@ def _compute_dashboard_data():
     FIXED_INSTRUMENTS = [
         ("XAUUSD",  ["XAUUSD"],                      "forex"),
         ("USDJPY",  ["USDJPY"],                      "forex"),
-        ("WTI OIL", ["WTI","XTIUSD","USOIL","CL"],  "index"),
-        ("NIKKEI",  ["JP225","JPN225","NI225","JP225Cash","JAPAN225"], "index"),
-        ("DOW JONES",["US30","DJ30","DJIA","WS30","USA30"],             "index"),
     ]
 
     ai_params = ai_tuner.load_ai_params()
