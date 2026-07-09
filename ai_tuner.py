@@ -15,7 +15,9 @@ DEFAULT_PARAMS = {
     "whipsaw_sd_threshold": 0.015,    # Standard deviation threshold above which it's considered a whipsaw
     "spam_cooldown": 60,              # Cooldown in seconds before re-entering same direction
     "deceleration_tolerance": 3,      # Number of ticks of decelerating confidence before EXIT WARNING
-    "trailing_buffer_multiplier": 1.0 # Multiplier for ATR padding on Trailing Stop
+    "trailing_buffer_multiplier": 1.0, # Multiplier for ATR padding on Trailing Stop
+    "csi_macro_threshold": 0.2,       # Baseline Currency Strength Index filter for major pairs
+    "csi_oil_threshold": 0.3          # Baseline Currency Strength Index filter for WTI Oil
 }
 
 def load_ai_params():
@@ -69,6 +71,10 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
             params["time_window"] -= 5
         if params["velocity_threshold"] > 0.01:
             params["velocity_threshold"] = round(params["velocity_threshold"] - 0.002, 4)
+        if params.get("csi_macro_threshold", 0.2) < 0.3:
+            params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) + 0.01, 3)
+        if params.get("csi_oil_threshold", 0.3) < 0.4:
+            params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) + 0.01, 3)
         save_ai_params(params)
         return
         
@@ -87,6 +93,12 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
     # 3. Increase whipsaw sensitivity (lower the threshold so we detect it earlier)
     if params["whipsaw_sd_threshold"] > 0.005:
         params["whipsaw_sd_threshold"] = round(params["whipsaw_sd_threshold"] - 0.001, 4)
+        
+    # 4. Tighten CSI thresholds to block trades against even minor opposing macro trends
+    if params.get("csi_macro_threshold", 0.2) > 0.1:
+        params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) - 0.02, 3)
+    if params.get("csi_oil_threshold", 0.3) > 0.15:
+        params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) - 0.02, 3)
         
     save_ai_params(params)
     print(f"[AI Tuner] Adaptive adjustment applied: tightened parameters to recover winrate. New params: {params}")

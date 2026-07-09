@@ -387,7 +387,9 @@ function renderTicker(ticks) {
     if (!ticks) return;
     for (const [symbol, t] of Object.entries(ticks)) {
         // IDs format match: ticker-bid-XAUUSD, ticker-ask-XAUUSD, ticker-chg-XAUUSD
-        const domSymbol = symbol.replace(" WTI OIL", "-WTI-OIL").replace(" OIL", "-OIL").replace(" ", "-");
+        let domSymbol = symbol.replace(" ", "-");
+        if (symbol === "XTIUSD" || symbol === "WTI OIL") domSymbol = "WTI-OIL";
+        if (symbol === "US30" || symbol === "DJI") domSymbol = "DJI";
         
         const bidEl = document.getElementById(`ticker-bid-${domSymbol}`);
         const askEl = document.getElementById(`ticker-ask-${domSymbol}`);

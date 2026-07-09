@@ -444,7 +444,6 @@
             <a href="/">🏠 HOME</a>
             
             <a href="/trade">📊 TRADE</a>
-            <a href="/Forecast">🔮 FORECAST</a>
             
             <a href="/Intermarket" class="active">🌐 INTERMARKET</a>
         </nav>
@@ -928,8 +927,11 @@
             }
         });
 
-        function fmt(val, digits) {
+        function fmt(val, digits, pair) {
             if (val == null) return '---';
+            if (pair && (pair.includes('NIKKEI') || pair.includes('DOW JONES') || pair.includes('US30') || pair.includes('DJI') || pair.includes('JP225'))) {
+                return Number(val).toFixed(0);
+            }
             return Number(val).toFixed(Math.min(digits || 5, 5));
         }
 
@@ -972,9 +974,9 @@
                 : `<span style="color:${actC}">${rec.strong||''}</span>${rec.weak && !isIndex ? ` → ${rec.weak}` : ''}`;
 
             const pairId = rec.pair.replace(/\s+/g, '-');
-            const entryTxt = `<span id="live-entry-${pairId}" data-digits="${d}">${fmt(rec.entry, d)}</span>`;
-            const slTxt    = fmt(rec.sl, d);
-            const tpTxt    = fmt(rec.tp, d);
+            const entryTxt = `<span id="live-entry-${pairId}" data-digits="${d}" data-pair="${rec.pair}">${fmt(rec.entry, d, rec.pair)}</span>`;
+            const slTxt    = fmt(rec.sl, d, rec.pair);
+            const tpTxt    = fmt(rec.tp, d, rec.pair);
 
             // Fundamental and Adaptive AI data
             const fIcon    = rec.fundamental_icon    || '🟡';
@@ -1181,7 +1183,11 @@
                     const pairId = pair.replace(/\s+/g, '-');
                     const el = document.getElementById(`live-entry-${pairId}`);
                     if (el) {
-                        const d = parseInt(el.getAttribute('data-digits') || 2);
+                        let d = parseInt(el.getAttribute('data-digits') || 2);
+                        const rawPair = el.getAttribute('data-pair') || pair;
+                        if (rawPair.includes('NIKKEI') || rawPair.includes('DOW JONES') || rawPair.includes('US30') || rawPair.includes('DJI') || rawPair.includes('JP225')) {
+                            d = 0;
+                        }
                         // Overlay the live tick price over the cached signal entry price
                         const currentText = el.innerText;
                         const newText = tick.bid.toFixed(d);

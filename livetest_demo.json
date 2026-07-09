@@ -1,6 +1,6 @@
 {
     "balance": 10543.1,
-    "equity": 10505.86,
+    "equity": 10562.98,
     "active_trades": [
         {
             "ticket": 25150034,
@@ -9,13 +9,13 @@
             "type": "BUY",
             "lots": 0.14,
             "entry_price": 4076.98,
-            "current_price": 4074.32,
+            "current_price": 4078.4,
             "sl": 4061.98,
             "tp": 4098.98,
             "commission": -1.5,
             "swap": 0.0,
             "status": "RUNNING",
-            "profit": -37.24
+            "profit": 19.88
         }
     ],
     "history": [
@@ -68,5 +68,5 @@
             "result": "PROFIT"
         }
     ],
-    "last_update": 1783551760.4670234
+    "last_update": 1783557066.0276058
 }

@@ -30,8 +30,7 @@
                     <h2>INSTITUTIONAL FORECAST DASHBOARD</h2>
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 5px;">
                     
-                    <a href="/trade" class="backtest-link-btn" style="display: inline-block; color: var(--text-gold); font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-decoration: none; border: 1px solid var(--text-gold); padding: 3px 10px; border-radius: 3px; background: rgba(255, 215, 0, 0.08); transition: all 0.3s; box-shadow: 0 0 8px rgba(255,215,0,0.15); font-weight: bold; letter-spacing: 1px;">📊 TRADE MONITOR</a>
-                    <a href="/Forecast" class="backtest-link-btn" style="display: inline-block; color: #00d2ff; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-decoration: none; border: 1px solid #00d2ff; padding: 3px 10px; border-radius: 3px; background: rgba(0, 210, 255, 0.08); transition: all 0.3s; box-shadow: 0 0 8px rgba(0,210,255,0.15); font-weight: bold; letter-spacing: 1px;">🔮 AI FORECAST</a>
+                    <a href="/trade" class="backtest-link-btn" style="display: inline-block; color: #00ff88; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-decoration: none; border: 1px solid #00ff88; padding: 3px 10px; border-radius: 3px; background: rgba(0, 255, 136, 0.08); transition: all 0.3s; box-shadow: 0 0 8px rgba(0,255,136,0.15); font-weight: bold; letter-spacing: 1px;">📊 LIVE TRADE MONITOR</a>
                     
                     <a href="/Intermarket" class="backtest-link-btn" style="display: inline-block; color: #a78bfa; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-decoration: none; border: 1px solid #a78bfa; padding: 3px 10px; border-radius: 3px; background: rgba(167, 139, 250, 0.08); transition: all 0.3s; box-shadow: 0 0 8px rgba(167,139,250,0.15); font-weight: bold; letter-spacing: 1px;">🌐 INTERMARKET</a>
                 </div>
@@ -121,7 +120,9 @@
                             <button onclick="switchTV('nhk')" id="tv-btn-nhk" class="tv-ch-btn" title="NHK World Live 24/7">🗾 NHK WORLD</button>
                             <button onclick="switchTV('cnbc')" id="tv-btn-cnbc" class="tv-ch-btn" title="CNBC/Bloomberg Live">📺 CNBC</button>
                         </div>
-                        <iframe id="live-tv-frame" src="https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="flex:1 1 0;"></iframe>
+                        <div style="flex:1 1 0; overflow:hidden; display:flex; position:relative; width:100%;">
+                            <iframe id="live-tv-frame" src="https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="flex:1 1 0; width:100%; height:100%;"></iframe>
+                        </div>
                     </div>
                     <div class="news-box panel-border">
                         <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
@@ -262,18 +263,27 @@
     </style>
     <script>
         const TV_CHANNELS = {
-            // Freshly verified live stream video IDs (fetched 2026-07-08)
-            'aljazeera': 'https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=1&mute=1',   // Al Jazeera English
-            'bloomberg':  'https://www.youtube.com/embed/OlUMDZchivQ?autoplay=1&mute=1',  // Bloomberg (@business)
+            'aljazeera':  'https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqNL5ZzHSJj3l8Bg&autoplay=1&mute=1',
+            'bloomberg':  'https://www.bloomberg.com/live/us',
             'dw':         'https://www.youtube.com/embed/LuKwFajn37U?autoplay=1&mute=1',   // DW News
-            'nhk':        'https://www.youtube.com/embed/f0lYkdA-Gtw?autoplay=1&mute=1',   // NHK World Japan
-            'cnbc':       'https://www.youtube.com/embed/KQp-e_XQnDE?autoplay=1&mute=1',   // CNBC/Bloomberg
+            'nhk':        'https://www3.nhk.or.jp/nhkworld/en/live_tv/',
+            'cnbc':       'https://www.youtube.com/embed/KQp-e_XQnDE?autoplay=1&mute=1',
         };
 
         function switchTV(channel) {
             const frame = document.getElementById('live-tv-frame');
             if (frame && TV_CHANNELS[channel]) {
                 frame.src = TV_CHANNELS[channel];
+                
+                // Crop website headers to simulate Player-Only view
+                frame.style.transformOrigin = 'top center';
+                if (channel === 'bloomberg') {
+                    frame.style.transform = 'scale(1.15) translateY(-80px)';
+                } else if (channel === 'nhk') {
+                    frame.style.transform = 'scale(1.25) translateY(-100px)';
+                } else {
+                    frame.style.transform = 'none';
+                }
             }
             // Update active button styles
             document.querySelectorAll('.tv-ch-btn').forEach(btn => btn.classList.remove('active'));

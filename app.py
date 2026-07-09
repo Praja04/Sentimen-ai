@@ -284,80 +284,86 @@ def auto_update_speech_sentiment():
     
     global latest_speech_analysis
     now = time.time()
-    # Throttled check: 5 seconds
-    if now - latest_speech_analysis.get("last_checked", 0) < 5:
+    # Throttled check: 300 seconds (5 minutes) to avoid IP ban and blocking
+    if now - latest_speech_analysis.get("last_checked", 0) < 300:
         return
         
     latest_speech_analysis["last_checked"] = now
-    
-    try:
-        # Search queries for Fed speeches, FOMC, and US political news
-        rss_url = "https://news.google.com/rss/search?q=Powell+OR+Fed+OR+FOMC+OR+Trump+OR+Biden&hl=en-US&gl=US&ceid=US:en"
-        feed = feedparser.parse(rss_url)
-        
-        analyzer = SentimentIntensityAnalyzer()
-        
-        for entry in feed.entries[:8]: # Scan top 8 headlines
-            title = entry.title.lower()
+
+    # Run the network request asynchronously so it doesn't block the 5-second AI computation loop
+    def _fetch_rss():
+        global latest_speech_analysis
+        try:
+            # Search queries for Fed speeches, FOMC, and US political news
+            rss_url = "https://news.google.com/rss/search?q=Powell+OR+Fed+OR+FOMC+OR+Trump+OR+Biden&hl=en-US&gl=US&ceid=US:en"
+            feed = feedparser.parse(rss_url)
             
-            # Identify critical keywords
-            is_fed = any(k in title for k in ["powell", "fed", "fomc", "interest rate", "inflation"])
-            is_president = any(k in title for k in ["trump", "biden", "president", "tariff", "trade war"])
+            analyzer = SentimentIntensityAnalyzer()
             
-            if is_fed or is_president:
-                headline_text = entry.title
-                vs = analyzer.polarity_scores(headline_text)
-                score = vs["compound"]
+            for entry in feed.entries[:8]: # Scan top 8 headlines
+                title = entry.title.lower()
                 
-                shifts = {}
-                # Hawkish Fed/US statement -> DXY up, US10Y up, equities down, gold down
-                if any(k in title for k in ["hawkish", "hike", "rate hike", "tighten", "delay cut"]):
-                    bias = "HAWKISH (AUTO)"
-                    shifts = {
-                        "DXY": 0.45, "US10Y": 0.35, "VIX": 0.50, "SILVER": -0.80,
-                        "S&P 500": -0.30, "DOW JONES": -0.25, "NIKKEI": -0.40, "WTI OIL": -0.20
-                    }
-                # Dovish statement -> DXY down, Yield down, Equities up, Gold up
-                elif any(k in title for k in ["dovish", "rate cut", "cut", "easing", "stimulus"]):
-                    bias = "DOVISH (AUTO)"
-                    shifts = {
-                        "DXY": -0.55, "US10Y": -0.40, "VIX": -0.60, "SILVER": 1.20,
-                        "S&P 500": 0.40, "DOW JONES": 0.35, "NIKKEI": 0.50, "WTI OIL": 0.25
-                    }
-                elif any(k in title for k in ["tariff", "trade war", "sanction"]):
-                    bias = "TRADE WAR / TARIFFS (Risk-Off AUTO)"
-                    shifts = {
-                        "DXY": 0.30, "US10Y": -0.15, "VIX": 0.85, "SILVER": 0.20,
-                        "S&P 500": -0.65, "DOW JONES": -0.60, "NIKKEI": -0.80, "WTI OIL": -0.40
-                    }
-                else:
-                    # Fallback to standard VADER score direction
-                    if score > 0.15:
-                        bias = "BULLISH / OPTIMISTIC (AUTO)"
+                # Identify critical keywords
+                is_fed = any(k in title for k in ["powell", "fed", "fomc", "interest rate", "inflation"])
+                is_president = any(k in title for k in ["trump", "biden", "president", "tariff", "trade war"])
+                
+                if is_fed or is_president:
+                    headline_text = entry.title
+                    vs = analyzer.polarity_scores(headline_text)
+                    score = vs["compound"]
+                    
+                    shifts = {}
+                    # Hawkish Fed/US statement -> DXY up, US10Y up, equities down, gold down
+                    if any(k in title for k in ["hawkish", "hike", "rate hike", "tighten", "delay cut"]):
+                        bias = "HAWKISH (AUTO)"
                         shifts = {
-                            "DXY": -0.15, "US10Y": -0.10, "VIX": -0.20, "SILVER": 0.30,
-                            "S&P 500": 0.20, "DOW JONES": 0.15, "NIKKEI": 0.25, "WTI OIL": 0.10
+                            "DXY": 0.45, "US10Y": 0.35, "VIX": 0.50, "SILVER": -0.80,
+                            "S&P 500": -0.30, "DOW JONES": -0.25, "NIKKEI": -0.40, "WTI OIL": -0.20
                         }
-                    elif score < -0.15:
-                        bias = "BEARISH / RISK-OFF (AUTO)"
+                    # Dovish statement -> DXY down, Yield down, Equities up, Gold up
+                    elif any(k in title for k in ["dovish", "rate cut", "cut", "easing", "stimulus"]):
+                        bias = "DOVISH (AUTO)"
                         shifts = {
-                            "DXY": 0.15, "US10Y": 0.10, "VIX": 0.35, "SILVER": -0.25,
-                            "S&P 500": -0.30, "DOW JONES": -0.25, "NIKKEI": -0.35, "WTI OIL": -0.15
+                            "DXY": -0.55, "US10Y": -0.40, "VIX": -0.60, "SILVER": 1.20,
+                            "S&P 500": 0.40, "DOW JONES": 0.35, "NIKKEI": 0.50, "WTI OIL": 0.25
+                        }
+                    elif any(k in title for k in ["tariff", "trade war", "sanction"]):
+                        bias = "TRADE WAR / TARIFFS (Risk-Off AUTO)"
+                        shifts = {
+                            "DXY": 0.30, "US10Y": -0.15, "VIX": 0.85, "SILVER": 0.20,
+                            "S&P 500": -0.65, "DOW JONES": -0.60, "NIKKEI": -0.80, "WTI OIL": -0.40
                         }
                     else:
-                        continue # Skip weak/neutral titles
-                
-                # We found a significant auto-speech headline, save and break
-                latest_speech_analysis = {
-                    "headline": headline_text,
-                    "bias": bias,
-                    "score": round(score, 3),
-                    "shifts": shifts,
-                    "last_checked": now
-                }
-                break
-    except Exception as e:
-        print("Auto speech updating error:", e)
+                        # Fallback to standard VADER score direction
+                        if score > 0.15:
+                            bias = "BULLISH / OPTIMISTIC (AUTO)"
+                            shifts = {
+                                "DXY": -0.15, "US10Y": -0.10, "VIX": -0.20, "SILVER": 0.30,
+                                "S&P 500": 0.20, "DOW JONES": 0.15, "NIKKEI": 0.25, "WTI OIL": 0.10
+                            }
+                        elif score < -0.15:
+                            bias = "BEARISH / RISK-OFF (AUTO)"
+                            shifts = {
+                                "DXY": 0.15, "US10Y": 0.10, "VIX": 0.35, "SILVER": -0.25,
+                                "S&P 500": -0.30, "DOW JONES": -0.25, "NIKKEI": -0.35, "WTI OIL": -0.15
+                            }
+                        else:
+                            continue # Skip weak/neutral titles
+                    
+                    # We found a significant auto-speech headline, save and break
+                    latest_speech_analysis = {
+                        "headline": headline_text,
+                        "bias": bias,
+                        "score": round(score, 3),
+                        "shifts": shifts,
+                        "last_checked": time.time()
+                    }
+                    break
+        except Exception as e:
+            print("Auto speech updating error:", e)
+
+    import threading
+    threading.Thread(target=_fetch_rss, daemon=True).start()
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.debug = True
@@ -776,8 +782,8 @@ def _compute_dashboard_data():
                             is_accel_bull = (hist[-3] < hist[-2] < hist[-1]) and chg_pct > 0
                             is_accel_bear = (hist[-3] < hist[-2] < hist[-1]) and chg_pct < 0
                             
-                            # Macro Alignment for Gold
-                            gold_blocked = False
+                            # Macro Alignment for Gold (Intermarket)
+                            macro_blocked = False
                             if label == "XAUUSD":
                                 macro = "NEUTRAL"
                                 if cached_dashboard_data and "intermarket" in cached_dashboard_data:
@@ -787,11 +793,35 @@ def _compute_dashboard_data():
                                     elif bears > bulls: macro = "BEARISH"
                                 
                                 if is_accel_bull and macro == "BEARISH":
-                                    gold_blocked = True
+                                    macro_blocked = True
                                 elif is_accel_bear and macro == "BULLISH":
-                                    gold_blocked = True
+                                    macro_blocked = True
+                            
+                            # Currency Strength Index (CSI) Filter
+                            dxy = strengths.get("DXY", 0.0)
+                            csi_th = ai_params.get("csi_macro_threshold", 0.2)
+                            oil_th = ai_params.get("csi_oil_threshold", 0.3)
+                            if label in ["XAUUSD", "EURUSD", "GBPUSD"]:
+                                # Inverse relationship to USD
+                                if is_accel_bull and dxy > csi_th: # Strong USD blocks BUY
+                                    macro_blocked = True
+                                elif is_accel_bear and dxy < -csi_th: # Weak USD blocks SELL
+                                    macro_blocked = True
+                            elif label == "USDJPY":
+                                # Direct relationship to USD, Inverse to JPY
+                                jxy = strengths.get("JXY", 0.0)
+                                if is_accel_bull and (dxy < -csi_th or jxy > csi_th): 
+                                    macro_blocked = True
+                                elif is_accel_bear and (dxy > csi_th or jxy < -csi_th):
+                                    macro_blocked = True
+                            elif label == "WTI OIL":
+                                # Oil generally inversely correlated to USD
+                                if is_accel_bull and dxy > oil_th:
+                                    macro_blocked = True
+                                elif is_accel_bear and dxy < -oil_th:
+                                    macro_blocked = True
                                     
-                            if not gold_blocked:
+                            if not macro_blocked:
                                 if is_accel_bull and "BULLISH" in current_trend:
                                     action = "BUY"
                                     last_trade_time[sym] = now
