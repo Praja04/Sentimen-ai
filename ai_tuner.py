@@ -19,7 +19,8 @@ DEFAULT_PARAMS = {
     "csi_macro_threshold": 0.2,       # Baseline Currency Strength Index filter for major pairs
     "csi_oil_threshold": 0.3,         # Baseline Currency Strength Index filter for WTI Oil
     "xauusd_velocity_threshold": 0.010, # Dedicated velocity threshold for Gold
-    "xauusd_macro_threshold": 0.15      # Dedicated Currency Strength Index filter for Gold
+    "xauusd_macro_threshold": 0.15,     # Dedicated Currency Strength Index filter for Gold
+    "xauusd_macro_min_divergence": 2    # Min difference between bulls/bears to trigger macro block
 }
 
 # Hard limits to prevent AI Tuner from over-tightening and blocking all signals
@@ -30,7 +31,8 @@ PARAM_LIMITS = {
     "csi_macro_threshold":   {"min": 0.15,  "max": 0.3},
     "csi_oil_threshold":     {"min": 0.2,   "max": 0.4},
     "xauusd_velocity_threshold": {"min": 0.006, "max": 0.015},
-    "xauusd_macro_threshold":    {"min": 0.10,  "max": 0.25}
+    "xauusd_macro_threshold":    {"min": 0.10,  "max": 0.25},
+    "xauusd_macro_min_divergence": {"min": 1,   "max": 4}
 }
 
 def _clamp_params(params):
@@ -102,6 +104,8 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
             params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) + 0.01, 3)
         if params.get("xauusd_macro_threshold", 0.15) < 0.25:
             params["xauusd_macro_threshold"] = round(params.get("xauusd_macro_threshold", 0.15) + 0.01, 3)
+        if params.get("xauusd_macro_min_divergence", 2) < 4:
+            params["xauusd_macro_min_divergence"] = params.get("xauusd_macro_min_divergence", 2) + 1
         if params.get("csi_oil_threshold", 0.3) < 0.4:
             params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) + 0.01, 3)
         save_ai_params(params)
@@ -128,6 +132,8 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
         params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) - 0.01, 3)
     if params.get("xauusd_macro_threshold", 0.15) > PARAM_LIMITS["xauusd_macro_threshold"]["min"]:
         params["xauusd_macro_threshold"] = round(params.get("xauusd_macro_threshold", 0.15) - 0.01, 3)
+    if params.get("xauusd_macro_min_divergence", 2) > 1:
+        params["xauusd_macro_min_divergence"] = params.get("xauusd_macro_min_divergence", 2) - 1
     if params.get("csi_oil_threshold", 0.3) > PARAM_LIMITS["csi_oil_threshold"]["min"]:
         params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) - 0.01, 3)
         

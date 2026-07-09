@@ -846,8 +846,14 @@ def _compute_dashboard_data():
                                 if cached_dashboard_data and "intermarket" in cached_dashboard_data:
                                     bulls = sum(1 for x in cached_dashboard_data["intermarket"] if x.get("gold_impact") == "BULLISH")
                                     bears = sum(1 for x in cached_dashboard_data["intermarket"] if x.get("gold_impact") == "BEARISH")
-                                    if bulls > bears: macro = "BULLISH"
-                                    elif bears > bulls: macro = "BEARISH"
+                                    min_div = ai_params.get("xauusd_macro_min_divergence", 2)
+                                    
+                                    # Block BUY only if Bearish sentiment is strong enough (bears - bulls >= min_div)
+                                    if bears - bulls >= min_div:
+                                        macro = "BEARISH"
+                                    # Block SELL only if Bullish sentiment is strong enough (bulls - bears >= min_div)
+                                    elif bulls - bears >= min_div:
+                                        macro = "BULLISH"
                                 
                                 if is_accel_bull and macro == "BEARISH":
                                     macro_blocked = True
