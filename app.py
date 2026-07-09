@@ -4259,7 +4259,7 @@ def get_live_trade_logs(active_config, positions, ticks, bias):
                 profit_str = f"+${p_profit:.2f}" if p_profit >= 0 else f"-${abs(p_profit):.2f}"
                 new_entries.append({
                     "t": t_str,
-                    "msg": f"Memantau Posisi Aktif #{p.get('ticket')}: {p.get('type').upper()} {p.get('volume')} lot XAUUSD | Entry {p.get('price'):.2f} | Current {p.get('price_current'):.2f} | S/L {p.get('sl'):.2f} | T/P {p.get('tp'):.2f} | Profit {profit_str}",
+                    "msg": f"Memantau Posisi Aktif #{p.get('ticket')}: {p.get('type').upper()} {p.get('volume')} lot {p.get('symbol')} | Entry {p.get('price'):.2f} | Current {p.get('price_current'):.2f} | S/L {p.get('sl'):.2f} | T/P {p.get('tp'):.2f} | Profit {profit_str}",
                     "type": "pos"
                 })
         else:
