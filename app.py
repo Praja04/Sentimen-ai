@@ -781,6 +781,7 @@ def _compute_dashboard_data():
                     confidence_history[sym].pop(0)
                 
                 hist = confidence_history[sym]
+                action = "WAIT"
                 if is_whipsaw:
                     action = "WAIT"
                 else:
@@ -862,7 +863,8 @@ def _compute_dashboard_data():
                     "_digits":    digits,
                     "_entry":     entry,
                 }
-            except Exception:
+            except Exception as e:
+                print(f"[get_signal Error] for {label}: {e}")
                 continue
         return None
 
