@@ -612,8 +612,8 @@ def _compute_dashboard_data():
     except Exception as e:
         print("[MAE/MFE Tuner] Update error:", e)
         
-    if len(rates_dict) < 5:
-        return jsonify({"error": f"Failed to fetch historical rates for all 5 assets. Found: {list(rates_dict.keys())}"}), 500
+    if len(rates_dict) < len(symbols):
+        return {"error": f"Failed to fetch historical rates for all assets. Found: {list(rates_dict.keys())}"}
 
         
     # Load latest forecast_v32 for comparison
