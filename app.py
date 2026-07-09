@@ -79,6 +79,10 @@ def process_auto_trades(recs):
     if not init_mt5():
         return
         
+    import ai_tuner
+    ai_params = ai_tuner.load_ai_params()
+    spam_cooldown = ai_params.get("spam_cooldown", 60)
+        
     # Read active config to get dynamic risk %
     risk_pct = 1.0
     config_file = r'C:\Antigravity\active_config.json'
@@ -202,6 +206,10 @@ def process_auto_trades(recs):
                     
         # 2. AUTO OPEN
         elif action in ["BUY", "SELL"] and not positions:
+            # Cooldown check
+            if time.time() - last_trade_time.get(active_symbol, 0) < spam_cooldown:
+                continue
+                
             sig_id = f"{active_symbol}_{action}"
             entry = rec.get("entry")
             sl = rec.get("sl")
@@ -240,6 +248,7 @@ def process_auto_trades(recs):
             
             if res and res.retcode == mt5.TRADE_RETCODE_DONE:
                 _executed_signals[sig_id] = time.time()
+                last_trade_time[active_symbol] = time.time()
                 direction = "BUY" if action == "BUY" else "SELL"
                 msg = f"AUTO {direction} EXECUTED\nSymbol: {active_symbol}\nLot: {lot}\nEntry: {price}\nSL: {sl}\nTP: {tp}\nConf: {conf}%"
                 send_telegram_alert(msg)
@@ -772,13 +781,6 @@ def _compute_dashboard_data():
                     confidence_history[sym].pop(0)
                 
                 hist = confidence_history[sym]
-                action = "WAIT"
-                
-                import time
-                now = time.time()
-                spam_cooldown = ai_params.get("spam_cooldown", 60) # default 60s cooldown
-                is_cooldown = (now - last_trade_time.get(sym, 0)) < spam_cooldown
-                
                 if is_whipsaw:
                     action = "WAIT"
                 else:
@@ -790,7 +792,7 @@ def _compute_dashboard_data():
                         if is_decelerating:
                             action = "EXIT WARNING"
 
-                    if action != "EXIT WARNING" and not is_cooldown:
+                    if action != "EXIT WARNING":
                         # Acceleration Entry Logic
                         if len(hist) >= 3:
                             is_accel_bull = (hist[-3] <= hist[-2] <= hist[-1]) and chg_pct > 0
@@ -844,10 +846,8 @@ def _compute_dashboard_data():
                                 trend_ok_bear = "BEARISH" in current_trend or inst_trend_bear
                                 if is_accel_bull and trend_ok_bull:
                                     action = "BUY"
-                                    last_trade_time[sym] = now
                                 elif is_accel_bear and trend_ok_bear:
                                     action = "SELL"
-                                    last_trade_time[sym] = now
 
                 return {
                     "pair":       label,
