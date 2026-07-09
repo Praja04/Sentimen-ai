@@ -19,7 +19,7 @@ DEFAULT_PARAMS = {
     "csi_macro_threshold": 0.2,       # Baseline Currency Strength Index filter for major pairs
     "csi_oil_threshold": 0.3,         # Baseline Currency Strength Index filter for WTI Oil
     "xauusd_velocity_threshold": 0.010, # Dedicated velocity threshold for Gold
-    "xauusd_macro_threshold": 0.15,     # Dedicated Currency Strength Index filter for Gold
+    "xauusd_macro_threshold": 0.25,     # Dedicated Currency Strength Index filter for Gold
     "xauusd_macro_min_divergence": 2    # Min difference between bulls/bears to trigger macro block
 }
 
@@ -31,7 +31,7 @@ PARAM_LIMITS = {
     "csi_macro_threshold":   {"min": 0.15,  "max": 0.3},
     "csi_oil_threshold":     {"min": 0.2,   "max": 0.4},
     "xauusd_velocity_threshold": {"min": 0.006, "max": 0.015},
-    "xauusd_macro_threshold":    {"min": 0.10,  "max": 0.25},
+    "xauusd_macro_threshold":    {"min": 0.20,  "max": 0.45},
     "xauusd_macro_min_divergence": {"min": 1,   "max": 4}
 }
 

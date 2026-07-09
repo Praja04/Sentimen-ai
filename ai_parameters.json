@@ -1,11 +1,14 @@
 {
-    "time_window": 60,
-    "velocity_threshold": 0.008,
+    "time_window": 120,
+    "velocity_threshold": 0.012,
     "momentum_threshold": 1.5,
-    "whipsaw_sd_threshold": 0.3,
+    "whipsaw_sd_threshold": 0.15,
     "spam_cooldown": 60,
     "deceleration_tolerance": 3,
     "trailing_buffer_multiplier": 1.0,
-    "csi_macro_threshold": 0.2,
-    "csi_oil_threshold": 0.3
+    "csi_macro_threshold": 0.15,
+    "csi_oil_threshold": 0.2,
+    "xauusd_velocity_threshold": 0.010,
+    "xauusd_macro_threshold": 0.35,
+    "xauusd_macro_min_divergence": 3
 }
