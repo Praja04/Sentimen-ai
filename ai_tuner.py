@@ -94,19 +94,19 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
     
     if current_winrate >= target_winrate:
         # Doing well — slightly relax parameters to capture more trades
-        if params["time_window"] > 30:
+        if params["time_window"] > PARAM_LIMITS["time_window"]["min"]:
             params["time_window"] -= 5
-        if params["velocity_threshold"] > 0.005:
+        if params["velocity_threshold"] > PARAM_LIMITS["velocity_threshold"]["min"]:
             params["velocity_threshold"] = round(params["velocity_threshold"] - 0.001, 4)
-        if params.get("xauusd_velocity_threshold", 0.010) > 0.006:
+        if params.get("xauusd_velocity_threshold", 0.010) > PARAM_LIMITS["xauusd_velocity_threshold"]["min"]:
             params["xauusd_velocity_threshold"] = round(params.get("xauusd_velocity_threshold", 0.010) - 0.001, 4)
-        if params.get("csi_macro_threshold", 0.2) < 0.3:
+        if params.get("csi_macro_threshold", 0.2) < PARAM_LIMITS["csi_macro_threshold"]["max"]:
             params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) + 0.01, 3)
-        if params.get("xauusd_macro_threshold", 0.15) < 0.25:
-            params["xauusd_macro_threshold"] = round(params.get("xauusd_macro_threshold", 0.15) + 0.01, 3)
-        if params.get("xauusd_macro_min_divergence", 2) < 4:
+        if params.get("xauusd_macro_threshold", 0.25) < PARAM_LIMITS["xauusd_macro_threshold"]["max"]:
+            params["xauusd_macro_threshold"] = round(params.get("xauusd_macro_threshold", 0.25) + 0.01, 3)
+        if params.get("xauusd_macro_min_divergence", 2) < PARAM_LIMITS["xauusd_macro_min_divergence"]["max"]:
             params["xauusd_macro_min_divergence"] = params.get("xauusd_macro_min_divergence", 2) + 1
-        if params.get("csi_oil_threshold", 0.3) < 0.4:
+        if params.get("csi_oil_threshold", 0.3) < PARAM_LIMITS["csi_oil_threshold"]["max"]:
             params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) + 0.01, 3)
         save_ai_params(params)
         return
@@ -130,9 +130,9 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
     # 4. Tighten CSI thresholds slightly
     if params.get("csi_macro_threshold", 0.2) > PARAM_LIMITS["csi_macro_threshold"]["min"]:
         params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) - 0.01, 3)
-    if params.get("xauusd_macro_threshold", 0.15) > PARAM_LIMITS["xauusd_macro_threshold"]["min"]:
-        params["xauusd_macro_threshold"] = round(params.get("xauusd_macro_threshold", 0.15) - 0.01, 3)
-    if params.get("xauusd_macro_min_divergence", 2) > 1:
+    if params.get("xauusd_macro_threshold", 0.25) > PARAM_LIMITS["xauusd_macro_threshold"]["min"]:
+        params["xauusd_macro_threshold"] = round(params.get("xauusd_macro_threshold", 0.25) - 0.01, 3)
+    if params.get("xauusd_macro_min_divergence", 2) > PARAM_LIMITS["xauusd_macro_min_divergence"]["min"]:
         params["xauusd_macro_min_divergence"] = params.get("xauusd_macro_min_divergence", 2) - 1
     if params.get("csi_oil_threshold", 0.3) > PARAM_LIMITS["csi_oil_threshold"]["min"]:
         params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) - 0.01, 3)
