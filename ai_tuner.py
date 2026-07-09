@@ -10,15 +10,31 @@ _param_lock = threading.Lock()
 
 DEFAULT_PARAMS = {
     "time_window": 60,                # 60 seconds rolling window for velocity/momentum
-    "velocity_threshold": 0.02,       # Minimum price % change in the window to confirm trend
+    "velocity_threshold": 0.008,      # Minimum % velocity in window to confirm trend (realistic: 0.005-0.015)
     "momentum_threshold": 1.5,        # Minimum confidence change in the window
-    "whipsaw_sd_threshold": 0.015,    # Standard deviation threshold above which it's considered a whipsaw
+    "whipsaw_sd_threshold": 0.3,      # SD threshold for whipsaw (realistic: different instruments diverge naturally)
     "spam_cooldown": 60,              # Cooldown in seconds before re-entering same direction
     "deceleration_tolerance": 3,      # Number of ticks of decelerating confidence before EXIT WARNING
     "trailing_buffer_multiplier": 1.0, # Multiplier for ATR padding on Trailing Stop
     "csi_macro_threshold": 0.2,       # Baseline Currency Strength Index filter for major pairs
     "csi_oil_threshold": 0.3          # Baseline Currency Strength Index filter for WTI Oil
 }
+
+# Hard limits to prevent AI Tuner from over-tightening and blocking all signals
+PARAM_LIMITS = {
+    "time_window":           {"min": 30,    "max": 120},   # Max 2 min window, not 5 min
+    "velocity_threshold":    {"min": 0.005, "max": 0.012}, # Max 0.012% - realistic market velocity
+    "whipsaw_sd_threshold":  {"min": 0.15,  "max": 0.5},   # Min 0.15% SD - instruments naturally diverge
+    "csi_macro_threshold":   {"min": 0.15,  "max": 0.3},
+    "csi_oil_threshold":     {"min": 0.2,   "max": 0.4},
+}
+
+def _clamp_params(params):
+    """Enforce hard limits on all parameters to prevent over-tightening."""
+    for key, limits in PARAM_LIMITS.items():
+        if key in params:
+            params[key] = max(limits["min"], min(limits["max"], params[key]))
+    return params
 
 def load_ai_params():
     """Load adaptive parameters from disk or initialize defaults."""
@@ -38,6 +54,9 @@ def load_ai_params():
                     params[k] = v
                     updated = True
             
+            # Always clamp to safe limits
+            params = _clamp_params(params)
+            
             if updated:
                 _save_params_internal(params)
                 
@@ -49,6 +68,7 @@ def load_ai_params():
 def save_ai_params(params):
     """Save the updated parameters to disk."""
     with _param_lock:
+        params = _clamp_params(params)
         _save_params_internal(params)
 
 def _save_params_internal(params):
@@ -62,15 +82,16 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
     """
     Self-learning function to adjust thresholds if winrate drops below target.
     This will be called periodically by the background thread.
+    Hard limits enforced via PARAM_LIMITS to prevent over-tightening.
     """
     params = load_ai_params()
     
     if current_winrate >= target_winrate:
-        # If we are doing great, we might slightly relax parameters to capture more trades
+        # Doing well — slightly relax parameters to capture more trades
         if params["time_window"] > 30:
             params["time_window"] -= 5
-        if params["velocity_threshold"] > 0.01:
-            params["velocity_threshold"] = round(params["velocity_threshold"] - 0.002, 4)
+        if params["velocity_threshold"] > 0.005:
+            params["velocity_threshold"] = round(params["velocity_threshold"] - 0.001, 4)
         if params.get("csi_macro_threshold", 0.2) < 0.3:
             params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) + 0.01, 3)
         if params.get("csi_oil_threshold", 0.3) < 0.4:
@@ -78,27 +99,25 @@ def tune_parameters_for_winrate(current_winrate, target_winrate=90.0):
         save_ai_params(params)
         return
         
+    # Winrate dropping — tighten slightly but respect hard limits
     
-    # If winrate is dropping, the market is likely getting choppier or we are entering false breakouts.
-    # We tighten the parameters to filter out more noise.
-    
-    # 1. Widen the time window to require longer sustained momentum (max 300s)
-    if params["time_window"] < 300:
-        params["time_window"] += 15
+    # 1. Widen the time window slightly (max 120s, NOT 300s)
+    if params["time_window"] < PARAM_LIMITS["time_window"]["max"]:
+        params["time_window"] += 5
         
-    # 2. Increase velocity threshold to require stronger moves (max 0.015%)
-    if params["velocity_threshold"] < 0.015:
-        params["velocity_threshold"] = round(params["velocity_threshold"] + 0.002, 4)
+    # 2. Increase velocity threshold slightly (max 0.012%, NOT 0.10%)
+    if params["velocity_threshold"] < PARAM_LIMITS["velocity_threshold"]["max"]:
+        params["velocity_threshold"] = round(params["velocity_threshold"] + 0.001, 4)
         
-    # 3. Increase whipsaw sensitivity (lower the threshold so we detect it earlier)
-    if params["whipsaw_sd_threshold"] > 0.005:
-        params["whipsaw_sd_threshold"] = round(params["whipsaw_sd_threshold"] - 0.001, 4)
+    # 3. Tighten whipsaw sensitivity — but keep floor at 0.15% so normal divergence doesn't trigger
+    if params["whipsaw_sd_threshold"] > PARAM_LIMITS["whipsaw_sd_threshold"]["min"]:
+        params["whipsaw_sd_threshold"] = round(params["whipsaw_sd_threshold"] - 0.01, 3)
         
-    # 4. Tighten CSI thresholds to block trades against even minor opposing macro trends
-    if params.get("csi_macro_threshold", 0.2) > 0.1:
-        params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) - 0.02, 3)
-    if params.get("csi_oil_threshold", 0.3) > 0.15:
-        params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) - 0.02, 3)
+    # 4. Tighten CSI thresholds slightly
+    if params.get("csi_macro_threshold", 0.2) > PARAM_LIMITS["csi_macro_threshold"]["min"]:
+        params["csi_macro_threshold"] = round(params.get("csi_macro_threshold", 0.2) - 0.01, 3)
+    if params.get("csi_oil_threshold", 0.3) > PARAM_LIMITS["csi_oil_threshold"]["min"]:
+        params["csi_oil_threshold"] = round(params.get("csi_oil_threshold", 0.3) - 0.01, 3)
         
     save_ai_params(params)
-    print(f"[AI Tuner] Adaptive adjustment applied: tightened parameters to recover winrate. New params: {params}")
+    print(f"[AI Tuner] Adaptive adjustment applied. New params: {params}")

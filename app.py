@@ -822,10 +822,10 @@ def _compute_dashboard_data():
                                     macro_blocked = True
                                     
                             if not macro_blocked:
-                                # Use per-instrument trend from daily chg_pct as primary signal
-                                # This prevents cross-instrument basket averaging from cancelling signals
-                                inst_trend_bull = chg_pct > ai_params["velocity_threshold"] * 100
-                                inst_trend_bear = chg_pct < -(ai_params["velocity_threshold"] * 100)
+                                # Per-instrument trend: simply use direction of daily chg_pct
+                                # A move > 0.05% is considered directional (velocity filter already handled above)
+                                inst_trend_bull = chg_pct > 0.05
+                                inst_trend_bear = chg_pct < -0.05
                                 trend_ok_bull = "BULLISH" in current_trend or inst_trend_bull
                                 trend_ok_bear = "BEARISH" in current_trend or inst_trend_bear
                                 if is_accel_bull and trend_ok_bull:
