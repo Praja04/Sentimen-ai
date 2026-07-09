@@ -150,10 +150,18 @@ def process_auto_trades(recs):
                         "type_time": mt5.ORDER_TIME_GTC,
                         "type_filling": mt5.ORDER_FILLING_IOC,
                     }
-                    res = mt5.order_send(request)
+                    # Auto-retry all filling modes supported by broker
+                    res = None
+                    for filling in [mt5.ORDER_FILLING_FOK, mt5.ORDER_FILLING_IOC, mt5.ORDER_FILLING_RETURN]:
+                        request["type_filling"] = filling
+                        res = mt5.order_send(request)
+                        if res and res.retcode == mt5.TRADE_RETCODE_DONE:
+                            break
                     if res and res.retcode == mt5.TRADE_RETCODE_DONE:
-                        msg = f"⚠️ <b>AUTO CLOSE ({action})</b>\nSymbol: {active_symbol}\nPrice: {close_price}"
+                        msg = f"Auto Close ({action}) {active_symbol} @ {close_price}"
                         send_telegram_alert(msg)
+                    else:
+                        print(f"[AutoTrade Error] Close {active_symbol}: {res.comment if res else mt5.last_error()}")
                     continue
 
                 # Auto Break-Even & Trailing Stop Logic
@@ -222,14 +230,23 @@ def process_auto_trades(recs):
                 "type_filling": mt5.ORDER_FILLING_IOC,
             }
             
-            res = mt5.order_send(request)
+            # Auto-retry all filling modes to support all brokers
+            res = None
+            for filling in [mt5.ORDER_FILLING_FOK, mt5.ORDER_FILLING_IOC, mt5.ORDER_FILLING_RETURN]:
+                request["type_filling"] = filling
+                res = mt5.order_send(request)
+                if res and res.retcode == mt5.TRADE_RETCODE_DONE:
+                    break
+            
             if res and res.retcode == mt5.TRADE_RETCODE_DONE:
                 _executed_signals[sig_id] = time.time()
-                icon = "🟢" if action == "BUY" else "🔴"
-                msg = f"{icon} <b>AUTO {action} EXECUTION</b>\nSymbol: {active_symbol}\nLot: {lot}\nEntry: {price}\nSL: {sl}\nTP: {tp}\nConfidence: {conf}%"
+                direction = "BUY" if action == "BUY" else "SELL"
+                msg = f"AUTO {direction} EXECUTED\nSymbol: {active_symbol}\nLot: {lot}\nEntry: {price}\nSL: {sl}\nTP: {tp}\nConf: {conf}%"
                 send_telegram_alert(msg)
+                print(f"[AutoTrade OK] {active_symbol} {action} lot={lot} entry={price} filling={request['type_filling']}")
             else:
-                print(f"[AutoTrade Error] {active_symbol} {action}: {res.comment if res else mt5.last_error()}")
+                err = res.comment if res else mt5.last_error()
+                print(f"[AutoTrade Error] {active_symbol} {action}: {err}")
 
 XEDY_DATABASE_PATH = r"C:\Antigravity\xedy_v30_data.json"
 
