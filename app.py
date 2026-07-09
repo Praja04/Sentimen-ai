@@ -587,10 +587,7 @@ def _compute_dashboard_data():
         
     symbols = {
         "XAUUSD": ["XAUUSD", "GOLD"],
-        "USDJPY": ["USDJPY"],
-        "WTI OIL": ["WTI", "XTIUSD", "USOIL", "CL"],
-        "EURUSD": ["EURUSD"],
-        "GBPUSD": ["GBPUSD"]
+        "USDJPY": ["USDJPY"]
     }
     
     rates_dict = {}
