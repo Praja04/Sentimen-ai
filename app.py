@@ -981,7 +981,9 @@ def _compute_dashboard_data():
                            "★★★★"  if abs_chg > q_th[1] else
                            "★★★"   if abs_chg > q_th[2] else
                            "★★"    if abs_chg > q_th[3] else "★")
-                               # --- NEW SIGNAL OVERHAUL BASED ON QUANTITATIVE OPTIMIZATION ---
+                            # --- SIGNAL LOGIC: RSI + SMA Momentum (Scalper T0.22 aligned) ---
+                # Initialize confidence before use
+                confidence = 50.0
                 global confidence_history, last_trade_time
                 if sym not in confidence_history:
                     confidence_history[sym] = []
@@ -1014,16 +1016,21 @@ def _compute_dashboard_data():
                             rs = avg_gain / avg_loss
                             rsi_val = 100.0 - (100.0 / (1.0 + rs))
                             
-                        # Apply optimized parameters: RSI Buy < 45, RSI Sell > 55 with SMA trend direction
-                        if rsi_val < 45.0 and sma_10 > sma_30:
+                        # Apply optimized parameters aligned with Scalper T0.22:
+                        # BUY  : RSI < 48 AND fast SMA above slow (momentum turning up)
+                        # SELL : RSI > 52 AND fast SMA below slow (momentum turning down)
+                        if rsi_val < 48.0 and sma_10 > sma_30:
                             action = "BUY"
-                            confidence = round(min(99.0, 50.0 + (45.0 - rsi_val) * 2.2), 0)
-                        elif rsi_val > 55.0 and sma_10 < sma_30:
+                            confidence = round(min(99.0, 50.0 + (48.0 - rsi_val) * 2.5), 0)
+                        elif rsi_val > 52.0 and sma_10 < sma_30:
                             action = "SELL"
-                            confidence = round(min(99.0, 50.0 + (rsi_val - 55.0) * 2.2), 0)
+                            confidence = round(min(99.0, 50.0 + (rsi_val - 52.0) * 2.5), 0)
                         else:
                             action = "WAIT"
-                            confidence = 50.0
+                            confidence = round(50.0 + abs(rsi_val - 50.0) * 0.5, 0)  # partial confidence even on WAIT
+                        
+                        # Update confidence history with resolved confidence
+                        confidence_history[sym][-1] = confidence
                 else:
                     # Fallback logic for other symbols
                     hist = confidence_history[sym]
