@@ -1026,8 +1026,32 @@ def _compute_dashboard_data():
                             action = "SELL"
                             confidence = round(min(99.0, 50.0 + (rsi_val - 52.0) * 2.5), 0)
                         else:
-                            action = "WAIT"
-                            confidence = round(50.0 + abs(rsi_val - 50.0) * 0.5, 0)  # partial confidence even on WAIT
+                            # --- FALLBACK: use 1H momentum when RSI is neutral ---
+                            # Fetch H1 rates to determine short-term bias direction
+                            rates_h1 = mt5.copy_rates_from_pos(sym, mt5.TIMEFRAME_H1, 0, 3)
+                            if rates_h1 is not None and len(rates_h1) >= 2:
+                                h1_now  = rates_h1[-1]['close']
+                                h1_prev = rates_h1[-2]['close']
+                                if h1_now > h1_prev:
+                                    action = "BUY"
+                                    confidence = round(50.0 + abs(rsi_val - 50.0) * 1.2, 0)
+                                elif h1_now < h1_prev:
+                                    action = "SELL"
+                                    confidence = round(50.0 + abs(rsi_val - 50.0) * 1.2, 0)
+                                else:
+                                    action = "WAIT"
+                                    confidence = round(50.0 + abs(rsi_val - 50.0) * 0.5, 0)
+                            else:
+                                # Final fallback: use daily chg_pct
+                                if chg_pct > 0.02:
+                                    action = "BUY"
+                                    confidence = round(52.0 + min(chg_pct * 5, 15), 0)
+                                elif chg_pct < -0.02:
+                                    action = "SELL"
+                                    confidence = round(52.0 + min(abs(chg_pct) * 5, 15), 0)
+                                else:
+                                    action = "WAIT"
+                                    confidence = 50.0
                         
                         # Update confidence history with resolved confidence
                         confidence_history[sym][-1] = confidence
@@ -1266,15 +1290,15 @@ def _compute_dashboard_data():
             target_sl = _stop_atr * atr * sl_multiplier
             target_tp = target_sl * rr * gap_multiplier
             
-            if action == "BUY":
+            # Always compute SL/TP using direction reference (never return null)
+            # If action is WAIT, use BUY direction as reference for display purposes
+            atr_action = action if action in ["BUY", "SELL"] else "BUY"
+            if atr_action == "BUY":
                 sl = round(entry - target_sl, digits)
                 tp = round(entry + target_tp, digits)
-            elif action == "SELL":
+            else:  # SELL
                 sl = round(entry + target_sl, digits)
                 tp = round(entry - target_tp, digits)
-            else:
-                sl = None
-                tp = None
             return {
                 "entry": entry,
                 "sl":    sl,
