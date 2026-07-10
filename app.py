@@ -431,7 +431,7 @@ def process_auto_trades(recs):
                 "type": order_type,
                 "price": float(price),
                 "sl": float(sl),
-                "tp": 0.0,
+                "tp": float(tp),
                 "deviation": 20,
                 "magic": 998877,
                 "comment": "AI AutoTrade",
