@@ -1,18 +1,18 @@
 {
     "timeframe": "M5",
-    "risk_percent": 1.0,
+    "risk_percent": 4.0,
     "strategy_type": "xedy_scalper",
-    "strategy_name": "AI XEDY_V31 Scalper T0.32 S0.6",
-    "sl_dist": 15.0,
-    "tp_dist": 18.0,
-    "win_rate": 54.55,
-    "max_drawdown": 6.64,
-    "net_profit": 635.51,
+    "strategy_name": "AI XEDY_V31 Scalper T0.22 S0.6",
+    "sl_dist": 12.0,
+    "tp_dist": 14.4,
+    "win_rate": 56.52,
+    "max_drawdown": 21.52,
+    "net_profit": 7373.67,
     "parameters": {
         "max_hold_bars": 15,
-        "risk_pct": 1.0,
+        "risk_pct": 4.0,
         "rr": 1.2,
         "stop_atr": 0.6,
-        "threshold": 0.32
+        "threshold": 0.22
     }
 }

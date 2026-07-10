@@ -1140,10 +1140,30 @@ def _compute_dashboard_data():
 
     # ── Intermarket Indices ─────────────────────────────────────────────────────
 
-    def get_atr_sl_tp(sym_opts, action, atr_periods=14, rr=2.0):
-        """Fetch ATR from H4 candles, return entry/sl/tp/atr rounded appropriately with adaptive AI self-learning."""
+    def get_atr_sl_tp(sym_opts, action, atr_periods=14, rr=None):
+        """Fetch ATR from H4 candles, return entry/sl/tp/atr rounded appropriately with adaptive AI self-learning.
+        
+        RR and stop_atr are loaded from active_config.json to stay in sync with the active strategy
+        (e.g. AI XEDY_V31 Scalper T0.22 S0.6 with rr=1.2, stop_atr=0.6).
+        """
         import sqlite3
         db_path = r"C:\Antigravity\forecast_history.db"
+        
+        # --- Load optimal rr and stop_atr from active_config.json ---
+        _config_file = r'C:\Antigravity\active_config.json'
+        _stop_atr = 0.6  # default: optimal Juli 2026
+        if rr is None:
+            rr = 1.2      # default: optimal Juli 2026
+        try:
+            if os.path.exists(_config_file):
+                with open(_config_file, 'r', encoding='utf-8') as _cf:
+                    _cfg = json.load(_cf)
+                    _params = _cfg.get('parameters', {})
+                    rr = float(_params.get('rr', rr))
+                    _stop_atr = float(_params.get('stop_atr', _stop_atr))
+        except Exception:
+            pass
+        
         win_rate = 92.5
         avg_mae_pct = 0.0
         avg_mfe_pct = 0.0
@@ -1233,9 +1253,11 @@ def _compute_dashboard_data():
             digits = info.digits if info.digits else 5
             entry = round(tick.bid, digits)
             
-            # Apply adaptive multipliers (Optimized baseline: SL=2.0 * ATR, TP=2.0 * ATR)
-            target_tp = 2.0 * atr * gap_multiplier
-            target_sl = 2.0 * atr * sl_multiplier
+            # Apply adaptive multipliers using active strategy parameters
+            # stop_atr: controls SL distance as fraction of ATR (e.g. 0.6 = tight scalper SL)
+            # rr: target Risk/Reward ratio controlling TP distance (e.g. 1.2)
+            target_sl = _stop_atr * atr * sl_multiplier
+            target_tp = target_sl * rr * gap_multiplier
             
             if action == "BUY":
                 sl = round(entry - target_sl, digits)
