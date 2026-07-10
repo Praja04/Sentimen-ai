@@ -78,6 +78,41 @@ def calculate_lot_size(symbol, entry_price, sl_price, risk_pct=1.0, confidence=7
 
 # Global trackers for adaptive AI logic and order spamming prevention
 _executed_signals = {}
+
+def sync_live_trade_history():
+    if not init_mt5(): return
+    import sqlite3, datetime, time
+    to_date = datetime.datetime.now()
+    from_date = to_date - datetime.timedelta(days=7)
+    deals = mt5.history_deals_get(from_date, to_date)
+    if not deals: return
+    try:
+        conn = sqlite3.connect(r"C:\Antigravity\forecast_history.db")
+        c = conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS live_trade_history (
+                        ticket INTEGER PRIMARY KEY,
+                        symbol TEXT,
+                        profit REAL,
+                        is_win INTEGER,
+                        time_closed INTEGER
+                     )''')
+        new_trades = 0
+        for deal in deals:
+            if deal.magic == 998877 and deal.entry == mt5.DEAL_ENTRY_OUT:
+                is_win = 1 if deal.profit > 0 else 0
+                c.execute("SELECT ticket FROM live_trade_history WHERE ticket=?", (deal.ticket,))
+                if not c.fetchone():
+                    c.execute("INSERT INTO live_trade_history (ticket, symbol, profit, is_win, time_closed) VALUES (?, ?, ?, ?, ?)",
+                              (deal.ticket, deal.symbol, deal.profit, is_win, deal.time))
+                    new_trades += 1
+        conn.commit()
+        conn.close()
+        if new_trades > 0:
+            print(f"[Live Trade Sync] Synced {new_trades} new closed trades to history.")
+    except Exception as e:
+        # Ignore silent sqlite errors or print if debug
+        pass
+
 confidence_history = {}
 last_trade_time = {}
 active_trades_meta = {}
@@ -233,10 +268,24 @@ def process_auto_trades(recs):
                     import sqlite3
                     conn = sqlite3.connect(r"C:\Antigravity\forecast_history.db")
                     c = conn.cursor()
-                    c.execute("SELECT correct FROM predictions WHERE evaluated = 1 ORDER BY timestamp DESC LIMIT 50")
+                    
+                    c.execute('''CREATE TABLE IF NOT EXISTS live_trade_history (
+                                    ticket INTEGER PRIMARY KEY,
+                                    symbol TEXT,
+                                    profit REAL,
+                                    is_win INTEGER,
+                                    time_closed INTEGER
+                                 )''')
+                                 
+                    c.execute("SELECT is_win FROM live_trade_history ORDER BY time_closed DESC LIMIT 50")
                     rows = c.fetchall()
-                    if rows:
+                    if len(rows) >= 5:
                         win_rate = (sum(r[0] for r in rows) / len(rows)) * 100.0
+                    else:
+                        c.execute("SELECT correct FROM predictions WHERE evaluated = 1 ORDER BY timestamp DESC LIMIT 50")
+                        rows_pred = c.fetchall()
+                        if rows_pred:
+                            win_rate = (sum(r[0] for r in rows_pred) / len(rows_pred)) * 100.0
                     conn.close()
                 except Exception:
                     pass
@@ -322,7 +371,7 @@ def process_auto_trades(recs):
                                     "type": order_type,
                                     "price": float(price),
                                     "sl": float(grid_sl) if grid_sl > 0 else 0.0,
-                                    "tp": 0.0,
+                                    "tp": float(positions[0].tp) if positions[0].tp > 0 else 0.0,
                                     "deviation": 20,
                                     "magic": 998877,
                                     "comment": f"AI Grid #{len(positions) + 1}",
@@ -1204,10 +1253,28 @@ def _compute_dashboard_data():
                 conn = sqlite3.connect(db_path)
                 c = conn.cursor()
                 # Get win_rate
-                c.execute("SELECT correct FROM predictions WHERE evaluated = 1 ORDER BY timestamp DESC LIMIT 50")
-                rows = c.fetchall()
-                if rows:
-                    win_rate = (sum(r[0] for r in rows) / len(rows)) * 100.0
+                try:
+                    c.execute('''CREATE TABLE IF NOT EXISTS live_trade_history (
+                                    ticket INTEGER PRIMARY KEY,
+                                    symbol TEXT,
+                                    profit REAL,
+                                    is_win INTEGER,
+                                    time_closed INTEGER
+                                 )''')
+                    c.execute("SELECT is_win FROM live_trade_history ORDER BY time_closed DESC LIMIT 50")
+                    rows = c.fetchall()
+                    if len(rows) >= 5:
+                        win_rate = (sum(r[0] for r in rows) / len(rows)) * 100.0
+                    else:
+                        c.execute("SELECT correct FROM predictions WHERE evaluated = 1 ORDER BY timestamp DESC LIMIT 50")
+                        rows_pred = c.fetchall()
+                        if rows_pred:
+                            win_rate = (sum(r[0] for r in rows_pred) / len(rows_pred)) * 100.0
+                except:
+                    c.execute("SELECT correct FROM predictions WHERE evaluated = 1 ORDER BY timestamp DESC LIMIT 50")
+                    rows = c.fetchall()
+                    if rows:
+                        win_rate = (sum(r[0] for r in rows) / len(rows)) * 100.0
                 
                 # Fetch recent MAE/MFE metrics for evaluated trades to optimize parameters
                 c.execute("""
@@ -1553,38 +1620,57 @@ def api_winrate():
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
         
-        # Overall winrate from last 100 evaluated predictions
-        c.execute("""
-            SELECT COUNT(*), SUM(correct) FROM predictions
-            WHERE evaluated=1
-            ORDER BY timestamp DESC
-            LIMIT 100
-        """)
-        row = c.fetchone()
-        total_eval = row[0] or 0
-        total_correct = int(row[1] or 0)
+        # Create table if missing first before querying to avoid errors
+        c.execute('''CREATE TABLE IF NOT EXISTS live_trade_history (
+                        ticket INTEGER PRIMARY KEY,
+                        symbol TEXT,
+                        profit REAL,
+                        is_win INTEGER,
+                        time_closed INTEGER
+                     )''')
+                     
+        # Get real MT5 trades from live_trade_history
+        c.execute("SELECT COUNT(*), SUM(is_win) FROM live_trade_history")
+        row_real = c.fetchone()
+        real_trades = row_real[0] or 0
+        real_correct = int(row_real[1] or 0)
         
-        # Per-symbol winrates (last 20 each)
-        c.execute("""
-            SELECT symbol, COUNT(*), SUM(correct)
-            FROM predictions
-            WHERE evaluated=1
-            GROUP BY symbol
-            ORDER BY MAX(timestamp) DESC
-        """)
-        sym_rows = c.fetchall()
-        conn.close()
+        # Get simulated trades from predictions
+        c.execute("SELECT COUNT(*), SUM(correct) FROM predictions WHERE evaluated=1")
+        row_sim = c.fetchone()
+        total_eval = row_sim[0] or 0
+        total_correct = int(row_sim[1] or 0)
         
+        source = "backtest"
+        if real_trades >= 5:
+            overall_wr = round((real_correct / real_trades) * 100, 1)
+            source = "real_mt5"
+        elif real_trades > 0 and total_eval > 0:
+            real_wr = (real_correct / real_trades) * 100.0
+            sim_wr = (total_correct / total_eval) * 100.0
+            overall_wr = round((real_wr * real_trades + sim_wr * 20) / (real_trades + 20), 1)
+            source = "mixed"
+        elif total_eval > 0:
+            overall_wr = round((total_correct / total_eval) * 100, 1)
+        else:
+            overall_wr = 92.5
+            
+        # Per-symbol winrates (combine real and sim)
         per_symbol = {}
+        c.execute("SELECT symbol, COUNT(*), SUM(is_win) FROM live_trade_history GROUP BY symbol")
+        sym_rows = c.fetchall()
         for sym, cnt, cor in sym_rows:
-            if cnt and cnt > 0:
+            if cnt and cnt >= 3:
                 per_symbol[sym] = round((int(cor or 0) / cnt) * 100, 1)
         
-        if total_eval == 0:
-            # No evaluated data yet, use optimistic default
-            overall_wr = 92.5
-        else:
-            overall_wr = round((total_correct / total_eval) * 100, 1)
+        # Fallback to predictions for symbols not in real trades
+        c.execute("SELECT symbol, COUNT(*), SUM(correct) FROM predictions WHERE evaluated=1 GROUP BY symbol")
+        sym_rows_sim = c.fetchall()
+        for sym, cnt, cor in sym_rows_sim:
+            if sym not in per_symbol and cnt and cnt > 0:
+                per_symbol[sym] = round((int(cor or 0) / cnt) * 100, 1)
+                
+        conn.close()
             
         # ── AUTO ADAPTIVE TUNING ──────────────────────────────────────────────────
         try:
@@ -1603,6 +1689,9 @@ def api_winrate():
             "achieved": achieved,
             "evaluated": total_eval,
             "correct": total_correct,
+            "real_trades": real_trades,
+            "real_winrate": round((real_correct / real_trades) * 100, 1) if real_trades > 0 else 0.0,
+            "source": source,
             "recovery_gap": round(recovery_gap, 1),
             "per_symbol": per_symbol
         })
@@ -4824,6 +4913,7 @@ if __name__ == '__main__':
         
         # Schedulers matching ai_engine.py
         schedule.every(1).minutes.do(ai_engine.run_live_price_update)
+        schedule.every(1).minutes.do(sync_live_trade_history)
         schedule.every(15).minutes.do(ai_engine.run_news_update)
         schedule.every(2).hours.do(ai_engine.run_claude_4h_forecast)
         schedule.every(1).hours.do(ai_engine.run_claude_daily_macro)
