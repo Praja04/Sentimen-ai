@@ -29,7 +29,7 @@ def send_telegram_alert(msg):
     except Exception as e:
         print(f"[Telegram Error] {e}")
 
-def calculate_lot_size(symbol, entry_price, sl_price, risk_pct=1.0, confidence=70.0):
+def calculate_lot_size(symbol, entry_price, sl_price, risk_pct=1.0, confidence=70.0, bos_multiplier=1.0):
     if not init_mt5():
         return 0.01
     account_info = mt5.account_info()
@@ -41,7 +41,7 @@ def calculate_lot_size(symbol, entry_price, sl_price, risk_pct=1.0, confidence=7
     # Baseline confidence is 70%. If confidence is 90%, multiplier = 1.3. If confidence is 50%, multiplier = 0.7.
     conf_factor = float(confidence) / 70.0
     conf_factor = max(0.5, min(1.5, conf_factor))
-    effective_risk_pct = risk_pct * conf_factor
+    effective_risk_pct = risk_pct * conf_factor * bos_multiplier
     
     risk_money = balance * (effective_risk_pct / 100.0)
     
@@ -470,7 +470,38 @@ def process_auto_trades(recs):
             if not tp:
                 tp = (price_now + (2.0 * atr_val)) if action == "BUY" else (price_now - (2.0 * atr_val))
                 
-            lot = calculate_lot_size(active_symbol, entry, sl, risk_pct=risk_pct, confidence=conf)
+            bos_multiplier = 1.0
+            try:
+                # BOS (Break of Structure) Logic: check if price breaks 24-period H1 High/Low
+                rates_h1 = mt5.copy_rates_from_pos(active_symbol, mt5.TIMEFRAME_H1, 1, 24)
+                if rates_h1 is not None and len(rates_h1) > 0:
+                    recent_high = max([r['high'] for r in rates_h1])
+                    recent_low = min([r['low'] for r in rates_h1])
+                    
+                    trend_info = _dynamic_trend_state.get("current_trend", "NEUTRAL")
+                    is_whipsaw = _dynamic_trend_state.get("is_whipsaw", False)
+                    
+                    # If Action is BUY and price breaks recent high
+                    if action == "BUY" and price_now > recent_high:
+                        if "BULLISH" in trend_info and not is_whipsaw:
+                            bos_multiplier = 2.5 # Strong Trend BOS: 2.5x lot size
+                            print(f"[BOS DETECTED] {active_symbol} BUY Breakout! Multiplier: 2.5x")
+                        elif is_whipsaw:
+                            bos_multiplier = 0.5 # Fakeout protection
+                            print(f"[FAKEOUT PROTECTED] {active_symbol} BUY Whipsaw! Multiplier: 0.5x")
+                    
+                    # If Action is SELL and price breaks recent low
+                    elif action == "SELL" and price_now < recent_low:
+                        if "BEARISH" in trend_info and not is_whipsaw:
+                            bos_multiplier = 2.5 # Strong Trend BOS: 2.5x lot size
+                            print(f"[BOS DETECTED] {active_symbol} SELL Breakout! Multiplier: 2.5x")
+                        elif is_whipsaw:
+                            bos_multiplier = 0.5 # Fakeout protection
+                            print(f"[FAKEOUT PROTECTED] {active_symbol} SELL Whipsaw! Multiplier: 0.5x")
+            except Exception as e:
+                print(f"[BOS Detection Error] {e}")
+
+            lot = calculate_lot_size(active_symbol, entry, sl, risk_pct=risk_pct, confidence=conf, bos_multiplier=bos_multiplier)
             order_type = mt5.ORDER_TYPE_BUY if action == "BUY" else mt5.ORDER_TYPE_SELL
             price = price_now
             
