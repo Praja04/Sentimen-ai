@@ -296,9 +296,10 @@ def process_auto_trades(recs):
                 if win_rate < 90.0:
                     atr_mult *= (1.0 + (90.0 - win_rate) * 0.02)
                 
-                tsl_buffer_points = atr_points * atr_mult
-                be_trigger_points = atr_points * 1.0
-                tsl_trigger_points = atr_points * atr_mult
+                # Highly aggressive lock-profit logic to prevent winning trades turning to losses
+                tsl_buffer_points = atr_points * 0.2
+                be_trigger_points = atr_points * 0.3
+                tsl_trigger_points = atr_points * 0.6
                 
                 profit_points = (current_price - open_price) / point if is_buy else (open_price - current_price) / point
                 
@@ -332,10 +333,10 @@ def process_auto_trades(recs):
 
             # 3. SMART ATR GRID AVERAGING ON FLOATING NEGATIVE
             if action in ["BUY", "SELL"]:
-                # Limit to 3 averaging positions per instrument (total 4 positions max)
-                max_grid = 4
+                # Limit to 2 averaging positions per instrument (total 3 positions max) to protect DD
+                max_grid = 3
                 if len(positions) < max_grid:
-                    grid_distance = atr_points * 1.25 # Dynamic grid distance: 1.25 H4 ATR
+                    grid_distance = atr_points * 0.8 # Dynamic grid distance: tighter 0.8 H4 ATR
                     
                     # Sort positions by entry price
                     sorted_pos = sorted(positions, key=lambda p: p.price_open)
@@ -1233,7 +1234,7 @@ def _compute_dashboard_data():
         _config_file = r'C:\Antigravity\active_config.json'
         _stop_atr = 0.6  # default: optimal Juli 2026
         if rr is None:
-            rr = 1.2      # default: optimal Juli 2026
+            rr = 1.0      # default: aggressive high winrate
         try:
             if os.path.exists(_config_file):
                 with open(_config_file, 'r', encoding='utf-8') as _cf:
